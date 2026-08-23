@@ -1,0 +1,13 @@
+# RStudio
+.Rproj.user/
+.Rhistory
+.RData
+.Ruserdata
+
+# Archivos temporales
+*.tmp
+*.log
+
+# Windows
+Thumbs.db
+Desktop.ini

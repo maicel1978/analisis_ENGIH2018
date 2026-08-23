@@ -1,0 +1,131 @@
+---
+title: "Visión y Arquitectura del Proyecto"
+subtitle: "ENGIH 2018 → Evidencia Nutricional para WFP"
+author: "Maicel E. Monzón"
+---
+
+# 1. Propósito
+
+Desarrollar una metodología reproducible para transformar datos de encuestas de hogares en evidencia nutricional útil para la toma de decisiones.
+
+La ENGIH 2018 de República Dominicana constituye el caso de aplicación inicial.
+
+Este documento define qué problema intenta resolver el proyecto y la ruta general para resolverlo.
+
+Para el estado diario del trabajo consultar `README.md`.
+
+---
+
+# 2. Problema
+
+Las Encuestas de Gasto y Consumo de Hogares (HCES) contienen información valiosa sobre alimentación, pero normalmente no producen estimaciones directas de:
+
+- Consumo alimentario.
+- Ingesta de micronutrientes.
+- Riesgo de inadecuación.
+- Cobertura de programas de fortificación.
+
+El objetivo del proyecto es construir una metodología que permita generar esos indicadores de forma reproducible.
+
+---
+
+# 3. Preguntas estratégicas para WFP
+
+1. ¿Qué micronutrientes presentan mayor riesgo de ingesta inadecuada?
+2. ¿Qué grupos poblacionales son más vulnerables?
+3. ¿Qué alimentos aportan la mayor proporción de micronutrientes clave?
+4. ¿Qué cobertura tienen los principales vehículos de fortificación?
+5. ¿Qué grupos quedan fuera del alcance de las intervenciones actuales?
+6. ¿Cuál sería la contribución potencial de diferentes escenarios de fortificación?
+
+---
+
+# 4. Marco metodológico y decisiones de alcance
+
+*(Sección nueva — ancla de qué se sigue y qué queda fuera, para no reabrir la discusión en cada fase)*
+
+- **Núcleo (todo lo demás depende de esto):** Guía MIMI/WFP (dic. 2025), *Modelo de Base — Cálculos de consumo*. Fórmula: `Consumo diario (g) = Q × FC × PC / PM`. Sin este cálculo bien hecho, ningún indicador de las fases siguientes es confiable.
+- **Capa de análisis y modelado, construida sobre el núcleo:** marco de Tang et al. (2021, Malawi) — cobertura de vehículos, densidad de nutrientes (por 1000 kcal), consumo aparente por AFE, escenarios de fortificación, equidad por subpoblación. No reemplaza a MIMI; consume su salida (gramos/día por alimento y hogar).
+- **Tabla de composición de alimentos:** INCAP. ("TCA" se usa como sigla genérica; en este proyecto siempre se refiere a INCAP.)
+- **Registro de decisiones del crosswalk:** vive dentro de `crosswalk_variedad_INCAP.xlsx` (columnas `ENHANCE_ID_final`, `tipo_equivalencia`, `validado`, `notas`), no en un archivo aparte. No se mantiene `decisiones_crosswalk.md`.
+- **Fuera de alcance en esta iteración:** Sección 3B de la ENGIH (alimentos preparados fuera del hogar). Requiere factores de receta/rendimiento que no están construidos. Es una decisión, no un olvido — revisar si el TdR lo exige explícitamente.
+
+---
+
+# 5. Hoja de ruta
+
+## Importar
+
+*(Fase activa — ver `README.md` para el estado del día a día)*
+
+Scripts: `/scripts/01_import.R` → `/scripts/05_join_incap.R`
+
+Objetivo: Construir el dataset unido (ENGIH + INCAP) que alimenta el cálculo.
+
+Incluye:
+
+1. Importar ENGIH Sección 2 (inventario despensa/refrigerador) y Sección 3A (adquisiciones diarias del hogar) — `01_import.R`.
+2. Identificar las variables críticas: Q (cantidad registrada), FC (factor de conversión a gramos), PC (porción comestible), PM (periodo de medición).
+3. Left join de Sección 3A con dos tablas puente — `05_join_incap.R`:
+   - `id_variedad` → `ENHANCE_ID_final` (`crosswalk_variedad_INCAP.xlsx`). Las decisiones de equivalencia viven en sus propias columnas (`tipo_equivalencia`, `validado`, `notas`); no hay archivo de decisiones aparte.
+   - `id_unidad_medida` → `fc_gramos` (`data_raw_unidades.xlsx`). Cubre unidades genéricas (kg, lb, taza, docena, etc.); el código "Unidad" (piezas/cabezas) queda fuera de esta tabla porque el gramaje depende del alimento — se resuelve como PC/FC específico por alimento, no aquí.
+
+Salidas:
+- `data/raw/data_raw_sec2.csv`, `data/raw/data_raw_sec3a.csv`
+- Dataset unido Sección 3A + crosswalk + conversión de unidades (input directo de Transformar)
+
+## Limpieza y Análisis Exploratorio de Datos (EDA)
+
+Script: `/scripts/02_eda.R`
+
+Objetivo: Validar la calidad de los datos crudos, antes del join.
+
+Incluye:
+- Detección de atípicos por alimento (percentiles P1–P99), no por IQR global.
+- Alimentos con menos del umbral mínimo de registros → marcados "no evaluable".
+- `dlookr` con versión fijada (fue removido de CRAN).
+
+## Transformar
+
+Objetivo: Convertir el dataset unido en consumo diario y en aporte de nutrientes, y controlar su calidad.
+
+Incluye:
+- Cálculo: `Q × FC × PC / PM` → gramos/día por alimento y hogar.
+- Equivalente de mujer adulta (AFE) y de hombre adulto (AME) a partir de la composición demográfica del hogar.
+- Aporte de micronutrientes por hogar vía `ENHANCE_ID_final`.
+- Densidad de nutrientes (micronutriente / 1000 kcal) y consumo aparente por AFE (Tang et al. 2021).
+- Limpieza y ajuste posterior al cálculo: detección de atípicos en gramos/día ya calculados, verificación de distribución (guía MIMI, paso 7) — distinto del EDA sobre datos crudos, que ya ocurrió antes del join.
+
+## Analizar
+
+Objetivo: Responder las preguntas estratégicas (§3) con los dos indicadores de Transformar. Cada cálculo se etiqueta con la(s) pregunta(s) que responde, para poder verificar cobertura de forma objetiva.
+
+Incluye:
+- Adecuación: consumo aparente y densidad de nutrientes frente a umbrales de referencia (H-AR / CND) → **P1**.
+- Alimentos que más aportan a cada micronutriente clave → **P3**.
+- Cobertura: % de hogares que consumen cada vehículo de fortificación (arroz, aceite, harina, azúcar) → **P4**.
+- Equidad: comparación por quintil de gasto, zona urbana/rural, región → **P2, P5**.
+
+## Modelar
+
+Objetivo: Evaluar contrafactuales de fortificación sobre la adecuación → **P6**.
+
+Incluye:
+- Escenarios: sin fortificación / fortificación actual / cumplimiento mejorado.
+- Estacionalidad de la densidad y el consumo aparente, si la fecha de encuesta lo permite.
+
+## Comunicar
+
+Objetivo: Convertir resultados en evidencia utilizable.
+
+Incluye:
+- Reportes.
+- Visualizaciones.
+- Productos para WFP.
+- Material educativo.
+
+---
+
+# 6. Principio rector
+
+Cada fase se cierra y se documenta (código, salida, decisión) antes de abrir la siguiente. La ENGIH es el caso de aplicación; la metodología reproducible es el entregable.
