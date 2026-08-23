@@ -4,10 +4,25 @@
 .RData
 .Ruserdata
 
+# Quarto
+.quarto/
+
 # Archivos temporales
 *.tmp
 *.log
 
 # Windows
 Thumbs.db
-Desktop.ini
+De*ktop.ini
+
+# Salidas de R
+.Rproj.us*r
+.Rhistory
+.RData
+
+# Cache
+_cache*
+_cache
+
+# Data grandes
+data/raw/*.xlsx
