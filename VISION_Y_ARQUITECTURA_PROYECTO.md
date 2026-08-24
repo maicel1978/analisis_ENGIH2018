@@ -10,9 +10,9 @@ Transformar datos de encuestas de hogares en evidencia nutricional útil para la
 
 La ENGIH 2018 de República Dominicana constituye el caso de aplicación de una metodología reproducible.
 
-Este documento define el Problema y las Preguntas estratégicas  y la ruta general para resolverlo.
+Este documento define el problema, las preguntas estratégicas y la ruta general para resolverlo.
 
-Para el estado diario del trabajo consultar `README.md`.
+Para el estado operativo y los próximos pasos consultar `README.md`.
 
 ---
 
@@ -29,7 +29,7 @@ El objetivo del proyecto es construir una metodología que permita generar esos 
 
 ---
 
-# 3. Preguntas estratégicas 
+# 3. Preguntas estratégicas
 
 1. ¿Qué micronutrientes presentan mayor riesgo de ingesta inadecuada?
 2. ¿Qué grupos poblacionales son más vulnerables?
@@ -42,12 +42,183 @@ El objetivo del proyecto es construir una metodología que permita generar esos 
 
 # 4. Marco metodológico y decisiones de alcance
 
+- **Núcleo (todo lo demás depende de esto):** Guía MIMI/WFP (dic. 2025), *Modelo de Base — Cálculos de consumo*. Fórmula:
 
-- **Núcleo (todo lo demás depende de esto):** Guía MIMI/WFP (dic. 2025), *Modelo de Base — Cálculos de consumo*. Fórmula: `Consumo diario (g) = Q × FC × PC / PM`. Sin este cálculo bien hecho, ningún indicador de las fases siguientes es confiable.
-- **Capa de análisis y modelado, construida sobre el núcleo:** marco de Tang et al. (2021, Malawi) — cobertura de vehículos, densidad de nutrientes (por 1000 kcal), consumo aparente por AFE, escenarios de fortificación, equidad por subpoblación. No reemplaza a MIMI; consume su salida (gramos/día por alimento y hogar).
-- **Tabla de composición de alimentos:** INCAP. ("TCA" se usa como sigla genérica; en este proyecto siempre se refiere a INCAP.)
-- **Registro de decisiones del crosswalk:** vive dentro de `crosswalk_variedad_INCAP.xlsx` (columnas `ENHANCE_ID_final`, `tipo_equivalencia`, `validado`, `notas`), no en un archivo aparte. No se mantiene `decisiones_crosswalk.md`.
-- **Fuera de alcance en esta iteración:** Sección 3B de la ENGIH (alimentos preparados fuera del hogar). Requiere factores de receta/rendimiento que no están construidos. Es una decisión, no un olvido — revisar si el TdR lo exige explícitamente.
+```text
+Consumo diario (g) = Q × FC × PC / PM
+```
+
+Sin este cálculo bien hecho, ningún indicador de las fases siguientes es confiable.
+
+- **Capa de análisis y modelado, construida sobre el núcleo:** marco de Tang et al. (2021, Malawi). Incluye cobertura de vehículos de fortificación, densidad de nutrientes (por 1000 kcal), consumo aparente por AFE, escenarios de fortificación y análisis de equidad. No reemplaza a MIMI; consume sus resultados.
+
+- **Tabla de composición de alimentos (fase actual):** INCAP.
+
+"TCA" se utiliza como término genérico para cualquier tabla de composición de alimentos. Durante la fase actual del proyecto la fuente principal es INCAP, aunque la arquitectura contempla la incorporación futura de otras fuentes (USDA, FNDDS u otras) cuando existan vacíos de cobertura.
+
+- **Registro de decisiones del crosswalk:** vive dentro del propio archivo de trabajo del crosswalk (columnas `ENHANCE_ID_final`, `tipo_equivalencia`, `validado` y `notas`). No se mantiene un archivo adicional de decisiones.
+
+- **Fuera de alcance en esta iteración:** Sección 3B de la ENGIH (alimentos preparados fuera del hogar). Requiere factores de receta y rendimiento que todavía no están construidos. Es una decisión metodológica explícita, no un olvido. Revisar únicamente si el TdR exige su inclusión.
+
+## Arquitectura de tablas de composición y crosswalks
+
+La ENGIH contiene alimentos que no siempre están representados adecuadamente en una única tabla de composición nutricional.
+
+Por esta razón, la curación manual se realizará por fuente.
+
+Ejemplos:
+
+```text
+crosswalk_variedad_INCAP.xlsx
+crosswalk_variedad_USDA.xlsx
+crosswalk_variedad_FNDDS.xlsx
+```
+
+Cada crosswalk se mantiene de forma independiente durante la etapa de construcción y validación para facilitar:
+
+- Auditoría manual.
+- Trazabilidad de decisiones.
+- Revisión experta.
+- Control de calidad por fuente.
+
+Durante esta etapa cada archivo puede evolucionar de forma independiente.
+
+Ejemplo:
+
+```text
+crosswalk_variedad_INCAP.xlsx
+```
+
+contiene únicamente asignaciones validadas contra la tabla INCAP.
+
+Posteriormente podrán existir otros crosswalks para alimentos que INCAP no cubra adecuadamente.
+
+Ejemplos:
+
+```text
+Mayonesa
+Vinagres
+Malta
+Caldo de pollo concentrado
+Caldo de pollo en polvo
+Aderezos comerciales
+```
+
+La existencia de múltiples crosswalks es únicamente una estrategia de construcción y mantenimiento.
+
+## Principio rector de integración
+
+Los scripts analíticos no deben depender directamente de:
+
+```text
+INCAP
+USDA
+FNDDS
+```
+
+Los scripts deben depender de una capa de abstracción única.
+
+Antes de ejecutar los análisis nutricionales se generará automáticamente una tabla consolidada:
+
+```text
+crosswalk_variedad_MASTER.xlsx
+```
+
+Esta será la única tabla puente utilizada por los procesos analíticos.
+
+No debe editarse manualmente.
+
+Será producida automáticamente a partir de los crosswalks específicos por fuente.
+
+La estructura conceptual esperada es:
+
+```text
+id_variedad
+descripcion_engih
+fuente_composicion
+id_composicion
+tipo_equivalencia
+validado
+```
+
+Ejemplo:
+
+```text
+367 | Habichuelas negras secas | INCAP | 70209060 | directa | TRUE
+541 | Mayonesa                | USDA  | XXXXXXX  | directa | TRUE
+649 | Malta                   | USDA  | XXXXXXX  | sustituto_por_criterio | TRUE
+```
+
+## Tabla maestra de composición nutricional
+
+La misma lógica se aplicará a las tablas de composición.
+
+Fuentes:
+
+```text
+food_composition_INCAP.xlsx
+food_composition_USDA.xlsx
+food_composition_FNDDS.xlsx
+```
+
+serán armonizadas posteriormente en una única tabla:
+
+```text
+food_composition_MASTER
+```
+
+Preferiblemente en formato Parquet.
+
+La armonización deberá estandarizar:
+
+- Identificadores.
+- Energía.
+- Macronutrientes.
+- Micronutrientes.
+- Factores de porción comestible.
+- Nombres de variables.
+- Unidades de medida.
+
+El objetivo es que las fases posteriores del pipeline no necesiten conocer la fuente original de cada alimento.
+
+## Regla de gobernanza
+
+Se editan manualmente:
+
+```text
+crosswalk_variedad_INCAP.xlsx
+crosswalk_variedad_USDA.xlsx
+crosswalk_variedad_FNDDS.xlsx
+```
+
+Se generan automáticamente:
+
+```text
+crosswalk_variedad_MASTER.xlsx
+food_composition_MASTER
+```
+
+## Decisión arquitectónica congelada
+
+Durante la etapa de construcción se mantendrán crosswalks separados por fuente.
+
+Antes de los análisis definitivos se generará automáticamente:
+
+```text
+crosswalk_variedad_MASTER.xlsx
+```
+
+y una:
+
+```text
+food_composition_MASTER
+```
+
+homogeneizada.
+
+Los scripts analíticos deberán depender exclusivamente de estas dos capas maestras y no de fuentes individuales.
+
+Esta decisión busca minimizar futuras refactorizaciones, facilitar la incorporación de nuevas tablas de composición y mantener la trazabilidad completa de las decisiones de correspondencia alimentaria.
 
 ---
 
@@ -55,76 +226,115 @@ El objetivo del proyecto es construir una metodología que permita generar esos 
 
 ## Importar
 
-*(Fase activa — ver `README.md` para el estado del día a día)*
+*(Fase activa. Ver `README.md` para el estado operativo.)*
 
-Scripts: `/scripts/01_import.R` → `/scripts/05_join_incap.R`
+Scripts:
 
-Objetivo: Construir el dataset unido (ENGIH + INCAP) que alimenta el cálculo.
+```text
+/scripts/01_import.R → /scripts/05_join_incap.R
+```
+
+Objetivo: construir el dataset unido (ENGIH + composición alimentaria) que alimenta los cálculos posteriores.
 
 Incluye:
 
-1. Importar ENGIH Sección 2 (inventario despensa/refrigerador) y Sección 3A (adquisiciones diarias del hogar) — `01_import.R`.
-2. Identificar las variables críticas: Q (cantidad registrada), FC (factor de conversión a gramos), PC (porción comestible), PM (periodo de medición).
-3. Left join de Sección 3A con dos tablas puente — `05_join_incap.R`:
-   - `id_variedad` → `ENHANCE_ID_final` (`crosswalk_variedad_INCAP.xlsx`). Las decisiones de equivalencia viven en sus propias columnas (`tipo_equivalencia`, `validado`, `notas`); no hay archivo de decisiones aparte.
-   - `id_unidad_medida` → `fc_gramos` (`data_raw_unidades.xlsx`). Cubre unidades genéricas (kg, lb, taza, docena, etc.); el código "Unidad" (piezas/cabezas) queda fuera de esta tabla porque el gramaje depende del alimento — se resuelve como PC/FC específico por alimento, no aquí.
+1. Importar ENGIH Sección 2 (inventario despensa/refrigerador) y Sección 3A (adquisiciones diarias del hogar).
+2. Identificar las variables críticas:
+   - Q = cantidad registrada.
+   - FC = factor de conversión a gramos.
+   - PC = porción comestible.
+   - PM = periodo de medición.
+3. Construir los joins necesarios para conectar ENGIH con:
+   - tablas de unidades;
+   - crosswalks de alimentos;
+   - tablas de composición nutricional.
 
 Salidas:
-- `data/raw/data_raw_sec2.csv`, `data/raw/data_raw_sec3a.csv`
-- Dataset unido Sección 3A + crosswalk + conversión de unidades (input directo de Transformar)
+
+```text
+data/raw/data_raw_sec2.csv
+data/raw/data_raw_sec3a.csv
+```
+
+y las versiones limpias utilizadas por el resto del pipeline.
 
 ## Limpieza y Análisis Exploratorio de Datos (EDA)
 
-Script: `/scripts/02_eda.R`
+Script:
 
-Objetivo: Validar la calidad de los datos crudos, antes del join.
+```text
+/scripts/02_eda.R
+```
+
+Objetivo: validar la calidad de los datos antes de los cálculos nutricionales.
 
 Incluye:
-- Detección de atípicos por alimento (percentiles P1–P99), no por IQR global.
-- Alimentos con menos del umbral mínimo de registros → marcados "no evaluable".
-- `dlookr` con versión fijada (fue removido de CRAN).
+
+- Detección de atípicos por alimento.
+- Alimentos con frecuencia insuficiente.
+- Revisión de distribuciones.
+- Verificaciones de consistencia.
 
 ## Transformar
 
-Objetivo: Convertir el dataset unido en consumo diario y en aporte de nutrientes, y controlar su calidad.
+Objetivo: convertir las cantidades observadas en consumo diario y aporte nutricional.
 
 Incluye:
-- Cálculo: `Q × FC × PC / PM` → gramos/día por alimento y hogar.
-- Equivalente de mujer adulta (AFE) y de hombre adulto (AME) a partir de la composición demográfica del hogar.
-- Aporte de micronutrientes por hogar vía `ENHANCE_ID_final`.
-- Densidad de nutrientes (micronutriente / 1000 kcal) y consumo aparente por AFE (Tang et al. 2021).
-- Limpieza y ajuste posterior al cálculo: detección de atípicos en gramos/día ya calculados, verificación de distribución (guía MIMI, paso 7) — distinto del EDA sobre datos crudos, que ya ocurrió antes del join.
+
+- Cálculo:
+
+```text
+Q × FC × PC / PM
+```
+
+- Gramos diarios por alimento.
+- Consumo por hogar.
+- AFE (Adult Female Equivalent).
+- AME (Adult Male Equivalent).
+- Densidad de nutrientes.
+- Integración con las tablas de composición alimentaria.
 
 ## Analizar
 
-Objetivo: Responder las preguntas estratégicas (§3) con los dos indicadores de Transformar. Cada cálculo se etiqueta con la(s) pregunta(s) que responde, para poder verificar cobertura de forma objetiva.
+Objetivo: responder las preguntas estratégicas del proyecto.
 
 Incluye:
-- Adecuación: consumo aparente y densidad de nutrientes frente a umbrales de referencia (H-AR / CND) → **P1**.
-- Alimentos que más aportan a cada micronutriente clave → **P3**.
-- Cobertura: % de hogares que consumen cada vehículo de fortificación (arroz, aceite, harina, azúcar) → **P4**.
-- Equidad: comparación por quintil de gasto, zona urbana/rural, región → **P2, P5**.
+
+- Adecuación de micronutrientes.
+- Principales alimentos contribuyentes.
+- Cobertura de vehículos de fortificación.
+- Equidad por quintil, región y área urbana/rural.
 
 ## Modelar
 
-Objetivo: Evaluar contrafactuales de fortificación sobre la adecuación → **P6**.
+Objetivo: evaluar escenarios contrafactuales de fortificación.
 
 Incluye:
-- Escenarios: sin fortificación / fortificación actual / cumplimiento mejorado.
-- Estacionalidad de la densidad y el consumo aparente, si la fecha de encuesta lo permite.
+
+- Situación observada.
+- Escenario de cumplimiento actual.
+- Escenario de cumplimiento mejorado.
+- Escenarios alternativos de política pública.
 
 ## Comunicar
 
-Objetivo: Convertir resultados en evidencia utilizable.
+Objetivo: transformar los resultados en evidencia utilizable.
 
 Incluye:
+
 - Reportes.
 - Visualizaciones.
 - Productos para WFP.
-- Material educativo.
+- Material de comunicación técnica.
 
 ---
 
 # 6. Principio rector
 
-Cada fase se cierra y se documenta (código, salida, decisión) antes de abrir la siguiente. La ENGIH es el caso de aplicación; la metodología reproducible es el entregable.
+Cada fase se cierra y se documenta (código, salida y decisión) antes de abrir la siguiente.
+
+La ENGIH es el caso de aplicación.
+
+La metodología reproducible es el verdadero entregable.
+
+
