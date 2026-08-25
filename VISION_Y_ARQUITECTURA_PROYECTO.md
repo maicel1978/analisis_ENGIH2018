@@ -161,13 +161,17 @@ food_composition_USDA.xlsx
 food_composition_FNDDS.xlsx
 ```
 
-serán armonizadas posteriormente en una única tabla:
+serán integradas posteriormente en una única tabla:
 
 ```text
 food_composition_MASTER
 ```
 
-Preferiblemente en formato Parquet.
+Preferiblemente en formato xlsx.
+
+El food_composition_MASTER es una tabla viva basada prioritariamente en INCAP, ampliada de forma selectiva con USDA y gobernada por frecuencia de uso (freq_registros) y estado de validación (validado), con el objetivo de maximizar la cobertura analítica y mejorar progresivamente la calidad de las estimaciones nutricionales.
+
+Cuando un alimento tenga equivalentes válidos en múltiples fuentes, la prioridad será INCAP > USDA > FNDDS, salvo decisión técnica específica documentada en el crosswalk correspondiente.
 
 La armonización deberá estandarizar:
 
@@ -180,6 +184,8 @@ La armonización deberá estandarizar:
 - Unidades de medida.
 
 El objetivo es que las fases posteriores del pipeline no necesiten conocer la fuente original de cada alimento.
+
+nota: El food_composition_MASTER.xlsx constituye una capa técnica de integración entre las tablas de composición alimentaria y la ENGIH. Su objetivo es permitir la construcción de un único dataset_nutricional, donde cada registro alimentario de la encuesta queda asociado a variables nutricionales estandarizadas e independientes de la fuente original (INCAP, USDA, FNDDS u otras). Todas las fases posteriores del pipeline consumirán preferentemente este dataset integrado.
 
 ## Regla de gobernanza
 
@@ -211,7 +217,7 @@ crosswalk_variedad_MASTER.xlsx
 y una:
 
 ```text
-food_composition_MASTER
+food_composition_MASTER.xlsx
 ```
 
 homogeneizada.
@@ -231,7 +237,7 @@ Esta decisión busca minimizar futuras refactorizaciones, facilitar la incorpora
 Scripts:
 
 ```text
-/scripts/01_import.R → /scripts/05_join_incap.R
+/scripts/01_import.R 
 ```
 
 Objetivo: construir el dataset unido (ENGIH + composición alimentaria) que alimenta los cálculos posteriores.
@@ -256,7 +262,9 @@ data/raw/data_raw_sec2.csv
 data/raw/data_raw_sec3a.csv
 ```
 
-y las versiones limpias utilizadas por el resto del pipeline.
+las versiones limpias utilizadas por el resto del pipeline.
+
+las tablas crosswalk_variedad_MASTER y food_composition_MASTER
 
 ## Limpieza y Análisis Exploratorio de Datos (EDA)
 
@@ -270,10 +278,11 @@ Objetivo: validar la calidad de los datos antes de los cálculos nutricionales.
 
 Incluye:
 
+- Tratamiento de datos perdidos
 - Detección de atípicos por alimento.
 - Alimentos con frecuencia insuficiente.
 - Revisión de distribuciones.
-- Verificaciones de consistencia.
+
 
 ## Transformar
 
@@ -293,6 +302,7 @@ Q × FC × PC / PM
 - AME (Adult Male Equivalent).
 - Densidad de nutrientes.
 - Integración con las tablas de composición alimentaria.
+- Incoporación de covariable para análisis estratificado, modelación multivarida y mapas
 
 ## Analizar
 

@@ -1,43 +1,145 @@
-# =========================================================================
 # Script: 01_import.R (Lectura de datos ENGIH 2018)
-# Proyecto: ENGIH 2018 - Consumo de alimentos
+# Proyecto: ENGIH 2018 - Consumo de alimentos y nutrición
 # Fecha: 2026-08-18
+#
 # Objetivos:
-#   1. Importar datos originales Secciones 2 y 3A
-#   2. Identificar la sección y el módulo de consumo alimentario
-#   3. Identificar variables críticas (Q, FC, PC, PM)
-#   - Q = Cantidad registrada en la encuesta
-#   - FC = Factor de conversión de unidades no estándar a gramos
-#   - PC = Porción comestible
-#   - PM = Periodo de medición
-#   4. Generar dataset crudo (raw) y dataset seleccionado (clean) para
-#      luego hacer transformaciones y modelación (Consumo diario)
-# Salidas:
-#   - data/raw/data_raw_sec2.csv    (Sección 2 sin transformar)
-#   - data/raw/data_raw_sec3a.csv   (Sección 3A sin transformar)
-#   - data/clean/data_sec2.csv      (Sección 2, variables seleccionadas)
-#   - data/clean/data_sec3a.csv     (Sección 3A, variables seleccionadas)
+#
+#   1. Importar datos originales de la ENGIH 2018
+#      (Sección 2 y Sección 3A)
+#
+#   2. Identificar variables necesarias para el cálculo de consumo:
+#
+#      Q  = Cantidad observada
+#      FC = Factor de conversión a gramos
+#      PC = Factor de porción comestible
+#      PM = Período de medición
+#
+#   3. Generar datasets limpios de trabajo
+#
+#   4. Preparar la integración posterior con tablas de composición
+#      alimentaria y crosswalks validados.
+#
+#
+# Salidas de esta etapa
+#
+#   data/raw/data_raw_sec2.csv
+#   data/raw/data_raw_sec3a.csv
+#
+#   data/clean/data_sec2.csv
+#   data/clean/data_sec3a.csv
+#
+# Esta etapa NO calcula nutrientes ni consumo diario.
+#
 # =========================================================================
-# Nota: variables para calcular el Consumo diario (Q * FC * PC / PM)
-# *   Q  = Cantidad registrada en la encuesta
-#          Sec 2  -> CONSUMO_EXCLUSIVO_HOGAR (pregunta 9: "Del inventario
-#                     inicial ¿cuánto utilizó exclusivamente para consumo
-#                     del hogar?")
-#          Sec 3A -> CANTIDAD_ADQUIRIDA (pregunta 3: "Cantidad adquirida")
-#                     OJO: no confundir con CANTIDAD_UNIDADES_PRESENTACION
-#                     (número de unidades del empaque, pregunta 5)
-# **  FC = Factor de conversión de unidades no estándar a gramos
-#          (se construye en 03_fc_pc.R a partir de ID_UNIDAD_MEDIDA; todavía no
-#          disponible en este dataset -> pendiente de tabla de conversión)
-# *** PC = Porción comestible (pendiente de tabla de composición alimentaria)
-# *** PM = Periodo de medición
-#          Sec 2  -> 30 días (recordatorio de inventario mensual)
-#          Sec 3A -> 1 día (recordatorio de 24 horas); un hogar puede tener
-#                    hasta 7 registros (variable `dia`) a agregar en 03_fc_pc.R
-# El identificador único de hogar es la combinación VIVIENDA + HOGAR:
-# HOGAR se repite entre viviendas distintas, por lo que usar solo HOGAR
-# como id mezclaría hogares diferentes.
+#
+# Fórmula base del proyecto
+#
+#   Consumo diario (g) = Q × FC × PC / PM
+#
+# donde:
+#
+#   Q  = cantidad registrada en la encuesta
+#   FC = factor de conversión a gramos
+#   PC = porción comestible
+#   PM = período de medición
+#
+# Ninguna estimación nutricional posterior es válida si esta etapa no
+# queda correctamente implementada.
+#
 # =========================================================================
+#
+# Arquitectura general del sistema
+#
+# Fuentes de composición alimentaria
+# ----------------------------------
+#
+#   food_composition_INCAP.xlsx
+#   food_composition_USDA.xlsx
+#   food_composition_FNDDS.xlsx
+#
+# Estas tablas se mantienen como fuentes independientes.
+#
+#
+# Crosswalks de correspondencia alimentaria
+# -----------------------------------------
+#
+#   crosswalk_variedad_INCAP.xlsx
+#   crosswalk_variedad_USDA.xlsx
+#   crosswalk_variedad_FNDDS.xlsx
+#                   ↓
+#   crosswalk_variedad_MASTER.xlsx
+#
+# Los crosswalks contienen las decisiones manuales de correspondencia
+# entre los alimentos observados en ENGIH y las tablas de composición.
+#
+# El archivo MASTER se genera automáticamente a partir de los
+# crosswalks validados por fuente.
+#
+#
+# Dataset nutricional integrado
+# -----------------------------
+#
+#   data_sec3a.csv
+#           +
+#   crosswalk_variedad_MASTER.xlsx
+#           +
+#   food_composition_*.xlsx
+#           ↓
+#   dataset_nutricional
+#
+# dataset_nutricional constituye el principal objeto analítico del
+# proyecto.
+#
+# Cada registro alimentario de ENGIH quedará asociado a:
+#
+#   - porción comestible (PC)
+#   - energía
+#   - macronutrientes
+#   - micronutrientes
+#   - metadatos de la correspondencia utilizada
+#
+# Todas las fases posteriores:
+#
+#   - EDA
+#   - Transformación
+#   - Cálculo de consumo
+#   - Adecuación nutricional
+#   - Fortificación
+#   - Modelación
+#   - Visualización
+#
+# deberán consumir preferentemente dataset_nutricional.
+#
+# Los análisis no deben depender directamente de INCAP, USDA o FNDDS.
+#
+# =========================================================================
+#
+# Nota metodológica
+#
+# Durante la fase actual:
+#
+#   INCAP es la fuente principal de composición alimentaria.
+#
+# USDA y FNDDS se incorporarán progresivamente cuando existan alimentos
+# frecuentes de ENGIH que no puedan representarse adecuadamente con INCAP.
+#
+# La prioridad del proyecto es mejorar gradualmente la cobertura
+# nutricional manteniendo la trazabilidad de las decisiones y evitando
+# complejidad innecesaria.
+#
+# =========================================================================
+#
+# Identificación de hogares
+#
+# El identificador único de hogar es:
+#
+#   VIVIENDA + HOGAR
+#
+# La variable HOGAR no es única dentro de la encuesta y no debe
+# utilizarse de forma aislada.
+#
+# =========================================================================
+
 
 # 1. Configuración general -------------------------------------------------
 rm(list = ls())   # limpia el entorno
