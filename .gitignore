@@ -25,4 +25,4 @@ _cache*
 _cache
 
 # Data grandes
-data/raw/*.xlsx
+# data/raw/*.xlsx
