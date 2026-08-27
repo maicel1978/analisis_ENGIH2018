@@ -19,7 +19,6 @@ De*ktop.ini
 .Rproj.us*r
 .Rhistory
 .RData
-01_analisis_ENGIH2018.Rproj
 
 # Cache
 _cache*
@@ -27,3 +26,10 @@ _cache
 
 # Data grandes
 # data/raw/*.xlsx
+# Temporales de sesiones R (no son artefactos del proyecto)
+.RDataTmp
+.RDataTmp*
+
+# Salidas generadas de 03_transform.R (se regeneran; no versionar)
+data/clean/consumo_diario_*_hogar.csv
+data/eda/qc_gramos_*.csv

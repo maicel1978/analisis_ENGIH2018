@@ -112,12 +112,13 @@ Malta
 
 La existencia de múltiples crosswalks es únicamente una estrategia de construcción y mantenimiento.
 
-hasta el momento hay tres tablas de composición de alimentos con toda la informacion nutricional
+hasta el momento hay dos tablas de composición de alimentos con toda la información
+nutricional (INCAP y FNDDS); la tercera (USDA / FoodData Central) está por construirse:
 
 ```text
-food_composition_USDA.xlsx
-food_composition_FNDDS.xlsx
-food_composition_USDA.xlsx # todavia por hacer
+food_composition_INCAP.xlsx   # existe
+food_composition_FNDDS.xlsx   # existe
+food_composition_USDA.xlsx    # todavía por hacer
 ```
 
 ## Principio rector de integración
@@ -238,6 +239,20 @@ Los scripts analíticos deberán depender exclusivamente de estas dos capas maes
 
 Esta decisión busca minimizar futuras refactorizaciones, facilitar la incorporación de nuevas tablas de composición y mantener la trazabilidad completa de las decisiones de correspondencia alimentaria.
 
+## Decisión operativa (2026-08-27)
+
+- Redirección del grupo de trabajo: **la Sección 2 (despensa) es la fase prioritaria**;
+  la 3A queda en estado operativo mínimo. Ruta y decisiones: `PLAN_DE_TRABAJO.md`.
+- **Llaves de alimento:** la Sección 3A usa códigos del Catálogo de variedades y la
+  Sección 2 usa los códigos locales del formulario de despensa (el mismo número puede
+  ser un alimento distinto en cada sección). La llave canónica lleva espacio de
+  nombres: `CAT:<id>` / `SEC2:<id>`; el crosswalk de Sec 2
+  (`crosswalk_variedad_SEC2.xlsx`) es la entrada manual de esa sección.
+- **Período de medición de la Sección 2:** el formulario oficial lo fija en 7 días
+  ("inventario ... el día 1 y 8 de la entrevista"); el código usa `PM_SEC2 = 7`,
+  pendiente de confirmación formal con MIMI (el valor 30 que circulaba no aparece en
+  el formulario).
+
 ---
 
 # 5. Hoja de ruta
@@ -270,13 +285,14 @@ Incluye:
 Salidas:
 
 ```text
-data/raw/data_raw_sec2.csv
+data/raw/data_raw_sec2.csv     # snapshot del archivo fuente (no se editan)
 data/raw/data_raw_sec3a.csv
+data/clean/data_sec2.csv       # versiones de trabajo del pipeline
+data/clean/data_sec3a.csv
 ```
 
-las versiones limpias utilizadas por el resto del pipeline.
-
-las tablas crosswalk_variedad_MASTER y food_composition_MASTER
+las tablas crosswalk_variedad_MASTER y food_composition_MASTER (generadas por
+`scripts/00_master.R`, en `data/master/`)
 
 ## Limpieza y Análisis Exploratorio de Datos (EDA)
 

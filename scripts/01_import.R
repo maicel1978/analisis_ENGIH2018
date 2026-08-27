@@ -311,7 +311,10 @@ message(sprintf("Sección 3A: %d filas, %d hogares únicos",
 # - Construir tabla de Factores de Conversión (FC) por id_unidad_medida -> gramos
 # - Construir tabla de Porciones Comestibles (PC) por alimento (variedad/artículo)
 # - Aplicar Consumo diario (gramos) = Q * FC * PC / PM
-#   (PM = 30 en Sec 2; PM = 1 en Sec 3A, agregado luego por hogar)
+#   (PM_SEC2 = 7: el formulario oficial dice "inventario ... el día 1 y 8
+#    de la entrevista"; el valor 30 que se usaba antes NO aparece en el
+#    formulario -> CONFIRMAR CON MIMI. PM_SEC3A = 1 por registro, diario
+#    de 7 días -> promediar entre 7. Ver 03_transform.R y PLAN_DE_TRABAJO.md)
 # - Controles de calidad: valores atípicos y verificación de distribución
 #   (ver "Paso 7" de la guía metodológica) antes de agregar a nivel de hogar
 # - Incorporar otras variable de estratificación sociodemográfica disponibles en ENGIH 2018 (informe y dashboard )
@@ -325,29 +328,20 @@ message(sprintf("Sección 3A: %d filas, %d hogares únicos",
 # Indicadores de seguridad alimentaria → diversidad dietética, gasto en alimentos vs ingreso total.
 # Equivalente de mujer adulta (AWE) → ajuste demográfico para comparar hogares de distinto tamaño y composición.
 
-# 5. Tabla de composición  (incluye el factor de porción comestible PC) ------------------------
-# nota
-# food_composition_INCAP.xlsx → Es la tabla de composición de alimentos que me envió Santiago.
-# La tabla de composición incluye el (PC) factor de porción comestible 
-# Contiene la composición nutricional por 100 g comestibles y, en muchos casos, el factor de porción comestible (PC).
-data_tca<- read_excel(path = ruta_tca) |> clean_names()
-# Nota: 
-# debo conectar data_tca con los datos con data_raw_sec2 y data_raw_sec3a
-# los datos de data_tca y data_raw_sec3a no tienen llaves compatibles para unir los datos 
-# Para solucionarlo hice una tercera base de datos manual (crosswalk_variedad_incap) para conectarlos y revisar manual
-# Se reducen la dimesion de los alimentos y eliminan algunos elementos como el cigarro que no son alimentos
-
-# 1. Tabla puente validada
-data_crosswalk <- read_excel(ruta_crosswalk, sheet = "Datos") |> 
-  clean_names() |> 
-  filter(validado == TRUE) |> 
-  select(id_variedad, enhance_id_final)
-
-# 2. Join ENGIH con tabla puente
-data_sec3a_join <- data_sec3a |>
-  left_join(data_crosswalk, by = "id_variedad")
-
-# 3. Join con tabla INCAP usando enhance_id
-data_sec3a_comp <- data_sec3a_join |>
-  left_join(data_tca, by = c("enhance_id_final" = "enhance_id"))
+# 5. Composición alimentaria (MOVIDO a 03_transform.R) ----------------------
+# Regla de gobernanza (VISION_Y_ARQUITECTURA_PROYECTO.md): los scripts
+# analíticos no leen fuentes individuales (INCAP/USDA/FNDDS). El join
+# ENGIH <-> crosswalk <-> composición se hace en 03_transform.R sobre las
+# capas maestras que genera 00_master.R:
+#
+#   data/master/crosswalk_variedad_MASTER.xlsx   (puente, llave con
+#                                                espacio de nombres CAT:/SEC2:)
+#   data/master/food_composition_MASTER.xlsx     (composición armonizada
+#                                                + pc_factor)
+#
+# Nota histórica: la tercera base manual (crosswalk_variedad_INCAP.xlsx)
+# sigue siendo la entrada editada manualmente; lo que cambió es que su
+# uso está mediado por el MASTER. Los alimentos que no son comida
+# (tabaco, etc.) se excluyen de forma EXPLÍCITA en el MASTER
+# (estado = "excluido"), no por ausencia del join.
 
