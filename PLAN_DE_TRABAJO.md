@@ -32,8 +32,10 @@ Este documento registra, paso a paso, el estado, las decisiones y la ruta. Lo qu
    con contenido en la unidad declarada). Con ellos + los 9 factores fijos (Gramos, Kilogramos,
    Libra, Onza, Miligramos, Mililitros, Litro, cc, Galón) se convierten a gramos:
    **Sec 2: 79.4% de los registros · Sec 3A: 63.6%**. El resto necesita FC por alimento ×
-   unidad: en Sec 2 son **~20 celdas** (hoja `FC_pendientes` del crosswalk SEC2); en 3A, la
-   cola grande (Fase 4).
+   unidad: en Sec 2 son **98 celdas** alimento×unidad (9,629 registros = 20.1%; las 28
+   principales cubren ~96% de esos registros; hoja `FC_pendientes` del crosswalk SEC2,
+   lista completa y machine-readable desde 2026-08-27) + 199 registros (0.4%) sin unidad
+   declarada; en 3A, la cola grande (Fase 4).
    Evidencia: en 96–99% de las filas con presentación, `cantidad ≤ 5` y en 72% (3A)
    `cantidad == unidades` → `cantidad` es el **conteo de presentaciones**, y el total es
    `unidades × contenido` (regla por defecto `REGLA_PRESENTACION = "presentacion"`).
@@ -130,8 +132,9 @@ Este documento registra, paso a paso, el estado, las decisiones y la ruta. Lo qu
     **sugerencia INCAP curada** (`sugerencia_ENHANCE_ID` + nombre + grupo + tipo + nota).
     Columnas de decisión: `fuente_composicion`, `id_composicion_final`,
     `tipo_equivalencia`, `validado`, `notas`.
-  - Hoja `FC_pendientes`: la mini-tabla de conversión de despensa (~20 celdas) con
-    valores referencia **placeholder** a validar.
+  - Hoja `FC_pendientes`: la tabla completa de conversión de despensa (**98 celdas**
+    alimento×unidad, 9,629 registros; 61 con peso de referencia propuesto) con valores
+    referencia **placeholder** a validar.
 - **2.2 Cómo llenarlo (por ítem, ~30 min c/u):**
   1. Leer `descripcion_item` + `unidades_top` (¿en qué unidades se declaró?).
   2. Validar o reemplazar la sugerencia contra `food_composition_INCAP.xlsx`; si es gap,
@@ -157,9 +160,12 @@ Este documento registra, paso a paso, el estado, las decisiones y la ruta. Lo qu
     HABICHUELAS ENLATADAS (28), CEREALES DE ARROZ (73), PALOMITAS (32), TURQUITOS (34),
     VIOLADOS (35). Es el trabajo que alimenta `crosswalk_variedad_USDA.xlsx` /
     `_FNDDS.xlsx` (hoy: 3 filas sin validar y 2 sin resolver).
-  - **Códigos sin nombre (0, 31, 33, 45, 50; 62 registros totales):** verificar contra
+  - **Códigos sin nombre (0, 31, 33, 45, 50; 35 registros totales, 0.07%):** verificar
+    contra
     BCRD; si son "otros"/errores de codificación → `no_alimento_excluir` documentado.
-- **2.4 Tabla FC de despensa (hoja `FC_pendientes`):** validar ~20 pesos de referencia
+- **2.4 Tabla FC de despensa (hoja `FC_pendientes`):** validar los pesos de referencia
+  (lista completa: 98 celdas alimento×unidad; priorizar las 28 principales, que cubren ~96%
+  de los registros pendientes; 61 ya tienen propuesta). Referencias típicas:
   (huevo ~60 g c/cáscara, papa ~150 g, plátano verde ~300 g c/cáscara, guineíto ~80 g,
   lata ~160 g, jarro ~1.5 L, pieza de pollo ~500 g…). Fuentes: BCRD/MIMI si tienen
   tabla de pesos, o tabla de porciones de referencia documentada. Con 30 alimentos es
@@ -253,3 +259,17 @@ artefactos `data/master/*` y `data/clean/consumo_diario_*` fueron generados con 
 espejo de verificación (Python) que implementa **regla por regla** la misma lógica de
 `00_master.R` y `03_transform.R`. Al correr `00_master.R` y `03_transform.R` en RStudio,
 los KPI de la tabla 0.5 deben reproducirse; cualquier desvío es un bug a reportar.
+
+### Actualización 2026-08-27 (tarde) — verificación de avances + tabla FC completa
+- **`FC_pendientes` completa:** 98 celdas alimento×unidad (9,629 registros = 20.1% de Sec 2;
+  61 con propuesta de referencia, resto "por definir"); hoja reescrita machine-readable
+  (item, id_variedad, unidad, id_unidad_medida, n_registros, referencia_sugerida_g, nota).
+  El "~20 celdas" de la sesión anterior subestimaba la cola (la lista original tenía 21).
+- **Correcciones verificadas contra `data/clean`:** los 5 códigos sin nombre suman
+  **35 registros** (0.07%), no 62 (62 = 35 sin nombre + 27 de catálogo); el código 31 tiene
+  23 registros (nota del starter decía 10); **199 registros (0.4%) de Sec 2 sin unidad
+  declarada** (id vacío); en 3A: 3,205 (0.9%).
+- Cobertura re-verificada hoy: Sec 2 37,993/47,837 = **79.4%** · Sec 3A 217,505/342,046 =
+  **63.6%** (idéntico al baseline 0.5).
+- **Nuevo:** `docs/20260827 Reporte_avances_ENGIH_Secciones_2_y_3A.md` — reporte de avances
+  para verificación (WFP/MIMI), con todos los números verificados.

@@ -27,7 +27,9 @@ Este README es la puerta de entrada operativa: qué hacer hoy.
 1. Llenar `data/raw/crosswalk_variedad_SEC2.xlsx` (46 filas; sugerencias INCAP ya curadas;
    hoja `FC_pendientes` = la mini-tabla de pesos de conversión de despensa).
    Regla de aceptación: `validado=TRUE` exige ID final no vacío o `no_alimento_excluir`.
-2. Validar los ~20 pesos de referencia de `FC_pendientes` (BCRD/MIMI o tabla de porciones).
+2. Validar los pesos de referencia de `FC_pendientes` (lista completa: 98 celdas
+   alimento×unidad; las 28 principales cubren ~96% de los registros pendientes;
+   BCRD/MIMI o tabla de porciones).
 3. Correr en RStudio: `00_master.R` → revisar KPI en consola → `03_transform.R`.
    Sec 2 se habilita sola (KPI objetivo: ~99.9% de sus registros con composición).
 4. Registrar el estado de cada racha aquí (estado actual) y commitear por fase.
