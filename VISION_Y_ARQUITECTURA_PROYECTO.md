@@ -1,7 +1,7 @@
 ---
 title: "Visión y Arquitectura del Proyecto"
-subtitle: "ENGIH 2018 → Evidencia Nutricional para WFP"
 author: "Maicel E. Monzón"
+subtitle: ENGIH 2018 → Evidencia Nutricional para WFP
 ---
 
 # 1. Propósito
@@ -87,24 +87,38 @@ Ejemplo:
 
 ```text
 crosswalk_variedad_INCAP.xlsx
+crosswalk_variedad_FNDDS.xlsx
+crosswalk_variedad_USDA.xlsx
 ```
 
-contiene únicamente asignaciones validadas contra la tabla INCAP.
+contienen únicamente asignaciones validadas contra las tablas de composición de alimentos.
 
-Posteriormente podrán existir otros crosswalks para alimentos que INCAP no cubra adecuadamente.
+Los crosswalks crosswalk_variedad_FNDDS.xlsx y crosswalk_variedad_USDA.xlsx son para los alimentos que INCAP no cubra adecuadamente.
 
 Ejemplos:
 
 ```text
+Caldo de pollo (Sopita Concentrada)
 Mayonesa
-Vinagres
+Vinagre dorado
+Bizcocho envasado de vainilla
+Jugo de frutas en polvo
+Snacks y picaderas de todo tipo
+Ensalada cruda (Varias hortalizas)
+Sazon liquido
 Malta
-Caldo de pollo concentrado
-Caldo de pollo en polvo
-Aderezos comerciales
+
 ```
 
 La existencia de múltiples crosswalks es únicamente una estrategia de construcción y mantenimiento.
+
+hasta el momento hay tres tablas de composición de alimentos con toda la informacion nutricional
+
+```text
+food_composition_USDA.xlsx
+food_composition_FNDDS.xlsx
+food_composition_USDA.xlsx # todavia por hacer
+```
 
 ## Principio rector de integración
 
@@ -128,7 +142,7 @@ Esta será la única tabla puente utilizada por los procesos analíticos.
 
 No debe editarse manualmente.
 
-Será producida automáticamente a partir de los crosswalks específicos por fuente.
+Será producida automáticamente a partir de los crosswalks específicos por fuente para los aliementos validados como TRUE.
 
 La estructura conceptual esperada es:
 
@@ -137,16 +151,14 @@ id_variedad
 descripcion_engih
 fuente_composicion
 id_composicion
-tipo_equivalencia
-validado
 ```
 
 Ejemplo:
 
 ```text
-367 | Habichuelas negras secas | INCAP | 70209060 | directa | TRUE
-541 | Mayonesa                | USDA  | XXXXXXX  | directa | TRUE
-649 | Malta                   | USDA  | XXXXXXX  | sustituto_por_criterio | TRUE
+367 | Habichuelas negras secas | INCAP | 70209060
+541 | Mayonesa                | USDA  | XXXXXXX  
+649 | Malta                   | USDA  | XXXXXXX  
 ```
 
 ## Tabla maestra de composición nutricional
