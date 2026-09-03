@@ -3,6 +3,7 @@
 .Rhistory
 .RData
 .Ruserdata
+.RDataTmp
 
 # Quarto
 .quarto/
@@ -25,5 +26,3 @@ De*ktop.ini
 _cache*
 _cache
 
-# Data grandes
-# data/raw/*.xlsx
