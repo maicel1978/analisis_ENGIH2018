@@ -56,6 +56,8 @@ Sin este cálculo bien hecho, ningún indicador de las fases siguientes es confi
 
 "TCA" se utiliza como término genérico para cualquier tabla de composición de alimentos. Durante la fase actual del proyecto la fuente principal es INCAP, aunque la arquitectura contempla la incorporación futura de otras fuentes (USDA, FNDDS u otras) cuando existan vacíos de cobertura.
 
+- **Benchmark externo para verificación de resultados:** Encuesta Nacional de Micronutrientes (ENM), República Dominicana, MSP. Hay dos versiones con resultados muy distintos: 2009 (MSP/CESDEM — anemia 28% en niños 6-59 meses, deficiencia de vitamina A) y 2024 (MSP/Inabie/FAO/PMA — mejoras sustanciales, baja deficiencia). Usar la versión 2024 como referencia principal una vez que su informe completo esté disponible; citar siempre el informe primario del MSP, nunca una síntesis de segunda mano sin bibliografía verificable.
+
 - **Registro de decisiones del crosswalk:** vive dentro del propio archivo de trabajo del crosswalk (columnas `ENHANCE_ID_final`, `tipo_equivalencia`, `validado` y `notas`). No se mantiene un archivo adicional de decisiones.
 
 - **Fuera de alcance en esta iteración:** Sección 3B de la ENGIH (alimentos preparados fuera del hogar). Requiere factores de receta y rendimiento que todavía no están construidos. Es una decisión metodológica explícita, no un olvido. Revisar únicamente si el TdR exige su inclusión.
@@ -359,4 +361,17 @@ La ENGIH es el caso de aplicación.
 
 La metodología reproducible es el verdadero entregable.
 
+---
 
+# 7. Principios de rigor y verificación
+
+Reglas de trabajo, no aspiraciones. Aplican a cualquier persona o herramienta que contribuya al proyecto.
+
+1. Ningún valor heredado de un archivo previo se usa "porque ya está ahí" — se verifica contra el dato crudo o la fuente oficial antes de entrar a un cálculo final.
+2. Ninguna nota o etiqueta heredada (ej. "revisar", un comentario antiguo) se repite como hecho sin comprobarla de nuevo.
+3. Toda cifra que llegue a un resultado final (FC, prevalencia, cobertura, consumo aparente) debe ser trazable a: (a) el dato crudo más la transformación exacta que la produjo, o (b) una fuente externa citada con documento y sección específicos.
+4. Ningún vacío de información se llena con un valor "plausible" sin marcarlo explícitamente como supuesto pendiente de validar. Un supuesto sin validar no entra al pipeline final.
+5. Antes de reportar una cifra agregada importante, se contrasta su orden de magnitud contra un benchmark externo conocido (ENM 2009/2024, líneas de pobreza, ENDESA). Si no cuadra, se investiga antes de publicar.
+6. Cualquier corrección a un dato existente conserva el valor original (columna aparte o historial de git) junto con la justificación y la fuente del cambio.
+7. Citas de literatura (Tang et al., Imhoff-Kunsch, guía MIMI/WFP, ENM) se usan solo verificadas contra el documento primario — nunca una síntesis sin bibliografía comprobable.
+8. No se guardan en el repositorio transcripciones de conversaciones con asistentes de IA ni borradores sin fuente verificable. Si algo de valor sale de esas conversaciones, se reescribe como decisión propia, verificada, e incorporada al documento correspondiente.
