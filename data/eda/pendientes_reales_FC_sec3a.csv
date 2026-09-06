@@ -1,0 +1,1373 @@
+﻿id_variedad;descripcion;id_unidad_medida_presentacion;frecuencia_real;pct_acumulado
+569;Caldo de pollo (Sopita Concentrada);47.0;15939;13.8
+545;Pasta de tomate(**);98.0;11229;23.5
+581;Café molido;98.0;7574;30.1
+588;Refrescos;20.0;6525;35.8
+552;Sazón en polvo;98.0;5118;40.2
+293;Aceite de soya;87.0;3940;43.6
+588;Refrescos;87.0;2886;46.1
+243;Leche entera liquida con UHT;31.0;2884;48.6
+23;Galletas saladas;8.0;2773;51.0
+293;Aceite de soya;98.0;2597;53.3
+254;Leche evaporada;63.0;2537;55.5
+586;Chocolate en barra;99.0;2057;57.2
+610;Jugo envasado de naranja;31.0;2017;59.0
+649;Malta;20.0;1868;60.6
+620;Jugo de frutas en polvo;98.0;1680;62.1
+553;Sazón líquido;98.0;1493;63.4
+237;Sardinas en salsa de tomate;63.0;1311;64.5
+594;Agua purificada (Dasani, Planeta Azul y similares);20.0;1219;65.6
+554;Vinagre dorado;87.0;1167;66.6
+587;Cocoa y chocolate en polvo;98.0;1064;67.5
+569;Caldo de pollo (Sopita Concentrada);48.0;1059;68.4
+447;Maíz enlatado;63.0;935;69.2
+2;Pan sobado;56.0;924;70.0
+523;Canela en astilla;98.0;909;70.8
+439;Guandules verdes en lata;63.0;888;71.6
+303;Margarina;98.0;877;72.3
+293;Aceite de soya;20.0;798;73.0
+611;Jugo envasado de pera;31.0;777;73.7
+20;Galletas dulces;8.0;736;74.3
+56;Harinas de maíz;56.0;724;75.0
+19;Galletas de soda;8.0;720;75.6
+579;Snacks y picaderas de todo tipo (excepto papitas fritas);56.0;718;76.2
+645;Cerveza clara;20.0;703;76.8
+545;Pasta de tomate(**);63.0;641;77.4
+541;Mayonesa;98.0;512;77.8
+71;Avena en hojuela o entera;98.0;504;78.3
+457;Papas fritas (snack y picaderas);56.0;482;78.7
+506;Sal molida refinada;56.0;446;79.1
+569;Caldo de pollo (Sopita Concentrada);99.0;416;79.4
+594;Agua purificada (Dasani, Planeta Azul y similares);87.0;388;79.8
+608;Jugo envasado de manzana;31.0;386;80.1
+4919;Leche líquida con chocolate;31.0;344;80.4
+1;Pan de agua;56.0;333;80.7
+552;Sazón en polvo;87.0;330;81.0
+410;Ajo;22.0;302;81.2
+71;Avena en hojuela o entera;56.0;301;81.5
+243;Leche entera liquida con UHT;87.0;298;81.7
+66;Arroz selecto;56.0;293;82.0
+571;Sopa instantánea (sopa china);98.0;283;82.2
+88;Spaghetti;56.0;280;82.5
+432;Ensalada cruda (Varias hortalizas);56.0;274;82.7
+254;Leche evaporada;31.0;271;83.0
+610;Jugo envasado de naranja;87.0;269;83.2
+536;Ajo en pasta;98.0;262;83.4
+2473;Azafrán;98.0;255;83.6
+534;Orégano;98.0;252;83.9
+573;Compota;87.0;248;84.1
+5752;Caldo de pollo en polvo;98.0;247;84.3
+527;Malagueta;98.0;245;84.5
+581;Café molido;8.0;244;84.7
+616;Jugo envasado de coctel de frutas (fruit punch);31.0;243;84.9
+2551;Guandules con coco;63.0;235;85.1
+243;Leche entera liquida con UHT;23.0;230;85.3
+275;Yogurt bebible saborizado;87.0;230;85.5
+569;Caldo de pollo (Sopita Concentrada);23.0;228;85.7
+542;Kétchup;98.0;221;85.9
+293;Aceite de soya;33.0;220;86.1
+251;Leche en polvo entera;98.0;218;86.3
+88;Spaghetti;8.0;215;86.5
+609;Jugo envasado de melocotón;31.0;215;86.7
+532;Pimienta en polvo;98.0;213;86.8
+594;Agua purificada (Dasani, Planeta Azul y similares);56.0;209;87.0
+541;Mayonesa;87.0;203;87.2
+235;Sardinas en aceite;63.0;190;87.4
+553;Sazón líquido;87.0;185;87.5
+652;Cigarrillos con filtro;24.0;183;87.7
+4915;Atún en trozo en aceite;63.0;182;87.8
+5692;Té frio en polvo;98.0;171;88.0
+303;Margarina;105.0;160;88.1
+581;Café molido;56.0;153;88.3
+565;Vainilla blanca;87.0;146;88.4
+610;Jugo envasado de naranja;20.0;144;88.5
+535;Orégano en polvo;98.0;141;88.6
+21;Galletas integrales;8.0;140;88.8
+496;Hielo industrializado;56.0;137;88.9
+610;Jugo envasado de naranja;23.0;135;89.0
+282;Leche de coco;63.0;133;89.1
+525;Clavo dulce;98.0;130;89.2
+611;Jugo envasado de pera;63.0;129;89.3
+66;Arroz selecto;97.0;127;89.4
+87;Fideos;56.0;118;89.5
+592;Bebidas hidratantes (Gatorade, Powerade y similares);87.0;115;89.6
+247;Leche descremada liquida con UHT;31.0;110;89.7
+288;Huevos de granja (gallina);31.0;106;89.8
+573;Compota;98.0;103;89.9
+76;Corn Flakes (incluye rice flakes, cereales de chocolates, frutas y demás);56.0;103;90.0
+506;Sal molida refinada;98.0;102;90.1
+435;Alcaparrado (aceitunas y alcaparras);98.0;101;90.2
+622;Ron extra añejo (extra viejo y similares);20.0;92;90.3
+506;Sal molida refinada;87.0;92;90.3
+251;Leche en polvo entera;56.0;92;90.4
+255;Leche condensada;63.0;90;90.5
+307;Mantequilla;98.0;90;90.6
+565;Vainilla blanca;98.0;89;90.7
+23;Galletas saladas;56.0;88;90.7
+277;Yogurt bebible natural;87.0;88;90.8
+3506;Bizcocho envasado de vainilla;56.0;88;90.9
+259;Suplementos alimenticios (Ensure y similares);87.0;87;91.0
+355;Maní tostado;56.0;86;91.0
+23;Galletas saladas;98.0;82;91.1
+650;Extracto de malta;20.0;81;91.2
+569;Caldo de pollo (Sopita Concentrada);98.0;79;91.2
+623;Ron añejo;20.0;78;91.3
+459;Azúcar morena;56.0;78;91.4
+625;Ron dorado;20.0;78;91.4
+649;Malta;87.0;78;91.5
+443;Habichuelas rojas enlatadas;63.0;77;91.6
+579;Snacks y picaderas de todo tipo (excepto papitas fritas);98.0;77;91.6
+542;Kétchup;87.0;76;91.7
+658;Picadura de tabaco;98.0;75;91.8
+501;Paletas, mentas;56.0;74;91.8
+19;Galletas de soda;23.0;73;91.9
+546;Salsa china;98.0;73;92.0
+640;Vino moscatel (La Fuerza y similares);20.0;73;92.0
+3021;Leche evaporada con sabor a queso;63.0;73;92.1
+86;Coditos;56.0;72;92.2
+297;Aceite de oliva;98.0;71;92.2
+21;Galletas integrales;56.0;71;92.3
+256;Leches reforzadas con hierro y minerales (fórmula infantil),;63.0;70;92.3
+242;Leche fresca o cruda de vaca;20.0;69;92.4
+185;Salchichas tipo Viena;63.0;69;92.5
+67;Arroz corriente;56.0;68;92.5
+256;Leches reforzadas con hierro y minerales (fórmula infantil),;98.0;67;92.6
+20;Galletas dulces;56.0;67;92.6
+433;Aceitunas verdes con semillas;98.0;66;92.7
+4461;Pasa deshidratada;23.0;66;92.8
+293;Aceite de soya;56.0;65;92.8
+592;Bebidas hidratantes (Gatorade, Powerade y similares);20.0;64;92.9
+554;Vinagre dorado;98.0;64;92.9
+3809;Macarroni & Cheese;23.0;63;93.0
+76;Corn Flakes (incluye rice flakes, cereales de chocolates, frutas y demás);23.0;63;93.0
+4149;Galletas rellenas de queso;8.0;62;93.1
+67;Arroz corriente;97.0;62;93.1
+4461;Pasa deshidratada;25.0;61;93.2
+4916;Atún en trozo en agua;63.0;61;93.2
+600;Jugo concentrado de naranja;31.0;60;93.3
+9;Pan integral;56.0;59;93.3
+522;Anís;98.0;58;93.4
+586;Chocolate en barra;23.0;54;93.4
+18;Galletas de harina / Galleta de manteca;56.0;54;93.5
+497;Hielo casero;56.0;53;93.5
+57;Maicena (fécula de maíz) /Maicera (harina de maíz procesada);23.0;52;93.6
+658;Picadura de tabaco;56.0;50;93.6
+451;Vegetales mixtos enlatados;63.0;50;93.7
+245;Leche semidescremada liquida con UHT;31.0;50;93.7
+58;Harina de trigo;56.0;49;93.8
+251;Leche en polvo entera;63.0;49;93.8
+624;Ron blanco;20.0;49;93.8
+638;Vino tinto;20.0;49;93.9
+51;Cazabe;8.0;49;93.9
+586;Chocolate en barra;98.0;48;94.0
+369;Habichuelas rojas secas;63.0;48;94.0
+515;Cilantrico o verdura;12.0;47;94.0
+59;Harina de negrito (fécula de trigo);23.0;46;94.1
+410;Ajo;51.0;45;94.1
+243;Leche entera liquida con UHT;25.0;45;94.2
+591;Bebidas energizantes (911, Vive100 y similares);87.0;44;94.2
+57;Maicena (fécula de maíz) /Maicera (harina de maíz procesada);25.0;44;94.2
+616;Jugo envasado de coctel de frutas (fruit punch);87.0;43;94.3
+610;Jugo envasado de naranja;25.0;42;94.3
+236;Sardinas en agua y sal;63.0;42;94.4
+376;Guandules verdes desgranados;63.0;42;94.4
+649;Malta;8.0;41;94.4
+611;Jugo envasado de pera;25.0;41;94.5
+573;Compota;55.0;41;94.5
+6467;Sopa con fideo (Maggie, Knorr y similares);98.0;41;94.5
+368;Habichuelas pintas secas;56.0;40;94.6
+563;Pimienta en granos;98.0;40;94.6
+435;Alcaparrado (aceitunas y alcaparras);87.0;40;94.6
+629;Whisky;20.0;40;94.7
+569;Caldo de pollo (Sopita Concentrada);25.0;40;94.7
+324;Guineo verde (guineíto);91.0;39;94.7
+635;Ponches;20.0;39;94.8
+13;Pan de sándwich rebanado blanco;56.0;38;94.8
+608;Jugo envasado de manzana;25.0;36;94.8
+554;Vinagre dorado;20.0;36;94.9
+545;Pasta de tomate(**);56.0;35;94.9
+410;Ajo;98.0;35;94.9
+269;Queso picantino parmesano rallado;98.0;35;95.0
+297;Aceite de oliva;87.0;35;95.0
+612;Jugo envasado de piña;31.0;35;95.0
+442;Habichuelas negras enlatadas;63.0;34;95.0
+587;Cocoa y chocolate en polvo;87.0;33;95.1
+87;Fideos;8.0;33;95.1
+367;Habichuelas negras secas;63.0;33;95.1
+498;Bombones y chocolates dulces;14.0;33;95.2
+257;Leche maternizada (sustituto de lactancia materna, hasta 1 año);63.0;32;95.2
+571;Sopa instantánea (sopa china);115.0;32;95.2
+616;Jugo envasado de coctel de frutas (fruit punch);20.0;32;95.2
+243;Leche entera liquida con UHT;20.0;32;95.3
+545;Pasta de tomate(**);23.0;32;95.3
+256;Leches reforzadas con hierro y minerales (fórmula infantil),;56.0;32;95.3
+4148;Galletas de ajo;56.0;31;95.4
+376;Guandules verdes desgranados;60.0;31;95.4
+243;Leche entera liquida con UHT;63.0;31;95.4
+611;Jugo envasado de pera;23.0;31;95.4
+4919;Leche líquida con chocolate;23.0;31;95.5
+314;Plátano verde;91.0;30;95.5
+57;Maicena (fécula de maíz) /Maicera (harina de maíz procesada);56.0;30;95.5
+555;Vinagre blanco;87.0;30;95.5
+499;Caramelos, chicles;25.0;29;95.6
+4148;Galletas de ajo;8.0;29;95.6
+4917;Atún desmenuzado en aceite;63.0;29;95.6
+254;Leche evaporada;23.0;29;95.6
+608;Jugo envasado de manzana;87.0;29;95.7
+457;Papas fritas (snack y picaderas);98.0;28;95.7
+470;Miel, polen y propóleo, jalea real;20.0;28;95.7
+183;Salchichas de hot-dog;8.0;28;95.7
+591;Bebidas energizantes (911, Vive100 y similares);20.0;28;95.8
+498;Bombones y chocolates dulces;99.0;27;95.8
+59;Harina de negrito (fécula de trigo);25.0;27;95.8
+259;Suplementos alimenticios (Ensure y similares);63.0;27;95.8
+355;Maní tostado;98.0;26;95.9
+247;Leche descremada liquida con UHT;87.0;26;95.9
+579;Snacks y picaderas de todo tipo (excepto papitas fritas);8.0;26;95.9
+76;Corn Flakes (incluye rice flakes, cereales de chocolates, frutas y demás);98.0;25;95.9
+371;Habichuelas blanditas;60.0;25;95.9
+438;Guandules secos en lata;63.0;24;96.0
+556;Vinagre balsámico;87.0;24;96.0
+459;Azúcar morena;8.0;24;96.0
+558;Bija en polvo;98.0;24;96.0
+216;Atún;63.0;24;96.0
+66;Arroz selecto;8.0;24;96.1
+537;Ajo en polvo;98.0;23;96.1
+545;Pasta de tomate(**);60.0;23;96.1
+300;Aceite de canola;87.0;23;96.1
+616;Jugo envasado de coctel de frutas (fruit punch);25.0;23;96.1
+652;Cigarrillos con filtro;23.0;23;96.2
+484;Dulces de navidad surtidos;56.0;23;96.2
+521;Ajinomoto;98.0;22;96.2
+251;Leche en polvo entera;31.0;22;96.2
+19;Galletas de soda;98.0;22;96.2
+72;Avena molida saborizada (Frescavena y otras);98.0;22;96.3
+546;Salsa china;20.0;21;96.3
+5882;Bizcocho envasado de maíz;56.0;21;96.3
+546;Salsa china;87.0;21;96.3
+110;Pollo fresco;8.0;21;96.3
+56;Harinas de maíz;98.0;21;96.4
+436;Alcaparras;98.0;21;96.4
+578;Gelatina en polvo;25.0;21;96.4
+536;Ajo en pasta;87.0;21;96.4
+307;Mantequilla;105.0;21;96.4
+324;Guineo verde (guineíto);66.0;20;96.4
+86;Coditos;8.0;20;96.5
+75;Cereales de trigo;63.0;19;96.5
+5042;Palitos de ajo;56.0;19;96.5
+281;Leche de soya;98.0;19;96.5
+534;Orégano;56.0;19;96.5
+4919;Leche líquida con chocolate;25.0;19;96.5
+13;Pan de sándwich rebanado blanco;117.0;18;96.6
+410;Ajo;8.0;18;96.6
+575;Cremora;87.0;18;96.6
+5965;Jugo de fresa envasado;31.0;18;96.6
+297;Aceite de oliva;20.0;18;96.6
+609;Jugo envasado de melocotón;25.0;18;96.6
+5049;Jugo envasado de cereza;31.0;18;96.7
+59;Harina de negrito (fécula de trigo);56.0;18;96.7
+254;Leche evaporada;25.0;18;96.7
+18;Galletas de harina / Galleta de manteca;8.0;18;96.7
+3571;Masa para empanada de harina;8.0;17;96.7
+4919;Leche líquida con chocolate;87.0;17;96.7
+24;Galletas de Avena / Granola;8.0;17;96.7
+578;Gelatina en polvo;23.0;17;96.8
+634;Clerén;20.0;17;96.8
+277;Yogurt bebible natural;115.0;17;96.8
+529;Manzanilla;98.0;17;96.8
+609;Jugo envasado de melocotón;23.0;17;96.8
+506;Sal molida refinada;8.0;16;96.8
+587;Cocoa y chocolate en polvo;99.0;16;96.8
+67;Arroz corriente;60.0;16;96.9
+6031;Gomitas dulces;56.0;16;96.9
+3810;Espirales;56.0;16;96.9
+319;Fresa;8.0;16;96.9
+571;Sopa instantánea (sopa china);56.0;16;96.9
+19;Galletas de soda;56.0;15;96.9
+295;Aceite de coco;20.0;15;96.9
+369;Habichuelas rojas secas;56.0;15;97.0
+499;Caramelos, chicles;23.0;15;97.0
+87;Fideos;98.0;15;97.0
+541;Mayonesa;55.0;15;97.0
+618;Jugo envasado de Aloe;87.0;15;97.0
+523;Canela en astilla;56.0;15;97.0
+56;Harinas de maíz;8.0;15;97.0
+4413;Sal en grano;56.0;15;97.0
+3807;Macarrones;23.0;15;97.1
+3812;Mostachones;56.0;15;97.1
+260;Queso cheddar amarillo;8.0;15;97.1
+458;Azúcar blanca refinada;56.0;15;97.1
+432;Ensalada cruda (Varias hortalizas);8.0;15;97.1
+322;Guayaba;63.0;14;97.1
+545;Pasta de tomate(**);87.0;14;97.1
+569;Caldo de pollo (Sopita Concentrada);8.0;14;97.1
+6446;Avena molida no saborizada;98.0;14;97.2
+586;Chocolate en barra;8.0;14;97.2
+608;Jugo envasado de manzana;23.0;14;97.2
+606;Jugo envasado de chinola;31.0;14;97.2
+587;Cocoa y chocolate en polvo;63.0;14;97.2
+97;Carne molida de res;8.0;14;97.2
+297;Aceite de oliva;63.0;14;97.2
+20;Galletas dulces;98.0;14;97.2
+596;Agua saborizada;20.0;14;97.3
+368;Habichuelas pintas secas;63.0;14;97.3
+501;Paletas, mentas;98.0;14;97.3
+307;Mantequilla;14.0;13;97.3
+611;Jugo envasado de pera;87.0;13;97.3
+405;Brócolis;8.0;13;97.3
+491;Helados de fruta a base de leche;105.0;13;97.3
+374;Guandules verdes en cáscara;63.0;13;97.3
+515;Cilantrico o verdura;92.0;13;97.3
+316;Cereza;60.0;13;97.4
+88;Spaghetti;98.0;13;97.4
+528;Nuez moscada;98.0;13;97.4
+4918;Atún desmenuzado en agua;63.0;13;97.4
+159;Chuleta ahumada;8.0;13;97.4
+514;Cilantro;8.0;13;97.4
+267;Queso holandés (Geo, gouda y similares);8.0;13;97.4
+433;Aceitunas verdes con semillas;87.0;13;97.4
+613;Jugo envasado de tamarindo;20.0;13;97.4
+6545;Mabí de limón;20.0;12;97.5
+544;Aderezos para sándwich;87.0;12;97.5
+560;Canela en polvo;98.0;12;97.5
+410;Ajo;20.0;12;97.5
+316;Cereza;63.0;12;97.5
+3809;Macarroni & Cheese;25.0;12;97.5
+5490;Jugo envasado de mango;31.0;12;97.5
+275;Yogurt bebible saborizado;115.0;12;97.5
+616;Jugo envasado de coctel de frutas (fruit punch);8.0;12;97.5
+498;Bombones y chocolates dulces;56.0;12;97.6
+610;Jugo envasado de naranja;56.0;12;97.6
+2848;Mabí de limón servido;20.0;12;97.6
+616;Jugo envasado de coctel de frutas (fruit punch);23.0;11;97.6
+587;Cocoa y chocolate en polvo;56.0;11;97.6
+369;Habichuelas rojas secas;8.0;11;97.6
+59;Harina de negrito (fécula de trigo);98.0;11;97.6
+542;Kétchup;63.0;11;97.6
+4952;Sobre de naranja agria en polvo;98.0;11;97.6
+548;Preparado líquido de Salsa de tomate (Ragú y similares);87.0;11;97.6
+5;Pan de mantequilla;56.0;11;97.6
+356;Nueces y semillas surtidas;56.0;11;97.7
+457;Papas fritas (snack y picaderas);8.0;11;97.7
+457;Papas fritas (snack y picaderas);63.0;11;97.7
+569;Caldo de pollo (Sopita Concentrada);1.0;11;97.7
+571;Sopa instantánea (sopa china);8.0;11;97.7
+108;Carne corriente de res;8.0;11;97.7
+112;Pechuga de pollo;8.0;11;97.7
+296;Aceite de maíz;87.0;10;97.7
+348;Tamarindo;8.0;10;97.7
+553;Sazón líquido;56.0;10;97.7
+20;Galletas dulces;63.0;10;97.8
+3506;Bizcocho envasado de vainilla;98.0;10;97.8
+316;Cereza;56.0;10;97.8
+92;Lasagña;23.0;10;97.8
+367;Habichuelas negras secas;56.0;10;97.8
+552;Sazón en polvo;56.0;10;97.8
+53;Tortilla de maíz (para tacos);8.0;10;97.8
+596;Agua saborizada;87.0;10;97.8
+598;Jugo concentrado de fruit-punch;87.0;10;97.8
+608;Jugo envasado de manzana;20.0;10;97.8
+371;Habichuelas blanditas;63.0;10;97.8
+642;Sidra;20.0;10;97.8
+507;Sal marina;56.0;10;97.9
+611;Jugo envasado de pera;8.0;10;97.9
+257;Leche maternizada (sustituto de lactancia materna, hasta 1 año);87.0;10;97.9
+261;Queso danés;8.0;10;97.9
+281;Leche de soya;56.0;10;97.9
+76;Corn Flakes (incluye rice flakes, cereales de chocolates, frutas y demás);115.0;10;97.9
+386;Papas;56.0;10;97.9
+57;Maicena (fécula de maíz) /Maicera (harina de maíz procesada);98.0;9;97.9
+535;Orégano en polvo;56.0;9;97.9
+4948;Cilantro en grano;98.0;9;97.9
+3076;Habichuela negra con coco en lata;63.0;9;97.9
+484;Dulces de navidad surtidos;8.0;9;97.9
+396;Apio planta, apio gusto;8.0;9;98.0
+254;Leche evaporada;87.0;9;98.0
+581;Café molido;87.0;9;98.0
+515;Cilantrico o verdura;8.0;9;98.0
+348;Tamarindo;56.0;9;98.0
+3242;Galleta con queso;8.0;9;98.0
+408;Cebolla roja;8.0;9;98.0
+1892;Alimentos para animales;97.0;9;98.0
+466;Melaza;20.0;9;98.0
+23;Galletas saladas;1.0;9;98.0
+1892;Alimentos para animales;56.0;9;98.0
+542;Kétchup;20.0;9;98.0
+114;Muslos de pollo;8.0;9;98.0
+545;Pasta de tomate(**);8.0;9;98.1
+306;Mantequilla de maní;87.0;9;98.1
+2;Pan sobado;1.0;9;98.1
+9;Pan integral;117.0;9;98.1
+8776;Salami guisado en lata;63.0;8;98.1
+5965;Jugo de fresa envasado;87.0;8;98.1
+267;Queso holandés (Geo, gouda y similares);17.0;8;98.1
+6451;Leche entera liquida sin lactosa;31.0;8;98.1
+566;Vainilla negra;87.0;8;98.1
+315;Rulo;91.0;8;98.1
+3506;Bizcocho envasado de vainilla;8.0;8;98.1
+456;Papa pre cocida congelada;56.0;8;98.1
+71;Avena en hojuela o entera;8.0;8;98.1
+440;Guisantes enlatados (petit-pois);63.0;8;98.1
+6213;Leche con avena envasado;31.0;8;98.2
+581;Café molido;63.0;8;98.2
+498;Bombones y chocolates dulces;8.0;8;98.2
+652;Cigarrillos con filtro;25.0;8;98.2
+247;Leche descremada liquida con UHT;23.0;8;98.2
+515;Cilantrico o verdura;98.0;8;98.2
+277;Yogurt bebible natural;20.0;8;98.2
+269;Queso picantino parmesano rallado;87.0;8;98.2
+84;Maíz para hacer rositas (palomitas);56.0;8;98.2
+392;Ají grande (cubanela);8.0;8;98.2
+657;Tabaco para pipa;98.0;8;98.2
+645;Cerveza clara;23.0;8;98.2
+10;Pan telera;56.0;7;98.2
+65;Arroz súper-selecto o premium;56.0;7;98.2
+653;Cigarrillos sin filtro;24.0;7;98.2
+92;Lasagña;8.0;7;98.3
+6579;Mabí de chinola;20.0;7;98.3
+5850;Jugo envasado de guayaba;31.0;7;98.3
+48;Masitas;56.0;7;98.3
+296;Aceite de maíz;98.0;7;98.3
+76;Corn Flakes (incluye rice flakes, cereales de chocolates, frutas y demás);8.0;7;98.3
+3807;Macarrones;56.0;7;98.3
+80;Trigo;56.0;7;98.3
+328;Limón agrio;63.0;7;98.3
+232;Bacalao;8.0;7;98.3
+507;Sal marina;87.0;7;98.3
+586;Chocolate en barra;56.0;7;98.3
+399;Auyama;79.0;7;98.3
+437;Garbanzos enlatados;63.0;7;98.3
+590;Soda amarga;20.0;7;98.3
+275;Yogurt bebible saborizado;20.0;7;98.3
+578;Gelatina en polvo;98.0;7;98.4
+523;Canela en astilla;8.0;7;98.4
+247;Leche descremada liquida con UHT;25.0;7;98.4
+524;Canelilla;98.0;7;98.4
+386;Papas;8.0;7;98.4
+610;Jugo envasado de naranja;8.0;7;98.4
+268;Queso mozzarella;8.0;7;98.4
+7460;Mabí de leche con guayaba envasado;20.0;6;98.4
+427;Lechuga repollada;8.0;6;98.4
+566;Vainilla negra;98.0;6;98.4
+552;Sazón en polvo;8.0;6;98.4
+408;Cebolla roja;1.0;6;98.4
+6472;Refrescos servido;20.0;6;98.4
+32;Palomitas de maíz para microondas;56.0;6;98.4
+121;Hígado de pollo;8.0;6;98.4
+303;Margarina;87.0;6;98.4
+545;Pasta de tomate(**);48.0;6;98.4
+573;Compota;23.0;6;98.4
+276;Yogurt con trozos de frutas;87.0;6;98.5
+251;Leche en polvo entera;8.0;6;98.5
+280;Crema de leche;31.0;6;98.5
+264;Queso crema;8.0;6;98.5
+615;Jugo envasado de uvas;31.0;6;98.5
+242;Leche fresca o cruda de vaca;87.0;6;98.5
+178;Salami súper especial;8.0;6;98.5
+491;Helados de fruta a base de leche;115.0;6;98.5
+367;Habichuelas negras secas;60.0;6;98.5
+400;Zanahoria;8.0;6;98.5
+2694;Cerveza clara servida;20.0;6;98.5
+641;Vino rosado;20.0;6;98.5
+620;Jugo de frutas en polvo;31.0;6;98.5
+169;Jamón de pavo;8.0;6;98.5
+420;Tomate Barceló o Bugalú;8.0;6;98.5
+73;Cereales de arroz;63.0;6;98.5
+439;Guandules verdes en lata;60.0;6;98.5
+4399;Cilantro molido;98.0;6;98.5
+530;Flor de tilo;98.0;6;98.5
+15;Pan de hot dog;56.0;6;98.6
+14;Pan de sándwich rebanado integral;56.0;6;98.6
+8;Pan camarón;56.0;6;98.6
+6547;Mabí de bejuco;20.0;6;98.6
+5300;Mabí de bejuco servido;20.0;5;98.6
+5599;Pan dulce;56.0;5;98.6
+58;Harina de trigo;23.0;5;98.6
+53;Tortilla de maíz (para tacos);56.0;5;98.6
+532;Pimienta en polvo;56.0;5;98.6
+535;Orégano en polvo;87.0;5;98.6
+6466;Sopa crema (Maggie, Knorr y similares);98.0;5;98.6
+6446;Avena molida no saborizada;56.0;5;98.6
+303;Margarina;49.0;5;98.6
+594;Agua purificada (Dasani, Planeta Azul y similares);8.0;5;98.6
+586;Chocolate en barra;25.0;5;98.6
+586;Chocolate en barra;14.0;5;98.6
+514;Cilantro;98.0;5;98.6
+610;Jugo envasado de naranja;63.0;5;98.6
+355;Maní tostado;87.0;5;98.6
+265;Queso de hoja;17.0;5;98.6
+569;Caldo de pollo (Sopita Concentrada);87.0;5;98.6
+245;Leche semidescremada liquida con UHT;87.0;5;98.6
+280;Crema de leche;63.0;5;98.6
+573;Compota;56.0;5;98.7
+549;Salsa francesa;98.0;5;98.7
+552;Sazón en polvo;47.0;5;98.7
+555;Vinagre blanco;20.0;5;98.7
+330;Limoncillo;8.0;5;98.7
+259;Suplementos alimenticios (Ensure y similares);98.0;5;98.7
+99;Carne preparada para bistec;8.0;5;98.7
+3571;Masa para empanada de harina;56.0;5;98.7
+128;Carne corriente de cerdo;8.0;5;98.7
+498;Bombones y chocolates dulces;98.0;5;98.7
+458;Azúcar blanca refinada;8.0;5;98.7
+51;Cazabe;56.0;5;98.7
+3079;Masa de pastelitos;8.0;5;98.7
+436;Alcaparras;87.0;5;98.7
+420;Tomate Barceló o Bugalú;56.0;5;98.7
+423;Vainitas chinas;8.0;5;98.7
+417;Repollo corriente;56.0;5;98.7
+20;Galletas dulces;23.0;5;98.7
+74;Cereales con frutas;63.0;5;98.7
+72;Avena molida saborizada (Frescavena y otras);56.0;5;98.7
+3813;Linguinis;8.0;5;98.7
+1536;Bicarbonato de sodio;98.0;5;98.7
+620;Jugo de frutas en polvo;87.0;5;98.7
+501;Paletas, mentas;1.0;5;98.8
+177;Salami corriente;1.0;5;98.8
+120;Carne de pavo;8.0;5;98.8
+619;Jugo envasado de Cranberry;87.0;5;98.8
+392;Ají grande (cubanela);1.0;5;98.8
+482;Flan enlatado;63.0;5;98.8
+174;Longaniza;8.0;5;98.8
+600;Jugo concentrado de naranja;87.0;5;98.8
+620;Jugo de frutas en polvo;8.0;5;98.8
+541;Mayonesa;56.0;4;98.8
+527;Malagueta;8.0;4;98.8
+366;Habichuelas blancas secas;63.0;4;98.8
+359;Cocos secos;56.0;4;98.8
+303;Margarina;14.0;4;98.8
+242;Leche fresca o cruda de vaca;60.0;4;98.8
+606;Jugo envasado de chinola;20.0;4;98.8
+373;Garbanzos;63.0;4;98.8
+376;Guandules verdes desgranados;115.0;4;98.8
+507;Sal marina;98.0;4;98.8
+257;Leche maternizada (sustituto de lactancia materna, hasta 1 año);56.0;4;98.8
+581;Café molido;1.0;4;98.8
+253;Leche en polvo descremada;31.0;4;98.8
+259;Suplementos alimenticios (Ensure y similares);20.0;4;98.8
+551;Salsa picante;87.0;4;98.8
+328;Limón agrio;56.0;4;98.8
+553;Sazón líquido;20.0;4;98.8
+314;Plátano verde;56.0;4;98.8
+296;Aceite de maíz;20.0;4;98.9
+314;Plátano verde;66.0;4;98.9
+569;Caldo de pollo (Sopita Concentrada);56.0;4;98.9
+323;Guineo maduro (banano);56.0;4;98.9
+58;Harina de trigo;97.0;4;98.9
+58;Harina de trigo;25.0;4;98.9
+5752;Caldo de pollo en polvo;47.0;4;98.9
+410;Ajo;56.0;4;98.9
+6304;Royal (levadura);98.0;4;98.9
+6469;Té frio envasado;87.0;4;98.9
+6553;Sardinas en salsa de coco;63.0;4;98.9
+368;Habichuelas pintas secas;8.0;4;98.9
+9;Pan integral;8.0;4;98.9
+178;Salami súper especial;1.0;4;98.9
+649;Malta;23.0;4;98.9
+645;Cerveza clara;63.0;4;98.9
+228;Arenque;8.0;4;98.9
+237;Sardinas en salsa de tomate;98.0;4;98.9
+242;Leche fresca o cruda de vaca;31.0;4;98.9
+78;Cereales integrales (corn flakes integral, bran flakes y demás);23.0;4;98.9
+77;Granola;56.0;4;98.9
+463;Azúcar dietética y sucedáneos del azúcar (Splenda y otros similares);23.0;4;98.9
+395;Ají morrón;56.0;4;98.9
+499;Caramelos, chicles;8.0;4;98.9
+620;Jugo de frutas en polvo;56.0;4;98.9
+639;Vino blanco;20.0;4;98.9
+499;Caramelos, chicles;56.0;4;98.9
+122;Molleja de pollo;8.0;4;98.9
+615;Jugo envasado de uvas;20.0;4;98.9
+208;Merluza;8.0;4;99.0
+611;Jugo envasado de pera;20.0;4;99.0
+182;Salchichas de carne de cerdo;8.0;4;99.0
+3498;Galletas de huevo;56.0;4;99.0
+660;Estupefacientes: marihuana, opio, cocaína y sus derivados;56.0;4;99.0
+2672;Jugo de pera-piña;20.0;4;99.0
+4379;Alhucema;98.0;4;99.0
+4199;Salchicha de pollo;63.0;4;99.0
+4461;Pasa deshidratada;8.0;4;99.0
+4886;Salsa BBQ;87.0;4;99.0
+86;Coditos;23.0;4;99.0
+3506;Bizcocho envasado de vainilla;23.0;4;99.0
+3501;Pan de hamburguer;56.0;4;99.0
+3506;Bizcocho envasado de vainilla;1.0;4;99.0
+447;Maíz enlatado;31.0;4;99.0
+69;Arroz integral;56.0;4;99.0
+3809;Macarroni & Cheese;31.0;4;99.0
+3812;Mostachones;8.0;4;99.0
+3992;Manzana roja;8.0;4;99.0
+430;Molondrones;56.0;4;99.0
+413;Espinaca;8.0;4;99.0
+6031;Gomitas dulces;8.0;4;99.0
+323;Guineo maduro (banano);66.0;3;99.0
+60;Harina de panqueques;56.0;3;99.0
+264;Queso crema;105.0;3;99.0
+4460;Ciruela deshidratada;8.0;3;99.0
+76;Corn Flakes (incluye rice flakes, cereales de chocolates, frutas y demás);63.0;3;99.0
+257;Leche maternizada (sustituto de lactancia materna, hasta 1 año);23.0;3;99.0
+76;Corn Flakes (incluye rice flakes, cereales de chocolates, frutas y demás);25.0;3;99.0
+3810;Espirales;23.0;3;99.0
+447;Maíz enlatado;60.0;3;99.0
+552;Sazón en polvo;23.0;3;99.1
+336;Naranja agria;98.0;3;99.1
+441;Habichuelas blancas enlatadas (alubias);63.0;3;99.1
+488;Esquimalito;56.0;3;99.1
+400;Zanahoria;56.0;3;99.1
+476;Habichuelas con dulce;115.0;3;99.1
+427;Lechuga repollada;56.0;3;99.1
+396;Apio planta, apio gusto;92.0;3;99.1
+559;Bija entera en granos;98.0;3;99.1
+375;Guandules secos;60.0;3;99.1
+4460;Ciruela deshidratada;56.0;3;99.1
+4076;Mabí de naranja servido;20.0;3;99.1
+214;Tilapia;8.0;3;99.1
+493;Helados de sabores artificiales;105.0;3;99.1
+259;Suplementos alimenticios (Ensure y similares);55.0;3;99.1
+493;Helados de sabores artificiales;56.0;3;99.1
+404;Berro;8.0;3;99.1
+499;Caramelos, chicles;98.0;3;99.1
+237;Sardinas en salsa de tomate;23.0;3;99.1
+634;Clerén;87.0;3;99.1
+643;Sangría;20.0;3;99.1
+245;Leche semidescremada liquida con UHT;63.0;3;99.1
+105;Bistec de palomilla;8.0;3;99.1
+4896;Sirup para panques;87.0;3;99.1
+245;Leche semidescremada liquida con UHT;20.0;3;99.1
+2775;Fécula de maíz (Maicena);23.0;3;99.1
+2775;Fécula de maíz (Maicena);25.0;3;99.1
+263;Queso blanco de freír;8.0;3;99.1
+3073;Guandules blanditos;60.0;3;99.1
+656;Tabaco para masticar;56.0;3;99.1
+457;Papas fritas (snack y picaderas);87.0;3;99.1
+544;Aderezos para sándwich;55.0;3;99.1
+74;Cereales con frutas;23.0;3;99.1
+113;Filete de pechuga (deshuesada) de pollo;8.0;3;99.1
+598;Jugo concentrado de fruit-punch;20.0;3;99.1
+254;Leche evaporada;98.0;3;99.1
+77;Granola;8.0;3;99.1
+5834;Avena integral;56.0;3;99.1
+178;Salami súper especial;79.0;3;99.2
+293;Aceite de soya;115.0;3;99.2
+5864;Fresalina;63.0;3;99.2
+578;Gelatina en polvo;8.0;3;99.2
+590;Soda amarga;87.0;3;99.2
+587;Cocoa y chocolate en polvo;105.0;3;99.2
+561;Extracto de vainilla;87.0;3;99.2
+610;Jugo envasado de naranja;1.0;3;99.2
+410;Ajo;47.0;3;99.2
+8392;Mabí de tamarindo;20.0;3;99.2
+78;Cereales integrales (corn flakes integral, bran flakes y demás);56.0;3;99.2
+615;Jugo envasado de uvas;87.0;3;99.2
+7372;Vinagre de manzana;87.0;3;99.2
+6653;Cazabe con ajo;8.0;3;99.2
+606;Jugo envasado de chinola;87.0;3;99.2
+5908;Almendras;56.0;3;99.2
+3585;Habichuela roja con coco en lata;63.0;3;99.2
+243;Leche entera liquida con UHT;1.0;3;99.2
+655;Tabaco en andullo;98.0;3;99.2
+548;Preparado líquido de Salsa de tomate (Ragú y similares);63.0;3;99.2
+600;Jugo concentrado de naranja;20.0;3;99.2
+303;Margarina;56.0;3;99.2
+551;Salsa picante;20.0;3;99.2
+612;Jugo envasado de piña;87.0;3;99.2
+18;Galletas de harina / Galleta de manteca;1.0;3;99.2
+356;Nueces y semillas surtidas;98.0;3;99.2
+6454;Leche líquida saborizada sin lactosa;23.0;3;99.2
+532;Pimienta en polvo;87.0;3;99.2
+563;Pimienta en granos;56.0;3;99.2
+6105;Jugo envasado de limón;87.0;3;99.2
+368;Habichuelas pintas secas;60.0;3;99.2
+554;Vinagre dorado;8.0;3;99.2
+21;Galletas integrales;23.0;3;99.2
+295;Aceite de coco;87.0;3;99.2
+598;Jugo concentrado de fruit-punch;31.0;3;99.2
+527;Malagueta;56.0;3;99.2
+6469;Té frio envasado;20.0;3;99.2
+613;Jugo envasado de tamarindo;31.0;3;99.2
+259;Suplementos alimenticios (Ensure y similares);23.0;2;99.2
+247;Leche descremada liquida con UHT;63.0;2;99.3
+237;Sardinas en salsa de tomate;60.0;2;99.3
+609;Jugo envasado de melocotón;63.0;2;99.3
+523;Canela en astilla;48.0;2;99.3
+181;Salchichas alemanas, suizas;63.0;2;99.3
+182;Salchichas de carne de cerdo;63.0;2;99.3
+186;Salchichas de carne de pavo;63.0;2;99.3
+612;Jugo envasado de piña;63.0;2;99.3
+242;Leche fresca o cruda de vaca;23.0;2;99.3
+587;Cocoa y chocolate en polvo;8.0;2;99.3
+341;Uvas rojas;8.0;2;99.3
+322;Guayaba;56.0;2;99.3
+323;Guineo maduro (banano);8.0;2;99.3
+541;Mayonesa;105.0;2;99.3
+260;Queso cheddar amarillo;79.0;2;99.3
+262;Queso blanco corriente;8.0;2;99.3
+581;Café molido;48.0;2;99.3
+586;Chocolate en barra;1.0;2;99.3
+245;Leche semidescremada liquida con UHT;23.0;2;99.3
+600;Jugo concentrado de naranja;23.0;2;99.3
+260;Queso cheddar amarillo;1.0;2;99.3
+322;Guayaba;8.0;2;99.3
+415;Puerro;8.0;2;99.3
+23;Galletas saladas;63.0;2;99.3
+23;Galletas saladas;87.0;2;99.3
+560;Canela en polvo;87.0;2;99.3
+306;Mantequilla de maní;105.0;2;99.3
+566;Vainilla negra;20.0;2;99.3
+307;Mantequilla;25.0;2;99.3
+299;Aceite de maní;87.0;2;99.3
+293;Aceite de soya;63.0;2;99.3
+565;Vainilla blanca;20.0;2;99.3
+297;Aceite de oliva;105.0;2;99.3
+569;Caldo de pollo (Sopita Concentrada);31.0;2;99.3
+5743;Mashmellow;56.0;2;99.3
+282;Leche de coco;60.0;2;99.3
+579;Snacks y picaderas de todo tipo (excepto papitas fritas);99.0;2;99.3
+573;Compota;1.0;2;99.3
+573;Compota;105.0;2;99.3
+578;Gelatina en polvo;56.0;2;99.3
+328;Limón agrio;8.0;2;99.3
+330;Limoncillo;56.0;2;99.3
+346;Pera;8.0;2;99.3
+269;Queso picantino parmesano rallado;56.0;2;99.3
+575;Cremora;55.0;2;99.3
+576;Polvo para hornear;98.0;2;99.3
+281;Leche de soya;31.0;2;99.3
+556;Vinagre balsámico;98.0;2;99.3
+600;Jugo concentrado de naranja;98.0;2;99.3
+221;Camarones;56.0;2;99.3
+599;Jugo concentrado de guayaba;31.0;2;99.3
+459;Azúcar morena;98.0;2;99.3
+395;Ají morrón;8.0;2;99.3
+396;Apio planta, apio gusto;12.0;2;99.3
+392;Ají grande (cubanela);56.0;2;99.3
+5212;Queso fundido;87.0;2;99.3
+5692;Té frio en polvo;8.0;2;99.3
+4398;Chenchen;56.0;2;99.3
+5732;Chía (semilla);56.0;2;99.4
+434;Aceitunas verdes rellenas;87.0;2;99.4
+410;Ajo;87.0;2;99.4
+435;Alcaparrado (aceitunas y alcaparras);56.0;2;99.4
+429;Zucchini;8.0;2;99.4
+430;Molondrones;8.0;2;99.4
+5049;Jugo envasado de cereza;23.0;2;99.4
+53;Tortilla de maíz (para tacos);98.0;2;99.4
+58;Harina de trigo;8.0;2;99.4
+58;Harina de trigo;98.0;2;99.4
+5042;Palitos de ajo;8.0;2;99.4
+5212;Queso fundido;63.0;2;99.4
+404;Berro;56.0;2;99.4
+408;Cebolla roja;56.0;2;99.4
+433;Aceitunas verdes con semillas;55.0;2;99.4
+434;Aceitunas verdes rellenas;98.0;2;99.4
+324;Guineo verde (guineíto);1.0;2;99.4
+552;Sazón en polvo;48.0;2;99.4
+3925;Cranberry (fruta);8.0;2;99.4
+401;Tomates de ensalada;56.0;2;99.4
+469;Mermeladas, dietéticas o no, jarabe de fructuosa;87.0;2;99.4
+66;Arroz selecto;87.0;2;99.4
+67;Arroz corriente;8.0;2;99.4
+3810;Espirales;8.0;2;99.4
+76;Corn Flakes (incluye rice flakes, cereales de chocolates, frutas y demás);60.0;2;99.4
+4702;Helado en paleta a base de leche;56.0;2;99.4
+62;Sémola de maíz;56.0;2;99.4
+73;Cereales de arroz;56.0;2;99.4
+501;Paletas, mentas;8.0;2;99.4
+60;Harina de panqueques;23.0;2;99.4
+4611;Donas de azucar;23.0;2;99.4
+4149;Galletas rellenas de queso;23.0;2;99.4
+4149;Galletas rellenas de queso;56.0;2;99.4
+4199;Salchicha de pollo;8.0;2;99.4
+4261;Aceite de ajonjolí;87.0;2;99.4
+4374;Agrio de naranja;20.0;2;99.4
+4406;Maíz triturado (para chaca, chenchén, etc.);56.0;2;99.4
+2551;Guandules con coco;60.0;2;99.4
+645;Cerveza clara;1.0;2;99.4
+645;Cerveza clara;8.0;2;99.4
+491;Helados de fruta a base de leche;25.0;2;99.4
+502;Sirope de chocolate;87.0;2;99.4
+3807;Macarrones;25.0;2;99.4
+5882;Bizcocho envasado de maíz;98.0;2;99.4
+6579;Mabí de chinola;87.0;2;99.4
+57;Maicena (fécula de maíz) /Maicera (harina de maíz procesada);31.0;2;99.4
+8201;Mabí de chinola sin envasar;20.0;2;99.4
+403;Berenjena corriente;1.0;2;99.4
+403;Berenjena corriente;8.0;2;99.4
+281;Leche de soya;63.0;2;99.4
+22;Galletas María;8.0;2;99.4
+23;Galletas saladas;23.0;2;99.4
+5864;Fresalina;87.0;2;99.4
+24;Galletas de Avena / Granola;56.0;2;99.4
+2;Pan sobado;98.0;2;99.4
+547;Salsa Alfredo, de queso y similares;98.0;2;99.4
+19;Galletas de soda;1.0;2;99.4
+6545;Mabí de limón;87.0;2;99.4
+6199;Costillita ahumada;8.0;2;99.5
+6440;Bizcocho envasado con mermelada;56.0;2;99.5
+5958;Tortilla de trigo;8.0;2;99.5
+6456;Leche en polvo entera sin lactosa;56.0;2;99.5
+6105;Jugo envasado de limón;20.0;2;99.5
+6;Pan baguette blanco;56.0;2;99.5
+6;Pan baguette blanco;117.0;2;99.5
+17;Galletas con ajonjolí;56.0;2;99.5
+307;Mantequilla;87.0;2;99.5
+313;Plátano maduro;56.0;2;99.5
+556;Vinagre balsámico;20.0;2;99.5
+5876;Linaza;56.0;2;99.5
+185;Salchichas tipo Viena;8.0;2;99.5
+624;Ron blanco;33.0;2;99.5
+649;Malta;1.0;2;99.5
+649;Malta;63.0;2;99.5
+652;Cigarrillos con filtro;8.0;2;99.5
+656;Tabaco para masticar;98.0;2;99.5
+132;Costillas-pecho de cerdo;8.0;2;99.5
+90;Pastas integrales;8.0;2;99.5
+160;Lacón ahumado;8.0;2;99.5
+498;Bombones y chocolates dulces;1.0;2;99.5
+6986;Bollo de maíz con coco crudo;8.0;2;99.5
+501;Paletas, mentas;25.0;2;99.5
+101;Pecho;8.0;2;99.5
+375;Guandules secos;56.0;2;99.5
+638;Vino tinto;87.0;2;99.5
+356;Nueces y semillas surtidas;8.0;2;99.5
+541;Mayonesa;20.0;2;99.5
+317;Chinola;63.0;2;99.5
+534;Orégano;87.0;2;99.5
+604;Jugo concentrado de uva;31.0;2;99.5
+177;Salami corriente;79.0;2;99.5
+608;Jugo envasado de manzana;8.0;2;99.5
+588;Refrescos;8.0;2;99.5
+177;Salami corriente;8.0;2;99.5
+371;Habichuelas blanditas;56.0;2;99.5
+233;Filete de bacalao;8.0;2;99.5
+373;Garbanzos;56.0;2;99.5
+2668;Café negro;98.0;2;99.5
+108;Carne corriente de res;56.0;2;99.5
+110;Pollo fresco;23.0;2;99.5
+110;Pollo fresco;56.0;2;99.5
+104;Filete;8.0;2;99.5
+3242;Galleta con queso;56.0;2;99.5
+3504;Bizcocho envasado de chocolate;56.0;2;99.5
+2473;Azafrán;23.0;2;99.5
+2473;Azafrán;87.0;2;99.5
+98;Carne no. 7;8.0;2;99.5
+443;Habichuelas rojas enlatadas;60.0;2;99.5
+445;Hongos y champiñones enlatados;63.0;2;99.5
+167;Jamón cocido;8.0;2;99.5
+77;Granola;23.0;2;99.5
+3589;Macarons;23.0;2;99.5
+385;Yuca;56.0;2;99.5
+376;Guandules verdes desgranados;56.0;2;99.5
+525;Clavo dulce;8.0;2;99.5
+350;Cajuil;87.0;2;99.6
+506;Sal molida refinada;105.0;2;99.6
+514;Cilantro;92.0;2;99.6
+518;Hojas de Menta;98.0;2;99.6
+171;Jamón picnic;8.0;2;99.6
+143;Hígado de res;8.0;2;99.6
+625;Ron dorado;87.0;2;99.6
+164;Chorizos;8.0;2;99.6
+477;Majarete;63.0;2;99.6
+14;Pan de sándwich rebanado integral;117.0;1;99.6
+8872;Apio en conserva;87.0;1;99.6
+2;Pan sobado;79.0;1;99.6
+5871;Agua de coco envasada (coco rico);87.0;1;99.6
+5875;Cúrcuma;8.0;1;99.6
+5875;Cúrcuma;98.0;1;99.6
+5876;Linaza;63.0;1;99.6
+5876;Linaza;87.0;1;99.6
+5876;Linaza;98.0;1;99.6
+5882;Bizcocho envasado de maíz;8.0;1;99.6
+5834;Avena integral;8.0;1;99.6
+5834;Avena integral;98.0;1;99.6
+5835;Harina integral;98.0;1;99.6
+5850;Jugo envasado de guayaba;23.0;1;99.6
+5871;Agua de coco envasada (coco rico);20.0;1;99.6
+24;Galletas de Avena / Granola;63.0;1;99.6
+24;Galletas de Avena / Granola;98.0;1;99.6
+24;Galletas de Avena / Granola;105.0;1;99.6
+32;Palomitas de maíz para microondas;8.0;1;99.6
+32;Palomitas de maíz para microondas;98.0;1;99.6
+41;Gofio;56.0;1;99.6
+5790;Pan de linaza;8.0;1;99.6
+21;Galletas integrales;98.0;1;99.6
+410;Ajo;48.0;1;99.6
+412;Coliflor;8.0;1;99.6
+417;Repollo corriente;79.0;1;99.6
+419;Tayota;8.0;1;99.6
+419;Tayota;56.0;1;99.6
+420;Tomate Barceló o Bugalú;82.0;1;99.6
+406;Brócolis y coliflores congelados;8.0;1;99.6
+407;Cebolla blanca;8.0;1;99.6
+53;Tortilla de maíz (para tacos);87.0;1;99.6
+56;Harinas de maíz;23.0;1;99.6
+56;Harinas de maíz;25.0;1;99.6
+23;Galletas saladas;99.0;1;99.6
+420;Tomate Barceló o Bugalú;98.0;1;99.6
+431;Maíz en mazorca tierno;8.0;1;99.6
+431;Maíz en mazorca tierno;56.0;1;99.6
+431;Maíz en mazorca tierno;98.0;1;99.6
+5692;Té frio en polvo;56.0;1;99.6
+5692;Té frio en polvo;105.0;1;99.6
+5717;Casabe con maní;8.0;1;99.6
+4920;Leche líquida con vainilla;31.0;1;99.6
+4999;Kiwi;87.0;1;99.6
+5049;Jugo envasado de cereza;20.0;1;99.6
+5049;Jugo envasado de cereza;63.0;1;99.6
+52;Churros sin relleno;98.0;1;99.6
+5741;Yogurt orgánico;115.0;1;99.6
+5744;Majarete en polvo;23.0;1;99.6
+5752;Caldo de pollo en polvo;23.0;1;99.6
+20;Galletas dulces;1.0;1;99.6
+20;Galletas dulces;14.0;1;99.6
+20;Galletas dulces;31.0;1;99.6
+5049;Jugo envasado de cereza;87.0;1;99.6
+5164;Dulce de cereza;87.0;1;99.6
+293;Aceite de soya;105.0;1;99.6
+293;Aceite de soya;107.0;1;99.6
+294;Aceite de girasol;20.0;1;99.6
+578;Gelatina en polvo;63.0;1;99.6
+578;Gelatina en polvo;87.0;1;99.6
+579;Snacks y picaderas de todo tipo (excepto papitas fritas);63.0;1;99.6
+255;Leche condensada;47.0;1;99.6
+573;Compota;8.0;1;99.6
+294;Aceite de girasol;87.0;1;99.6
+297;Aceite de oliva;56.0;1;99.6
+297;Aceite de oliva;114.0;1;99.6
+299;Aceite de maní;20.0;1;99.6
+299;Aceite de maní;98.0;1;99.6
+287;Huevos criollos (gallina);31.0;1;99.6
+288;Huevos de granja (gallina);23.0;1;99.6
+288;Huevos de granja (gallina);25.0;1;99.6
+565;Vainilla blanca;55.0;1;99.6
+565;Vainilla blanca;56.0;1;99.6
+567;Colorante vegetal;98.0;1;99.6
+569;Caldo de pollo (Sopita Concentrada);24.0;1;99.6
+268;Queso mozzarella;56.0;1;99.6
+269;Queso picantino parmesano rallado;8.0;1;99.6
+558;Bija en polvo;20.0;1;99.6
+561;Extracto de vainilla;98.0;1;99.6
+317;Chinola;8.0;1;99.6
+317;Chinola;25.0;1;99.6
+547;Salsa Alfredo, de queso y similares;55.0;1;99.6
+300;Aceite de canola;56.0;1;99.6
+303;Margarina;48.0;1;99.6
+303;Margarina;60.0;1;99.6
+303;Margarina;114.0;1;99.6
+304;Margarina dietética;105.0;1;99.6
+342;Uvas verdes;8.0;1;99.6
+346;Pera;56.0;1;99.6
+347;Sandía (patilla);8.0;1;99.6
+544;Aderezos para sándwich;63.0;1;99.6
+326;Lechosa;56.0;1;99.6
+328;Limón agrio;1.0;1;99.6
+331;Mandarina;56.0;1;99.6
+341;Uvas rojas;23.0;1;99.6
+545;Pasta de tomate(**);1.0;1;99.6
+545;Pasta de tomate(**);25.0;1;99.6
+545;Pasta de tomate(**);31.0;1;99.6
+545;Pasta de tomate(**);105.0;1;99.6
+546;Salsa china;55.0;1;99.7
+546;Salsa china;56.0;1;99.7
+546;Salsa china;115.0;1;99.7
+341;Uvas rojas;56.0;1;99.7
+269;Queso picantino parmesano rallado;55.0;1;99.7
+275;Yogurt bebible saborizado;56.0;1;99.7
+275;Yogurt bebible saborizado;105.0;1;99.7
+275;Yogurt bebible saborizado;114.0;1;99.7
+356;Nueces y semillas surtidas;105.0;1;99.7
+363;Coctel de Frutas en almíbar;63.0;1;99.7
+365;Ajonjolí;8.0;1;99.7
+544;Aderezos para sándwich;105.0;1;99.7
+573;Compota;20.0;1;99.7
+574;Cremas de vegetales;63.0;1;99.7
+575;Cremora;105.0;1;99.7
+283;Leche de almendra;20.0;1;99.7
+283;Leche de almendra;23.0;1;99.7
+571;Sopa instantánea (sopa china);63.0;1;99.7
+571;Sopa instantánea (sopa china);105.0;1;99.7
+571;Sopa instantánea (sopa china);114.0;1;99.7
+220;Calamares;8.0;1;99.7
+221;Camarones;8.0;1;99.7
+231;Filete de arenque;8.0;1;99.7
+232;Bacalao;87.0;1;99.7
+598;Jugo concentrado de fruit-punch;23.0;1;99.7
+600;Jugo concentrado de naranja;25.0;1;99.7
+602;Jugo concentrado de piña;23.0;1;99.7
+588;Refrescos;63.0;1;99.7
+265;Queso de hoja;63.0;1;99.7
+243;Leche entera liquida con UHT;47.0;1;99.7
+256;Leches reforzadas con hierro y minerales (fórmula infantil),;31.0;1;99.7
+257;Leche maternizada (sustituto de lactancia materna, hasta 1 año);20.0;1;99.7
+257;Leche maternizada (sustituto de lactancia materna, hasta 1 año);98.0;1;99.7
+260;Queso cheddar amarillo;23.0;1;99.7
+212;Salmón;8.0;1;99.7
+212;Salmón;63.0;1;99.7
+581;Café molido;20.0;1;99.7
+582;Café soluble instantáneo;23.0;1;99.7
+243;Leche entera liquida con UHT;98.0;1;99.7
+247;Leche descremada liquida con UHT;8.0;1;99.7
+247;Leche descremada liquida con UHT;20.0;1;99.7
+251;Leche en polvo entera;23.0;1;99.7
+260;Queso cheddar amarillo;56.0;1;99.7
+260;Queso cheddar amarillo;87.0;1;99.7
+323;Guineo maduro (banano);91.0;1;99.7
+276;Yogurt con trozos de frutas;114.0;1;99.7
+277;Yogurt bebible natural;55.0;1;99.7
+280;Crema de leche;23.0;1;99.7
+252;Leche en polvo semidescremada;63.0;1;99.7
+254;Leche evaporada;1.0;1;99.7
+580;Suplementos alimenticios balanceados en polvo (proteínas);63.0;1;99.7
+580;Suplementos alimenticios balanceados en polvo (proteínas);99.0;1;99.7
+366;Habichuelas blancas secas;56.0;1;99.7
+367;Habichuelas negras secas;8.0;1;99.7
+369;Habichuelas rojas secas;60.0;1;99.7
+525;Clavo dulce;56.0;1;99.7
+525;Clavo dulce;87.0;1;99.7
+353;Trozos de caña;8.0;1;99.7
+355;Maní tostado;8.0;1;99.7
+356;Nueces y semillas surtidas;87.0;1;99.7
+319;Fresa;56.0;1;99.7
+528;Nuez moscada;8.0;1;99.7
+528;Nuez moscada;87.0;1;99.7
+529;Manzanilla;8.0;1;99.7
+530;Flor de tilo;8.0;1;99.7
+530;Flor de tilo;56.0;1;99.7
+532;Pimienta en polvo;8.0;1;99.7
+365;Ajonjolí;98.0;1;99.7
+587;Cocoa y chocolate en polvo;23.0;1;99.7
+379;Lentejas;56.0;1;99.7
+379;Lentejas;98.0;1;99.7
+380;Maní con o sin cáscara, sin procesar;87.0;1;99.7
+534;Orégano;8.0;1;99.7
+536;Ajo en pasta;47.0;1;99.7
+536;Ajo en pasta;55.0;1;99.7
+541;Mayonesa;8.0;1;99.7
+588;Refrescos;115.0;1;99.7
+589;Refrescos de dieta;20.0;1;99.7
+589;Refrescos de dieta;87.0;1;99.7
+591;Bebidas energizantes (911, Vive100 y similares);63.0;1;99.7
+597;Jugo concentrado de chinola;20.0;1;99.7
+586;Chocolate en barra;63.0;1;99.7
+586;Chocolate en barra;87.0;1;99.7
+587;Cocoa y chocolate en polvo;20.0;1;99.7
+618;Jugo envasado de Aloe;31.0;1;99.7
+116;Carne molida de pollo;8.0;1;99.7
+117;Carne de gallina;8.0;1;99.7
+209;Mero;8.0;1;99.7
+611;Jugo envasado de pera;98.0;1;99.7
+612;Jugo envasado de piña;20.0;1;99.7
+613;Jugo envasado de tamarindo;87.0;1;99.7
+615;Jugo envasado de uvas;8.0;1;99.7
+234;Mariscos en conserva;8.0;1;99.7
+235;Sardinas en aceite;8.0;1;99.7
+239;Salmón ahumado enlatado;63.0;1;99.7
+242;Leche fresca o cruda de vaca;63.0;1;99.7
+615;Jugo envasado de uvas;98.0;1;99.7
+616;Jugo envasado de coctel de frutas (fruit punch);47.0;1;99.7
+616;Jugo envasado de coctel de frutas (fruit punch);98.0;1;99.7
+616;Jugo envasado de coctel de frutas (fruit punch);115.0;1;99.7
+608;Jugo envasado de manzana;98.0;1;99.7
+609;Jugo envasado de melocotón;8.0;1;99.7
+609;Jugo envasado de melocotón;87.0;1;99.7
+242;Leche fresca o cruda de vaca;114.0;1;99.7
+243;Leche entera liquida con UHT;8.0;1;99.7
+602;Jugo concentrado de piña;31.0;1;99.7
+606;Jugo envasado de chinola;23.0;1;99.7
+606;Jugo envasado de chinola;115.0;1;99.7
+587;Cocoa y chocolate en polvo;48.0;1;99.7
+174;Longaniza;31.0;1;99.7
+174;Longaniza;108.0;1;99.7
+174;Longaniza;113.0;1;99.7
+176;Mortadela;1.0;1;99.7
+178;Salami súper especial;45.0;1;99.7
+608;Jugo envasado de manzana;1.0;1;99.7
+608;Jugo envasado de manzana;63.0;1;99.8
+383;Yautía blanca;56.0;1;99.8
+385;Yuca;1.0;1;99.8
+385;Yuca;8.0;1;99.8
+386;Papas;1.0;1;99.8
+506;Sal molida refinada;63.0;1;99.8
+378;Arvejas;8.0;1;99.8
+378;Arvejas;56.0;1;99.8
+378;Arvejas;63.0;1;99.8
+507;Sal marina;8.0;1;99.8
+509;Pimientos maduros en polvo;98.0;1;99.8
+513;Albahaca;87.0;1;99.8
+515;Cilantrico o verdura;20.0;1;99.8
+515;Cilantrico o verdura;91.0;1;99.8
+515;Cilantrico o verdura;99.0;1;99.8
+380;Maní con o sin cáscara, sin procesar;98.0;1;99.8
+383;Yautía blanca;8.0;1;99.8
+183;Salchichas de hot-dog;23.0;1;99.8
+183;Salchichas de hot-dog;56.0;1;99.8
+493;Helados de sabores artificiales;115.0;1;99.8
+497;Hielo casero;98.0;1;99.8
+522;Anís;56.0;1;99.8
+523;Canela en astilla;53.0;1;99.8
+524;Canelilla;87.0;1;99.8
+351;Carambola;56.0;1;99.8
+186;Salchichas de carne de pavo;8.0;1;99.8
+189;Pepperoni;63.0;1;99.8
+203;Chillo;8.0;1;99.8
+204;Cojinúa;8.0;1;99.8
+206;Colorado;8.0;1;99.8
+207;Dorado;8.0;1;99.8
+207;Dorado;87.0;1;99.8
+178;Salami súper especial;81.0;1;99.8
+133;Carne molida de cerdo;8.0;1;99.8
+134;Patica de cerdo;8.0;1;99.8
+88;Spaghetti;87.0;1;99.8
+89;Tallarines;8.0;1;99.8
+89;Tallarines;23.0;1;99.8
+90;Pastas integrales;23.0;1;99.8
+90;Pastas integrales;56.0;1;99.8
+92;Lasagña;25.0;1;99.8
+158;Hamburguesas para cocinar de carne;8.0;1;99.8
+159;Chuleta ahumada;56.0;1;99.8
+161;Tocineta;8.0;1;99.8
+123;Pico y pala de pollo;8.0;1;99.8
+125;Lomo de Cerdo;8.0;1;99.8
+126;Masa de cerdo;8.0;1;99.8
+127;Pierna de cerdo;8.0;1;99.8
+128;Carne corriente de cerdo;56.0;1;99.8
+161;Tocineta;56.0;1;99.8
+165;Jamón ahumado;8.0;1;99.8
+167;Jamón cocido;79.0;1;99.8
+173;Jamoneta;81.0;1;99.8
+620;Jugo de frutas en polvo;23.0;1;99.8
+143;Hígado de res;31.0;1;99.8
+147;Riñón de res;8.0;1;99.8
+154;Carne ahumada de pollo;8.0;1;99.8
+379;Lentejas;8.0;1;99.8
+183;Salchichas de hot-dog;63.0;1;99.8
+184;Salchichas de freír;63.0;1;99.8
+620;Jugo de frutas en polvo;48.0;1;99.8
+620;Jugo de frutas en polvo;63.0;1;99.8
+622;Ron extra añejo (extra viejo y similares);87.0;1;99.8
+623;Ron añejo;87.0;1;99.8
+627;Rones saborizados;20.0;1;99.8
+501;Paletas, mentas;99.0;1;99.8
+502;Sirope de chocolate;55.0;1;99.8
+503;Turrones;23.0;1;99.8
+373;Garbanzos;8.0;1;99.8
+498;Bombones y chocolates dulces;25.0;1;99.8
+499;Caramelos, chicles;14.0;1;99.8
+499;Caramelos, chicles;15.0;1;99.8
+499;Caramelos, chicles;24.0;1;99.8
+399;Auyama;1.0;1;99.8
+399;Auyama;8.0;1;99.8
+374;Guandules verdes en cáscara;56.0;1;99.8
+374;Guandules verdes en cáscara;60.0;1;99.8
+375;Guandules secos;63.0;1;99.8
+376;Guandules verdes desgranados;8.0;1;99.8
+376;Guandules verdes desgranados;48.0;1;99.8
+499;Caramelos, chicles;99.0;1;99.8
+652;Cigarrillos con filtro;56.0;1;99.8
+655;Tabaco en andullo;56.0;1;99.8
+656;Tabaco para masticar;8.0;1;99.8
+635;Ponches;31.0;1;99.8
+636;Triculí;20.0;1;99.8
+638;Vino tinto;114.0;1;99.8
+640;Vino moscatel (La Fuerza y similares);87.0;1;99.8
+398;Remolacha;56.0;1;99.8
+95;Boliche limpio;8.0;1;99.8
+656;Tabaco para masticar;87.0;1;99.8
+657;Tabaco para pipa;56.0;1;99.8
+660;Estupefacientes: marihuana, opio, cocaína y sus derivados;98.0;1;99.8
+1310;Fósforos;25.0;1;99.8
+1536;Bicarbonato de sodio;56.0;1;99.8
+88;Spaghetti;1.0;1;99.8
+646;Cerveza con niveles bajos de alcohol;20.0;1;99.8
+3508;Bizcocho envasado de zanahoria;56.0;1;99.8
+3571;Masa para empanada de harina;98.0;1;99.8
+3581;Yogurt batido;115.0;1;99.8
+83;Maíz en grano;63.0;1;99.8
+84;Maíz para hacer rositas (palomitas);8.0;1;99.8
+86;Coditos;25.0;1;99.8
+86;Coditos;87.0;1;99.8
+3080;Vegetales mixtos empacados;8.0;1;99.8
+2672;Jugo de pera-piña;115.0;1;99.8
+1892;Alimentos para animales;87.0;1;99.8
+2076;Tacos;8.0;1;99.8
+96;Cadera limpia;8.0;1;99.8
+97;Carne molida de res;56.0;1;99.8
+100;Rotí;8.0;1;99.8
+106;Rabo de res;8.0;1;99.8
+3504;Bizcocho envasado de chocolate;8.0;1;99.8
+2702;Ron añejo servido;20.0;1;99.8
+2710;Vino tinto servido;20.0;1;99.8
+2785;Harina de maíz dulce;56.0;1;99.9
+2546;Pollo enlatado;63.0;1;99.9
+2551;Guandules con coco;31.0;1;99.9
+2615;Sopa de pollo;98.0;1;99.9
+2665;Agua purificada servida (Dasani, Planeta Azul y similares);87.0;1;99.9
+2671;Jugo de avena;20.0;1;99.9
+499;Caramelos, chicles;31.0;1;99.9
+499;Caramelos, chicles;87.0;1;99.9
+491;Helados de fruta a base de leche;56.0;1;99.9
+491;Helados de fruta a base de leche;84.0;1;99.9
+492;Malteada (helados);115.0;1;99.9
+2673;Jugo sin envasar de cereza;31.0;1;99.9
+2682;Jugo sin envasar de naranja;31.0;1;99.9
+2682;Jugo sin envasar de naranja;98.0;1;99.9
+399;Auyama;56.0;1;99.9
+400;Zanahoria;1.0;1;99.9
+400;Zanahoria;63.0;1;99.9
+400;Zanahoria;82.0;1;99.9
+401;Tomates de ensalada;8.0;1;99.9
+464;Edulcorantes naturales (Fructosa y similares);56.0;1;99.9
+396;Apio planta, apio gusto;100.0;1;99.9
+397;Rábano;8.0;1;99.9
+484;Dulces de navidad surtidos;31.0;1;99.9
+487;Palitos de coco;56.0;1;99.9
+467;Dulce de leche;8.0;1;99.9
+467;Dulce de leche;87.0;1;99.9
+467;Dulce de leche;105.0;1;99.9
+468;Dulce de coco;8.0;1;99.9
+468;Dulce de coco;87.0;1;99.9
+470;Miel, polen y propóleo, jalea real;87.0;1;99.9
+2887;Avena preparada;56.0;1;99.9
+2936;Impuesto a vivienda de lujos o suntuarias;87.0;1;99.9
+3021;Leche evaporada con sabor a queso;20.0;1;99.9
+75;Cereales de trigo;56.0;1;99.9
+478;Dulce de maní;8.0;1;99.9
+478;Dulce de maní;56.0;1;99.9
+483;Suspiros;63.0;1;99.9
+484;Dulces de navidad surtidos;25.0;1;99.9
+3136;Harina del negrito;23.0;1;99.9
+3136;Harina del negrito;56.0;1;99.9
+76;Corn Flakes (incluye rice flakes, cereales de chocolates, frutas y demás);114.0;1;99.9
+81;Germen de trigo;56.0;1;99.9
+82;Maíz en mazorca seco;56.0;1;99.9
+83;Maíz en grano;8.0;1;99.9
+83;Maíz en grano;56.0;1;99.9
+2850;Batida de naranja con leche;98.0;1;99.9
+4919;Leche líquida con chocolate;8.0;1;99.9
+4919;Leche líquida con chocolate;20.0;1;99.9
+41;Gofio;87.0;1;99.9
+47;Mantecados;8.0;1;99.9
+49;Conconete;8.0;1;99.9
+51;Cazabe;98.0;1;99.9
+4701;Helado en paleta en sabores artificiales;56.0;1;99.9
+4701;Helado en paleta en sabores artificiales;98.0;1;99.9
+71;Avena en hojuela o entera;23.0;1;99.9
+71;Avena en hojuela o entera;87.0;1;99.9
+3807;Macarrones;8.0;1;99.9
+3807;Macarrones;31.0;1;99.9
+60;Harina de panqueques;8.0;1;99.9
+61;Harina de plátano;56.0;1;99.9
+4916;Atún en trozo en agua;60.0;1;99.9
+4917;Atún desmenuzado en aceite;8.0;1;99.9
+74;Cereales con frutas;31.0;1;99.9
+74;Cereales con frutas;98.0;1;99.9
+3809;Macarroni & Cheese;56.0;1;99.9
+3812;Mostachones;23.0;1;99.9
+3812;Mostachones;31.0;1;99.9
+3813;Linguinis;56.0;1;99.9
+65;Arroz súper-selecto o premium;97.0;1;99.9
+67;Arroz corriente;87.0;1;99.9
+397;Rábano;56.0;1;99.9
+398;Remolacha;8.0;1;99.9
+3905;Amaretto;20.0;1;99.9
+3925;Cranberry (fruta);56.0;1;99.9
+3992;Manzana roja;25.0;1;99.9
+3992;Manzana roja;56.0;1;99.9
+3993;Manzana verde;8.0;1;99.9
+4076;Mabí de naranja servido;87.0;1;99.9
+447;Maíz enlatado;56.0;1;99.9
+447;Maíz enlatado;87.0;1;99.9
+449;Pepinillos encurtidos;55.0;1;99.9
+450;Tomates en conserva o enlatados;63.0;1;99.9
+435;Alcaparrado (aceitunas y alcaparras);55.0;1;99.9
+435;Alcaparrado (aceitunas y alcaparras);105.0;1;99.9
+4401;Diten o tomillo;87.0;1;99.9
+4403;Habichuela Yacomelo;63.0;1;99.9
+455;Puré de papa deshidratado o instantáneo;98.0;1;99.9
+457;Papas fritas (snack y picaderas);99.0;1;99.9
+459;Azúcar morena;20.0;1;99.9
+386;Papas;23.0;1;99.9
+389;Batata;8.0;1;99.9
+446;Maíz en mazorca envasado;63.0;1;99.9
+447;Maíz enlatado;1.0;1;99.9
+447;Maíz enlatado;23.0;1;99.9
+403;Berenjena corriente;56.0;1;99.9
+403;Berenjena corriente;82.0;1;99.9
+392;Ají grande (cubanela);63.0;1;99.9
+393;Ají gustoso o cachucha;1.0;1;99.9
+393;Ají gustoso o cachucha;56.0;1;99.9
+393;Ají gustoso o cachucha;89.0;1;99.9
+396;Apio planta, apio gusto;1.0;1;99.9
+453;Pimientos encurtidos;63.0;1;99.9
+4702;Helado en paleta a base de leche;20.0;1;99.9
+4884;Perejil seco el polvo;98.0;1;99.9
+4886;Salsa BBQ;63.0;1;99.9
+4916;Atún en trozo en agua;56.0;1;99.9
+4404;Hoja de ruda;8.0;1;99.9
+4413;Sal en grano;87.0;1;99.9
+4413;Sal en grano;98.0;1;99.9
+4461;Pasa deshidratada;56.0;1;99.9
+6746;Extracto de almendra;87.0;1;99.9
+6994;Vino rosado servido;20.0;1;99.9
+5883;Cacao en bola;17.0;1;99.9
+5908;Almendras;8.0;1;99.9
+5908;Almendras;98.0;1;99.9
+13;Pan de sándwich rebanado blanco;8.0;1;99.9
+14;Pan de sándwich rebanado integral;8.0;1;100.0
+22;Galletas María;56.0;1;100.0
+7377;Jugo envasado de pera-piña;31.0;1;100.0
+7381;Jugo envasado de kiwi;31.0;1;100.0
+1;Pan de agua;117.0;1;100.0
+7517;Quínoa;56.0;1;100.0
+7517;Quínoa;87.0;1;100.0
+6030;Jalao (dulce);8.0;1;100.0
+6580;Mabí de cereza;20.0;1;100.0
+6652;Manzana en conservas enlatadas;63.0;1;100.0
+7838;Alas de pollo;8.0;1;100.0
+8229;Licor saborizado;20.0;1;100.0
+8244;Semillas de girasol;56.0;1;100.0
+1;Pan de agua;1.0;1;100.0
+8869;Bollito de harina de maíz crudo;56.0;1;100.0
+2;Pan sobado;117.0;1;100.0
+7367;Dulce de piña;87.0;1;100.0
+7367;Dulce de piña;105.0;1;100.0
+407;Cebolla blanca;56.0;1;100.0
+408;Cebolla roja;63.0;1;100.0
+410;Ajo;1.0;1;100.0
+2;Pan sobado;8.0;1;100.0
+401;Tomates de ensalada;82.0;1;100.0
+401;Tomates de ensalada;87.0;1;100.0
+56;Harinas de maíz;55.0;1;100.0
+56;Harinas de maíz;63.0;1;100.0
+547;Salsa Alfredo, de queso y similares;63.0;1;100.0
+548;Preparado líquido de Salsa de tomate (Ragú y similares);20.0;1;100.0
+548;Preparado líquido de Salsa de tomate (Ragú y similares);98.0;1;100.0
+549;Salsa francesa;20.0;1;100.0
+549;Salsa francesa;87.0;1;100.0
+308;Manteca de cerdo;20.0;1;100.0
+309;Manteca vegetal;20.0;1;100.0
+314;Plátano verde;97.0;1;100.0
+4;Pan de maíz entero;1.0;1;100.0
+12;Pan de pita;23.0;1;100.0
+324;Guineo verde (guineíto);56.0;1;100.0
+326;Lechosa;8.0;1;100.0
+554;Vinagre dorado;55.0;1;100.0
+555;Vinagre blanco;55.0;1;100.0
+283;Leche de almendra;31.0;1;100.0
+283;Leche de almendra;87.0;1;100.0
+6250;Platos de frutas;8.0;1;100.0
+6446;Avena molida no saborizada;8.0;1;100.0
+6451;Leche entera liquida sin lactosa;87.0;1;100.0
+6453;Leche descremada liquida sin lactosa;63.0;1;100.0
+17;Galletas con ajonjolí;8.0;1;100.0
+18;Galletas de harina / Galleta de manteca;23.0;1;100.0
+6167;Jugo envasado de guineo;31.0;1;100.0
+3;Pan de leche;56.0;1;100.0
+5958;Tortilla de trigo;56.0;1;100.0
+5965;Jugo de fresa envasado;20.0;1;100.0
+6455;Leche liquida pasteurizada (no UHT);25.0;1;100.0
+6456;Leche en polvo entera sin lactosa;63.0;1;100.0
+6461;Flan de leche en cajita;63.0;1;100.0
+6464;Ciruela (fruta);8.0;1;100.0
+6465;Pistacho;56.0;1;100.0
+6167;Jugo envasado de guineo;87.0;1;100.0
