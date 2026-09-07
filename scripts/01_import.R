@@ -39,6 +39,22 @@
 #   cada sección esté limpia por separado -- este script las deja listas
 #   pero independientes.
 
+# Salida adicional:
+#   
+#   data/clean/data_sociodemografia.csv
+# 
+# Variables:
+#   - id_hogar_unico
+# - miembro
+# - sexo
+# - edad
+# - parentesco
+# - factor_expansion
+# 
+# Reservado para el cálculo posterior de
+# AME/AFE en 04_equivalente_adulto.R
+
+
 # Configuración general ------------------------------------------------
 rm(list = ls())   # limpia el entorno
 options(stringsAsFactors = FALSE)
@@ -240,9 +256,30 @@ sec3a_pc <- read_excel(ruta_tabla_PC, sheet = hoja_sec3a) |>
 # many-to-many fan-out exactamente a esas 1349 filas del crudo (374+376),
 # duplicandolas. id_variedad es unico en esta tabla, asi que se une por ahi.
 
-# Paso 5: Ensamblar Q + FC + enhance_id + PC, por sección -----------------
 
-## 5.1 Sección 2 -----------------------------------------------------------
+
+# Paso 5: Variables demográficas para AME/AFE ----------------------------
+
+sociodemografia_data <- read_excel(
+  here("data", "raw", "Sociodemograficas_e_ingresos.xlsx"),
+  sheet = "Base",
+  guess_max = 10000
+) |>
+  clean_names() |>
+  transmute(
+    id_hogar_unico = paste(vivienda, hogar, sep = "_"),
+    miembro,
+    sexo       = a402,
+    edad       = a403,
+    parentesco = a404,
+    factor_expansion
+  )
+
+
+
+# Paso 6: Ensamblar Q + FC + enhance_id + PC, por sección -----------------
+
+## 6.1 Sección 2 -----------------------------------------------------------
 sec2_data <- sec2_data_raw |>
   transmute(
     id_vivienda    = vivienda,
@@ -280,7 +317,7 @@ message(
   " | sin PC/edible: ", sum(is.na(sec2_data$edible))
 )
 
-## 5.2 Sección 3A ------------------------------------------------------------
+## 6.2 Sección 3A ------------------------------------------------------------
 sec3a_data <- sec3a_data_raw |>
   transmute(
     id_vivienda    = vivienda,
@@ -326,7 +363,7 @@ message(
   " | sin PC/edible: ", sum(is.na(sec3a_data$edible))
 )
 
-# Paso 6: Guardar datos limpios (aún SIN calcular consumo) ------------------
+# Paso 7. Guardar datos limpios (aún SIN calcular consumo) ------------------
 dir.create(here("data", "clean"), showWarnings = FALSE, recursive = TRUE)
 
 write_delim(
@@ -340,6 +377,13 @@ write_delim(
   here("data", "clean", "data_sec3a.csv"),
   delim = ";"
 )
+
+write_delim(
+  sociodemografia_data,
+  here("data", "clean", "data_sociodemografia.csv"),
+  delim = ";"
+)
+
 
 # Resumen y siguientes pasos -------------------------------------------------
 # Este script deja, por cada registro de Sec 2 y Sec 3A, las columnas:
