@@ -202,15 +202,50 @@ message(
 write_delim(sociodemografia_data, here("data", "clean", "data_ema_individual.csv"), delim = ";")
 write_delim(ema_hogar, here("data", "clean", "data_ema_hogar.csv"), delim = ";")
 
+# Paso 6: Unir con consumo diario (03_transform.R) y calcular gramos por EMA
+# ----------------------------------------------------------------------
+# OJO: esto da "gramos de alimento consumidos por EMA por dia", TODAVIA NO
+# la "ingesta aparente de micronutrientes por EMA" completa de la formula
+# de Daniel -- para eso falta multiplicar por la composicion nutricional
+# (INCAP/FNDDS), que es 05_ingesta_micronutrientes.R, dejado pendiente a
+# proposito por la complejidad de armonizar los esquemas de columnas de
+# INCAP y FNDDS (ver HOJA_DE_RUTA). Esta pieza intermedia sí se puede
+# construir ya sin esa complejidad, y deja 05 mas simple despues (solo
+# tendra que multiplicar esto por nutriente/gramo, no reconstruir todo).
+
+consumo_sec2  <- read_delim(here("data", "clean", "data_sec2_consumo.csv"),  delim = ";", show_col_types = FALSE)
+consumo_sec3a <- read_delim(here("data", "clean", "data_sec3a_consumo.csv"), delim = ";", show_col_types = FALSE)
+
+# Se excluyen outliers marcados en 03_transform.R y filas sin Consumo_diario_g
+consumo_por_hogar_alimento <- bind_rows(
+  consumo_sec2  |> select(id_hogar_unico, descripcion, enhance_id, Consumo_diario_g, es_outlier),
+  consumo_sec3a |> select(id_hogar_unico, descripcion, enhance_id, Consumo_diario_g, es_outlier)
+) |>
+  filter(!is.na(Consumo_diario_g), !es_outlier | is.na(es_outlier))
+
+gramos_por_ema <- consumo_por_hogar_alimento |>
+  inner_join(ema_hogar |> select(id_hogar_unico, EMA_hogar), by = "id_hogar_unico") |>
+  filter(EMA_hogar > 0) |>
+  mutate(Gramos_por_EMA_dia = Consumo_diario_g / EMA_hogar)
+
+message(
+  "\nGramos por EMA calculado: ", nrow(gramos_por_ema), " filas",
+  " (de ", nrow(consumo_por_hogar_alimento), " registros de consumo validos, Sec2+Sec3A, sin outliers)"
+)
+
+write_delim(gramos_por_ema, here("data", "clean", "data_gramos_por_ema.csv"), delim = ";")
+
 # Próximos pasos (NO hechos en este script) ------------------------------
 # 1. Revisar KCAL_MENOR_1_ANO_PROVISIONAL contra FAO/WHO/UNU 2004
 #    seccion 3 (requerimientos de lactantes) -- ahora mismo es un
 #    placeholder, no un valor verificado.
-# 2. Cuando 03_transform.R tenga el consumo diario agregado por hogar
-#    (Sec 2 + Sec 3A), unir por id_hogar_unico y dividir entre EMA_hogar
-#    para obtener la ingesta aparente por EMA (formula completa del
-#    documento de Daniel).
+# 2. [HECHO 2026-09-08, ver Paso 6 arriba] Union con consumo diario y
+#    calculo de gramos por EMA.
 # 3. Decidir qué hacer con los hogares que tengan algún miembro sin EMA
 #    calculado (n_sin_ema > 0 en data_ema_hogar.csv) -- ahora mismo el
 #    EMA_hogar de esos casos está subestimado (solo suma los miembros
 #    que sí se pudieron calcular).
+# 4. 05_ingesta_micronutrientes.R: multiplicar data_gramos_por_ema.csv por
+#    la composicion nutricional (INCAP/FNDDS, armonizando esquemas) para
+#    obtener la ingesta aparente de cada micronutriente por EMA -- la
+#    formula completa del documento de Daniel.
