@@ -55,6 +55,8 @@ Sec 3A superó la proyección (155,770 vs. ~113,700 esperados) — probablemente
 - [x] **Resuelto (2026-09-08):** "Guandules verdes desgranados" y "Guandules verdes en cáscara" compartían el mismo `ENHANCE_ID` (70211088, EDIBLE=0.48 — correcto solo para la versión con cáscara). Creada fila nueva `99211088` (copia de 70211088 con EDIBLE=1.0, mismo prefijo 99 = corrección nuestra) y actualizado el crosswalk para que "desgranados" apunte ahí. "En cáscara" sigue en 70211088 sin cambios.
 - [ ] Decidir arquitectura para los ítems de fuente FNDDS en el join final (su ID no es nativo de INCAP)
 
+- [ ] **Idea para el cierre de Fase 0 (anotada 2026-09-08, no ejecutar antes):** informe de estado del proyecto (crosswalk, FC, pipeline, hallazgos), con gráficos, para supervisores. **Condición para hacerlo bien:** debe generarse automáticamente desde los datos reales (script Quarto/R que lea el estado y corra el pipeline), nunca texto escrito a mano — si no, duplica `HOJA_DE_RUTA_PROYECTO.md` como fuente de verdad y puede desactualizarse. No es prioridad mientras Fase 0 siga abierta.
+
 ## Fase 1 — Pipeline de scripts (01 → 06)
 
 - [x] `01_import.R` — Q, FC (3 niveles), `enhance_id`, PC ensamblados. Recién corregido; pendiente correr contra datos reales — **estamos acá**.
