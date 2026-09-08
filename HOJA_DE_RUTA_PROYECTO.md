@@ -9,6 +9,13 @@ Este documento fija el alcance acordado hasta ahora. Cualquier cambio de alcance
 
 ## Fase 0 — Cerrar la base de datos (prerrequisito, en curso)
 
+- [x] **HITO (2026-09-08): primera corrida completa y exitosa de `01_import.R` → `02_eda.R` → `03_transform.R`, de punta a punta, en la historia del proyecto.** Con datos parciales pero honestos (crosswalk Sec3A al 50%, `food_factors.xlsx` cubriendo 144/770 alimentos): Sec2 con 11 filas marcadas outlier, Sec3A con 41; ejemplo de cobertura ponderada real (arroz blanco enriquecido, enhance_id 70213002): 30% (IC 28.9-31.1%). En el camino se corrigieron 3 bugs reales que nunca se habían detectado porque estos scripts nunca se habían corrido completos hasta hoy (ver bugs documentados más abajo). El aviso de diseño muestral (IC probablemente subestimado, faltan variables de conglomerado/estrato) sigue pendiente, documentado en el propio script.
+
+- [x] **Resuelto/entendido (2026-09-08):** 54,772 filas de Sec 3A quedan "sin PC/edible" — **confirmado: no es un bug, `food_factors.xlsx` (la tabla de EDIBLE) es un archivo separado del crosswalk, y solo cubre 144 de los 770 alimentos.** No se toca con la validación del crosswalk porque son tablas distintas. Pendiente real: ampliar `food_factors.xlsx` a más alimentos (626 sin cubrir) cuando llegue el momento de esa fase — no es urgente para Fase 0.
+- [x] **Dos bugs reales corregidos en `01_import.R`/`02_eda.R` (2026-09-08), encontrados corriendo el pipeline completo por primera vez:**
+  1. `EDIBLE` de Sec2 en `food_factors.xlsx` estaba guardado como texto con coma decimal ("1,00"); `as.numeric()` directo lo convertía todo a NA. Corregido con reemplazo de coma por punto antes de convertir.
+  2. `02_eda.R` estaba desactualizado desde el 16 de agosto: usaba nombres de columna viejos (`id`, `cantidad`, `alimento`, `unidad_medida`) que ya no existen, y leía los CSV con `read_csv2()` (asume coma decimal) cuando `01_import.R` los escribe con `write_delim()` (punto decimal) — corrompía `Q` y otras columnas numéricas a texto en cada corrida. Reescrito completo, ahora corre limpio y el detector de atípicos por alimento funciona (confirmado: Cebolla roja, Pollo fresco, Ajo, Aceite de soya encabezan atípicos en Sec 3A, resultado con sentido real).
+
 **Primer corrido real de `01_import.R` (2026-09-05, Dr. Monzón):**
 ```
 Sec 2   -- 47,837 filas | universal: 22,316 | específica: 16,866 | SIN FC: 8,655

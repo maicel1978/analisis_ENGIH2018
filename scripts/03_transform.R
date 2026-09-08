@@ -99,8 +99,12 @@ marcar_outliers <- function(df) {
     group_by(enhance_id) |>
     mutate(
       n_grupo = n(),
-      p995 = if (n_grupo >= 20) quantile(Consumo_diario_g, 0.995, na.rm = TRUE) else NA_real_,
-      p005 = if (n_grupo >= 20) quantile(Consumo_diario_g, 0.005, na.rm = TRUE) else NA_real_,
+      # if() no acepta vectores de longitud >1 desde R 4.2 -- dentro de un
+      # mutate() agrupado, "n_grupo >= 20" es un vector (uno por fila del
+      # grupo, aunque todos iguales), no un escalar. Corregido con
+      # if_else() (vectorizado), que es lo que corresponde aqui.
+      p995 = if_else(n_grupo >= 20, quantile(Consumo_diario_g, 0.995, na.rm = TRUE), NA_real_),
+      p005 = if_else(n_grupo >= 20, quantile(Consumo_diario_g, 0.005, na.rm = TRUE), NA_real_),
       es_outlier = !is.na(Consumo_diario_g) & !is.na(p995) &
         (Consumo_diario_g > p995 * 5 | (Consumo_diario_g < p005 / 5 & Consumo_diario_g > 0))
     ) |>
