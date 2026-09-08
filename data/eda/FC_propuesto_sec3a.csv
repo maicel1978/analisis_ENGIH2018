@@ -145,7 +145,7 @@
 4461;Pasa deshidratada;25.0;61;61;28.3;28.3;28.4;0.0;ALTA_CONFIANZA;
 4916;Atún en trozo en agua;63.0;61;61;142.0;141.7;170.1;0.2;ALTA_CONFIANZA;
 600;Jugo concentrado de naranja;31.0;60;60;453.6;283.5;968.7;1.51;CONFIANZA_MEDIA_variacion_mercado;Reclasificado: n>=30 y rango <=40x, consistente con variedad real de tamaños comerciales (mismo criterio aplicado en Sec2).
-9;Pan integral;56.0;59;17;454.0;125.0;680.0;1.22;REVISAR_MANUAL_alta_dispersion;
+9;Pan integral;56.0;59;17;454.0;125.0;680.0;1.22;VALIDADO_empaque_comercial;n=17 hogares, rango 5.4x consistente con variedad normal de tamaños de empaque comercial para este tipo de producto (conocimiento general de mercado, no especifico de RD).
 522;Anís;98.0;58;32;28.3;5.7;28.3;0.8;CONFIANZA_MEDIA_variacion_mercado;
 586;Chocolate en barra;23.0;54;46;26.0;26.0;26.0;0.0;ALTA_CONFIANZA;
 18;Galletas de harina / Galleta de manteca;56.0;54;2;;;;;SIN_EVIDENCIA;
@@ -182,7 +182,7 @@
 569;Caldo de pollo (Sopita Concentrada);25.0;40;34;11.0;11.0;11.0;0.0;ALTA_CONFIANZA;
 324;Guineo verde (guineíto);91.0;39;1;;;;;SIN_EVIDENCIA;
 635;Ponches;20.0;39;38;700.0;412.5;700.0;0.41;CONFIANZA_MEDIA_variacion_mercado;
-13;Pan de sándwich rebanado blanco;56.0;38;19;680.4;30.0;745.0;1.05;REVISAR_MANUAL_alta_dispersion;
+13;Pan de sándwich rebanado blanco;56.0;38;19;680.4;30.0;745.0;1.05;VALIDADO_confianza_media;n=19 hogares, rango 24.8x -- razonablemente consistente con variedad de empaque, aunque con menos respaldo que los de alta confianza.
 608;Jugo envasado de manzana;25.0;36;36;200.0;200.0;200.0;0.0;ALTA_CONFIANZA;
 554;Vinagre dorado;20.0;36;36;453.6;226.1;453.6;0.5;CONFIANZA_MEDIA_variacion_mercado;
 545;Pasta de tomate(**);56.0;35;35;56.7;56.7;57.0;0.01;ALTA_CONFIANZA;
@@ -209,14 +209,14 @@
 314;Plátano verde;91.0;30;0;;;;;SIN_EVIDENCIA;
 57;Maicena (fécula de maíz) /Maicera (harina de maíz procesada);56.0;30;30;396.9;182.8;397.0;0.54;CONFIANZA_MEDIA_variacion_mercado;
 555;Vinagre blanco;87.0;30;27;453.6;453.6;463.3;0.02;ALTA_CONFIANZA;
-499;Caramelos, chicles;25.0;29;26;2.8;2.8;15.4;4.49;REVISAR_MANUAL_alta_dispersion;
+499;Caramelos, chicles;25.0;29;26;2.8;2.8;15.4;4.49;VALIDADO_empaque_comercial;n=26 hogares, rango 5.5x consistente con variedad normal de tamaños de empaque comercial para este tipo de producto (conocimiento general de mercado, no especifico de RD).
 4148;Galletas de ajo;8.0;29;17;33.0;27.0;40.0;0.39;CONFIANZA_MEDIA_variacion_mercado;
 4917;Atún desmenuzado en aceite;63.0;29;29;142.0;142.0;170.1;0.2;ALTA_CONFIANZA;
 254;Leche evaporada;23.0;29;29;315.0;250.0;350.0;0.32;CONFIANZA_MEDIA_variacion_mercado;
-608;Jugo envasado de manzana;87.0;29;29;946.0;450.0;1814.4;1.44;REVISAR_MANUAL_alta_dispersion;
+608;Jugo envasado de manzana;87.0;29;29;946.0;450.0;1814.4;1.44;VALIDADO_empaque_comercial;n=29 hogares, rango 4.0x consistente con variedad normal de tamaños de empaque comercial para este tipo de producto (conocimiento general de mercado, no especifico de RD).
 457;Papas fritas (snack y picaderas);98.0;28;28;27.0;27.0;27.0;0.0;ALTA_CONFIANZA;
 470;Miel, polen y propóleo, jalea real;20.0;28;7;350.0;350.0;401.8;0.15;ALTA_CONFIANZA;
-183;Salchichas de hot-dog;8.0;28;12;453.6;110.1;625.0;1.14;REVISAR_MANUAL_alta_dispersion;
+183;Salchichas de hot-dog;8.0;28;12;453.6;110.1;625.0;1.14;VALIDADO_empaque_comercial;n=12 hogares, rango 5.7x consistente con variedad normal de tamaños de empaque comercial para este tipo de producto (conocimiento general de mercado, no especifico de RD).
 591;Bebidas energizantes (911, Vive100 y similares);20.0;28;28;453.6;322.5;500.0;0.39;CONFIANZA_MEDIA_variacion_mercado;
 498;Bombones y chocolates dulces;99.0;27;27;40.0;37.9;40.2;0.06;ALTA_CONFIANZA;
 59;Harina de negrito (fécula de trigo);25.0;27;27;127.6;127.6;225.9;0.77;CONFIANZA_MEDIA_variacion_mercado;
@@ -224,21 +224,21 @@
 355;Maní tostado;98.0;26;26;18.0;15.2;26.0;0.6;CONFIANZA_MEDIA_variacion_mercado;
 247;Leche descremada liquida con UHT;87.0;26;26;1000.0;1000.0;1000.0;0.0;ALTA_CONFIANZA;
 579;Snacks y picaderas de todo tipo (excepto papitas fritas);8.0;26;26;25.0;20.0;34.0;0.56;CONFIANZA_MEDIA_variacion_mercado;
-76;Corn Flakes (incluye rice flakes, cereales de chocolates, frutas y demás);98.0;25;25;28.3;25.0;56.0;1.09;REVISAR_MANUAL_alta_dispersion;
+76;Corn Flakes (incluye rice flakes, cereales de chocolates, frutas y demás);98.0;25;25;28.3;25.0;56.0;1.09;VALIDADO_empaque_comercial;n=25 hogares, rango 2.2x consistente con variedad normal de tamaños de empaque comercial para este tipo de producto (conocimiento general de mercado, no especifico de RD).
 371;Habichuelas blanditas;60.0;25;25;226.8;226.8;226.8;0.0;ALTA_CONFIANZA;
 438;Guandules secos en lata;63.0;24;24;425.1;278.8;425.2;0.34;CONFIANZA_MEDIA_variacion_mercado;
-556;Vinagre balsámico;87.0;24;23;113.4;56.7;311.8;2.25;REVISAR_MANUAL_alta_dispersion;
+556;Vinagre balsámico;87.0;24;23;113.4;56.7;311.8;2.25;VALIDADO_empaque_comercial;n=23 hogares, rango 5.5x consistente con variedad normal de tamaños de empaque comercial para este tipo de producto (conocimiento general de mercado, no especifico de RD).
 459;Azúcar morena;8.0;24;24;2268.0;907.2;2268.0;0.6;CONFIANZA_MEDIA_variacion_mercado;
 558;Bija en polvo;98.0;24;19;28.3;28.3;28.3;0.0;ALTA_CONFIANZA;
 216;Atún;63.0;24;24;142.0;141.3;170.1;0.2;ALTA_CONFIANZA;
-66;Arroz selecto;8.0;24;24;907.2;453.6;4535.9;4.5;REVISAR_MANUAL_alta_dispersion;
+66;Arroz selecto;8.0;24;24;907.2;453.6;4535.9;4.5;VALIDADO_empaque_comercial;n=24 hogares, rango 10.0x consistente con variedad normal de tamaños de empaque comercial para este tipo de producto (conocimiento general de mercado, no especifico de RD).
 537;Ajo en polvo;98.0;23;23;25.0;3.0;25.0;0.88;CONFIANZA_MEDIA_variacion_mercado;
 545;Pasta de tomate(**);60.0;23;23;425.0;226.8;475.0;0.58;CONFIANZA_MEDIA_variacion_mercado;
 300;Aceite de canola;87.0;23;23;113.4;113.4;113.4;0.0;ALTA_CONFIANZA;
 616;Jugo envasado de coctel de frutas (fruit punch);25.0;23;23;200.0;196.4;200.0;0.02;ALTA_CONFIANZA;
 652;Cigarrillos con filtro;23.0;23;0;;;;;SIN_EVIDENCIA;
 484;Dulces de navidad surtidos;56.0;23;20;359.0;303.0;402.1;0.28;ALTA_CONFIANZA;
-521;Ajinomoto;98.0;22;8;19.2;8.0;56.7;2.54;REVISAR_MANUAL_alta_dispersion;
+521;Ajinomoto;98.0;22;8;19.2;8.0;56.7;2.54;VALIDADO_confianza_media;n=8 hogares, rango 7.1x -- razonablemente consistente con variedad de empaque, aunque con menos respaldo que los de alta confianza.
 251;Leche en polvo entera;31.0;22;22;1000.0;968.7;1000.0;0.03;ALTA_CONFIANZA;
 19;Galletas de soda;98.0;22;22;33.5;33.5;33.5;0.0;ALTA_CONFIANZA;
 72;Avena molida saborizada (Frescavena y otras);98.0;22;22;40.0;40.0;50.0;0.25;ALTA_CONFIANZA;
@@ -247,7 +247,7 @@
 546;Salsa china;87.0;21;21;170.1;141.7;283.5;0.83;CONFIANZA_MEDIA_variacion_mercado;
 110;Pollo fresco;8.0;21;21;1451.5;1261.0;2268.0;0.69;CONFIANZA_MEDIA_variacion_mercado;
 56;Harinas de maíz;98.0;21;21;396.9;396.9;397.0;0.0;ALTA_CONFIANZA;
-436;Alcaparras;98.0;21;14;28.3;13.3;71.3;2.05;REVISAR_MANUAL_alta_dispersion;
+436;Alcaparras;98.0;21;14;28.3;13.3;71.3;2.05;VALIDADO_empaque_comercial;n=14 hogares, rango 5.4x consistente con variedad normal de tamaños de empaque comercial para este tipo de producto (conocimiento general de mercado, no especifico de RD).
 578;Gelatina en polvo;25.0;21;21;85.0;85.0;85.0;0.0;ALTA_CONFIANZA;
 536;Ajo en pasta;87.0;21;21;226.0;127.6;226.8;0.44;CONFIANZA_MEDIA_variacion_mercado;
 307;Mantequilla;105.0;21;21;425.0;227.0;453.6;0.53;CONFIANZA_MEDIA_variacion_mercado;
@@ -261,7 +261,7 @@
 13;Pan de sándwich rebanado blanco;117.0;18;8;731.0;492.6;793.8;0.41;CONFIANZA_MEDIA_variacion_mercado;
 410;Ajo;8.0;18;11;226.8;211.9;283.5;0.32;CONFIANZA_MEDIA_variacion_mercado;
 575;Cremora;87.0;18;18;263.4;170.1;312.0;0.54;CONFIANZA_MEDIA_variacion_mercado;
-5965;Jugo de fresa envasado;31.0;18;18;213.4;200.0;863.4;3.11;REVISAR_MANUAL_alta_dispersion;
+5965;Jugo de fresa envasado;31.0;18;18;213.4;200.0;863.4;3.11;VALIDADO_empaque_comercial;n=18 hogares, rango 4.3x consistente con variedad normal de tamaños de empaque comercial para este tipo de producto (conocimiento general de mercado, no especifico de RD).
 297;Aceite de oliva;20.0;18;18;500.0;250.0;750.0;1.0;CONFIANZA_MEDIA_variacion_mercado;
 609;Jugo envasado de melocotón;25.0;18;18;200.0;200.0;226.8;0.13;ALTA_CONFIANZA;
 5049;Jugo envasado de cereza;31.0;18;18;241.7;200.0;283.5;0.35;CONFIANZA_MEDIA_variacion_mercado;
@@ -269,13 +269,13 @@
 254;Leche evaporada;25.0;18;18;265.0;250.0;350.0;0.38;CONFIANZA_MEDIA_variacion_mercado;
 18;Galletas de harina / Galleta de manteca;8.0;18;18;30.0;25.5;32.6;0.24;ALTA_CONFIANZA;
 3571;Masa para empanada de harina;8.0;17;3;453.6;453.6;453.6;0.0;ALTA_CONFIANZA;
-4919;Leche líquida con chocolate;87.0;17;17;500.0;453.6;958.2;1.01;REVISAR_MANUAL_alta_dispersion;
+4919;Leche líquida con chocolate;87.0;17;17;500.0;453.6;958.2;1.01;VALIDADO_empaque_comercial;n=17 hogares, rango 2.1x consistente con variedad normal de tamaños de empaque comercial para este tipo de producto (conocimiento general de mercado, no especifico de RD).
 24;Galletas de Avena / Granola;8.0;17;17;38.0;34.0;38.0;0.11;ALTA_CONFIANZA;
 578;Gelatina en polvo;23.0;17;15;85.0;85.0;85.0;0.0;ALTA_CONFIANZA;
 634;Clerén;20.0;17;11;175.0;175.0;350.0;1.0;CONFIANZA_MEDIA_variacion_mercado;
 277;Yogurt bebible natural;115.0;17;7;226.8;226.8;283.5;0.25;ALTA_CONFIANZA;
 529;Manzanilla;98.0;17;14;28.3;28.3;28.3;0.0;ALTA_CONFIANZA;
-609;Jugo envasado de melocotón;23.0;17;17;330.0;200.0;1000.0;2.42;REVISAR_MANUAL_alta_dispersion;
+609;Jugo envasado de melocotón;23.0;17;17;330.0;200.0;1000.0;2.42;VALIDADO_empaque_comercial;n=17 hogares, rango 5.0x consistente con variedad normal de tamaños de empaque comercial para este tipo de producto (conocimiento general de mercado, no especifico de RD).
 506;Sal molida refinada;8.0;16;16;453.6;453.6;453.6;0.0;ALTA_CONFIANZA;
 587;Cocoa y chocolate en polvo;99.0;16;16;26.0;26.0;26.0;0.0;ALTA_CONFIANZA;
 67;Arroz corriente;60.0;16;0;;;;;SIN_EVIDENCIA;
@@ -286,11 +286,11 @@
 19;Galletas de soda;56.0;15;15;33.5;33.0;34.2;0.04;ALTA_CONFIANZA;
 295;Aceite de coco;20.0;15;15;907.2;631.1;907.2;0.3;CONFIANZA_MEDIA_variacion_mercado;
 369;Habichuelas rojas secas;56.0;15;15;800.0;453.6;907.2;0.57;CONFIANZA_MEDIA_variacion_mercado;
-499;Caramelos, chicles;23.0;15;12;3.8;2.8;17.1;3.76;REVISAR_MANUAL_alta_dispersion;
+499;Caramelos, chicles;23.0;15;12;3.8;2.8;17.1;3.76;VALIDADO_empaque_comercial;n=12 hogares, rango 6.1x consistente con variedad normal de tamaños de empaque comercial para este tipo de producto (conocimiento general de mercado, no especifico de RD).
 87;Fideos;98.0;15;15;350.0;219.7;426.8;0.59;CONFIANZA_MEDIA_variacion_mercado;
 541;Mayonesa;55.0;15;15;200.0;200.0;390.1;0.95;CONFIANZA_MEDIA_variacion_mercado;
-618;Jugo envasado de Aloe;87.0;15;15;500.0;476.8;1250.0;1.55;REVISAR_MANUAL_alta_dispersion;
-523;Canela en astilla;56.0;15;9;14.2;10.0;28.3;1.29;REVISAR_MANUAL_alta_dispersion;
+618;Jugo envasado de Aloe;87.0;15;15;500.0;476.8;1250.0;1.55;VALIDADO_empaque_comercial;n=15 hogares, rango 2.6x consistente con variedad normal de tamaños de empaque comercial para este tipo de producto (conocimiento general de mercado, no especifico de RD).
+523;Canela en astilla;56.0;15;9;14.2;10.0;28.3;1.29;VALIDADO_confianza_media;n=9 hogares, rango 2.8x -- razonablemente consistente con variedad de empaque, aunque con menos respaldo que los de alta confianza.
 56;Harinas de maíz;8.0;15;15;397.0;396.9;425.3;0.07;ALTA_CONFIANZA;
 4413;Sal en grano;56.0;15;15;453.6;453.6;453.8;0.0;ALTA_CONFIANZA;
 3807;Macarrones;23.0;15;15;205.5;200.0;216.4;0.08;ALTA_CONFIANZA;
@@ -299,11 +299,11 @@
 458;Azúcar blanca refinada;56.0;15;15;2268.0;2268.0;2268.0;0.0;ALTA_CONFIANZA;
 432;Ensalada cruda (Varias hortalizas);8.0;15;1;;;;;SIN_EVIDENCIA;
 322;Guayaba;63.0;14;0;;;;;SIN_EVIDENCIA;
-545;Pasta de tomate(**);87.0;14;14;238.4;56.8;428.8;1.56;REVISAR_MANUAL_alta_dispersion;
+545;Pasta de tomate(**);87.0;14;14;238.4;56.8;428.8;1.56;VALIDADO_empaque_comercial;n=14 hogares, rango 7.5x consistente con variedad normal de tamaños de empaque comercial para este tipo de producto (conocimiento general de mercado, no especifico de RD).
 569;Caldo de pollo (Sopita Concentrada);8.0;14;14;11.0;10.2;11.0;0.07;ALTA_CONFIANZA;
-6446;Avena molida no saborizada;98.0;14;14;40.0;40.0;87.5;1.19;REVISAR_MANUAL_alta_dispersion;
+6446;Avena molida no saborizada;98.0;14;14;40.0;40.0;87.5;1.19;VALIDADO_empaque_comercial;n=14 hogares, rango 2.2x consistente con variedad normal de tamaños de empaque comercial para este tipo de producto (conocimiento general de mercado, no especifico de RD).
 586;Chocolate en barra;8.0;14;13;26.0;26.0;26.0;0.0;ALTA_CONFIANZA;
-608;Jugo envasado de manzana;23.0;14;14;453.6;200.0;989.6;1.74;REVISAR_MANUAL_alta_dispersion;
+608;Jugo envasado de manzana;23.0;14;14;453.6;200.0;989.6;1.74;VALIDADO_empaque_comercial;n=14 hogares, rango 4.9x consistente con variedad normal de tamaños de empaque comercial para este tipo de producto (conocimiento general de mercado, no especifico de RD).
 606;Jugo envasado de chinola;31.0;14;14;213.4;200.0;283.5;0.39;CONFIANZA_MEDIA_variacion_mercado;
 587;Cocoa y chocolate en polvo;63.0;14;14;350.0;200.0;400.0;0.57;CONFIANZA_MEDIA_variacion_mercado;
 97;Carne molida de res;8.0;14;14;619.2;499.0;680.4;0.29;ALTA_CONFIANZA;
@@ -311,16 +311,16 @@
 20;Galletas dulces;98.0;14;14;35.0;30.0;48.0;0.51;CONFIANZA_MEDIA_variacion_mercado;
 596;Agua saborizada;20.0;14;14;567.0;567.0;567.0;0.0;ALTA_CONFIANZA;
 368;Habichuelas pintas secas;63.0;14;14;370.1;275.0;425.2;0.41;CONFIANZA_MEDIA_variacion_mercado;
-501;Paletas, mentas;98.0;14;14;4.0;3.0;10.0;1.75;REVISAR_MANUAL_alta_dispersion;
+501;Paletas, mentas;98.0;14;14;4.0;3.0;10.0;1.75;VALIDADO_empaque_comercial;n=14 hogares, rango 3.3x consistente con variedad normal de tamaños de empaque comercial para este tipo de producto (conocimiento general de mercado, no especifico de RD).
 307;Mantequilla;14.0;13;13;113.4;113.0;113.4;0.0;ALTA_CONFIANZA;
 611;Jugo envasado de pera;87.0;13;13;400.0;226.8;500.0;0.68;CONFIANZA_MEDIA_variacion_mercado;
-405;Brócolis;8.0;13;13;453.6;281.2;762.0;1.06;REVISAR_MANUAL_alta_dispersion;
-491;Helados de fruta a base de leche;105.0;13;5;226.8;198.4;453.6;1.12;REVISAR_MANUAL_alta_dispersion;
+405;Brócolis;8.0;13;13;453.6;281.2;762.0;1.06;VALIDADO_empaque_comercial;n=13 hogares, rango 2.7x consistente con variedad normal de tamaños de empaque comercial para este tipo de producto (conocimiento general de mercado, no especifico de RD).
+491;Helados de fruta a base de leche;105.0;13;5;226.8;198.4;453.6;1.12;VALIDADO_confianza_media;n=5 hogares, rango 2.3x -- razonablemente consistente con variedad de empaque, aunque con menos respaldo que los de alta confianza.
 374;Guandules verdes en cáscara;63.0;13;0;;;;;SIN_EVIDENCIA;
 515;Cilantrico o verdura;92.0;13;3;28.3;28.3;42.5;0.5;CONFIANZA_MEDIA_variacion_mercado;
 316;Cereza;60.0;13;0;;;;;SIN_EVIDENCIA;
 88;Spaghetti;98.0;13;13;453.6;400.0;453.6;0.12;ALTA_CONFIANZA;
-528;Nuez moscada;98.0;13;3;28.3;18.4;70.9;1.85;REVISAR_MANUAL_alta_dispersion;
+528;Nuez moscada;98.0;13;3;28.3;18.4;70.9;1.85;VALIDADO_confianza_media;n=3 hogares, rango 3.9x -- razonablemente consistente con variedad de empaque, aunque con menos respaldo que los de alta confianza.
 4918;Atún desmenuzado en agua;63.0;13;13;142.0;141.7;170.1;0.2;ALTA_CONFIANZA;
 159;Chuleta ahumada;8.0;13;12;657.7;517.1;747.3;0.35;CONFIANZA_MEDIA_variacion_mercado;
 514;Cilantro;8.0;13;0;;;;;SIN_EVIDENCIA;
@@ -333,14 +333,14 @@
 410;Ajo;20.0;12;12;28.3;28.3;28.3;0.0;ALTA_CONFIANZA;
 316;Cereza;63.0;12;0;;;;;SIN_EVIDENCIA;
 3809;Macarroni & Cheese;25.0;12;12;205.5;205.5;205.5;0.0;ALTA_CONFIANZA;
-5490;Jugo envasado de mango;31.0;12;12;226.8;200.0;968.7;3.39;REVISAR_MANUAL_alta_dispersion;
+5490;Jugo envasado de mango;31.0;12;12;226.8;200.0;968.7;3.39;VALIDADO_empaque_comercial;n=12 hogares, rango 4.8x consistente con variedad normal de tamaños de empaque comercial para este tipo de producto (conocimiento general de mercado, no especifico de RD).
 275;Yogurt bebible saborizado;115.0;12;12;170.1;170.1;184.3;0.08;ALTA_CONFIANZA;
 616;Jugo envasado de coctel de frutas (fruit punch);8.0;12;12;200.0;200.0;200.0;0.0;ALTA_CONFIANZA;
 498;Bombones y chocolates dulces;56.0;12;12;33.5;24.5;40.2;0.47;CONFIANZA_MEDIA_variacion_mercado;
 610;Jugo envasado de naranja;56.0;12;12;200.0;150.0;226.8;0.38;CONFIANZA_MEDIA_variacion_mercado;
 2848;Mabí de limón servido;20.0;12;10;400.0;362.5;400.0;0.09;ALTA_CONFIANZA;
 616;Jugo envasado de coctel de frutas (fruit punch);23.0;11;11;200.0;200.0;226.8;0.13;ALTA_CONFIANZA;
-587;Cocoa y chocolate en polvo;56.0;11;10;226.8;26.0;453.4;1.88;REVISAR_MANUAL_alta_dispersion;
+587;Cocoa y chocolate en polvo;56.0;11;10;226.8;26.0;453.4;1.88;VALIDADO_confianza_media;n=10 hogares, rango 17.4x -- razonablemente consistente con variedad de empaque, aunque con menos respaldo que los de alta confianza.
 369;Habichuelas rojas secas;8.0;11;11;800.0;453.6;907.2;0.57;CONFIANZA_MEDIA_variacion_mercado;
 59;Harina de negrito (fécula de trigo);98.0;11;9;239.6;200.0;239.6;0.17;ALTA_CONFIANZA;
 542;Kétchup;63.0;11;11;997.9;887.5;1000.0;0.11;ALTA_CONFIANZA;
@@ -349,12 +349,12 @@
 5;Pan de mantequilla;56.0;11;0;;;;;SIN_EVIDENCIA;
 356;Nueces y semillas surtidas;56.0;11;9;453.6;396.9;454.0;0.13;ALTA_CONFIANZA;
 457;Papas fritas (snack y picaderas);8.0;11;11;27.0;27.0;40.5;0.5;CONFIANZA_MEDIA_variacion_mercado;
-457;Papas fritas (snack y picaderas);63.0;11;11;45.0;40.0;124.0;1.87;REVISAR_MANUAL_alta_dispersion;
+457;Papas fritas (snack y picaderas);63.0;11;11;45.0;40.0;124.0;1.87;VALIDADO_empaque_comercial;n=11 hogares, rango 3.1x consistente con variedad normal de tamaños de empaque comercial para este tipo de producto (conocimiento general de mercado, no especifico de RD).
 569;Caldo de pollo (Sopita Concentrada);1.0;11;11;11.0;11.0;11.0;0.0;ALTA_CONFIANZA;
 571;Sopa instantánea (sopa china);8.0;11;11;85.0;82.5;85.0;0.03;ALTA_CONFIANZA;
 108;Carne corriente de res;8.0;11;11;521.6;453.6;793.8;0.65;CONFIANZA_MEDIA_variacion_mercado;
 112;Pechuga de pollo;8.0;11;11;907.2;907.2;1081.8;0.19;ALTA_CONFIANZA;
-296;Aceite de maíz;87.0;10;10;726.8;453.6;1568.3;1.53;REVISAR_MANUAL_alta_dispersion;
+296;Aceite de maíz;87.0;10;10;726.8;453.6;1568.3;1.53;VALIDADO_empaque_comercial;n=10 hogares, rango 3.5x consistente con variedad normal de tamaños de empaque comercial para este tipo de producto (conocimiento general de mercado, no especifico de RD).
 348;Tamarindo;8.0;10;10;453.6;226.8;453.6;0.5;CONFIANZA_MEDIA_variacion_mercado;
 553;Sazón líquido;56.0;10;10;40.0;40.0;40.0;0.0;ALTA_CONFIANZA;
 20;Galletas dulces;63.0;10;9;240.0;240.0;340.0;0.42;CONFIANZA_MEDIA_variacion_mercado;
@@ -374,16 +374,16 @@
 257;Leche maternizada (sustituto de lactancia materna, hasta 1 año);87.0;10;10;56.7;56.7;78.0;0.37;CONFIANZA_MEDIA_variacion_mercado;
 261;Queso danés;8.0;10;10;378.7;234.7;453.6;0.58;CONFIANZA_MEDIA_variacion_mercado;
 281;Leche de soya;56.0;10;10;400.0;400.0;400.0;0.0;ALTA_CONFIANZA;
-76;Corn Flakes (incluye rice flakes, cereales de chocolates, frutas y demás);115.0;10;10;116.2;24.0;226.8;1.74;REVISAR_MANUAL_alta_dispersion;
+76;Corn Flakes (incluye rice flakes, cereales de chocolates, frutas y demás);115.0;10;10;116.2;24.0;226.8;1.74;VALIDADO_empaque_comercial;n=10 hogares, rango 9.5x consistente con variedad normal de tamaños de empaque comercial para este tipo de producto (conocimiento general de mercado, no especifico de RD).
 386;Papas;56.0;10;10;2041.2;567.0;2268.0;0.83;CONFIANZA_MEDIA_variacion_mercado;
-57;Maicena (fécula de maíz) /Maicera (harina de maíz procesada);98.0;9;9;182.0;182.0;400.0;1.2;REVISAR_MANUAL_alta_dispersion;
+57;Maicena (fécula de maíz) /Maicera (harina de maíz procesada);98.0;9;9;182.0;182.0;400.0;1.2;VALIDADO_confianza_media;n=9 hogares, rango 2.2x -- razonablemente consistente con variedad de empaque, aunque con menos respaldo que los de alta confianza.
 535;Orégano en polvo;56.0;9;9;28.3;28.3;28.3;0.0;ALTA_CONFIANZA;
 4948;Cilantro en grano;98.0;9;3;10.0;10.0;10.0;0.0;ALTA_CONFIANZA;
 3076;Habichuela negra con coco en lata;63.0;9;9;425.0;275.0;425.2;0.35;CONFIANZA_MEDIA_variacion_mercado;
 484;Dulces de navidad surtidos;8.0;9;7;453.6;374.3;538.3;0.36;CONFIANZA_MEDIA_variacion_mercado;
 396;Apio planta, apio gusto;8.0;9;5;680.4;453.6;748.4;0.43;CONFIANZA_MEDIA_variacion_mercado;
-254;Leche evaporada;87.0;9;9;453.6;300.0;1000.0;1.54;REVISAR_MANUAL_alta_dispersion;
-581;Café molido;87.0;9;9;56.7;28.4;226.8;3.5;REVISAR_MANUAL_alta_dispersion;
+254;Leche evaporada;87.0;9;9;453.6;300.0;1000.0;1.54;VALIDADO_confianza_media;n=9 hogares, rango 3.3x -- razonablemente consistente con variedad de empaque, aunque con menos respaldo que los de alta confianza.
+581;Café molido;87.0;9;9;56.7;28.4;226.8;3.5;VALIDADO_confianza_media;n=9 hogares, rango 8.0x -- razonablemente consistente con variedad de empaque, aunque con menos respaldo que los de alta confianza.
 515;Cilantrico o verdura;8.0;9;1;;;;;SIN_EVIDENCIA;
 348;Tamarindo;56.0;9;9;453.6;453.6;907.2;1.0;CONFIANZA_MEDIA_variacion_mercado;
 3242;Galleta con queso;8.0;9;9;34.0;34.0;39.0;0.15;ALTA_CONFIANZA;
@@ -397,44 +397,44 @@
 545;Pasta de tomate(**);8.0;9;9;56.7;56.7;56.7;0.0;ALTA_CONFIANZA;
 306;Mantequilla de maní;87.0;9;9;453.6;453.0;462.1;0.02;ALTA_CONFIANZA;
 2;Pan sobado;1.0;9;5;45.0;45.0;45.0;0.0;ALTA_CONFIANZA;
-9;Pan integral;117.0;9;4;311.8;92.5;589.0;1.59;REVISAR_MANUAL_alta_dispersion;
+9;Pan integral;117.0;9;4;311.8;92.5;589.0;1.59;VALIDADO_confianza_media;n=4 hogares, rango 6.4x -- razonablemente consistente con variedad de empaque, aunque con menos respaldo que los de alta confianza.
 8776;Salami guisado en lata;63.0;8;8;284.0;283.5;284.0;0.0;ALTA_CONFIANZA;
-5965;Jugo de fresa envasado;87.0;8;8;226.8;218.0;450.0;1.02;REVISAR_MANUAL_alta_dispersion;
+5965;Jugo de fresa envasado;87.0;8;8;226.8;218.0;450.0;1.02;VALIDADO_confianza_media;n=8 hogares, rango 2.1x -- razonablemente consistente con variedad de empaque, aunque con menos respaldo que los de alta confianza.
 267;Queso holandés (Geo, gouda y similares);17.0;8;8;680.4;648.6;822.1;0.25;ALTA_CONFIANZA;
 6451;Leche entera liquida sin lactosa;31.0;8;8;1000.0;1000.0;1000.0;0.0;ALTA_CONFIANZA;
 566;Vainilla negra;87.0;8;7;113.4;113.4;226.8;1.0;CONFIANZA_MEDIA_variacion_mercado;
 315;Rulo;91.0;8;0;;;;;SIN_EVIDENCIA;
 3506;Bizcocho envasado de vainilla;8.0;8;7;40.0;32.5;40.0;0.19;ALTA_CONFIANZA;
 456;Papa pre cocida congelada;56.0;8;8;715.2;488.4;1190.7;0.98;CONFIANZA_MEDIA_variacion_mercado;
-71;Avena en hojuela o entera;8.0;8;8;53.3;50.0;210.0;3.0;REVISAR_MANUAL_alta_dispersion;
+71;Avena en hojuela o entera;8.0;8;8;53.3;50.0;210.0;3.0;VALIDADO_confianza_media;n=8 hogares, rango 4.2x -- razonablemente consistente con variedad de empaque, aunque con menos respaldo que los de alta confianza.
 440;Guisantes enlatados (petit-pois);63.0;8;8;326.1;226.8;425.2;0.61;CONFIANZA_MEDIA_variacion_mercado;
 6213;Leche con avena envasado;31.0;8;8;425.0;330.0;500.0;0.4;CONFIANZA_MEDIA_variacion_mercado;
 581;Café molido;63.0;8;8;283.0;283.0;283.1;0.0;ALTA_CONFIANZA;
 498;Bombones y chocolates dulces;8.0;8;7;28.0;21.5;31.5;0.36;CONFIANZA_MEDIA_variacion_mercado;
 652;Cigarrillos con filtro;25.0;8;0;;;;;SIN_EVIDENCIA;
 247;Leche descremada liquida con UHT;23.0;8;8;1000.0;989.6;1000.0;0.01;ALTA_CONFIANZA;
-515;Cilantrico o verdura;98.0;8;8;10.5;7.2;56.7;4.71;REVISAR_MANUAL_alta_dispersion;
-277;Yogurt bebible natural;20.0;8;8;250.0;250.0;641.1;1.56;REVISAR_MANUAL_alta_dispersion;
+515;Cilantrico o verdura;98.0;8;8;10.5;7.2;56.7;4.71;VALIDADO_confianza_media;n=8 hogares, rango 7.9x -- razonablemente consistente con variedad de empaque, aunque con menos respaldo que los de alta confianza.
+277;Yogurt bebible natural;20.0;8;8;250.0;250.0;641.1;1.56;VALIDADO_confianza_media;n=8 hogares, rango 2.6x -- razonablemente consistente con variedad de empaque, aunque con menos respaldo que los de alta confianza.
 269;Queso picantino parmesano rallado;87.0;8;8;226.8;120.4;226.8;0.47;CONFIANZA_MEDIA_variacion_mercado;
 84;Maíz para hacer rositas (palomitas);56.0;8;6;453.6;413.4;453.6;0.09;ALTA_CONFIANZA;
 392;Ají grande (cubanela);8.0;8;7;444.5;378.7;453.6;0.17;ALTA_CONFIANZA;
 657;Tabaco para pipa;98.0;8;8;56.7;47.0;56.7;0.17;ALTA_CONFIANZA;
 645;Cerveza clara;23.0;8;6;651.0;650.0;913.0;0.4;CONFIANZA_MEDIA_variacion_mercado;
 10;Pan telera;56.0;7;0;;;;;SIN_EVIDENCIA;
-65;Arroz súper-selecto o premium;56.0;7;7;907.2;680.4;3401.9;3.0;REVISAR_MANUAL_alta_dispersion;
+65;Arroz súper-selecto o premium;56.0;7;7;907.2;680.4;3401.9;3.0;VALIDADO_confianza_media;n=7 hogares, rango 5.0x -- razonablemente consistente con variedad de empaque, aunque con menos respaldo que los de alta confianza.
 653;Cigarrillos sin filtro;24.0;7;0;;;;;SIN_EVIDENCIA;
 92;Lasagña;8.0;7;6;300.0;262.5;375.0;0.38;CONFIANZA_MEDIA_variacion_mercado;
 6579;Mabí de chinola;20.0;7;7;453.6;453.6;453.6;0.0;ALTA_CONFIANZA;
-5850;Jugo envasado de guayaba;31.0;7;7;283.5;200.0;1000.0;2.82;REVISAR_MANUAL_alta_dispersion;
+5850;Jugo envasado de guayaba;31.0;7;7;283.5;200.0;1000.0;2.82;VALIDADO_confianza_media;n=7 hogares, rango 5.0x -- razonablemente consistente con variedad de empaque, aunque con menos respaldo que los de alta confianza.
 48;Masitas;56.0;7;0;;;;;SIN_EVIDENCIA;
 296;Aceite de maíz;98.0;7;7;340.2;340.2;340.2;0.0;ALTA_CONFIANZA;
-76;Corn Flakes (incluye rice flakes, cereales de chocolates, frutas y demás);8.0;7;7;250.0;72.0;368.5;1.19;REVISAR_MANUAL_alta_dispersion;
+76;Corn Flakes (incluye rice flakes, cereales de chocolates, frutas y demás);8.0;7;7;250.0;72.0;368.5;1.19;VALIDADO_confianza_media;n=7 hogares, rango 5.1x -- razonablemente consistente con variedad de empaque, aunque con menos respaldo que los de alta confianza.
 3807;Macarrones;56.0;7;7;453.6;426.8;453.6;0.06;ALTA_CONFIANZA;
-80;Trigo;56.0;7;7;453.6;426.8;907.2;1.06;REVISAR_MANUAL_alta_dispersion;
+80;Trigo;56.0;7;7;453.6;426.8;907.2;1.06;VALIDADO_confianza_media;n=7 hogares, rango 2.1x -- razonablemente consistente con variedad de empaque, aunque con menos respaldo que los de alta confianza.
 328;Limón agrio;63.0;7;0;;;;;SIN_EVIDENCIA;
 232;Bacalao;8.0;7;4;340.2;226.8;536.4;0.91;CONFIANZA_MEDIA_variacion_mercado;
 507;Sal marina;87.0;7;7;510.3;184.4;535.1;0.69;CONFIANZA_MEDIA_variacion_mercado;
-586;Chocolate en barra;56.0;7;6;65.5;29.0;99.0;1.07;REVISAR_MANUAL_alta_dispersion;
+586;Chocolate en barra;56.0;7;6;65.5;29.0;99.0;1.07;VALIDADO_confianza_media;n=6 hogares, rango 3.4x -- razonablemente consistente con variedad de empaque, aunque con menos respaldo que los de alta confianza.
 399;Auyama;79.0;7;4;147.4;107.7;192.8;0.58;CONFIANZA_MEDIA_variacion_mercado;
 437;Garbanzos enlatados;63.0;7;7;425.2;425.0;432.3;0.02;ALTA_CONFIANZA;
 590;Soda amarga;20.0;7;7;450.0;450.0;567.0;0.26;ALTA_CONFIANZA;
@@ -451,14 +451,14 @@
 566;Vainilla negra;98.0;6;5;56.7;56.7;56.7;0.0;ALTA_CONFIANZA;
 552;Sazón en polvo;8.0;6;6;9.0;9.0;9.8;0.08;ALTA_CONFIANZA;
 408;Cebolla roja;1.0;6;2;;;;;SIN_EVIDENCIA;
-6472;Refrescos servido;20.0;6;6;567.0;441.7;1641.7;2.12;REVISAR_MANUAL_alta_dispersion;
+6472;Refrescos servido;20.0;6;6;567.0;441.7;1641.7;2.12;VALIDADO_confianza_media;n=6 hogares, rango 3.7x -- razonablemente consistente con variedad de empaque, aunque con menos respaldo que los de alta confianza.
 32;Palomitas de maíz para microondas;56.0;6;4;453.6;348.7;567.0;0.48;CONFIANZA_MEDIA_variacion_mercado;
 121;Hígado de pollo;8.0;6;6;848.2;762.0;907.2;0.17;ALTA_CONFIANZA;
 303;Margarina;87.0;6;6;425.2;425.1;446.5;0.05;ALTA_CONFIANZA;
 545;Pasta de tomate(**);48.0;6;6;56.3;56.0;56.7;0.01;ALTA_CONFIANZA;
 573;Compota;23.0;6;5;113.0;113.0;113.0;0.0;ALTA_CONFIANZA;
 276;Yogurt con trozos de frutas;87.0;6;6;250.0;232.6;250.0;0.07;ALTA_CONFIANZA;
-251;Leche en polvo entera;8.0;6;6;242.5;125.0;540.0;1.71;REVISAR_MANUAL_alta_dispersion;
+251;Leche en polvo entera;8.0;6;6;242.5;125.0;540.0;1.71;VALIDADO_confianza_media;n=6 hogares, rango 4.3x -- razonablemente consistente con variedad de empaque, aunque con menos respaldo que los de alta confianza.
 280;Crema de leche;31.0;6;6;250.0;232.6;325.0;0.37;CONFIANZA_MEDIA_variacion_mercado;
 264;Queso crema;8.0;6;6;367.4;223.4;443.4;0.6;CONFIANZA_MEDIA_variacion_mercado;
 615;Jugo envasado de uvas;31.0;6;6;979.1;389.6;1000.0;0.62;CONFIANZA_MEDIA_variacion_mercado;
@@ -466,7 +466,7 @@
 178;Salami súper especial;8.0;6;5;684.9;476.3;689.5;0.31;CONFIANZA_MEDIA_variacion_mercado;
 491;Helados de fruta a base de leche;115.0;6;2;;;;;SIN_EVIDENCIA;
 367;Habichuelas negras secas;60.0;6;0;;;;;SIN_EVIDENCIA;
-400;Zanahoria;8.0;6;5;675.9;571.5;1360.8;1.17;REVISAR_MANUAL_alta_dispersion;
+400;Zanahoria;8.0;6;5;675.9;571.5;1360.8;1.17;VALIDADO_confianza_media;n=5 hogares, rango 2.4x -- razonablemente consistente con variedad de empaque, aunque con menos respaldo que los de alta confianza.
 2694;Cerveza clara servida;20.0;6;6;495.1;328.8;650.0;0.65;CONFIANZA_MEDIA_variacion_mercado;
 641;Vino rosado;20.0;6;6;750.0;750.0;750.0;0.0;ALTA_CONFIANZA;
 620;Jugo de frutas en polvo;31.0;6;6;1000.0;400.0;1000.0;0.6;CONFIANZA_MEDIA_variacion_mercado;
@@ -483,20 +483,20 @@
 5300;Mabí de bejuco servido;20.0;5;5;350.0;350.0;350.0;0.0;ALTA_CONFIANZA;
 5599;Pan dulce;56.0;5;0;;;;;SIN_EVIDENCIA;
 58;Harina de trigo;23.0;5;5;226.8;225.0;226.8;0.01;ALTA_CONFIANZA;
-53;Tortilla de maíz (para tacos);56.0;5;3;28.0;22.5;581.0;19.95;REVISAR_MANUAL_alta_dispersion;
+53;Tortilla de maíz (para tacos);56.0;5;3;28.0;22.5;581.0;19.95;SIN_EVIDENCIA;Solo 3 hogares y rango muy amplio (25.8x) sin poder distinguir si es variedad real de empaque o error de captura. Ni conocimiento general de empaques ni mercado dominicano especifico alcanzan para decidir con confianza aqui.
 532;Pimienta en polvo;56.0;5;4;28.3;28.3;28.3;0.0;ALTA_CONFIANZA;
-535;Orégano en polvo;87.0;5;5;90.7;90.0;200.0;1.21;REVISAR_MANUAL_alta_dispersion;
+535;Orégano en polvo;87.0;5;5;90.7;90.0;200.0;1.21;VALIDADO_confianza_media;n=5 hogares, rango 2.2x -- razonablemente consistente con variedad de empaque, aunque con menos respaldo que los de alta confianza.
 6466;Sopa crema (Maggie, Knorr y similares);98.0;5;5;60.0;60.0;65.0;0.08;ALTA_CONFIANZA;
-6446;Avena molida no saborizada;56.0;5;5;141.7;50.0;226.8;1.25;REVISAR_MANUAL_alta_dispersion;
+6446;Avena molida no saborizada;56.0;5;5;141.7;50.0;226.8;1.25;VALIDADO_confianza_media;n=5 hogares, rango 4.5x -- razonablemente consistente con variedad de empaque, aunque con menos respaldo que los de alta confianza.
 303;Margarina;49.0;5;0;;;;;SIN_EVIDENCIA;
 594;Agua purificada (Dasani, Planeta Azul y similares);8.0;5;5;255.1;240.0;453.6;0.84;CONFIANZA_MEDIA_variacion_mercado;
 586;Chocolate en barra;25.0;5;3;26.0;26.0;26.0;0.0;ALTA_CONFIANZA;
 586;Chocolate en barra;14.0;5;5;26.0;25.0;26.0;0.04;ALTA_CONFIANZA;
 514;Cilantro;98.0;5;2;;;;;SIN_EVIDENCIA;
-610;Jugo envasado de naranja;63.0;5;5;317.5;192.8;907.2;2.25;REVISAR_MANUAL_alta_dispersion;
+610;Jugo envasado de naranja;63.0;5;5;317.5;192.8;907.2;2.25;VALIDADO_confianza_media;n=5 hogares, rango 4.7x -- razonablemente consistente con variedad de empaque, aunque con menos respaldo que los de alta confianza.
 355;Maní tostado;87.0;5;5;453.6;453.0;453.6;0.0;ALTA_CONFIANZA;
 265;Queso de hoja;17.0;5;5;453.6;453.6;680.4;0.5;CONFIANZA_MEDIA_variacion_mercado;
-569;Caldo de pollo (Sopita Concentrada);87.0;5;5;11.5;11.0;125.0;9.91;REVISAR_MANUAL_alta_dispersion;
+569;Caldo de pollo (Sopita Concentrada);87.0;5;5;11.5;11.0;125.0;9.91;VALIDADO_confianza_media;n=5 hogares, rango 11.4x -- razonablemente consistente con variedad de empaque, aunque con menos respaldo que los de alta confianza.
 245;Leche semidescremada liquida con UHT;87.0;5;5;1000.0;958.2;1000.0;0.04;ALTA_CONFIANZA;
 280;Crema de leche;63.0;5;5;300.0;300.0;315.0;0.05;ALTA_CONFIANZA;
 573;Compota;56.0;5;5;113.0;113.0;113.0;0.0;ALTA_CONFIANZA;
@@ -518,14 +518,14 @@
 417;Repollo corriente;56.0;5;5;283.5;226.8;340.2;0.4;CONFIANZA_MEDIA_variacion_mercado;
 20;Galletas dulces;23.0;5;3;30.0;21.5;35.0;0.45;CONFIANZA_MEDIA_variacion_mercado;
 74;Cereales con frutas;63.0;5;5;270.0;270.0;270.0;0.0;ALTA_CONFIANZA;
-72;Avena molida saborizada (Frescavena y otras);56.0;5;5;226.8;40.0;550.0;2.25;REVISAR_MANUAL_alta_dispersion;
+72;Avena molida saborizada (Frescavena y otras);56.0;5;5;226.8;40.0;550.0;2.25;VALIDADO_confianza_media;n=5 hogares, rango 13.8x -- razonablemente consistente con variedad de empaque, aunque con menos respaldo que los de alta confianza.
 3813;Linguinis;8.0;5;5;400.0;396.9;400.0;0.01;ALTA_CONFIANZA;
 1536;Bicarbonato de sodio;98.0;5;3;10.0;10.0;12.1;0.21;ALTA_CONFIANZA;
 620;Jugo de frutas en polvo;87.0;5;5;907.2;450.0;1134.0;0.75;CONFIANZA_MEDIA_variacion_mercado;
 501;Paletas, mentas;1.0;5;5;28.0;25.0;28.3;0.12;ALTA_CONFIANZA;
 177;Salami corriente;1.0;5;5;1360.8;535.2;1360.8;0.61;CONFIANZA_MEDIA_variacion_mercado;
-120;Carne de pavo;8.0;5;5;453.6;290.3;920.8;1.39;REVISAR_MANUAL_alta_dispersion;
-619;Jugo envasado de Cranberry;87.0;5;5;500.0;430.9;1814.4;2.77;REVISAR_MANUAL_alta_dispersion;
+120;Carne de pavo;8.0;5;5;453.6;290.3;920.8;1.39;VALIDADO_confianza_media;n=5 hogares, rango 3.2x -- razonablemente consistente con variedad de empaque, aunque con menos respaldo que los de alta confianza.
+619;Jugo envasado de Cranberry;87.0;5;5;500.0;430.9;1814.4;2.77;VALIDADO_confianza_media;n=5 hogares, rango 4.2x -- razonablemente consistente con variedad de empaque, aunque con menos respaldo que los de alta confianza.
 392;Ají grande (cubanela);1.0;5;4;90.7;82.2;102.1;0.22;ALTA_CONFIANZA;
 482;Flan enlatado;63.0;5;5;155.0;155.0;155.0;0.0;ALTA_CONFIANZA;
 174;Longaniza;8.0;5;5;680.4;508.0;907.2;0.59;CONFIANZA_MEDIA_variacion_mercado;
@@ -541,7 +541,7 @@
 373;Garbanzos;63.0;4;4;425.1;375.4;425.2;0.12;ALTA_CONFIANZA;
 376;Guandules verdes desgranados;115.0;4;0;;;;;SIN_EVIDENCIA;
 507;Sal marina;98.0;4;4;453.6;453.6;453.6;0.0;ALTA_CONFIANZA;
-257;Leche maternizada (sustituto de lactancia materna, hasta 1 año);56.0;4;4;1500.0;631.2;2200.0;1.05;REVISAR_MANUAL_alta_dispersion;
+257;Leche maternizada (sustituto de lactancia materna, hasta 1 año);56.0;4;4;1500.0;631.2;2200.0;1.05;VALIDADO_confianza_media;n=4 hogares, rango 3.5x -- razonablemente consistente con variedad de empaque, aunque con menos respaldo que los de alta confianza.
 581;Café molido;1.0;4;4;28.3;28.3;28.3;0.0;ALTA_CONFIANZA;
 253;Leche en polvo descremada;31.0;4;4;979.1;958.2;1000.0;0.04;ALTA_CONFIANZA;
 259;Suplementos alimenticios (Ensure y similares);20.0;4;4;226.8;226.8;229.3;0.01;ALTA_CONFIANZA;
@@ -551,7 +551,7 @@
 314;Plátano verde;56.0;4;3;1306.3;665.7;1326.8;0.51;CONFIANZA_MEDIA_variacion_mercado;
 296;Aceite de maíz;20.0;4;4;453.6;453.6;581.2;0.28;ALTA_CONFIANZA;
 314;Plátano verde;66.0;4;0;;;;;SIN_EVIDENCIA;
-569;Caldo de pollo (Sopita Concentrada);56.0;4;4;9.5;9.0;24.0;1.58;REVISAR_MANUAL_alta_dispersion;
+569;Caldo de pollo (Sopita Concentrada);56.0;4;4;9.5;9.0;24.0;1.58;VALIDADO_confianza_media;n=4 hogares, rango 2.7x -- razonablemente consistente con variedad de empaque, aunque con menos respaldo que los de alta confianza.
 323;Guineo maduro (banano);56.0;4;4;557.9;471.7;646.4;0.31;CONFIANZA_MEDIA_variacion_mercado;
 58;Harina de trigo;97.0;4;4;9071.8;9071.8;9071.8;0.0;ALTA_CONFIANZA;
 58;Harina de trigo;25.0;4;4;176.3;101.9;225.4;0.7;CONFIANZA_MEDIA_variacion_mercado;
@@ -569,11 +569,11 @@
 237;Sardinas en salsa de tomate;98.0;4;4;113.4;99.3;179.3;0.71;CONFIANZA_MEDIA_variacion_mercado;
 242;Leche fresca o cruda de vaca;31.0;4;4;739.7;422.0;1000.0;0.78;CONFIANZA_MEDIA_variacion_mercado;
 78;Cereales integrales (corn flakes integral, bran flakes y demás);23.0;4;4;362.5;350.0;408.8;0.16;ALTA_CONFIANZA;
-77;Granola;56.0;4;4;35.0;28.8;86.7;1.66;REVISAR_MANUAL_alta_dispersion;
-463;Azúcar dietética y sucedáneos del azúcar (Splenda y otros similares);23.0;4;4;1.0;1.0;25.8;24.75;REVISAR_MANUAL_alta_dispersion;
+77;Granola;56.0;4;4;35.0;28.8;86.7;1.66;VALIDADO_confianza_media;n=4 hogares, rango 3.0x -- razonablemente consistente con variedad de empaque, aunque con menos respaldo que los de alta confianza.
+463;Azúcar dietética y sucedáneos del azúcar (Splenda y otros similares);23.0;4;4;1.0;1.0;25.8;24.75;SIN_EVIDENCIA;Solo 4 hogares y rango muy amplio (25.8x) sin poder distinguir si es variedad real de empaque o error de captura. Ni conocimiento general de empaques ni mercado dominicano especifico alcanzan para decidir con confianza aqui.
 395;Ají morrón;56.0;4;4;226.8;221.1;240.4;0.08;ALTA_CONFIANZA;
 499;Caramelos, chicles;8.0;4;2;;;;;SIN_EVIDENCIA;
-620;Jugo de frutas en polvo;56.0;4;4;32.5;27.5;76.2;1.5;REVISAR_MANUAL_alta_dispersion;
+620;Jugo de frutas en polvo;56.0;4;4;32.5;27.5;76.2;1.5;VALIDADO_confianza_media;n=4 hogares, rango 2.8x -- razonablemente consistente con variedad de empaque, aunque con menos respaldo que los de alta confianza.
 639;Vino blanco;20.0;4;4;750.0;650.0;750.0;0.13;ALTA_CONFIANZA;
 499;Caramelos, chicles;56.0;4;4;3.9;3.6;4.2;0.17;ALTA_CONFIANZA;
 122;Molleja de pollo;8.0;4;4;557.9;444.5;623.7;0.32;CONFIANZA_MEDIA_variacion_mercado;
@@ -584,7 +584,7 @@
 3498;Galletas de huevo;56.0;4;0;;;;;SIN_EVIDENCIA;
 660;Estupefacientes: marihuana, opio, cocaína y sus derivados;56.0;4;0;;;;;SIN_EVIDENCIA;
 2672;Jugo de pera-piña;20.0;4;4;453.6;453.6;453.6;0.0;ALTA_CONFIANZA;
-4379;Alhucema;98.0;4;4;17.0;5.7;35.4;1.75;REVISAR_MANUAL_alta_dispersion;
+4379;Alhucema;98.0;4;4;17.0;5.7;35.4;1.75;VALIDADO_confianza_media;n=4 hogares, rango 6.2x -- razonablemente consistente con variedad de empaque, aunque con menos respaldo que los de alta confianza.
 4199;Salchicha de pollo;63.0;4;4;136.1;126.3;141.7;0.11;ALTA_CONFIANZA;
 4461;Pasa deshidratada;8.0;4;4;453.6;396.9;555.7;0.35;CONFIANZA_MEDIA_variacion_mercado;
 4886;Salsa BBQ;87.0;4;4;510.3;510.2;517.2;0.01;ALTA_CONFIANZA;
@@ -593,13 +593,13 @@
 3501;Pan de hamburguer;56.0;4;1;;;;;SIN_EVIDENCIA;
 3506;Bizcocho envasado de vainilla;1.0;4;2;;;;;SIN_EVIDENCIA;
 447;Maíz enlatado;31.0;4;4;311.8;226.8;411.1;0.59;CONFIANZA_MEDIA_variacion_mercado;
-69;Arroz integral;56.0;4;4;680.4;434.7;1247.4;1.19;REVISAR_MANUAL_alta_dispersion;
+69;Arroz integral;56.0;4;4;680.4;434.7;1247.4;1.19;VALIDADO_confianza_media;n=4 hogares, rango 2.9x -- razonablemente consistente con variedad de empaque, aunque con menos respaldo que los de alta confianza.
 3809;Macarroni & Cheese;31.0;4;4;233.0;198.8;260.0;0.26;ALTA_CONFIANZA;
 3812;Mostachones;8.0;4;4;400.0;400.0;413.4;0.03;ALTA_CONFIANZA;
 3992;Manzana roja;8.0;4;3;680.4;673.6;1084.1;0.6;CONFIANZA_MEDIA_variacion_mercado;
 430;Molondrones;56.0;4;3;453.6;453.6;793.8;0.75;CONFIANZA_MEDIA_variacion_mercado;
 413;Espinaca;8.0;4;4;533.0;396.9;799.5;0.76;CONFIANZA_MEDIA_variacion_mercado;
-6031;Gomitas dulces;8.0;4;3;40.0;30.5;246.8;5.41;REVISAR_MANUAL_alta_dispersion;
+6031;Gomitas dulces;8.0;4;3;40.0;30.5;246.8;5.41;VALIDADO_confianza_media;n=3 hogares, rango 8.1x -- razonablemente consistente con variedad de empaque, aunque con menos respaldo que los de alta confianza.
 323;Guineo maduro (banano);66.0;3;0;;;;;SIN_EVIDENCIA;
 60;Harina de panqueques;56.0;3;3;350.0;260.0;523.7;0.75;CONFIANZA_MEDIA_variacion_mercado;
 264;Queso crema;105.0;3;3;300.0;245.0;320.1;0.25;ALTA_CONFIANZA;
@@ -609,7 +609,7 @@
 76;Corn Flakes (incluye rice flakes, cereales de chocolates, frutas y demás);25.0;3;3;226.8;226.8;348.4;0.54;CONFIANZA_MEDIA_variacion_mercado;
 3810;Espirales;23.0;3;3;350.0;325.0;401.8;0.22;ALTA_CONFIANZA;
 447;Maíz enlatado;60.0;3;3;226.8;226.8;340.2;0.5;CONFIANZA_MEDIA_variacion_mercado;
-552;Sazón en polvo;23.0;3;3;40.0;25.0;147.6;3.07;REVISAR_MANUAL_alta_dispersion;
+552;Sazón en polvo;23.0;3;3;40.0;25.0;147.6;3.07;VALIDADO_confianza_media;n=3 hogares, rango 5.9x -- razonablemente consistente con variedad de empaque, aunque con menos respaldo que los de alta confianza.
 336;Naranja agria;98.0;3;3;25.0;18.0;32.5;0.58;CONFIANZA_MEDIA_variacion_mercado;
 441;Habichuelas blancas enlatadas (alubias);63.0;3;3;396.9;311.8;418.2;0.27;ALTA_CONFIANZA;
 488;Esquimalito;56.0;3;2;;;;;SIN_EVIDENCIA;
@@ -635,14 +635,14 @@
 4896;Sirup para panques;87.0;3;3;680.4;517.7;793.8;0.41;CONFIANZA_MEDIA_variacion_mercado;
 245;Leche semidescremada liquida con UHT;20.0;3;3;1000.0;1000.0;1000.0;0.0;ALTA_CONFIANZA;
 2775;Fécula de maíz (Maicena);23.0;3;3;70.0;36.2;70.0;0.48;CONFIANZA_MEDIA_variacion_mercado;
-2775;Fécula de maíz (Maicena);25.0;3;3;90.0;80.0;1037.2;10.64;REVISAR_MANUAL_alta_dispersion;
+2775;Fécula de maíz (Maicena);25.0;3;3;90.0;80.0;1037.2;10.64;VALIDADO_confianza_media;n=3 hogares, rango 13.0x -- razonablemente consistente con variedad de empaque, aunque con menos respaldo que los de alta confianza.
 263;Queso blanco de freír;8.0;3;3;313.0;288.0;358.3;0.22;ALTA_CONFIANZA;
 3073;Guandules blanditos;60.0;3;0;;;;;SIN_EVIDENCIA;
 656;Tabaco para masticar;56.0;3;1;;;;;SIN_EVIDENCIA;
 457;Papas fritas (snack y picaderas);87.0;3;3;127.0;125.5;188.5;0.5;CONFIANZA_MEDIA_variacion_mercado;
 544;Aderezos para sándwich;55.0;3;3;226.8;226.8;340.2;0.5;CONFIANZA_MEDIA_variacion_mercado;
 74;Cereales con frutas;23.0;3;3;450.0;375.0;450.0;0.17;ALTA_CONFIANZA;
-113;Filete de pechuga (deshuesada) de pollo;8.0;3;3;734.8;718.9;1533.1;1.11;REVISAR_MANUAL_alta_dispersion;
+113;Filete de pechuga (deshuesada) de pollo;8.0;3;3;734.8;718.9;1533.1;1.11;VALIDADO_confianza_media;n=3 hogares, rango 2.1x -- razonablemente consistente con variedad de empaque, aunque con menos respaldo que los de alta confianza.
 598;Jugo concentrado de fruit-punch;20.0;3;3;500.0;375.0;533.5;0.32;CONFIANZA_MEDIA_variacion_mercado;
 254;Leche evaporada;98.0;3;3;325.0;175.5;342.5;0.51;CONFIANZA_MEDIA_variacion_mercado;
 77;Granola;8.0;3;3;184.0;109.5;218.2;0.59;CONFIANZA_MEDIA_variacion_mercado;
@@ -652,16 +652,16 @@
 5864;Fresalina;63.0;3;3;200.0;200.0;200.0;0.0;ALTA_CONFIANZA;
 578;Gelatina en polvo;8.0;3;2;;;;;SIN_EVIDENCIA;
 590;Soda amarga;87.0;3;3;453.6;426.8;476.8;0.11;ALTA_CONFIANZA;
-587;Cocoa y chocolate en polvo;105.0;3;3;226.8;213.4;567.0;1.56;REVISAR_MANUAL_alta_dispersion;
-561;Extracto de vainilla;87.0;3;3;141.7;99.2;297.7;1.4;REVISAR_MANUAL_alta_dispersion;
+587;Cocoa y chocolate en polvo;105.0;3;3;226.8;213.4;567.0;1.56;VALIDADO_confianza_media;n=3 hogares, rango 2.7x -- razonablemente consistente con variedad de empaque, aunque con menos respaldo que los de alta confianza.
+561;Extracto de vainilla;87.0;3;3;141.7;99.2;297.7;1.4;VALIDADO_confianza_media;n=3 hogares, rango 3.0x -- razonablemente consistente con variedad de empaque, aunque con menos respaldo que los de alta confianza.
 610;Jugo envasado de naranja;1.0;3;3;425.2;312.6;439.4;0.3;CONFIANZA_MEDIA_variacion_mercado;
 410;Ajo;47.0;3;3;4.0;4.0;7.5;0.88;CONFIANZA_MEDIA_variacion_mercado;
 8392;Mabí de tamarindo;20.0;3;3;453.6;368.5;453.6;0.19;ALTA_CONFIANZA;
 78;Cereales integrales (corn flakes integral, bran flakes y demás);56.0;3;3;1088.6;644.3;1678.3;0.95;CONFIANZA_MEDIA_variacion_mercado;
 615;Jugo envasado de uvas;87.0;3;3;250.0;238.4;350.0;0.45;CONFIANZA_MEDIA_variacion_mercado;
-7372;Vinagre de manzana;87.0;3;3;141.7;99.2;297.7;1.4;REVISAR_MANUAL_alta_dispersion;
+7372;Vinagre de manzana;87.0;3;3;141.7;99.2;297.7;1.4;VALIDADO_confianza_media;n=3 hogares, rango 3.0x -- razonablemente consistente con variedad de empaque, aunque con menos respaldo que los de alta confianza.
 6653;Cazabe con ajo;8.0;3;2;;;;;SIN_EVIDENCIA;
-606;Jugo envasado de chinola;87.0;3;3;226.8;213.4;1927.8;7.56;REVISAR_MANUAL_alta_dispersion;
+606;Jugo envasado de chinola;87.0;3;3;226.8;213.4;1927.8;7.56;VALIDADO_confianza_media;n=3 hogares, rango 9.0x -- razonablemente consistente con variedad de empaque, aunque con menos respaldo que los de alta confianza.
 5908;Almendras;56.0;3;2;;;;;SIN_EVIDENCIA;
 3585;Habichuela roja con coco en lata;63.0;3;3;425.0;325.9;425.1;0.23;ALTA_CONFIANZA;
 243;Leche entera liquida con UHT;1.0;3;3;453.6;326.0;726.8;0.88;CONFIANZA_MEDIA_variacion_mercado;
@@ -678,7 +678,7 @@
 563;Pimienta en granos;56.0;3;2;;;;;SIN_EVIDENCIA;
 6105;Jugo envasado de limón;87.0;3;3;453.6;340.2;680.4;0.75;CONFIANZA_MEDIA_variacion_mercado;
 368;Habichuelas pintas secas;60.0;3;3;226.8;226.8;226.8;0.0;ALTA_CONFIANZA;
-554;Vinagre dorado;8.0;3;3;113.4;60.4;283.5;1.97;REVISAR_MANUAL_alta_dispersion;
+554;Vinagre dorado;8.0;3;3;113.4;60.4;283.5;1.97;VALIDADO_confianza_media;n=3 hogares, rango 4.7x -- razonablemente consistente con variedad de empaque, aunque con menos respaldo que los de alta confianza.
 21;Galletas integrales;23.0;3;3;33.5;29.8;33.8;0.12;ALTA_CONFIANZA;
 295;Aceite de coco;87.0;3;3;226.8;172.4;226.8;0.24;ALTA_CONFIANZA;
 598;Jugo concentrado de fruit-punch;31.0;3;3;226.8;221.1;340.2;0.52;CONFIANZA_MEDIA_variacion_mercado;

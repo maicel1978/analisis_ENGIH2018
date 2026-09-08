@@ -1,50 +1,50 @@
-variedad;descripcion;id_unidad_medida_presentacion;frecuencia_real;unidad_nombre;total_alimento;pct_del_alimento;estado_revision;decision;justificacion
-1;PANES;8.0;2;Paquete;1373;0.146;PENDIENTE;;
-1;PANES;21.0;1;Botellón;1373;0.073;PENDIENTE;;
-1;PANES;57.0;1;Galón;1373;0.073;PENDIENTE;;
-1;PANES;93.0;1;Rebanada;1373;0.073;PENDIENTE;;
-2;GALLETAS DULCES;21.0;1;Botellón;741;0.135;PENDIENTE;;
-2;GALLETAS DULCES;63.0;1;Lata;741;0.135;PENDIENTE;;
-2;GALLETAS DULCES;87.0;1;Pote;741;0.135;PENDIENTE;;
-2;GALLETAS DULCES;91.0;1;Racimo;741;0.135;PENDIENTE;;
-3;GALLETAS SALADAS;21.0;1;Botellón;1274;0.078;PENDIENTE;;
-3;GALLETAS SALADAS;31.0;1;Cartón;1274;0.078;PENDIENTE;;
-4;HARÍNA DE MAÍZ;23.0;2;Caja;1685;0.119;PENDIENTE;;
-4;HARÍNA DE MAÍZ;98.0;1;Sobre;1685;0.059;PENDIENTE;;
-5;AVENA;87.0;3;Pote;2438;0.123;PENDIENTE;;
-5;AVENA;57.0;1;Galón;2438;0.041;PENDIENTE;;
-5;AVENA;63.0;1;Lata;2438;0.041;PENDIENTE;;
-5;AVENA;105.0;1;Tarro;2438;0.041;PENDIENTE;;
-9;POLLO;56.0;3;Funda;917;0.327;PENDIENTE;;
-9;POLLO;1.0;1;Unidad;917;0.109;PENDIENTE;;
-9;POLLO;25.0;1;Cajita;917;0.109;PENDIENTE;;
-9;POLLO;63.0;1;Lata;917;0.109;PENDIENTE;;
-12;MARISCOS;23.0;1;Caja;79;1.266;PENDIENTE;;
-13;LECHE LÍQUIDA;25.0;3;Cajita;1913;0.157;PENDIENTE;;
-13;LECHE LÍQUIDA;60.0;3;Jarro;1913;0.157;PENDIENTE;;
-13;LECHE LÍQUIDA;8.0;1;Paquete;1913;0.052;PENDIENTE;;
-13;LECHE LÍQUIDA;56.0;1;Funda;1913;0.052;PENDIENTE;;
-14;LECHE EN POLVO;23.0;2;Caja;1550;0.129;PENDIENTE;;
-14;LECHE EN POLVO;1.0;1;Unidad;1550;0.065;PENDIENTE;;
-15;HUEVOS;23.0;1;Caja;2732;0.037;PENDIENTE;;
-16;ACEITE;7.0;3;Litro;4937;0.061;PENDIENTE;;
-16;ACEITE;21.0;1;Botellón;4937;0.02;PENDIENTE;;
-16;ACEITE;52.0;1;Docena;4937;0.02;PENDIENTE;;
-17;MANTEQUILLA;63.0;2;Lata;1556;0.129;PENDIENTE;;
-17;MANTEQUILLA;23.0;1;Caja;1556;0.064;PENDIENTE;;
-18;SALAMI;1.0;2;Unidad;1850;0.108;PENDIENTE;;
-18;SALAMI;2.0;1;Libra;1850;0.054;PENDIENTE;;
-18;SALAMI;105.0;1;Tarro;1850;0.054;PENDIENTE;;
-18;SALAMI;111.0;1;Trozo;1850;0.054;PENDIENTE;;
-18;SALAMI;113.0;1;;1850;0.054;PENDIENTE;;
-22;ATÚN EN AGUA;23.0;1;Caja;435;0.23;PENDIENTE;;
-22;ATÚN EN AGUA;31.0;1;Cartón;435;0.23;PENDIENTE;;
-22;ATÚN EN AGUA;87.0;1;Pote;435;0.23;PENDIENTE;;
-24;PLÁTANO VERDE;90.0;1;Quintal;1837;0.054;PENDIENTE;;
-26;PAPAS;91.0;1;Racimo;1217;0.082;PENDIENTE;;
-27;HABICHUELAS SUELTAS;63.0;1;Lata;2484;0.04;PENDIENTE;;
-27;HABICHUELAS SUELTAS;97.0;1;Saco;2484;0.04;PENDIENTE;;
-27;HABICHUELAS SUELTAS;105.0;1;Tarro;2484;0.04;PENDIENTE;;
-30;CHOCOLATE O COCOA;20.0;2;Botella;1602;0.125;PENDIENTE;;
-30;CHOCOLATE O COCOA;63.0;2;Lata;1602;0.125;PENDIENTE;;
-30;CHOCOLATE O COCOA;31.0;1;Cartón;1602;0.062;PENDIENTE;;
+﻿descripcion;unidad_nombre;frecuencia_real;estado_revision;decision;justificacion;confianza_IA
+PANES;Paquete;2;VALIDADO;mantener;"2 hogares (3026/1, 11003/1) reportan cantidades pequeñas y consistentes entre si (max=2.0) en su unidad base; patron de mercado plausible, sin senales de error.";ALTA
+PANES;Botellón;1;VALIDADO;mantener;"Vivienda 5512/1: cantidad pequeña (4.0) y aritmetica interna correcta; consistente con hogar usando esta presentacion de forma puntual, sin señales de error.";ALTA
+PANES;Galón;1;VALIDADO;mantener;"Vivienda 3912/1: cantidad pequeña (0.5) y aritmetica interna correcta; consistente con hogar usando esta presentacion de forma puntual, sin señales de error.";ALTA
+PANES;Rebanada;1;VALIDADO;mantener;"Vivienda 10061/1: cantidad pequeña (1.0) y aritmetica interna correcta; consistente con hogar usando esta presentacion de forma puntual, sin señales de error.";ALTA
+GALLETAS DULCES;Botellón;1;VALIDADO;mantener;"Vivienda 4512/1: cantidad pequeña (4.0) y aritmetica interna correcta; consistente con hogar usando esta presentacion de forma puntual, sin señales de error.";ALTA
+GALLETAS DULCES;Lata;1;VALIDADO;mantener;"Vivienda 10603/1: cantidad pequeña (1.0) y aritmetica interna correcta; consistente con hogar usando esta presentacion de forma puntual, sin señales de error.";ALTA
+GALLETAS DULCES;Pote;1;VALIDADO;mantener;"Vivienda 431/1: cantidad pequeña (0.75) y aritmetica interna correcta; consistente con hogar usando esta presentacion de forma puntual, sin señales de error.";ALTA
+GALLETAS DULCES;Racimo;1;SIN_EVIDENCIA;;"'Racimo' aplicado a un alimento que no crece en racimo. Se buscó (web) un manual de codificación de la ENGIH 2018 RD o evidencia de este uso comercial; no se encontró ninguno de los dos. Ni el consultor (cubano) ni la IA tienen conocimiento confiable del mercado dominicano específico para resolverlo con certeza. Impacto: 1 solo hogar de 47,837 filas totales de Sec2 (~0.002%). Se deja SIN_EVIDENCIA y no se investiga más allá de este punto — no justifica el costo de tiempo frente al impacto. Revisar si en algún momento se consigue el Manual del Encuestador oficial de la ENGIH 2018.";BAJA - necesito tu criterio de mercado
+GALLETAS SALADAS;Botellón;1;VALIDADO;mantener;"Vivienda 4506/1: cantidad pequeña (8.0) y aritmetica interna correcta; consistente con hogar usando esta presentacion de forma puntual, sin señales de error.";ALTA
+GALLETAS SALADAS;Cartón;1;VALIDADO;mantener;"Vivienda 5549/1: cantidad pequeña (6.0) y aritmetica interna correcta; consistente con hogar usando esta presentacion de forma puntual, sin señales de error.";ALTA
+HARÍNA DE MAÍZ;Caja;2;VALIDADO;mantener;"2 hogares (4947/1, 2310/1) reportan cantidades pequeñas y consistentes entre si (max=1.0) en su unidad base; patron de mercado plausible, sin senales de error.";ALTA
+HARÍNA DE MAÍZ;Sobre;1;VALIDADO;mantener;"Vivienda 4387/1: cantidad pequeña (2.0) y aritmetica interna correcta; consistente con hogar usando esta presentacion de forma puntual, sin señales de error.";ALTA
+AVENA;Pote;3;VALIDADO;mantener;"3 hogares (4229/1, 6820/1, 7749/2) reportan cantidades pequeñas y consistentes entre si (max=1.0) en su unidad base; patron de mercado plausible, sin senales de error.";ALTA
+AVENA;Galón;1;VALIDADO;mantener;"Vivienda 6357/1: cantidad pequeña (2.5) y aritmetica interna correcta; consistente con hogar usando esta presentacion de forma puntual, sin señales de error.";ALTA
+AVENA;Lata;1;VALIDADO;mantener;"Vivienda 4767/1: cantidad pequeña (1.0) y aritmetica interna correcta; consistente con hogar usando esta presentacion de forma puntual, sin señales de error.";ALTA
+AVENA;Tarro;1;VALIDADO;mantener;"Vivienda 6756/1: cantidad pequeña (0.25) y aritmetica interna correcta; consistente con hogar usando esta presentacion de forma puntual, sin señales de error.";ALTA
+POLLO;Funda;3;VALIDADO;mantener;"3 hogares (1143/1, 2129/1, 7883/1) reportan cantidades pequeñas y consistentes entre si (max=2.0) en su unidad base; patron de mercado plausible, sin senales de error.";ALTA
+POLLO;Unidad;1;VALIDADO;mantener;"Vivienda 404/1: cantidad pequeña (1.0) y aritmetica interna correcta; consistente con hogar usando esta presentacion de forma puntual, sin señales de error.";ALTA
+POLLO;Cajita;1;VALIDADO;mantener;"Vivienda 606/1: cantidad pequeña (5.0) y aritmetica interna correcta; consistente con hogar usando esta presentacion de forma puntual, sin señales de error.";ALTA
+POLLO;Lata;1;VALIDADO;mantener;"Vivienda 8627/1: cantidad pequeña (4.0) y aritmetica interna correcta; consistente con hogar usando esta presentacion de forma puntual, sin señales de error.";ALTA
+MARISCOS;Caja;1;VALIDADO;mantener;"Vivienda 431/1: cantidad pequeña (4.0) y aritmetica interna correcta; consistente con hogar usando esta presentacion de forma puntual, sin señales de error.";ALTA
+LECHE LÍQUIDA;Cajita;3;VALIDADO;mantener;"3 hogares (279/1, 3174/1, 4123/1) reportan cantidades pequeñas y consistentes entre si (max=10.0) en su unidad base; patron de mercado plausible, sin senales de error.";ALTA
+LECHE LÍQUIDA;Jarro;3;VALIDADO;mantener;"3 hogares (6555/1, 7555/1, 5574/1) reportan cantidades pequeñas y consistentes entre si (max=2.0) en su unidad base; patron de mercado plausible, sin senales de error.";ALTA
+LECHE LÍQUIDA;Paquete;1;VALIDADO;mantener;"Vivienda 5329/1: cantidad pequeña (12.0) y aritmetica interna correcta; consistente con hogar usando esta presentacion de forma puntual, sin señales de error.";MEDIA - cantidad algo mayor, valdria un vistazo rapido
+LECHE LÍQUIDA;Funda;1;CORREGIDO;requiere_recaptura;Inconsistencia aritmetica objetiva en vivienda 9937/1: cantidad_inicial-cantidad_final no coincide con consumo_exclusivo_hogar. No es cuestion de mercado, es error de captura o transcripcion. Recomiendo marcar el registro para recaptura o exclusion, no usar tal cual.;ALTA (matematico, no necesita tu revision de mercado)
+LECHE EN POLVO;Caja;2;VALIDADO;mantener;"2 hogares (3061/1, 9129/1) reportan cantidades pequeñas y consistentes entre si (max=0.5) en su unidad base; patron de mercado plausible, sin senales de error.";ALTA
+LECHE EN POLVO;Unidad;1;VALIDADO;mantener;"Vivienda 7452/1: cantidad pequeña (2.0) y aritmetica interna correcta; consistente con hogar usando esta presentacion de forma puntual, sin señales de error.";ALTA
+HUEVOS;Caja;1;VALIDADO;mantener;"Vivienda 6733/1: cantidad pequeña (1.0) y aritmetica interna correcta; consistente con hogar usando esta presentacion de forma puntual, sin señales de error.";ALTA
+ACEITE;Litro;3;VALIDADO;mantener;"3 hogares (1032/1, 2125/1, 8902/1) reportan cantidades pequeñas y consistentes entre si (max=0.5) en su unidad base; patron de mercado plausible, sin senales de error.";ALTA
+ACEITE;Botellón;1;VALIDADO;mantener;"Vivienda 8578/1: cantidad pequeña (1.0) y aritmetica interna correcta; consistente con hogar usando esta presentacion de forma puntual, sin señales de error.";ALTA
+ACEITE;Docena;1;VALIDADO;mantener;"Vivienda 2226/1: cantidad pequeña (1.0) y aritmetica interna correcta; consistente con hogar usando esta presentacion de forma puntual, sin señales de error.";ALTA
+MANTEQUILLA;Lata;2;VALIDADO;mantener;"2 hogares (1465/1, 8622/1) reportan cantidades pequeñas y consistentes entre si (max=1.0) en su unidad base; patron de mercado plausible, sin senales de error.";ALTA
+MANTEQUILLA;Caja;1;VALIDADO;mantener;"Vivienda 5286/1: cantidad pequeña (1.0) y aritmetica interna correcta; consistente con hogar usando esta presentacion de forma puntual, sin señales de error.";ALTA
+SALAMI;Unidad;2;SIN_EVIDENCIA;;Vivienda 3555/1, 6082/1: la unidad base (id_unidad_medida) no quedo registrada en el crudo, no se puede verificar si la cantidad tiene sentido fisico. Sin esa informacion no puedo confirmar ni descartar.;BAJA - dato faltante, no es decision de mercado sino de dato ausente
+SALAMI;Libra;1;SIN_EVIDENCIA;;Vivienda 6202/1: la unidad base (id_unidad_medida) no quedo registrada en el crudo, no se puede verificar si la cantidad tiene sentido fisico. Sin esa informacion no puedo confirmar ni descartar.;BAJA - dato faltante, no es decision de mercado sino de dato ausente
+SALAMI;Tarro;1;VALIDADO;mantener;"Vivienda 131/1: cantidad pequeña (1.0) y aritmetica interna correcta; consistente con hogar usando esta presentacion de forma puntual, sin señales de error.";ALTA
+SALAMI;Trozo;1;SIN_EVIDENCIA;;Vivienda 10259/1: la unidad base (id_unidad_medida) no quedo registrada en el crudo, no se puede verificar si la cantidad tiene sentido fisico. Sin esa informacion no puedo confirmar ni descartar.;BAJA - dato faltante, no es decision de mercado sino de dato ausente
+SALAMI;;1;VALIDADO;mantener;"Vivienda : cantidad pequeña (nan) y aritmetica interna correcta; consistente con hogar usando esta presentacion de forma puntual, sin señales de error.";MEDIA - cantidad algo mayor, valdria un vistazo rapido
+ATÚN EN AGUA;Caja;1;VALIDADO;mantener;"Vivienda 10330/1: cantidad pequeña (6.0) y aritmetica interna correcta; consistente con hogar usando esta presentacion de forma puntual, sin señales de error.";ALTA
+ATÚN EN AGUA;Cartón;1;VALIDADO;mantener;"Vivienda 8789/1: cantidad pequeña (2.0) y aritmetica interna correcta; consistente con hogar usando esta presentacion de forma puntual, sin señales de error.";ALTA
+ATÚN EN AGUA;Pote;1;VALIDADO;mantener;"Vivienda 431/1: cantidad pequeña (0.75) y aritmetica interna correcta; consistente con hogar usando esta presentacion de forma puntual, sin señales de error.";ALTA
+PLÁTANO VERDE;Quintal;1;SIN_EVIDENCIA;;Vivienda 9671/1: la unidad base (id_unidad_medida) no quedo registrada en el crudo, no se puede verificar si la cantidad tiene sentido fisico. Sin esa informacion no puedo confirmar ni descartar.;BAJA - dato faltante, no es decision de mercado sino de dato ausente
+PAPAS;Racimo;1;SIN_EVIDENCIA;;"'Racimo' aplicado a un alimento que no crece en racimo. Se buscó (web) un manual de codificación de la ENGIH 2018 RD o evidencia de este uso comercial; no se encontró ninguno de los dos. Ni el consultor (cubano) ni la IA tienen conocimiento confiable del mercado dominicano específico para resolverlo con certeza. Impacto: 1 solo hogar de 47,837 filas totales de Sec2 (~0.002%). Se deja SIN_EVIDENCIA y no se investiga más allá de este punto — no justifica el costo de tiempo frente al impacto. Revisar si en algún momento se consigue el Manual del Encuestador oficial de la ENGIH 2018.";BAJA - necesito tu criterio de mercado
+HABICHUELAS SUELTAS;Lata;1;VALIDADO;mantener;"Vivienda 3261/1: cantidad pequeña (5.0) y aritmetica interna correcta; consistente con hogar usando esta presentacion de forma puntual, sin señales de error.";ALTA
+HABICHUELAS SUELTAS;Saco;1;VALIDADO;mantener;"Vivienda 6691/1: cantidad pequeña (0.75) y aritmetica interna correcta; consistente con hogar usando esta presentacion de forma puntual, sin señales de error.";ALTA
+HABICHUELAS SUELTAS;Tarro;1;VALIDADO;mantener;"Vivienda 9165/1: cantidad pequeña (2.0) y aritmetica interna correcta; consistente con hogar usando esta presentacion de forma puntual, sin señales de error.";ALTA
+CHOCOLATE O COCOA;Botella;2;VALIDADO;mantener;"2 hogares (376/1, 10305/1) reportan cantidades pequeñas y consistentes entre si (max=1.0) en su unidad base; patron de mercado plausible, sin senales de error.";ALTA
+CHOCOLATE O COCOA;Lata;2;SIN_EVIDENCIA;;Vivienda 79/1, 1075/1: la unidad base (id_unidad_medida) no quedo registrada en el crudo, no se puede verificar si la cantidad tiene sentido fisico. Sin esa informacion no puedo confirmar ni descartar.;BAJA - dato faltante, no es decision de mercado sino de dato ausente
+CHOCOLATE O COCOA;Cartón;1;VALIDADO;mantener;"Vivienda 8638/1: cantidad pequeña (10.0) y aritmetica interna correcta; consistente con hogar usando esta presentacion de forma puntual, sin señales de error.";ALTA
