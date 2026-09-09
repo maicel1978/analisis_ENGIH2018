@@ -1,7 +1,14 @@
 # =========================================================================
 # Script: 02_eda.R (Control de calidad y caracterización - ENGIH 2018)
 # Proyecto: ENGIH 2018 - Consumo de alimentos (WFP / MIMI)
-# Fecha: 2026-08-16
+# Fecha original: 2026-08-16. Corregido: 2026-09-08 -- estaba desactualizado
+# respecto al esquema de columnas que produce 01_import.R desde que se
+# agregaron FC/PC/sociodemografia (id -> id_hogar_unico, cantidad -> Q,
+# alimento -> descripcion, unidad_medida -> unidad_a_convertir). Ademas,
+# "unidad_a_convertir" es un CODIGO NUMERICO (id_unidad_medida_presentacion),
+# no el nombre de texto que usaba la version vieja de este script -- se
+# corrige comparando contra los codigos reales de diccionario_conversion
+# (los que tienen FC no nulo = universales), no una lista de texto a mano.
 #
 # Objetivo: generar evidencia para el informe de factibilidad (ToR 4.1-4.3)
 # Entradas: data/clean/data_sec2.csv, data/clean/data_sec3a.csv
@@ -12,6 +19,7 @@
 library(dplyr)
 library(readr)
 library(here)
+library(readxl)
 library(dlookr)
 
 # dlookr fue removido de CRAN en dic-2023 y resubmitido después; se deja
@@ -19,15 +27,15 @@ library(dlookr)
 # si el paquete cambia o vuelve a removerse en el futuro.
 message(sprintf("dlookr version: %s", as.character(packageVersion("dlookr"))))
 
-data_sec2  <- read_csv2(here("data", "clean", "data_sec2.csv"),  show_col_types = FALSE)
-data_sec3a <- read_csv2(here("data", "clean", "data_sec3a.csv"), show_col_types = FALSE)
+data_sec2  <- read_delim(here("data", "clean", "data_sec2.csv"),  delim = ";", show_col_types = FALSE)
+data_sec3a <- read_delim(here("data", "clean", "data_sec3a.csv"), delim = ";", show_col_types = FALSE)
 
 dir_eda <- here("data", "eda")
 if (!dir.exists(dir_eda)) dir.create(dir_eda, recursive = TRUE)
 
 # 1. Cobertura de hogares ---------------------------------------------------
-hh_sec2  <- unique(data_sec2$id)
-hh_sec3a <- unique(data_sec3a$id)
+hh_sec2  <- unique(data_sec2$id_hogar_unico)
+hh_sec3a <- unique(data_sec3a$id_hogar_unico)
 
 cat("\n== 1. Cobertura de hogares ==\n")
 cat(sprintf("Sec 2:        %d hogares únicos\n", length(hh_sec2)))
@@ -40,14 +48,15 @@ cat(sprintf("Solo Sec 3A:  %d hogares\n", length(setdiff(hh_sec3a, hh_sec2))))
 # Unidades cuya conversión a gramos es un factor fijo, universal (no depende
 # del alimento). Todo lo demás requiere una tabla FC específica por alimento
 # (p.ej. "unidad" de plátano != "unidad" de huevo).
-unidades_estandar <- c(
-  "Gramos", "Kilogramos", "Libra", "Onza", "Miligramos",
-  "Mililitros o CC", "Litro", "Centímetro cúbico (cc)", "Galón"
-)
+# "unidad_a_convertir" es un CODIGO NUMERICO -- se compara contra los codigos
+# de diccionario_conversion que tienen FC poblado (esos SON los universales,
+# por definicion, ya confirmado en la auditoria de FC de esta semana).
+dic_conversion <- read_excel(here("data", "raw", "data_raw_unidades.xlsx"), sheet = "diccionario_conversion")
+codigos_universales <- dic_conversion |> filter(!is.na(FC)) |> pull(id_unidad_medida_presentacion)
 
 clasificar_unidad <- function(df) {
   df |>
-    mutate(tipo_unidad = if_else(unidad_medida %in% unidades_estandar,
+    mutate(tipo_unidad = if_else(unidad_a_convertir %in% codigos_universales,
                                  "estándar", "no estándar")) |>
     count(tipo_unidad, name = "n_registros") |>
     mutate(pct = round(100 * n_registros / sum(n_registros), 1))
@@ -58,10 +67,10 @@ cat("-- Sec 2 --\n");  print(clasificar_unidad(data_sec2))
 cat("-- Sec 3A --\n");  print(clasificar_unidad(data_sec3a))
 
 ranking_no_estandar <- bind_rows(sec2 = data_sec2, sec3a = data_sec3a, .id = "seccion") |>
-  filter(!unidad_medida %in% unidades_estandar) |>
-  count(unidad_medida, sort = TRUE, name = "n_registros")
+  filter(!unidad_a_convertir %in% codigos_universales) |>
+  count(unidad_a_convertir, sort = TRUE, name = "n_registros")
 
-cat("\nTop 15 unidades no estándar más frecuentes (definen alcance de la tabla FC):\n")
+cat("\nTop 15 códigos de unidad no estándar más frecuentes (definen alcance de la tabla FC):\n")
 print(head(ranking_no_estandar, 15))
 write_csv2(ranking_no_estandar, file.path(dir_eda, "ranking_unidades_no_estandar.csv"))
 
@@ -72,31 +81,31 @@ cat("\n== 3. Diagnóstico general (dlookr::diagnose) ==\n")
 cat("-- Sec 2 --\n");  print(diagnose(data_sec2))
 cat("-- Sec 3A --\n");  print(diagnose(data_sec3a))
 
-# diagnose_numeric() SOLO sobre `cantidad`: min/max/ceros/negativos.
-# Restringido a propósito -> id_unidad_medida es un código categórico, no
-# una cantidad, y no debe tratarse como variable continua.
-cat("\n-- Estadísticos de `cantidad` (Sec 2) --\n")
-print(data_sec2 |> select(cantidad) |> diagnose_numeric())
-cat("\n-- Estadísticos de `cantidad` (Sec 3A) --\n")
-print(data_sec3a |> select(cantidad) |> diagnose_numeric())
+# diagnose_numeric() SOLO sobre `Q` (la cantidad consumida/adquirida):
+# min/max/ceros/negativos. Restringido a propósito -> id_unidad_medida es un
+# código categórico, no una cantidad, y no debe tratarse como variable continua.
+cat("\n-- Estadísticos de `Q` (Sec 2) --\n")
+print(data_sec2 |> select(Q) |> diagnose_numeric())
+cat("\n-- Estadísticos de `Q` (Sec 3A) --\n")
+print(data_sec3a |> select(Q) |> diagnose_numeric())
 
 # Chequeo global rápido de atípicos (referencia, NO el criterio de decisión;
 # ver sección 4 para el criterio agrupado por alimento).
-cat("\n-- Atípicos globales de `cantidad`, referencia (dlookr::diagnose_outlier) --\n")
-print(data_sec2 |> select(cantidad) |> diagnose_outlier())
-print(data_sec3a |> select(cantidad) |> diagnose_outlier())
+cat("\n-- Atípicos globales de `Q`, referencia (dlookr::diagnose_outlier) --\n")
+print(data_sec2 |> select(Q) |> diagnose_outlier())
+print(data_sec3a |> select(Q) |> diagnose_outlier())
 
 # 4. Valores atípicos POR ALIMENTO (Paso 7 de la guía WFP) -------------------
 # Regla: dentro de cada alimento, marcar como atípico un Q fuera de [P1,P99].
 # Es el criterio metodológicamente correcto aquí (ver nota al inicio).
 detectar_atipicos <- function(df) {
   df |>
-    filter(!is.na(cantidad)) |>
-    group_by(alimento) |>
+    filter(!is.na(Q)) |>
+    group_by(descripcion) |>
     mutate(
-      p01 = quantile(cantidad, 0.01, na.rm = TRUE),
-      p99 = quantile(cantidad, 0.99, na.rm = TRUE),
-      atipico = cantidad < p01 | cantidad > p99
+      p01 = quantile(Q, 0.01, na.rm = TRUE),
+      p99 = quantile(Q, 0.99, na.rm = TRUE),
+      atipico = Q < p01 | Q > p99
     ) |>
     ungroup()
 }
@@ -114,7 +123,7 @@ cat(sprintf("Sec 3A: %d de %d registros (%.1f%%)\n",
 
 top_atipicos_sec3a <- atipicos_sec3a |>
   filter(atipico) |>
-  count(alimento, sort = TRUE, name = "n_atipicos") |>
+  count(descripcion, sort = TRUE, name = "n_atipicos") |>
   head(20)
 
 cat("\nTop 20 alimentos con más valores atípicos en Sec 3A:\n")
@@ -123,8 +132,8 @@ write_csv2(top_atipicos_sec3a, file.path(dir_eda, "top_atipicos_sec3a.csv"))
 
 # 5. Cobertura del diario de 7 días en Sec 3A --------------------------------
 cobertura_dias <- data_sec3a |>
-  distinct(id, dia) |>
-  count(id, name = "n_dias_registrados")
+  distinct(id_hogar_unico, dia) |>
+  count(id_hogar_unico, name = "n_dias_registrados")
 
 cat("\n== 5. Cobertura del diario (días registrados por hogar, Sec 3A) ==\n")
 print(table(cobertura_dias$n_dias_registrados))
@@ -141,7 +150,7 @@ generar_reporte_dlookr <- FALSE  # cambiar a TRUE para generar el HTML
 
 if (generar_reporte_dlookr) {
   data_sec3a |>
-    select(cantidad, porcentaje_hogar, factor_expansion) |>
+    select(Q, factor_expansion) |>
     eda_report(output_format = "html",
                output_file = "eda_report_sec3a.html",
                output_dir = dir_eda)

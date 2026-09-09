@@ -243,12 +243,28 @@ sec3a_puente <- read_excel(ruta_puente, sheet = hoja_sec3a) |>
 sec2_pc <- read_excel(ruta_tabla_PC, sheet = hoja_sec2) |>
   clean_names() |>
   select(enhance_id, edible) |>
-  mutate(enhance_id = as.numeric(enhance_id))
+  mutate(
+    enhance_id = as.numeric(enhance_id),
+    # OJO: en food_factors.xlsx, hoja Sec2, EDIBLE esta guardado como TEXTO
+    # con coma decimal ("1,00"), no como numero -- confirmado revisando el
+    # tipo de celda real (openpyxl data_type='s'), no solo como lo muestra
+    # RStudio. as.numeric() directo sobre "1,00" da NA (interpreta la coma
+    # como caracter invalido). Se reemplaza la coma por punto antes de convertir.
+    edible = as.numeric(gsub(",", ".", as.character(edible)))
+  )
 
 sec3a_pc <- read_excel(ruta_tabla_PC, sheet = hoja_sec3a) |>
   clean_names() |>
   select(id_variedad, edible) |>
-  mutate(id_variedad = as.character(id_variedad))
+  mutate(
+    # id_variedad se mantiene como character -- es la convencion ya
+    # establecida en sec3a_puente (ver comentario ahi: "en el crudo
+    # id_variedad es 'text' a proposito, codigo, no cantidad"). Revertido
+    # aqui despues de confirmar que cambiarlo a numerico rompia el join
+    # con sec3a_puente mas arriba en la cadena.
+    id_variedad = as.character(id_variedad),
+    edible = as.numeric(gsub(",", ".", as.character(edible)))
+  )
 # OJO -- CONFIRMADO CONTRA DATOS REALES: no se puede unir por enhance_id
 # aca. El enhance_id 70211088 (Guandu, grano verde) aparece en DOS
 # id_variedad distintos (374 "en cascara" y 376 "desgranados") con edible
