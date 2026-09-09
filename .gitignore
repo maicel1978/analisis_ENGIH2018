@@ -28,3 +28,9 @@ _cache
 
 data/clean/
 
+
+# Salidas automaticas de 02_eda.R (regenerables, no requieren juicio manual
+# como si lo requieren otros archivos de data/eda/ ej. FC_propuesto_*.csv)
+data/eda/cobertura_dias_sec3a.csv
+data/eda/ranking_unidades_no_estandar.csv
+data/eda/top_atipicos_sec3a.csv
