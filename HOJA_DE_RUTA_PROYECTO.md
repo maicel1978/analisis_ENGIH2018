@@ -7,6 +7,16 @@ Este documento fija el alcance acordado hasta ahora. Cualquier cambio de alcance
 
 ---
 
+## PRIORIDAD ACTUAL (leer esto primero, antes que Fase 0 de abajo)
+
+**Al 2026-09-09: lo que sigue es empezar `05_ingesta_micronutrientes.R` (Fase 1), NO seguir la lista de pendientes de Fase 0** (esa lista es real pero se retoma después — ver "ESTRATEGIA ACORDADA" en Fase 1).
+
+**Para no caer en un ciclo infinito intentando mapear los ~65 nutrientes de una vez:** empezar con solo 4 — **Energía, Hierro, Ácido fólico, Vitamina A** (los que Santiago nombró explícitamente + los que ya tienen benchmark de comparación, la ENM 2009/2024 mencionada más abajo). Conseguir esos 4 corriendo de punta a punta primero. Ampliar a más nutrientes después de tener ese resultado, no antes.
+
+**Antes de escribir el join:** revisar los nombres exactos de columna en `food_composition_INCAP.xlsx` (ej. `ENERC_KCAL`, `FE`, `FOLDFE`, `VITA_RAE`) vs. `food_composition_FNDDS.xlsx` (nombres en inglés tipo "Energy (kcal)", "Iron, Fe (mg)") — **no son los mismos nombres ni necesariamente las mismas unidades** (mg vs mcg, por ejemplo). Construir la tabla de equivalencia de columnas primero, como un paso explícito y verificado, no asumido.
+
+---
+
 ## Fase 0 — Cerrar la base de datos (prerrequisito, en curso)
 
 - [x] **HITO (2026-09-08): primera corrida completa y exitosa de `01_import.R` → `02_eda.R` → `03_transform.R`, de punta a punta, en la historia del proyecto.** Con datos parciales pero honestos (crosswalk Sec3A al 50%, `food_factors.xlsx` cubriendo 144/770 alimentos): Sec2 con 11 filas marcadas outlier, Sec3A con 41; ejemplo de cobertura ponderada real (arroz blanco enriquecido, enhance_id 70213002): 30% (IC 28.9-31.1%). En el camino se corrigieron 3 bugs reales que nunca se habían detectado porque estos scripts nunca se habían corrido completos hasta hoy (ver bugs documentados más abajo). El aviso de diseño muestral (IC probablemente subestimado, faltan variables de conglomerado/estrato) sigue pendiente, documentado en el propio script.
@@ -61,6 +71,8 @@ Sec 3A superó la proyección (155,770 vs. ~113,700 esperados) — probablemente
 
 ## Fase 1 — Pipeline de scripts (01 → 06)
 
+**ESTRATEGIA ACORDADA (2026-09-09), para no perderla en una sesión nueva: avanzar por fases con los datos como están, no perfeccionar datos antes de avanzar.** El crosswalk al 55%/peso-por-unidad al 60% son suficientes para intentar `05_ingesta_micronutrientes.R` ya — no esperar a que estén completos. El pulido de datos (resto del crosswalk, cilantro/plátano/guineo, `VISION_Y_ARQUITECTURA_PROYECTO.md` desactualizado) se retoma después, documentado y sin bloquear el avance — la cobertura máxima sigue siendo la meta, solo pospuesta, no abandonada. **Si una conversación nueva por defecto propone "sigamos afinando datos", es la señal de que se perdió esta estrategia — corregir hacia 05/06.**
+
 - [x] `01_import.R` — Q, FC (3 niveles), `enhance_id`, PC ensamblados. Corriendo limpio contra datos reales desde 2026-09-08.
 - [x] `02_eda.R` — corregido y confirmado corriendo limpio (2026-09-08): overlap de hogares, estandarización de unidades, missingness, atípicos por alimento, cobertura del diario. Ver HITO arriba.
 - [x] `03_transform.R` — corregido y confirmado corriendo limpio (2026-09-08): `Q × FC × PC / PM`, outliers marcados, ejemplo de cobertura ponderada real. Ver HITO arriba. Queda pendiente afinar: disponibilidad neta para alimentos almacenables, y el aviso de diseño muestral (IC subestimado).
@@ -93,6 +105,7 @@ Sec 3A superó la proyección (155,770 vs. ~113,700 esperados) — probablemente
 - [ ] Seleccionar indicadores clave (cobertura, prevalencia de inadecuación, densidad, equidad)
 - [ ] Prototipo (herramienta a decidir: Shiny, Quarto dashboard, u otra)
 - [ ] Iterar con retroalimentación de Carlos Rodas y Daniel Hernández
+- [ ] **Revisión editorial/creativa antes de presentar (no antes — solo cuando haya contenido real que pulir):** pasada de Claude como editor crítico sobre `06_report.qmd` y los materiales de presentación — tono, concisión, que no "suene a transcripción de IA" (frases repetitivas, exceso de explicación). Los documentos internos (`HOJA_DE_RUTA`, `VISION`) NO se tocan para esto — su densidad técnica es correcta para lo que son, un log de trabajo, no un entregable.
 
 ## Fase 4 — Artículo
 
