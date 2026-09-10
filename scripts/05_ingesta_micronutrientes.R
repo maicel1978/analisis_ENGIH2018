@@ -1,81 +1,79 @@
 # 05_ingesta_micronutrientes.R
 #
-# BORRADOR/ANCLA (2026-09-09) -- primer paso verificado, no un pipeline
-# completo todavia. Ver "PRIORIDAD ACTUAL" en HOJA_DE_RUTA_PROYECTO.md.
+# Ingesta aparente de micronutrientes por EMA/dia, a nivel de hogar.
+# Alcance acotado a 4 nutrientes: Energia, Hierro, Acido folico, Vitamina A.
 #
-# Alcance deliberadamente acotado a 4 nutrientes (no los ~65 disponibles),
-# para tener un resultado real de punta a punta antes de ampliar:
-#   Energia, Hierro, Acido folico, Vitamina A
-# (los que Santiago nombro explicitamente + los que tienen benchmark de
-# comparacion documentado, ENM 2009/2024 -- ver VISION_Y_ARQUITECTURA).
+# Equivalencia de columnas (verificada 2026-09-09):
+#   Nutriente     | INCAP      | FNDDS                     | Unidad
+#   Energia       | ENERC_KCAL | Energy (kcal)             | kcal
+#   Hierro        | FE         | Iron\n(mg)                | mg
+#   Acido folico  | FOLDFE     | Folate, DFE (mcg_DFE)     | mcg DFE
+#   Vitamina A    | VITA_RAE   | Vitamin A, RAE (mcg_RAE)  | mcg RAE
+# FNDDS trae TRES columnas de folato; solo "Folate, DFE" corresponde a FOLDFE.
+# Las 4 unidades coinciden entre tablas -- sin factor de conversion.
 #
-# YA VERIFICADO (2026-09-09), no asumido -- ver tabla de equivalencia:
-#   Nutriente      | INCAP      | FNDDS                        | Unidad
-#   Energia        | ENERC_KCAL | Energy (kcal)                | kcal
-#   Hierro         | FE         | Iron (mg)                    | mg
-#   Acido folico   | FOLDFE     | Folate, DFE (mcg_DFE)         | mcg DFE
-#   Vitamina A     | VITA_RAE   | Vitamin A, RAE (mcg_RAE)      | mcg RAE
+# Verificado 2026-09-10 sobre los archivos reales (no asumido):
+#   - INCAP: 1,466 filas, ENHANCE_ID unico. FNDDS: 7,083 filas, Food code unico.
+#   - Interseccion INCAP x FNDDS = 0 IDs. Por eso bind_rows() es seguro aqui.
+#     Se deja una comprobacion en codigo (stop) para que no dependa de esa
+#     verificacion puntual si alguna tabla se actualiza.
+#   - En el crosswalk, ningun enhance_id validado aparece con dos `fuente`
+#     distintas (211 enhance_id distintos).
+#   - Trampa de nombres: la hoja "Cuest. B Sec 2" usa `variedad` y la hoja
+#     "Cuest. B Sec 3A" usa `id_variedad`. Aqui no se usa ninguna de las dos
+#     (el join es por enhance_id, que ya viene resuelto desde 01_import.R),
+#     pero conviene saberlo antes de tocar esas hojas en otro script.
+#   - `validado` es booleano en Sec 2 y 0/1 numerico en Sec 3A -> as.logical().
 #
-# OJO -- trampa real encontrada al verificar: FNDDS tiene TRES columnas de
-# folato ("Folate, food", "Folate, DFE", "Folate, total"). Solo "Folate, DFE"
-# corresponde a FOLDFE de INCAP (mismo ajuste de equivalencia dietetica).
-# Las otras dos miden algo distinto -- NO usarlas por error.
-#
-# Las 4 unidades coinciden exactamente entre INCAP y FNDDS -- no hace falta
-# factor de conversion para estos 4 nutrientes especificamente (puede que
-# si haga falta al ampliar a otros).
-#
-# PENDIENTE (no hecho en este borrador, dejarlo para cuando se retome):
-#   - Ejecutar y confirmar que corre limpio contra los datos reales.
-#   - Extender a mas nutrientes una vez este resultado este validado.
-#   - Sec 3A: ~45% de los alimentos todavia sin enhance_id validado en el
-#     crosswalk (55% completo) -- esas filas daran NA en el resultado,
-#     es esperado, no un bug. Documentar el % de cobertura real del
-#     resultado final, no solo presentarlo sin ese contexto.
+# SUPUESTO EXPLICITO, no validado con la documentacion de origen:
+#   ambas tablas expresan los nutrientes por 100 g de porcion comestible.
+#   Todo el calculo divide entre 100. Verificar contra la doc de INCAP/FNDDS
+#   antes de reportar cifras a supervisores.
 
 library(conflicted)
 library(readr)
 library(dplyr)
+library(tidyr)
 library(readxl)
 library(here)
 conflicts_prefer(dplyr::filter)
 
-# Paso 1: Cargar consumo por EMA (ya construido en 04_equivalente_adulto.R) -
+NUTRIENTES <- c("energia_kcal", "hierro_mg", "folato_mcg_dfe", "vitamina_a_mcg_rae")
+
+# Paso 1: consumo por EMA (04_equivalente_adulto.R) -----------------------
 gramos_por_ema <- read_delim(
   here("data", "clean", "data_gramos_por_ema.csv"),
   delim = ";",
   show_col_types = FALSE
 )
 
-# Paso 2: Cargar crosswalk (fuente de enhance_id + de donde viene: INCAP/FNDDS)
-crosswalk_sec2 <- read_excel(
-  here("data", "raw", "crosswalk_tablas_composicion.xlsx"),
-  sheet = "Cuest. B Sec 2"
+# Paso 2: crosswalk -> de que tabla sale cada enhance_id ------------------
+leer_crosswalk <- function(hoja) {
+  read_excel(here("data", "raw", "crosswalk_tablas_composicion.xlsx"), sheet = hoja) |>
+    filter(!is.na(enhance_id), as.logical(validado) %in% TRUE) |>
+    transmute(enhance_id = as.numeric(enhance_id), fuente)
+}
+
+fuente_por_id <- bind_rows(
+  leer_crosswalk("Cuest. B Sec 2"),
+  leer_crosswalk("Cuest. B Sec 3A")
 ) |>
-  filter(!is.na(enhance_id), validado == TRUE) |>
-  select(id_variedad, enhance_id, fuente)
+  distinct(enhance_id, fuente)
 
-crosswalk_sec3a <- read_excel(
-  here("data", "raw", "crosswalk_tablas_composicion.xlsx"),
-  sheet = "Cuest. B Sec 3A"
-) |>
-  filter(!is.na(enhance_id), validado == TRUE) |>
-  select(id_variedad, enhance_id, fuente)
+conflictos_fuente <- fuente_por_id |> count(enhance_id) |> filter(n > 1)
+if (nrow(conflictos_fuente) > 0) {
+  stop("enhance_id con mas de una `fuente` en el crosswalk: ",
+       paste(conflictos_fuente$enhance_id, collapse = ", "))
+}
 
-# TODO: unir crosswalk_sec2/sec3a con gramos_por_ema por id_variedad
-# (revisar que el tipo de id_variedad coincida en ambos lados -- ya tuvimos
-# un bug real por esto en data_raw_unidades.xlsx, ver HOJA_DE_RUTA, no
-# repetir el mismo error aqui sin comprobar el tipo primero).
-
-# Paso 3: Cargar las 4 columnas de nutrientes de cada tabla, con nombres
-# de columna ESTANDARIZADOS para poder combinarlas despues (independiente
-# de si el alimento vino de INCAP o de FNDDS).
+# Paso 3: tablas de composicion, con nombres estandarizados ---------------
 nutrientes_incap <- read_excel(
   here("data", "raw", "food_composition_INCAP.xlsx"),
   sheet = "nutrient_values"
 ) |>
   transmute(
-    enhance_id = ENHANCE_ID,
+    enhance_id = as.numeric(ENHANCE_ID),
+    fuente = "INCAP",
     energia_kcal = ENERC_KCAL,
     hierro_mg = FE,
     folato_mcg_dfe = FOLDFE,
@@ -87,26 +85,84 @@ nutrientes_fndds <- read_excel(
   skip = 1
 ) |>
   transmute(
-    enhance_id = `Food code`,
+    enhance_id = as.numeric(`Food code`),
+    fuente = "FNDDS",
     energia_kcal = `Energy (kcal)`,
-    hierro_mg = `Iron\n(mg)`,  # OJO: el nombre real trae un salto de linea
-    folato_mcg_dfe = `Folate, DFE (mcg_DFE)`,  # NO usar las otras 2 columnas de folato
+    hierro_mg = `Iron\n(mg)`,               # el nombre real trae salto de linea
+    folato_mcg_dfe = `Folate, DFE (mcg_DFE)`, # NO usar las otras 2 de folato
     vitamina_a_mcg_rae = `Vitamin A, RAE (mcg_RAE)`
   )
 
-# TODO: combinar nutrientes_incap + nutrientes_fndds en una sola tabla,
-# usar crosswalk$fuente para saber de cual tabla sacar cada enhance_id
-# (bind_rows no sirve directo si un mismo enhance_id numerico pudiera
-# existir en ambas fuentes por coincidencia -- verificar esto antes de
-# combinar, no asumir que los enhance_id son unicos entre fuentes).
+colisiones <- intersect(nutrientes_incap$enhance_id, nutrientes_fndds$enhance_id)
+if (length(colisiones) > 0) {
+  stop("Hay ", length(colisiones), " id presentes en INCAP y FNDDS a la vez. ",
+       "El join debe hacerse por (enhance_id, fuente), no solo por enhance_id.")
+}
 
-# TODO: unir gramos_por_ema + crosswalk + nutrientes; calcular
-# ingesta_aparente_por_EMA = sum(Gramos_por_EMA_dia * nutriente_por_gramo)
-# agrupado por hogar, para cada uno de los 4 nutrientes.
+composicion <- bind_rows(nutrientes_incap, nutrientes_fndds)
 
-# TODO: reportar el % de gramos consumidos (ponderado, no solo conteo de
-# filas) que SI logro match de nutriente, vs. el % que quedo sin match
-# por crosswalk incompleto -- ese numero es tan importante como el
-# resultado final, no ocultarlo.
+# Paso 4: unir consumo + composicion --------------------------------------
+# left_join a proposito: las filas sin match se conservan para poder medir
+# la cobertura real. Se une por enhance_id (verificado unico entre fuentes);
+# `fuente` viene del crosswalk solo como trazabilidad del origen del dato.
+consumo_nutrientes <- gramos_por_ema |>
+  left_join(fuente_por_id, by = "enhance_id") |>
+  left_join(composicion |> select(-fuente), by = "enhance_id") |>
+  mutate(across(all_of(NUTRIENTES), ~ Gramos_por_EMA_dia * .x / 100))
 
-message("Borrador cargado. Columnas de nutrientes verificadas y listas para unir -- falta el join final y la agregacion por hogar (ver TODOs arriba).")
+# Paso 5: ingesta aparente por hogar --------------------------------------
+ingesta_hogar <- consumo_nutrientes |>
+  group_by(id_hogar_unico) |>
+  summarise(across(all_of(NUTRIENTES), ~ sum(.x, na.rm = TRUE)), .groups = "drop")
+
+# Paso 6: cobertura -- ponderada por gramos, por nutriente ----------------
+# Este numero acompana al resultado siempre: sin el, la ingesta se lee como
+# si fuera completa cuando en realidad es un piso (los alimentos sin match
+# suman 0, no NA, y por tanto SUBESTIMAN la ingesta).
+total_g <- sum(gramos_por_ema$Gramos_por_EMA_dia, na.rm = TRUE)
+
+cobertura <- tibble(nutriente = NUTRIENTES) |>
+  rowwise() |>
+  mutate(
+    g_con_dato = sum(
+      gramos_por_ema$Gramos_por_EMA_dia[!is.na(consumo_nutrientes[[nutriente]])],
+      na.rm = TRUE
+    ),
+    pct_gramos_cubiertos = 100 * g_con_dato / total_g
+  ) |>
+  ungroup()
+
+cobertura_filas <- tibble(
+  filas_totales = nrow(consumo_nutrientes),
+  filas_con_composicion = sum(!is.na(consumo_nutrientes$energia_kcal)),
+  pct_filas = 100 * filas_con_composicion / filas_totales,
+  pct_gramos = 100 * sum(gramos_por_ema$Gramos_por_EMA_dia[
+    !is.na(consumo_nutrientes$energia_kcal)], na.rm = TRUE) / total_g
+)
+
+message("\nIngesta aparente calculada para ", nrow(ingesta_hogar), " hogares.")
+message("Cobertura (energia): ", round(cobertura_filas$pct_filas, 1), "% de filas, ",
+        round(cobertura_filas$pct_gramos, 1), "% de gramos consumidos.")
+print(cobertura)
+
+# Paso 7: salidas ---------------------------------------------------------
+write_delim(ingesta_hogar, here("data", "clean", "data_ingesta_micronutrientes_hogar.csv"), delim = ";")
+write_delim(cobertura, here("data", "clean", "cobertura_composicion_nutrientes.csv"), delim = ";")
+
+# Alimentos sin composicion, ordenados por gramos perdidos: es la lista de
+# trabajo para ampliar el crosswalk por impacto real, no por orden alfabetico.
+faltantes <- consumo_nutrientes |>
+  filter(is.na(energia_kcal)) |>
+  group_by(descripcion, enhance_id) |>
+  summarise(gramos_perdidos = sum(Gramos_por_EMA_dia, na.rm = TRUE),
+            filas = n(), .groups = "drop") |>
+  arrange(desc(gramos_perdidos))
+
+write_delim(faltantes, here("data", "eda", "alimentos_sin_composicion.csv"), delim = ";")
+
+# Pendiente (no hecho aqui):
+#   - Validar el supuesto "por 100 g" contra la documentacion de INCAP y FNDDS.
+#   - 04_equivalente_adulto.R pierde la marca de seccion (Sec2/Sec3A) al hacer
+#     bind_rows: agregar una columna `seccion` alli permitiria reportar
+#     cobertura separada por seccion, que es como Daniel/Carlos la van a pedir.
+#   - Comparar contra benchmark ENM 2009/2024 (siguiente script, no este).

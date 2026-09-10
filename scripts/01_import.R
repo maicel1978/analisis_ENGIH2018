@@ -192,6 +192,85 @@ sec3a_fc_especifico <- read_excel(ruta_unidades, sheet = hoja_sec3a, na = "NA") 
   filter(!is.na(fc)) |>
   select(descripcion, id_unidad_medida_presentacion, fc_especifico = fc)
 
+# ---------------------------------------------------------------------------
+# Guardas de integridad para tablas usadas en left_join().
+#
+# Detecta:
+#   1. Claves duplicadas -> fan-out.
+#   2. FC existente pero clave vacía -> fila inerte.
+#
+# Se usa stop() para impedir continuar con datos inconsistentes.
+# ---------------------------------------------------------------------------
+
+verificar_tabla_join <- function(df, claves, nombre) {
+  
+  con_fc <- df |>
+    filter(!is.na(fc_especifico))
+  
+  dups <- con_fc |>
+    count(across(all_of(claves)), name = "n") |>
+    filter(n > 1)
+  
+  if (nrow(dups) > 0) {
+    
+    message("\nDuplicados encontrados:")
+    print(dups)
+    
+    stop(
+      "Claves duplicadas en ",
+      nombre,
+      ": ",
+      nrow(dups),
+      " combinaciones. ",
+      "Provocarian fan-out."
+    )
+  }
+  
+  inertes <- con_fc |>
+    filter(
+      if_any(
+        all_of(claves),
+        \(x) is.na(x) | trimws(as.character(x)) == ""
+      )
+    )
+  
+  if (nrow(inertes) > 0) {
+    
+    message("\nFilas con FC y claves incompletas:")
+    print(inertes)
+    
+    stop(
+      "Filas con FC y clave vacia en ",
+      nombre,
+      ": ",
+      nrow(inertes),
+      ". Nunca se aplicarian durante el join."
+    )
+  }
+  
+  message(
+    "OK -- ",
+    nombre,
+    ": ",
+    nrow(con_fc),
+    " filas con FC, claves unicas y completas."
+  )
+}
+
+
+verificar_tabla_join(
+  sec2_fc_especifico,
+  c("variedad", "id_unidad_medida_presentacion"),
+  "Sec 2"
+)
+
+verificar_tabla_join(
+  sec3a_fc_especifico,
+  c("descripcion", "id_unidad_medida_presentacion"),
+  "Sec 3A"
+)
+
+
 # Función compartida: unidad a convertir = presentación si existe, si no la base.
 # as.numeric() en ambos lados porque en Sec 3A `id_unidad_medida` se lee como
 # "text" (character) mientras que `id_unidad_medida_presentacion` se infiere
