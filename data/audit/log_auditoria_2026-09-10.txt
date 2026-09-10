@@ -1,0 +1,152 @@
+
+==============================================================================
+PASO 0. Tablas de referencia
+==============================================================================
+diccionario_conversion: 11 unidades universales con FC
+FC específico Sec 2: 82 filas con FC | filas con clave (variedad) vacía = INERTES: 0
+  claves duplicadas en tabla específica Sec2: 0
+FC específico Sec 3A: 619 filas con FC | CLAVES DUPLICADAS (fan-out en left_join): 0
+crosswalk Sec 2: 30 variedades con enhance_id validado (de 30)
+crosswalk Sec 3A: 253 id_variedad con enhance_id validado (de 769 validadas=420)
+food_factors (PC): Sec2 30 enhance_id | Sec3A 144 id_variedad
+nutrientes: INCAP 1466 alimentos | FNDDS 7083 | colisión de IDs entre fuentes: 0
+
+==============================================================================
+PASO 1. Crudo y resolución de FC (espejo 01_import.R)
+==============================================================================
+Crudo Sec 2: 47837 filas | Sec 3A: 342046 filas
+
+-- Estado ACTUAL del repo (lo que produce hoy 01_import.R) --
+Sec 2 : 47837 filas | universal 22316 | específica 21108 | SIN FC 4413
+Sec 3A: 342046 filas (crudo 342046) | universal 107095 | específica 186268 | SIN FC 48683
+   >>> fan-out Sec3A: 0 filas duplicadas espurias
+
+-- Estado CORREGIDO (dedupe Sec3A + variedad en filas de peso-por-unidad Sec2) --
+Sec 2 : 47837 filas | universal 22316 | específica 21108 | SIN FC 4413
+Sec 3A: 342046 filas | universal 107095 | específica 186268 | SIN FC 48683
+
+==============================================================================
+PASO 2. Consumo diario y outliers (espejo 03_transform.R) [corregido]
+==============================================================================
+Sec 2 : consumo calculado 43404/47837 | outliers 11
+Sec 3A: consumo calculado 245898/342046 | outliers 42
+
+==============================================================================
+PASO 3. Equivalente de Mujer Adulta (espejo 04)
+==============================================================================
+Hogares: 8892 | EMA mediana: 3.04 | personas sin EMA: 0
+Suma factor_expansion (hogares): 3,214,540
+
+==============================================================================
+PASO 4. Gramos por EMA (espejo 04 paso 6)
+==============================================================================
+Registros de consumo válidos (sin outliers): 289249
+Gramos por EMA calculado: 289249 filas  [hito documentado 2026-09-08: 254,905]
+
+==============================================================================
+PASO 5. Ingesta aparente (avance preliminar de 05_ingesta_micronutrientes.R)
+==============================================================================
+Sec 2: 43,404 de 47,837 filas entran al cálculo (90.7%) | excluidas: sin FC 4,413 | FC pero sin PC 20 | PC pero sin FC 4,371
+Sec 3A: 245,898 de 342,046 filas entran al cálculo (71.9%) | excluidas: sin FC 48,683 | FC pero sin PC 47,465 | PC pero sin FC 41,376
+
+Top 20 alimentos EXCLUIDOS del cálculo (prioridad de relleno):
+descripcion
+Caldo de pollo (Sopita Concentrada)                   18087
+Agua purificada (Dasani, Planeta Azul y similares)     7775
+Plátano verde                                          7690
+Guineo verde (guineíto)                                5577
+Aguacate                                               2417
+Tomate Barceló o Bugalú                                1982
+PLÁTANO VERDE                                          1836
+Plátano maduro                                         1815
+Sazón líquido                                          1756
+Ají gustoso o cachucha                                 1616
+GUINEITO VERDE                                         1513
+Apio planta, apio gusto                                1449
+Naranja agria                                          1394
+Guineo maduro (banano)                                 1313
+Berenjena corriente                                    1068
+Margarina                                              1013
+Tomates de ensalada                                     946
+Limón agrio                                             920
+Cilantro                                                887
+Tayota                                                  815
+
+Match de nutrientes sobre filas ya calculadas: 100.0% de filas | 100.0% de gramos (esperado ~100%: PC ⊆ crosswalk, ver arriba)
+
+Ingesta aparente por EMA (hogares, ponderado por factor_expansion):
+  energia_kcal          : media pond.    2648.6 | mediana    2102.3 | ref. EAR/EER   2291 | hogares bajo ref:  56.3%
+  hierro_mg             : media pond.      17.5 | mediana      13.8 | ref. EAR/EER      8 | hogares bajo ref:  24.8%
+  folato_mcg_dfe        : media pond.    1011.2 | mediana     794.2 | ref. EAR/EER    320 | hogares bajo ref:  23.3%
+  vitamina_a_mcg_rae    : media pond.     283.7 | mediana     163.0 | ref. EAR/EER    500 | hogares bajo ref:  86.9%
+
+Top 10 alimentos por aporte a la ingesta de HIERRO (solo filas con match):
+descripcion
+ARROZ                                                                        40030.872151
+Arroz selecto                                                                27783.310493
+HABICHUELAS SUELTAS                                                           9295.172560
+Corn Flakes (incluye rice flakes, cereales de chocolates, frutas y demás)     4474.940302
+Pan sobado                                                                    4447.780396
+Arroz corriente                                                               4408.607217
+Habichuelas pintas secas                                                      3897.176274
+Pollo fresco                                                                  3748.472188
+Pan de agua                                                                   3313.954786
+Habichuelas rojas secas                                                       3110.523609
+
+Top 10 alimentos por aporte a FOLATO:
+descripcion
+ARROZ                           3.544018e+06
+Arroz selecto                   2.459715e+06
+Habichuelas pintas secas        4.035538e+05
+HABICHUELAS SUELTAS             3.916896e+05
+FIEDOS O SPAGUETTIS (PASTAS)    3.078517e+05
+Spaghetti                       2.284781e+05
+Pan sobado                      2.106843e+05
+Pan de agua                     1.440850e+05
+Fideos                          1.424970e+05
+Habichuelas rojas secas         1.310745e+05
+
+==============================================================================
+PASO 6. Cobertura ponderada del arroz blanco enriquecido (70213002)
+==============================================================================
+Cobertura ponderada: 30.0%  [documentado en 03: 30.0% (IC 28.9-31.1)]
+  IC ids=1 (actual, subestimado):    29.0 - 31.0%
+  IC diseño completo ESTRATO+UPM:    28.9 - 31.1%
+
+==============================================================================
+PASO 7. Escenarios de fortificación (ilustración, capa de intercambio)
+==============================================================================
+escenario                                                              | nutriente        |   mediana | %hog<EAR
+(a) sin fortificación (arroz 70213004, harina 70213038, azúcar 70215001) | energia_kcal     |    2102.3 |    56.3%
+(a) sin fortificación (arroz 70213004, harina 70213038, azúcar 70215001) | hierro_mg        |       8.7 |    44.8%
+(a) sin fortificación (arroz 70213004, harina 70213038, azúcar 70215001) | folato_mcg_dfe   |     266.4 |    60.3%
+(a) sin fortificación (arroz 70213004, harina 70213038, azúcar 70215001) | vitamina_a_mcg_rae |     163.0 |    86.9%
+(b) norma RD vigente 2018 (arroz s/fort, harina 70213039, azúcar 70215002) | energia_kcal     |    2102.3 |    56.3%
+(b) norma RD vigente 2018 (arroz s/fort, harina 70213039, azúcar 70215002) | hierro_mg        |       8.9 |    44.3%
+(b) norma RD vigente 2018 (arroz s/fort, harina 70213039, azúcar 70215002) | folato_mcg_dfe   |     273.5 |    59.3%
+(b) norma RD vigente 2018 (arroz s/fort, harina 70213039, azúcar 70215002) | vitamina_a_mcg_rae |     325.9 |    60.3%
+(c) crosswalk actual (mixto: arroz enriquecido, harina s/enrio, azúcar s/fort) | energia_kcal     |    2102.3 |    56.3%
+(c) crosswalk actual (mixto: arroz enriquecido, harina s/enrio, azúcar s/fort) | hierro_mg        |      13.8 |    24.8%
+(c) crosswalk actual (mixto: arroz enriquecido, harina s/enrio, azúcar s/fort) | folato_mcg_dfe   |     794.2 |    23.3%
+(c) crosswalk actual (mixto: arroz enriquecido, harina s/enrio, azúcar s/fort) | vitamina_a_mcg_rae |     163.0 |    86.9%
+
+Nota: pan/pastas/galletas mantienen su entrada actual en los 3 escenarios
+(decisión pendiente: si asumen harina fortificada en sus valores INCAP).
+
+==============================================================================
+RESUMEN: cifras documentadas vs. verificadas
+==============================================================================
+  Crudo Sec 2 filas                | doc: 47,837                       | verificado: 47,837
+  Crudo Sec 3A filas               | doc: 342,046                      | verificado: 342,046
+  Sec2 FC universal                | doc: 22,316 (doc 05-09)           | verificado: 22,316
+  Sec2 FC específica               | doc: 16,866 (doc 05-09, sin pesos-por-unidad) | verificado: 21,108 (hoy: con pesos-por-unidad + fix filas inertes)
+  Sec2 SIN FC                      | doc: 8,655 (doc 05-09)            | verificado: 4,413 (hoy: 4,242 filas recuperadas con el fix)
+  Sec3A FC universal               | doc: 107,095 (doc 05-09)          | verificado: 107,095
+  Sec3A filas tras joins (fan-out) | doc: 342,046 (doc: sin fan-out)   | verificado: 342,046 (OK, sin fan-out)
+  Crosswalk Sec3A validado         | doc: 420/769                      | verificado: 420/769
+  food_factors Sec3A               | doc: 144 alimentos                | verificado: 144 alimentos
+  Hogares con EMA                  | doc: 8,892 (mediana 3.04)         | verificado: 8,892 (mediana 3.04)
+  Gramos por EMA                   | doc: 254,905 (hito 08-09, sin pesos-por-unidad) | verificado: 289,249 (hoy: incluye filas resueltas por pesos-por-unidad)
+  Cobertura arroz 70213002         | doc: 30.0% (IC 28.9-31.1)         | verificado: 30.0% (IC diseño 28.9-31.1)
+
+FIN de la verificación cruzada.

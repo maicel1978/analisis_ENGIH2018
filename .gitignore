@@ -34,3 +34,8 @@ data/clean/
 data/eda/cobertura_dias_sec3a.csv
 data/eda/ranking_unidades_no_estandar.csv
 data/eda/top_atipicos_sec3a.csv
+# Salidas grandes de la auditoría Python (scripts/audit/) -- regenerables
+# corriendo el script; NO commit (los CSV pequeños de priorización sí van)
+data/audit/gramos_por_ema_python.csv
+data/audit/ingesta_hogar_python.csv
+data/audit/socio_extract.csv

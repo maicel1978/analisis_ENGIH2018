@@ -1,0 +1,13 @@
+escenario,nutriente,mediana_hogar_por_EMA,pct_hogares_bajo_EAR
+"(a) sin fortificación (arroz 70213004, harina 70213038, azúcar 70215001)",energia_kcal,2102.3056280918545,56.26320497043315
+"(a) sin fortificación (arroz 70213004, harina 70213038, azúcar 70215001)",hierro_mg,8.729121539903991,44.83866135485286
+"(a) sin fortificación (arroz 70213004, harina 70213038, azúcar 70215001)",folato_mcg_dfe,266.3554957704427,60.32343701752856
+"(a) sin fortificación (arroz 70213004, harina 70213038, azúcar 70215001)",vitamina_a_mcg_rae,162.96580891525628,86.92869273234622
+"(b) norma RD vigente 2018 (arroz s/fort, harina 70213039, azúcar 70215002)",energia_kcal,2102.3056280918545,56.26320497043315
+"(b) norma RD vigente 2018 (arroz s/fort, harina 70213039, azúcar 70215002)",hierro_mg,8.852826201270656,44.258800869514424
+"(b) norma RD vigente 2018 (arroz s/fort, harina 70213039, azúcar 70215002)",folato_mcg_dfe,273.49594902909666,59.313194792281266
+"(b) norma RD vigente 2018 (arroz s/fort, harina 70213039, azúcar 70215002)",vitamina_a_mcg_rae,325.8728003781382,60.33234108562432
+"(c) crosswalk actual (mixto: arroz enriquecido, harina s/enrio, azúcar s/fort)",energia_kcal,2102.3056280918545,56.26320497043315
+"(c) crosswalk actual (mixto: arroz enriquecido, harina s/enrio, azúcar s/fort)",hierro_mg,13.807384725535227,24.77526619257876
+"(c) crosswalk actual (mixto: arroz enriquecido, harina s/enrio, azúcar s/fort)",folato_mcg_dfe,794.1931723846681,23.261112415744726
+"(c) crosswalk actual (mixto: arroz enriquecido, harina s/enrio, azúcar s/fort)",vitamina_a_mcg_rae,162.96580891525628,86.92869273234622
