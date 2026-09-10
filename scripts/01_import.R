@@ -192,6 +192,40 @@ sec3a_fc_especifico <- read_excel(ruta_unidades, sheet = hoja_sec3a, na = "NA") 
   filter(!is.na(fc)) |>
   select(descripcion, id_unidad_medida_presentacion, fc_especifico = fc)
 
+# --- CONTROL DE INTEGRIDAD DE CLAVES (añadido 2026-09-10, ver auditoría) ---
+# Un left_join contra una tabla con CLAVES DUPLICADAS duplica filas del crudo
+# silenciosamente (fan-out), y una fila con FC pero CLAVE VACÍA nunca aplica
+# (fila inerte). Ambos casos ocurrieron en la práctica (2026-09-08/09, al
+# añadir los pesos-por-unidad; corregidos el 2026-09-10 -- ver nota en
+# data_raw_unidades.xlsx e INFORME_AUDITORIA_2026-09-10.md). Desde entonces
+# el pipeline falla ruidosamente si vuelve a pasar, en vez de corromper
+# resultados aguas abajo.
+verificar_claves_join <- function(tabla, claves, nombre_archivo, clave_na_es_bug = TRUE) {
+  if (any(is.na(tabla[claves]))) {
+    msg <- paste0(" en ", nombre_archivo, ": hay filas con FC pero clave de join vacía (",
+                  paste(claves, collapse = ", "), ") -- nunca se aplicarían (fila inerte).")
+    if (clave_na_es_bug) stop("BUG", msg, " Corregir el Excel antes de continuar.")
+    else warning("AVISO", msg, " Es solo peso muerto (dplyr no une NA por defecto), pero conviene limpiarlo.")
+  }
+  dup <- tabla |> count(across(all_of(claves))) |> filter(n > 1)
+  if (nrow(dup) > 0) {
+    stop("BUG en ", nombre_archivo, ": ", nrow(dup), " clave(s) de join duplicada(s) (",
+         paste(claves, collapse = ", "),
+         ") -- el left_join duplicaría filas del crudo (fan-out). Claves: ",
+         paste(utils::head(dup[[1]], 5), collapse = " | "),
+         ". Corregir el Excel antes de continuar.")
+  }
+  invisible(TRUE)
+}
+
+verificar_claves_join(sec2_fc_especifico, c("variedad", "id_unidad_medida_presentacion"),
+                      "data_raw_unidades.xlsx / 'Cuest. B Sec 2' (FC específico)")
+verificar_claves_join(sec3a_fc_especifico, c("descripcion", "id_unidad_medida_presentacion"),
+                      "data_raw_unidades.xlsx / 'Cuest. B Sec 3A' (FC específico)")
+# Nota: en Sec 3A el join es por TEXTO (descripcion) -- además de duplicadas,
+# cualquier diferencia de tildes/mayúsculas contra el crudo rompe el match sin
+# avisar. Migrar el join a id_variedad sigue en el backlog (HOJA_DE_RUTA).
+
 # Función compartida: unidad a convertir = presentación si existe, si no la base.
 # as.numeric() en ambos lados porque en Sec 3A `id_unidad_medida` se lee como
 # "text" (character) mientras que `id_unidad_medida_presentacion` se infiere
@@ -233,6 +267,18 @@ sec3a_puente <- read_excel(ruta_puente, sheet = hoja_sec3a) |>
     enhance_id  = as.numeric(enhance_id)
   )
 
+# Mismo control de integridad para las tablas que se unen por clave unica
+# (añadido 2026-09-10): duplicados con validado=TRUE harían fan-out aquí
+# también. Verificado ese día: 0 duplicados en las cuatro tablas.
+verificar_claves_join(
+  sec2_puente |> filter(validado == TRUE, !is.na(enhance_id)),
+  "id_variedad", "crosswalk_tablas_composicion.xlsx / Sec 2", clave_na_es_bug = FALSE
+)
+verificar_claves_join(
+  sec3a_puente |> filter(validado == TRUE, !is.na(enhance_id)),
+  "id_variedad", "crosswalk_tablas_composicion.xlsx / Sec 3A", clave_na_es_bug = FALSE
+)
+
 # Paso 4: Porción comestible (PC) -----------------------------------------
 # food_factors.xlsx ya trae el EDIBLE resuelto por enhance_id (INCAP directo,
 # o 1.00 justificado para FNDDS ). No hace
@@ -271,6 +317,11 @@ sec3a_pc <- read_excel(ruta_tabla_PC, sheet = hoja_sec3a) |>
 # DISTINTO (0.48 vs 1.00, ver bitacora QC) -- unir por enhance_id le hace
 # many-to-many fan-out exactamente a esas 1349 filas del crudo (374+376),
 # duplicandolas. id_variedad es unico en esta tabla, asi que se une por ahi.
+
+verificar_claves_join(sec2_pc, "enhance_id",
+                      "food_factors.xlsx / 'Cuest. B Sec 2' (PC)")
+verificar_claves_join(sec3a_pc, "id_variedad",
+                      "food_factors.xlsx / 'Cuest. B Sec 3A' (PC)")
 
 
 
