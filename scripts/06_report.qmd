@@ -1,5 +1,62 @@
 ---
-title: "Untitled"
+title: "Consumo aparente y adecuación de micronutrientes — ENGIH 2018, República Dominicana"
+subtitle: "Análisis preliminar de cobertura y escenarios de fortificación"
 format: html
-editor: visual
+---
+
+<!--
+ESQUELETO/ANCLA (2026-09-09) -- solo estructura de secciones, sin contenido
+todavia. No llenar ninguna seccion con datos hasta que 05_ingesta_micronutrientes.R
+produzca resultados reales -- nunca redactar un resultado antes de tenerlo
+calculado (ver Principios de rigor en VISION_Y_ARQUITECTURA_PROYECTO.md).
+
+Estructura basada en el marco Tang et al. (2021) + especificacion de
+Santiago (audio 2026-09-09, ver HOJA_DE_RUTA_PROYECTO.md Fase 2).
+-->
+
+## Objetivo
+
+<!-- Una version corta del objetivo del proyecto (VISION_Y_ARQUITECTURA_PROYECTO.md
+seccion 1), no repetir el documento completo aqui. -->
+
+## Metodología (resumen)
+
+<!-- Formula Q x FC x PC / PM, EMA (fuente FAO/WHO/UNU 2004), y las
+limitaciones ya documentadas (sin datos de embarazo/lactancia, etc.) --
+mencionarlas aqui tambien, no solo en el codigo. -->
+
+## Cobertura de vehículos fortificados
+
+<!-- % de hogares/EMA que consumen arroz/harina fortificados, por quintil,
+region, urbano/rural -- pendiente hasta que exista ese calculo. -->
+
+## Ingesta aparente: basal vs. con fortificación
+
+<!-- Para cada uno de los 4 nutrientes iniciales (energia, hierro, folato,
+vitamina A): ingesta sin fortificar vs. con fortificacion segun norma RD
+vs. segun estandar OMS. -->
+
+## Desplazamiento de la distribución respecto al EAR
+
+<!-- El punto especifico que pidio Santiago: mostrar como se mueve la
+curva de ingesta a la derecha con la fortificacion, y que proporcion de
+la poblacion deja de estar por debajo del EAR. -->
+
+## Escenarios de fortificación complementaria
+
+<!-- Que pasaria si, ademas del vehiculo principal, se fortifica otro
+alimento (ej. leche) para cerrar la brecha que el vehiculo principal no
+puede cerrar solo. -->
+
+## Limitaciones
+
+<!-- Listar las reales, ya conocidas: crosswalk incompleto (% exacto al
+momento del reporte), sin datos de embarazo/lactancia, pesos por unidad
+estimados para varios alimentos, diseño muestral (IC probablemente
+subestimado). No omitir esta seccion nunca. -->
+
+## Conclusiones
+
+<!-- Solo una vez que las secciones anteriores tengan contenido real. -->
+
 ---

@@ -57,188 +57,18 @@ Sin este cálculo bien hecho, ningún indicador de las fases siguientes es confi
 "TCA" se utiliza como término genérico para cualquier tabla de composición de alimentos. Durante la fase actual del proyecto la fuente principal es INCAP, aunque la arquitectura contempla la incorporación futura de otras fuentes (USDA, FNDDS u otras) cuando existan vacíos de cobertura.
 
 - **Benchmark externo para verificación de resultados:** Encuesta Nacional de Micronutrientes (ENM), República Dominicana, MSP. Hay dos versiones con resultados muy distintos: 2009 (MSP/CESDEM — anemia 28% en niños 6-59 meses, deficiencia de vitamina A) y 2024 (MSP/Inabie/FAO/PMA — mejoras sustanciales, baja deficiencia). Usar la versión 2024 como referencia principal una vez que su informe completo esté disponible; citar siempre el informe primario del MSP, nunca una síntesis de segunda mano sin bibliografía verificable.
-
-- **Registro de decisiones del crosswalk:** vive dentro del propio archivo de trabajo del crosswalk (columnas `ENHANCE_ID_final`, `tipo_equivalencia`, `validado` y `notas`). No se mantiene un archivo adicional de decisiones.
+- **Registro de decisiones del crosswalk:** vive dentro del propio archivo de trabajo del crosswalk (`crosswalk_tablas_composicion.xlsx`, columnas `enhance_id`, `tipo_equivalencia`, `validado` y `notas`). No se mantiene un archivo adicional de decisiones.
 
 - **Fuera de alcance en esta iteración:** Sección 3B de la ENGIH (alimentos preparados fuera del hogar). Requiere factores de receta y rendimiento que todavía no están construidos. Es una decisión metodológica explícita, no un olvido. Revisar únicamente si el TdR exige su inclusión.
 
 ## Arquitectura de tablas de composición y crosswalks
 
-La ENGIH contiene alimentos que no siempre están representados adecuadamente en una única tabla de composición nutricional.
+**Actualizado 2026-09-09 — la estrategia descrita en versiones anteriores de esta sección (múltiples crosswalks por fuente + tablas "MASTER" generadas automáticamente) fue abandonada. Esto es lo que realmente existe y usa el pipeline hoy:**
 
-Por esta razón, la curación manual se realizará por fuente.
-
-Ejemplos:
-
-```text
-crosswalk_variedad_INCAP.xlsx
-crosswalk_variedad_USDA.xlsx
-crosswalk_variedad_FNDDS.xlsx
-```
-
-Cada crosswalk se mantiene de forma independiente durante la etapa de construcción y validación para facilitar:
-
-- Auditoría manual.
-- Trazabilidad de decisiones.
-- Revisión experta.
-- Control de calidad por fuente.
-
-Durante esta etapa cada archivo puede evolucionar de forma independiente.
-
-Ejemplo:
-
-```text
-crosswalk_variedad_INCAP.xlsx
-crosswalk_variedad_FNDDS.xlsx
-crosswalk_variedad_USDA.xlsx
-```
-
-contienen únicamente asignaciones validadas contra las tablas de composición de alimentos.
-
-Los crosswalks crosswalk_variedad_FNDDS.xlsx y crosswalk_variedad_USDA.xlsx son para los alimentos que INCAP no cubra adecuadamente.
-
-Ejemplos:
-
-```text
-Caldo de pollo (Sopita Concentrada)
-Mayonesa
-Vinagre dorado
-Bizcocho envasado de vainilla
-Jugo de frutas en polvo
-Snacks y picaderas de todo tipo
-Ensalada cruda (Varias hortalizas)
-Sazon liquido
-Malta
-
-```
-
-La existencia de múltiples crosswalks es únicamente una estrategia de construcción y mantenimiento.
-
-hasta el momento hay tres tablas de composición de alimentos con toda la informacion nutricional
-
-```text
-food_composition_USDA.xlsx
-food_composition_FNDDS.xlsx
-food_composition_USDA.xlsx # todavia por hacer
-```
-
-## Principio rector de integración
-
-Los scripts analíticos no deben depender directamente de:
-
-```text
-INCAP
-USDA
-FNDDS
-```
-
-Los scripts deben depender de una capa de abstracción única.
-
-Antes de ejecutar los análisis nutricionales se generará automáticamente una tabla consolidada:
-
-```text
-crosswalk_variedad_MASTER.xlsx
-```
-
-Esta será la única tabla puente utilizada por los procesos analíticos.
-
-No debe editarse manualmente.
-
-Será producida automáticamente a partir de los crosswalks específicos por fuente para los aliementos validados como TRUE.
-
-La estructura conceptual esperada es:
-
-```text
-id_variedad
-descripcion_engih
-fuente_composicion
-id_composicion
-```
-
-Ejemplo:
-
-```text
-367 | Habichuelas negras secas | INCAP | 70209060
-541 | Mayonesa                | USDA  | XXXXXXX  
-649 | Malta                   | USDA  | XXXXXXX  
-```
-
-## Tabla maestra de composición nutricional
-
-La misma lógica se aplicará a las tablas de composición.
-
-Fuentes:
-
-```text
-food_composition_INCAP.xlsx
-food_composition_USDA.xlsx
-food_composition_FNDDS.xlsx
-```
-
-serán integradas posteriormente en una única tabla:
-
-```text
-food_composition_MASTER
-```
-
-Preferiblemente en formato xlsx.
-
-El food_composition_MASTER es una tabla viva basada prioritariamente en INCAP, ampliada de forma selectiva con USDA y gobernada por frecuencia de uso (freq_registros) y estado de validación (validado), con el objetivo de maximizar la cobertura analítica y mejorar progresivamente la calidad de las estimaciones nutricionales.
-
-Cuando un alimento tenga equivalentes válidos en múltiples fuentes, la prioridad será INCAP > USDA > FNDDS, salvo decisión técnica específica documentada en el crosswalk correspondiente.
-
-La armonización deberá estandarizar:
-
-- Identificadores.
-- Energía.
-- Macronutrientes.
-- Micronutrientes.
-- Factores de porción comestible.
-- Nombres de variables.
-- Unidades de medida.
-
-El objetivo es que las fases posteriores del pipeline no necesiten conocer la fuente original de cada alimento.
-
-nota: El food_composition_MASTER.xlsx constituye una capa técnica de integración entre las tablas de composición alimentaria y la ENGIH. Su objetivo es permitir la construcción de un único dataset_nutricional, donde cada registro alimentario de la encuesta queda asociado a variables nutricionales estandarizadas e independientes de la fuente original (INCAP, USDA, FNDDS u otras). Todas las fases posteriores del pipeline consumirán preferentemente este dataset integrado.
-
-## Regla de gobernanza
-
-Se editan manualmente:
-
-```text
-crosswalk_variedad_INCAP.xlsx
-crosswalk_variedad_USDA.xlsx
-crosswalk_variedad_FNDDS.xlsx
-```
-
-Se generan automáticamente:
-
-```text
-crosswalk_variedad_MASTER.xlsx
-food_composition_MASTER
-```
-
-## Decisión arquitectónica congelada
-
-Durante la etapa de construcción se mantendrán crosswalks separados por fuente.
-
-Antes de los análisis definitivos se generará automáticamente:
-
-```text
-crosswalk_variedad_MASTER.xlsx
-```
-
-y una:
-
-```text
-food_composition_MASTER.xlsx
-```
-
-homogeneizada.
-
-Los scripts analíticos deberán depender exclusivamente de estas dos capas maestras y no de fuentes individuales.
-
-Esta decisión busca minimizar futuras refactorizaciones, facilitar la incorporación de nuevas tablas de composición y mantener la trazabilidad completa de las decisiones de correspondencia alimentaria.
+- **Un solo archivo de crosswalk:** `crosswalk_tablas_composicion.xlsx`, con una pestaña por sección de la ENGIH ("Cuest. B Sec 2", "Cuest. B Sec 3A"). Columnas clave: `id_variedad`/`descripcion_engih`, `enhance_id` (apunta a la tabla de composición), `fuente` (marca si ese `enhance_id` viene de INCAP o de FNDDS), `tipo_equivalencia`, `validado`, `notas`.
+- **Dos tablas de composición nutricional, usadas directamente, sin tabla "MASTER" que las una:** `food_composition_INCAP.xlsx` (fuente principal) y `food_composition_FNDDS.xlsx` (para alimentos que INCAP no cubre — bebidas alcohólicas, condimentos concentrados, platos combinados, etc.). **No existe ni se va a construir `food_composition_USDA.xlsx` por separado** — FNDDS (que ya es de origen USDA) cumple ese rol.
+- **No existen** `crosswalk_variedad_INCAP.xlsx`, `crosswalk_variedad_FNDDS.xlsx`, `crosswalk_variedad_USDA.xlsx`, `crosswalk_variedad_MASTER.xlsx` ni `food_composition_MASTER.xlsx` — son nombres de una arquitectura planeada que nunca se construyó así. Si aparecen en commits viejos o en versiones anteriores de este documento, no reflejan el proyecto real.
+- **Para `05_ingesta_micronutrientes.R`:** por cada fila con `enhance_id`+`fuente` validados en el crosswalk, buscar el nutriente en `food_composition_INCAP.xlsx` o `food_composition_FNDDS.xlsx` según diga `fuente` — no hay una sola tabla ya unificada, hay que resolver la fuente fila por fila.
 
 ---
 
@@ -272,13 +102,12 @@ Incluye:
 Salidas:
 
 ```text
-data/raw/data_raw_sec2.csv
-data/raw/data_raw_sec3a.csv
+data/clean/data_sec2.csv
+data/clean/data_sec3a.csv
+data/clean/data_sociodemografia.csv
 ```
 
-las versiones limpias utilizadas por el resto del pipeline.
-
-las tablas crosswalk_variedad_MASTER y food_composition_MASTER
+las versiones limpias utilizadas por el resto del pipeline (no comiteadas a git — regenerables corriendo `01_import.R`, ver `.gitignore`).
 
 ## Limpieza y Análisis Exploratorio de Datos (EDA)
 
