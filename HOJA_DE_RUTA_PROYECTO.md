@@ -1,6 +1,7 @@
 # Hoja de ruta — Proyecto ENGIH 2018 (Consumo y Nutrición, WFP)
 
 **Congelada el:** 2026-09-03
+**Última actualización:** 2026-09-10
 **Objetivo final:** artículo científico + dashboard de apoyo a decisiones, siguiendo el marco ampliado de Tang et al. (2021) sobre la base metodológica de Imhoff-Kunsch (2012).
 
 Este documento fija el alcance acordado hasta ahora. Cualquier cambio de alcance debería reflejarse acá explícitamente antes de asumirse en el trabajo diario — si algo cambia, se edita esta hoja, no se improvisa por fuera de ella.
@@ -9,7 +10,9 @@ Este documento fija el alcance acordado hasta ahora. Cualquier cambio de alcance
 
 ## PRIORIDAD ACTUAL (leer esto primero, antes que Fase 0 de abajo)
 
-**Al 2026-09-09: lo que sigue es empezar `05_ingesta_micronutrientes.R` (Fase 1), NO seguir la lista de pendientes de Fase 0** (esa lista es real pero se retoma después — ver "ESTRATEGIA ACORDADA" en Fase 1).
+**Al 2026-09-10: lo que sigue es (1) revisar y cargar los 154 mapeos confirmados del crosswalk Sec 3A, y (2) correr `05_ingesta_micronutrientes.R` por primera vez** — el script ya está escrito y versionado. Después de eso, llevar a Daniel/Carlos la decisión sobre la línea base de fortificación (ver "Decisión abierta" al final de Fase 0), que hoy es el hallazgo metodológico más importante sin resolver: el crosswalk actual asume arroz fortificado y harina/azúcar sin fortificar, que es lo inverso a la norma dominicana de 2018.
+
+*(Anterior, 2026-09-09: empezar `05_ingesta_micronutrientes.R` (Fase 1), NO seguir la lista de pendientes de Fase 0 — esa lista es real pero se retoma después, ver "ESTRATEGIA ACORDADA" en Fase 1. Sigue vigente como criterio.)*
 
 **Para no caer en un ciclo infinito intentando mapear los ~65 nutrientes de una vez:** empezar con solo 4 — **Energía, Hierro, Ácido fólico, Vitamina A** (los que Santiago nombró explícitamente + los que ya tienen benchmark de comparación, la ENM 2009/2024 mencionada más abajo). Conseguir esos 4 corriendo de punta a punta primero. Ampliar a más nutrientes después de tener ese resultado, no antes.
 
@@ -18,6 +21,39 @@ Este documento fija el alcance acordado hasta ahora. Cualquier cambio de alcance
 ---
 
 ## Fase 0 — Cerrar la base de datos (prerrequisito, en curso)
+
+- [x] **HITO (2026-09-10): dos bugs de corrupción silenciosa corregidos + guardas de integridad en el pipeline + cobertura de PC ampliada.** Origen: auditoría externa independiente (réplica del pipeline en Python), revisada y verificada punto por punto contra los archivos reales antes de aplicar nada.
+
+  1. **Fan-out de 17,698 filas en Sec 3A (crítico).** En `data_raw_unidades.xlsx` hoja "Cuest. B Sec 3A", Pan sobado y Ají grande (cubanela) con unidad=1 tenían *dos* filas de FC cada uno (la mediana del crudo y el peso-por-unidad agregado el 08-09). El `left_join()` por `descripcion`+unidad duplicaba cada fila del crudo que coincidía: 9,131 de Pan sobado + 8,567 de Ají cubanela. Sec 3A pasaba de 342,046 a 359,744 filas y esos dos alimentos quedaban doble-contados aguas abajo. **Toda corrida posterior al 2026-09-08 y anterior a hoy produjo resultados corruptos.** Corregido retirando el FC de las dos filas viejas (45 g y 90.7 g), con el valor original conservado en `nota` y `validacion = RETIRADO_duplicado_clave`.
+  2. **Las 3 filas de peso-por-unidad de Sec 2 nunca se aplicaron.** HUEVOS, PANES y GALLETAS SALADAS se agregaron el 08-09 sin la columna `variedad`, que es la clave del join de Sec 2. Se perdían 4,242 filas (2,637 + 1,090 + 515), incluido el 100% de los huevos comprados por unidad. **Corrige la afirmación del 08-09 ("ya funciona con la lógica existente sin tocar código"): era cierto para Sec 3A (une por `descripcion`) y falso para Sec 2 (une por código numérico).** Completadas `variedad` (15/1/3) y `frecuencia_datos`, verificadas contra las otras filas del mismo alimento.
+  3. **Guardas de integridad en `01_import.R`.** Los tres errores de esta semana son del mismo tipo: una fila mal escrita en un Excel que el pipeline acepta en silencio. Se agregó `verificar_tabla_join()`, que **detiene la corrida** (`stop()`, no `warning()`) si una tabla de join tiene claves duplicadas o filas con FC y clave vacía; más `stopifnot()` de que el crudo no crece al unir (47,837 y 342,046). Confirmado en la corrida de hoy: "OK -- Sec 2: 82 filas" / "OK -- Sec 3A: 619 filas".
+  4. **+109 filas de PC en `food_factors.xlsx` (144 → 253).** Se detectó que 109 alimentos ya tenían `enhance_id` validado pero no tenían fila de porción comestible, perdiendo ~8,760 filas del crudo por una ausencia puramente mecánica (71 con `EDIBLE` de INCAP; 38 de FNDDS a 1.00 por la convención ya documentada en la hoja). **Efecto estructural: "sin enhance_id validado" y "sin PC/edible" ahora son idénticos (Sec 3A: 46,012; Sec 2: 62) — el PC dejó de ser un cuello de botella independiente y todo lo que queda por ganar está en el crosswalk.** Corrige el ítem del 08-09 sobre las 54,772 filas sin PC.
+
+  **Cifras de la corrida del 2026-09-10 (post-fix, `01`→`04`):**
+  Sec 2: 47,837 filas | universal 22,316 | específica 21,108 | sin FC 4,413 | con FC sin PC 20 | **entran al cálculo 43,404 (90.7%)**.
+  Sec 3A: 342,046 filas | universal 107,095 | específica 186,268 | sin FC 48,683 | con FC sin PC 39,742 | **entran al cálculo 253,621 (74.1%)**.
+  Outliers marcados: Sec 2 = 11, Sec 3A = 45. Hogares con EMA: 8,892/8,892, mediana 3.04.
+  **Gramos por EMA: 296,969 registros** (era 289,249 antes de cargar el lote de 109, y 254,905 en el hito del 08-09 — cifra que quedó desactualizada al día siguiente).
+  Commits: `8c243ce` (bloques 1-3), `be0fd32` (food_factors).
+
+  **Regla adoptada hoy:** toda cifra del log va fechada y con la corrida de la que salió. Todo resultado de consumo o ingesta se cita junto a su % de cobertura (hoy: Sec 2 90.7%, Sec 3A 74.1%).
+
+- [ ] **DECISIÓN ABIERTA (2026-09-10) — línea base de fortificación. Corresponde al equipo (Daniel/Carlos/Santiago), NO se automatiza.** El crosswalk actual no representa ningún escenario real de política pública dominicana:
+  - **Arroz:** RD **no** tiene norma de fortificación de arroz, pero el crosswalk manda ARROZ (var. 7), Arroz selecto (66) y Súper-selecto (65) a `70213002` "Arroz blanco enriquecido" (Fe 4.36, folato 386/100g). Solo Arroz corriente (67) va a `70213004` sin enriquecer. **Sobrestima** Fe y folato del alimento #1 de la dieta.
+  - **Harina de trigo:** fortificación **obligatoria desde 2009** (Fe, ácido fólico, complejo B), pero el crosswalk manda Harina de trigo (58) a `70213038` "s/enriquecer" (Fe 1.17, folato 26). **Subestima.**
+  - **Azúcar:** fortificada con vitamina A (NORDOM 606, 5–25 mg/kg), pero AZUCARES (29) va a `70215001` sin fortificar (vit A = 0) y Azúcar blanca refinada (458) a `70215036`. **Subestima** vitamina A.
+  - Fuentes: informe ENM 2009 RD (MSP/CESDEM) y FFI (Food Fortification Initiative) — la fortificación de harina para pastas y galletas es **voluntaria**, hay que declararlo por escenario.
+  - **Tractable sin datos nuevos:** INCAP ya tiene las entradas pareadas — arroz `70213002`/`70213004`, harina `70213039`/`70213038`, azúcar `70215002`/`70215001` (esta última con VITA_RAE = 1000 vs 0). Se implementa como una **capa de escenarios que intercambia el `enhance_id` por vehículo**, conservando `enhance_id_base` para volver al estado observado.
+  - **A decidir:** (a) confirmar "norma RD 2018" como línea base; (b) qué se asume para pan/pastas/galletas; (c) verificar si "Arroz selecto/súper-selecto" venía realmente enriquecido en el mercado dominicano de 2018 ("seleccionado" en RD alude a calidad de grano, no a fortificación). El escenario mixto actual **nunca** se reporta como línea base.
+
+- [ ] **Backlog abierto por la jornada del 2026-09-10:**
+  - **Los 154 mapeos del crosswalk Sec 3A** con `validado=1`, `enhance_id` vacío y nota "Confirmado": el ID ya está en `sugerencia_ID` y los 154 tienen `EDIBLE` en INCAP. Lista generada en `data/eda/revision_154_sugerencias.csv`. Requiere revisión manual (~40 min) antes de copiar: las sugerencias automáticas fallan en parte del alimento, estado de preparación y grado de procesamiento (detectadas: Remolacha → "hojas crudas"; Yogurt bebible → "leche descremada").
+  - **Tipado explícito en las lecturas de Excel.** `readxl` adivina el tipo de columna y puede convertir valores válidos en `NA` sin avisar (hoy: 768 avisos de coerción en `validado`, benignos; en el crosswalk de Sec 2, 27 de 29 celdas de `enhance_id` están guardadas como texto). Usar `filter(validado %in% c(TRUE, 1))`, `na = c("", "NA", "N/A")` y un chequeo que falle si `as.numeric()` genera NAs nuevos en columnas clave.
+  - **Migrar el join de Sec 3A** de `descripcion` a `id_variedad` (ya anotado; hoy se completó `id_variedad` en las dos filas de peso-por-unidad para preparar el terreno).
+  - **Diseño muestral: el descargo de `03_transform.R` está desactualizado.** `Sociodemograficas_e_ingresos.xlsx` hoja "Base" **sí** trae `ESTRATO` (8), `UPM` (933), `FACTOR_EXPANSION` y `TRIMESTRE`. `svydesign(strata = ESTRATO, ids = UPM, weights = FACTOR_EXPANSION)` es implementable ya; `srvyr`/`survey` están en el entorno.
+  - **"Docena" (código 52) se usa como factor universal de conteo, no de masa.** `diccionario_conversion` le asigna FC = 12 y la unidad universal tiene prioridad sobre la tabla específica, así que una docena devuelve "12", no gramos. Afecta ~217 filas de Sec 3A y 1 de Sec 2 (0.06%), pero con subestimación sistemática de ~40x en esos ítems. Decidir: mover Docena a "Alimento-específico" o crear FC por alimento (12 × peso por unidad).
+  - **Archivos referenciados que no existen en el repo:** `data_raw_unidades_ACTUALIZADO.xlsx` (el contenido reconstruido vive directamente en `data_raw_unidades.xlsx`) y `notas_estrategicas_personales.md` (citado en un comentario de `01_import.R`). Documentado para no volver a buscarlos.
+  - **README desactualizado** ("Fase activa: Fase 0", última actualización 05-09).
 
 - [x] **HITO (2026-09-08): primera corrida completa y exitosa de `01_import.R` → `02_eda.R` → `03_transform.R`, de punta a punta, en la historia del proyecto.** Con datos parciales pero honestos (crosswalk Sec3A al 50%, `food_factors.xlsx` cubriendo 144/770 alimentos): Sec2 con 11 filas marcadas outlier, Sec3A con 41; ejemplo de cobertura ponderada real (arroz blanco enriquecido, enhance_id 70213002): 30% (IC 28.9-31.1%). En el camino se corrigieron 3 bugs reales que nunca se habían detectado porque estos scripts nunca se habían corrido completos hasta hoy (ver bugs documentados más abajo). El aviso de diseño muestral (IC probablemente subestimado, faltan variables de conglomerado/estrato) sigue pendiente, documentado en el propio script.
 - [x] **HITO (2026-09-08): `04_equivalente_adulto.R` ahora une el consumo diario (`03_transform.R`) con `EMA_hogar` y calcula `Gramos_por_EMA_dia`** — 254,905 de 254,905 registros de consumo válidos (Sec2+Sec3A, sin outliers) con gramos-por-EMA calculado (100%, esperado dado que el 100% de los hogares ya tenía EMA). Esto NO es todavía la "ingesta aparente de micronutrientes por EMA" completa (falta multiplicar por composición nutricional, ver `05_ingesta_micronutrientes.R` abajo) — es la pieza intermedia que deja ese paso final mucho más simple. Salida: `data/clean/data_gramos_por_ema.csv`.
