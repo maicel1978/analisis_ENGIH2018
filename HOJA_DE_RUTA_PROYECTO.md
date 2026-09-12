@@ -1,7 +1,7 @@
 # Hoja de ruta — Proyecto ENGIH 2018 (Consumo y Nutrición, WFP)
 
 **Congelada el:** 2026-09-03
-**Última actualización:** 2026-09-10
+**Última actualización:** 2026-09-12
 **Objetivo final:** artículo científico + dashboard de apoyo a decisiones, siguiendo el marco ampliado de Tang et al. (2021) sobre la base metodológica de Imhoff-Kunsch (2012).
 
 Este documento fija el alcance acordado hasta ahora. Cualquier cambio de alcance debería reflejarse acá explícitamente antes de asumirse en el trabajo diario — si algo cambia, se edita esta hoja, no se improvisa por fuera de ella.
@@ -9,6 +9,14 @@ Este documento fija el alcance acordado hasta ahora. Cualquier cambio de alcance
 ---
 
 ## PRIORIDAD ACTUAL (leer esto primero, antes que Fase 0 de abajo)
+
+**Al 2026-09-12: el crosswalk Sec 3A quedó cerrado y el pipeline corre limpio de punta a punta. Lo que sigue es (1) renderizar `R1_calidad_datos.qmd`, y (2) correr `05_ingesta_micronutrientes.R` por primera vez.** Después, llevar a Daniel/Carlos la decisión sobre la línea base de fortificación (ver "Decisión abierta" al final de Fase 0), que sigue siendo el hallazgo metodológico más importante sin resolver.
+
+**Fecha límite dura: reunión del 2026-09-16.** Ver "Fase 5 — Presentación" al final de este documento para el alcance comprometido y lo que queda explícitamente fuera.
+
+*(Anterior, 2026-09-10: revisar y cargar los 154 mapeos confirmados + correr el `05`. El primero quedó hecho el 12-09; el segundo sigue vigente.)*
+
+*(Anterior, 2026-09-09: avanzar por fases con los datos como están, no perfeccionar datos antes de avanzar. Sigue vigente, con el matiz aprendido el 12-09: **se justifica volver atrás cuando el arreglo es acotado, no requiere criterio nuevo y bloquea algo que ya se está por mostrar — los tres a la vez.** Si falta alguno, se anota y se sigue. Ejemplo real: completar el PC de 154 alimentos costó 30 minutos y subió la cobertura efectiva de 86.5% a 89.2% antes de publicarla en R1; postergarlo habría obligado a rehacer el reporte.)*
 
 **Al 2026-09-10: lo que sigue es (1) revisar y cargar los 154 mapeos confirmados del crosswalk Sec 3A, y (2) correr `05_ingesta_micronutrientes.R` por primera vez** — el script ya está escrito y versionado. Después de eso, llevar a Daniel/Carlos la decisión sobre la línea base de fortificación (ver "Decisión abierta" al final de Fase 0), que hoy es el hallazgo metodológico más importante sin resolver: el crosswalk actual asume arroz fortificado y harina/azúcar sin fortificar, que es lo inverso a la norma dominicana de 2018.
 
@@ -21,6 +29,18 @@ Este documento fija el alcance acordado hasta ahora. Cualquier cambio de alcance
 ---
 
 ## Fase 0 — Cerrar la base de datos (prerrequisito, en curso)
+
+- [x] **HITO (2026-09-12): crosswalk Sec 3A cerrado, porción comestible completa y pipeline verificado de punta a punta.**
+
+  1. **Cargados los 154 mapeos revisados + 15 correcciones manuales** (`99_aplicar_correcciones_crosswalk.R`). Sec 3A pasa de 253 a **407 alimentos mapeados de 769** (89.2% de los registros). Las 15 correcciones salieron de revisar uno por uno el bloque que `data/eda/revision_154_sugerencias.csv` había marcado "OK": 9 eran errores del tipo ya anticipado (parte del alimento, estado de preparación, grado de procesamiento) y 6 venían marcadas DUDOSA/NO. Ejemplos: Cereza → acerola (en RD "cereza" es acerola: 1600 vs 7 mg vit C/100g); Jamón ahumado apuntaba a jamón de **pavo**; Hígado de pollo apuntaba a **paté** envasado; Macarrones a pasta **enlatada** con queso. **Tasa real de error de la sugerencia automática: 9/148 = 6.1%** — cifra citable para justificar por qué la revisión manual no era opcional. Trazabilidad fila por fila en `data/eda/log_merge_crosswalk_2026-09-11.csv`.
+
+  2. **+154 filas de porción comestible** (`98_completar_PC_lote154.R`, `food_factors.xlsx` 253 → 407). El merge anterior dejó 154 alimentos con `enhance_id` pero sin PC, así que **no entraban al cálculo pese a estar mapeados**: la cobertura efectiva seguía en 86.5%, no en 89.2%. Los 154 eran todos INCAP y todos tenían `EDIBLE` en la tabla — extracción determinista, sin criterio. Log en `data/eda/log_PC_lote154_2026-09-12.csv`. Mismo patrón que el lote de 109 del 10-09.
+
+  3. **BUG SILENCIOSO corregido: `validado` con tres representaciones distintas** (`97_normalizar_tipos_crosswalk.R`). Al reescribir el crosswalk con `writexl` tras leerlo con `col_types="text"`, la columna quedó con "TRUE" (265 filas), "VERDADERO" (154, las recién cargadas) y "1" (1 fila). `01_import.R` filtra con `validado == TRUE`, así que **las 154 filas nuevas se habrían descartado sin aviso**: el pipeline habría corrido sin un solo error y reportado la cobertura anterior. Lo que lo atrapó fue un error *distinto* y ruidoso (tipos incompatibles en el join de Sec 2) que obligó a abrir el archivo. **Regla adoptada: no reescribir un Excel de entrada leyéndolo con `col_types="text"`** — convierte a texto columnas numéricas y booleanas y rompe supuestos aguas abajo. **Nota incómoda y útil: este fallo estaba anticipado por escrito en esta misma hoja desde el 10-09** (ver backlog del 10-09, "Tipado explícito en las lecturas de Excel", que recomienda `filter(validado %in% c(TRUE, 1))` en lugar de `== TRUE`). La hoja hizo su trabajo; falló el no consultarla antes de actuar. **Regla de proceso: antes de tocar un archivo de entrada, releer el backlog de Fase 0.**
+
+  4. **Corrida completa verificada (12-09).** Sec 3A: 342,046 filas, 36,841 sin `enhance_id` (89.2% mapeado), 36,841 sin PC — **los dos números coinciden, confirmando que ya no queda alimento mapeado sin porción comestible**. Sec 2: 47,837 filas, 62 sin mapeo y 62 sin PC. Outliers: Sec 2 = 11, Sec 3A = 45. EMA: 8,892/8,892 hogares, mediana 3.04. **Gramos por EMA: 303,407 registros** (era 296,969 el 10-09 y 254,905 el 08-09).
+
+  5. **Cambió el cuello de botella.** Sec 3A tiene 48,684 filas sin factor de conversión contra 36,841 sin mapeo. **De aquí en adelante, el trabajo de cobertura rinde más en la tabla de FC que en el crosswalk.** Esto invierte la conclusión del 10-09, que decía que todo lo que quedaba por ganar estaba en el crosswalk: era cierto entonces, ya no.
 
 - [x] **HITO (2026-09-10): dos bugs de corrupción silenciosa corregidos + guardas de integridad en el pipeline + cobertura de PC ampliada.** Origen: auditoría externa independiente (réplica del pipeline en Python), revisada y verificada punto por punto contra los archivos reales antes de aplicar nada.
 
@@ -103,6 +123,16 @@ Sec 3A superó la proyección (155,770 vs. ~113,700 esperados) — probablemente
 - [x] **Resuelto (2026-09-08):** "Guandules verdes desgranados" y "Guandules verdes en cáscara" compartían el mismo `ENHANCE_ID` (70211088, EDIBLE=0.48 — correcto solo para la versión con cáscara). Creada fila nueva `99211088` (copia de 70211088 con EDIBLE=1.0, mismo prefijo 99 = corrección nuestra) y actualizado el crosswalk para que "desgranados" apunte ahí. "En cáscara" sigue en 70211088 sin cambios.
 - [ ] Decidir arquitectura para los ítems de fuente FNDDS en el join final (su ID no es nativo de INCAP)
 
+- [ ] **114 filas con `enhance_id` pero sin `tipo_equivalencia`** (detectado 2026-09-11). Heredadas de la fase inicial, anteriores al merge del 12-09 — no las introdujo ese merge. No bloquean el cálculo (el join usa `enhance_id`), pero sí la defensa metodológica: sin ese campo no se puede declarar si la equivalencia fue directa o por criterio. Trabajo mecánico, sin decisiones nuevas.
+- [ ] **13 filas con `validado = TRUE` pero sin `enhance_id`** (detectado 2026-09-12: 420 validadas vs. 407 con código). Inconsistencia menor, no afecta el pipeline porque exige ambas cosas.
+- [ ] **README desactualizado — ahora es urgente, no cosmético.** Dice "Fase activa: Fase 0" con fecha 05-09. **El enlace del repo se va a compartir con los supervisores**, y el README es el primer archivo que abren. Debe explicar el pipeline en cinco minutos: qué hace cada script, cómo reproducir las cifras, dónde están documentadas las decisiones. Lo más barato y más visible del repo.
+- [ ] **Bug de "Docena" (código 52) — abierto desde el 10-09 y puede aparecer en R1.** El diccionario universal le asigna FC = 12 (un conteo, no gramos) y la tabla universal tiene prioridad sobre la específica, así que una docena de huevos devuelve 12 en vez de ~600 g. Afecta ~217 filas de Sec 3A y 1 de Sec 2 (0.06%), con subestimación sistemática de ~40x en esos ítems. No invalida los agregados por su tamaño, pero **puede verse en R1 como valores anómalamente bajos en alimentos comprados por docena**. Mejor declararlo que improvisar si lo notan en la presentación.
+- [ ] **VERIFICAR antes del 16: el módulo demográfico de la ENGIH.** Fase 2 anota que el consumo aparente por AFE con mujeres 15-49, embarazadas y lactantes **requiere un módulo demográfico aún sin descargar**. Eso cambia cómo se declara la limitación de embarazo/lactancia en R1 y R2: no es lo mismo "la encuesta no captura el dato" que "está en un módulo que no se incorporó en esta etapa". La segunda es honesta y deja la puerta abierta; la primera sería incorrecta si el módulo existe.
+- [ ] **Aplicar el diseño muestral complejo con `srvyr`** (`ESTRATO` 8 niveles, `UPM` 933, `FACTOR_EXPANSION`). Las tres variables están disponibles y el paquete está en el entorno. Mientras no se aplique, **todos los intervalos de confianza están subestimados**, incluido el que ya imprime `03_transform.R`. Los TdR lo piden explícitamente (numeral 3.3).
+- [ ] **Unificar nomenclatura EMA / AFE / AWE.** Mismo constructo con tres nombres: los TdR dicen AFE, la presentación de Daniel dice EMA, el módulo 24 del repo `fortificacion` dice AWE. **Adoptar EMA** (término del material en español, y el que usa quien revisa). Ojo: **AME (Adult Male Equivalent) sí es un concepto distinto** y no debe fusionarse. Mencionarlo de entrada en la presentación, antes de que lo marquen en revisión.
+- [ ] **Afinar la detección de atípicos.** La corrida del 12-09 marca 45 filas en Sec 3A de más de 300,000 — tasa muy baja. El umbral es deliberadamente conservador (marca sin eliminar), lo cual es defendible, pero hay que poder explicar el criterio si preguntan.
+- [ ] **Limpieza del repositorio (después del 16-09, no antes).** El enlace se comparte con los supervisores. Quitar archivos redundantes con commits, no con borrado manual, para que todo quede en el historial. Identificados: `food_factors_BACKUP_2026-09-10.xlsx` (redundante, git ya es el respaldo), `lote_PC_109.csv` (lote ya incorporado), `.RDataTmp*` (agregar al `.gitignore`: la regla actual no lo atrapa por falta de comodín), y los scripts de uso único `96`, `97`, `98`, `99` una vez commiteados sus resultados.
+
 - [ ] **Idea para el cierre de Fase 0 (anotada 2026-09-08, no ejecutar antes):** informe de estado del proyecto (crosswalk, FC, pipeline, hallazgos), con gráficos, para supervisores. **Condición para hacerlo bien:** debe generarse automáticamente desde los datos reales (script Quarto/R que lea el estado y corra el pipeline), nunca texto escrito a mano — si no, duplica `HOJA_DE_RUTA_PROYECTO.md` como fuente de verdad y puede desactualizarse. No es prioridad mientras Fase 0 siga abierta.
 
 ## Fase 1 — Pipeline de scripts (01 → 06)
@@ -112,7 +142,7 @@ Sec 3A superó la proyección (155,770 vs. ~113,700 esperados) — probablemente
 - [x] `01_import.R` — Q, FC (3 niveles), `enhance_id`, PC ensamblados. Corriendo limpio contra datos reales desde 2026-09-08.
 - [x] `02_eda.R` — corregido y confirmado corriendo limpio (2026-09-08): overlap de hogares, estandarización de unidades, missingness, atípicos por alimento, cobertura del diario. Ver HITO arriba.
 - [x] `03_transform.R` — corregido y confirmado corriendo limpio (2026-09-08): `Q × FC × PC / PM`, outliers marcados, ejemplo de cobertura ponderada real. Ver HITO arriba. Queda pendiente afinar: disponibilidad neta para alimentos almacenables, y el aviso de diseño muestral (IC subestimado).
-- [x] **`04_equivalente_adulto.R` — completo y conectado con consumo diario (2026-09-08).** EMA por persona (fuente: FAO/WHO/UNU 2004, Tablas 4.2/4.3/5.2, no el documento de Daniel que solo las cita) y por hogar (8,892/8,892 con EMA, mediana 3.04), unido con `03_transform.R` → `Gramos_por_EMA_dia` (254,905/254,905 registros). **Limitaciones documentadas en el propio script:** sin ajuste embarazo/lactancia (dato no existe en la ENGIH), peso fijo por sexo (65/55kg, no individual), menores de 1 año con valor provisional (600 kcal, sin verificar contra FAO sección 3).
+- [x] **`04_equivalente_adulto.R` — completo y conectado con consumo diario (2026-09-08).** EMA por persona (fuente: FAO/WHO/UNU 2004, Tablas 4.2/4.3/5.2, no el documento de Daniel que solo las cita) y por hogar (8,892/8,892 con EMA, mediana 3.04), unido con `03_transform.R` → `Gramos_por_EMA_dia` (**303,407 registros** en la corrida del 12-09; las cifras de 254,905 y 296,969 son de corridas anteriores y quedaron desactualizadas al ampliarse la cobertura). **Limitaciones documentadas en el propio script:** sin ajuste embarazo/lactancia (dato no existe en la ENGIH), peso fijo por sexo (65/55kg, no individual), menores de 1 año con valor provisional (600 kcal, sin verificar contra FAO sección 3).
 - [ ] `05_ingesta_micronutrientes.R` — join con INCAP/FNDDS completos (~65 nutrientes) sobre `data_gramos_por_ema.csv` (ya listo); consumo aparente de energía, macro y micronutrientes por EMA. **Único script del pipeline básico sin empezar** — pendiente por la complejidad de armonizar esquemas INCAP/FNDDS, no por falta de piezas previas (esas ya están).
 - [ ] `06_report.qmd` — reporte reproducible base.
 
@@ -153,3 +183,46 @@ Sec 3A superó la proyección (155,770 vs. ~113,700 esperados) — probablemente
 ---
 
 *Próximo paso inmediato: "peso por unidad" (Sec 2 ~8,655 filas, Sec 3A ~79,181 filas) empezando por Cebolla roja, Huevos de granja, Pan sobado, Cilantrico, Ají cubanela, Ajo, Plátano verde. En paralelo, cuando haya tiempo: los 49 candidatos de Sec 2 y los 68+758 de Sec 3A marcados para revisión manual.*
+
+---
+
+## Fase 5 — Presentación del 2026-09-16
+
+**Encuadre.** No es entrega final: el contrato corre hasta el 2026-10-25 y los TdR condicionan formalmente los productos 8.1–8.6 al resultado del análisis preliminar (numeral 4). Esta reunión es el **hito de factibilidad** — el dictamen sobre si la ENGIH 2018 permite implementar la metodología. Conviene decirlo en el primer minuto.
+
+**Estructura en tres actos:**
+
+1. **¿Sirven estos datos?** Cobertura, factores de conversión, porción comestible, atípicos, adaptaciones metodológicas. Responde los numerales 4.1–4.3 y 7 de los TdR. Establece la regla que rige toda la presentación: ninguna cifra se cita sin su cobertura. Aquí van los problemas resueltos (fan-out de 17,698 filas, guardas de integridad, trabajo de campo en el mercado, cereza→acerola) como evidencia de dato auditado, no como anécdotas.
+2. **El modelo de base.** `Q × FC × PC / PM` primero, EMA después — el mismo orden de las dos presentaciones de Daniel, y en su orden cronológico (dic-2025, ago-2026). Es mostrarle su metodología implementada sobre datos dominicanos reales.
+3. **Hacia lo que le sirve al PMA.** La especificación de Santiago en su orden: cobertura de vehículos, contribución del alimento fortificado, desplazamiento respecto al EAR, escenarios. Cierra con replicabilidad: el paquete va a Perú, RD y Cuba, y los TdR (numerales 9, 10, 12) piden código modular y adaptable.
+
+**Frontera explícita** al final del Acto 2: *hasta aquí entregable cerrado; de aquí en adelante línea de trabajo abierta con decisiones pendientes que corresponden a los supervisores.* Decirlo en voz alta protege los dos primeros actos de lo que falte en el tercero, y convierte el final abierto en una solicitud de decisión en vez de un vacío.
+
+**Reportes, clasificados por defendibilidad.** Un reporte es defendible cuando cada cifra sale de datos reales, se reporta con su cobertura, y no depende de una decisión sin resolver.
+
+| | Reporte | TdR | Estado |
+|---|---|---|---|
+| R1 | Calidad y preparación de los datos | 4.1–4.3, 7 | Compromiso firme |
+| R2 | Modelo de base: consumo diario y EMA | 1.3, 1.4, 8.2 | Compromiso firme |
+| R3 | Cobertura de vehículos fortificables | 8.1 | Compromiso firme |
+| R4 | Ingesta aparente de micronutrientes | 8.3 | Solo como dos escenarios en paralelo |
+| R5 | Desplazamiento respecto al EAR y escenarios | 8.3 | Método especificado, no ejecutado |
+
+**R3 es inmune a la decisión de línea base**: la cobertura pregunta si el hogar consume arroz, no si ese arroz estaba fortificado. Por eso es compromiso firme aunque la línea base siga sin resolverse.
+
+**R4 nunca se presenta como cifra única.** Se corre sin fortificar y con norma RD en paralelo; el rango entre ambos *es* la demostración de por qué la decisión importa y por qué les corresponde a los supervisores.
+
+**Dashboards.** D1 (estado del pipeline, sin ninguna cifra nutricional, autogenerado) primero; D2 (resultados, cuatro paneles = los cuatro indicadores del TdR 4.1–4.4) después del `05`. **Antes de D2 hay que definir audiencia** — uso interno del PMA o Ministerio de Salud — porque decide si se muestran intervalos y limitaciones o mensajes de política. Pregunta para Santiago. Argumento de utilidad: el numeral 11 de los TdR pide recursos de aprendizaje interactivos, así que el dashboard **no es un extra, es un activo del módulo 4** y la plantilla de visualización del sistema de evaluación, probada en un país y lista para adaptar a los otros dos.
+
+**Infraestructura compartida:** `scripts/_comun.R` centraliza rutas, carga, definición de vehículos de fortificación y la regla de elegibilidad (`marcar_elegible()`). Al mejorar los datos o cambiar una definición se toca ahí y todos los reportes quedan consistentes — es lo que impide que R1 diga 89.2% y R3 diga otra cosa. **Ningún reporte lleva cifras escritas a mano.**
+
+**Resuelto (2026-09-11):** la aparente discrepancia entre H-AR (presentación de Daniel) y EAR con enfoque probabilístico (TdR numeral 1.6). La especificación de Santiago transcrita en Fase 2 ya fija **EAR con punto de corte**, alineado con los TdR. No es pregunta abierta.
+
+**Decisiones a llevar a la reunión, no a resolver por cuenta propia:**
+1. Línea base de fortificación (ver "Decisión abierta" en Fase 0).
+2. Si se suman Sección 2 y Sección 3A, o se reporta solo 3A — una es inventario (stock) y la otra adquisiciones (flujo), y sumarlas puede ser doble conteo en almacenables. Evidencia a llevar: correr ambas por separado y comparar magnitudes contra la ENM.
+3. Fuentes para los 21 alimentos sin equivalencia en INCAP ni FNDDS.
+
+**Orden de trabajo (de mayor a menor valor, para que lo que no quede hecho sea lo menos importante):** R1 → `05` → R2 y R3 → R4 en dos escenarios → README. D1, D2 y R5 son lo primero que se sacrifica.
+
+**Infraestructura de trabajo (fin de semana del 12–14):** dos máquinas. PC-A (trabajo, dentro de OneDrive del PMA — riesgo conocido de cuelgue en `.git/objects`) y PC-B (prestada, se devuelve el lunes 15). Regla: **PC-B escribe, PC-A solo lee**; `git pull` al empezar, `git push` al terminar. **PC-A debe quedar verificada (paquetes, Quarto, identidad de git) antes de devolver PC-B**, porque el último día y medio de preparación ocurre ahí. Es el único riesgo del fin de semana sin arreglo posible.

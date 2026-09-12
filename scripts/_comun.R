@@ -66,12 +66,12 @@ cargar_consumo <- function() {
   f3a <- file.path(RUTA_CLEAN, "data_sec3a_consumo.csv")
   exigir_archivo(f2,  "03_transform.R")
   exigir_archivo(f3a, "03_transform.R")
-
+  
   sec2 <- leer_limpio(f2) |>
     mutate(seccion = "Sec 2", peso = factor_anual)
   sec3a <- leer_limpio(f3a) |>
     mutate(seccion = "Sec 3A", peso = factor_expansion)
-
+  
   list(sec2 = sec2, sec3a = sec3a)
 }
 
@@ -116,12 +116,16 @@ marcar_elegible <- function(df) {
     )
 }
 
-# Porcentaje formateado, para no repetir round() en cada reporte
+# Porcentaje formateado, para no repetir round() en cada reporte.
+# VECTORIZADO a proposito: se usa dentro de mutate() sobre columnas enteras,
+# donde un if() ordinario falla ("the condition has length > 1").
 pct <- function(x, n, dec = 1) {
-  if (n == 0) return("0.0%")
-  paste0(round(100 * x / n, dec), "%")
+  v <- ifelse(is.na(n) | n == 0, NA_real_, 100 * x / n)
+  ifelse(is.na(v), "--", paste0(round(v, dec), "%"))
 }
 
 # Toda cifra de cobertura se reporta como "valor (n/N, %)" -- regla del
 # proyecto: ninguna cifra agregada se cita sin su cobertura.
-con_cobertura <- function(x, n) paste0(format(x, big.mark = ","), " (", pct(x, n), ")")
+con_cobertura <- function(x, n) {
+  paste0(format(x, big.mark = ",", trim = TRUE), " (", pct(x, n), ")")
+}
