@@ -6,10 +6,12 @@
 # Equivalencia de columnas (verificada 2026-09-09):
 #   Nutriente     | INCAP      | FNDDS                     | Unidad
 #   Energia       | ENERC_KCAL | Energy (kcal)             | kcal
-#   Hierro        | FE         | Iron\n(mg)                | mg
+#   Hierro        | FE         | Iron (mg) [con salto de linea en el nombre real] | mg
 #   Acido folico  | FOLDFE     | Folate, DFE (mcg_DFE)     | mcg DFE
 #   Vitamina A    | VITA_RAE   | Vitamin A, RAE (mcg_RAE)  | mcg RAE
-# FNDDS trae TRES columnas de folato; solo "Folate, DFE" corresponde a FOLDFE.
+# FNDDS trae CUATRO columnas de folato; solo "Folate, DFE" corresponde a FOLDFE.
+# Las columnas de FNDDS se resuelven por PATRON, no por nombre literal: varios
+# encabezados traen saltos de linea internos (verificado 2026-09-12).
 # Las 4 unidades coinciden entre tablas -- sin factor de conversion.
 #
 # Verificado 2026-09-10 sobre los archivos reales (no asumido):
@@ -80,17 +82,45 @@ nutrientes_incap <- read_excel(
     vitamina_a_mcg_rae = VITA_RAE
   )
 
-nutrientes_fndds <- read_excel(
+# Los encabezados de FNDDS traen saltos de linea DENTRO del nombre: el de
+# hierro es literalmente "Iron" + salto + "(mg)". Escribirlos literales es
+# fragil (falla segun como R interprete el escape, y se rompe si la fuente
+# cambia el formato). Se resuelven por patron sobre el nombre normalizado,
+# con stop() si el patron no identifica exactamente una columna -- asi un
+# cambio en FNDDS falla ruidosamente en vez de devolver la columna equivocada.
+fndds_raw <- read_excel(
   here("data", "raw", "food_composition_FNDDS.xlsx"),
-  skip = 1
-) |>
+  sheet = "nutrient_values",
+  skip = 1,
+  .name_repair = "minimal"
+)
+
+col_fndds <- function(patron, etiqueta) {
+  nombres_norm <- gsub("[[:space:]]+", " ", trimws(names(fndds_raw)))
+  i <- grep(patron, nombres_norm, ignore.case = TRUE, perl = TRUE)
+  if (length(i) != 1) {
+    stop("El patron de '", etiqueta, "' identifica ", length(i),
+         " columnas en FNDDS (deberia ser exactamente 1)",
+         if (length(i) > 0) paste0(": ", paste(nombres_norm[i], collapse = " | ")) else "",
+         call. = FALSE)
+  }
+  names(fndds_raw)[i]
+}
+
+nutrientes_fndds <- fndds_raw |>
   transmute(
-    enhance_id = as.numeric(`Food code`),
-    fuente = "FNDDS",
-    energia_kcal = `Energy (kcal)`,
-    hierro_mg = `Iron\n(mg)`,               # el nombre real trae salto de linea
-    folato_mcg_dfe = `Folate, DFE (mcg_DFE)`, # NO usar las otras 2 de folato
-    vitamina_a_mcg_rae = `Vitamin A, RAE (mcg_RAE)`
+    enhance_id         = as.numeric(.data[[col_fndds("^Food code$", "id")]]),
+    fuente             = "FNDDS",
+    energia_kcal       = as.numeric(.data[[col_fndds("^Energy \\(kcal\\)$", "energia")]]),
+    hierro_mg          = as.numeric(.data[[col_fndds("^Iron ?\\(mg\\)$", "hierro")]]),
+    # De las CUATRO columnas de folato de FNDDS (acido folico, folato de los
+    # alimentos, folato total y DFE), solo DFE corresponde a FOLDFE de INCAP:
+    # los equivalentes dietéticos ponderan el acido folico sintetico por su
+    # mayor biodisponibilidad (factor 1.7). Usar "folato total" mezclaria dos
+    # escalas y SUBESTIMARIA el aporte de los alimentos fortificados -- que es
+    # justo lo que este analisis busca medir.
+    folato_mcg_dfe     = as.numeric(.data[[col_fndds("^Folate, DFE", "folato DFE")]]),
+    vitamina_a_mcg_rae = as.numeric(.data[[col_fndds("^Vitamin A, RAE", "vitamina A")]])
   )
 
 colisiones <- intersect(nutrientes_incap$enhance_id, nutrientes_fndds$enhance_id)
