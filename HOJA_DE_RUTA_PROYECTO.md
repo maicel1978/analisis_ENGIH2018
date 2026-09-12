@@ -10,7 +10,14 @@ Este documento fija el alcance acordado hasta ahora. Cualquier cambio de alcance
 
 ## PRIORIDAD ACTUAL (leer esto primero, antes que Fase 0 de abajo)
 
-**Al 2026-09-12 (noche): el pipeline `01`→`05` corre completo y hay ingesta aparente de micronutrientes por primera vez.** Lo que sigue es **R2 (modelo de base) y R3 (cobertura de vehículos)**, que son compromiso firme y salen de datos ya calculados; después el **README**, que es el primer archivo que abren los supervisores al recibir el enlace del repo.
+**Al 2026-09-12 (noche): pipeline `01`→`05` completo, R1 y R3 renderizados. Lo que sigue, en este orden:**
+
+1. **Re-renderizar R3** con el `pct()` corregido y verificar que los porcentajes ya no se repiten (Arroz 87.7 / Aceite 87.3 / Azúcar 78.6 / Harina 8.0). Re-renderizar R1 también (usa la misma función).
+2. **R2 — modelo de base: consumo diario y EMA.** Único reporte de compromiso firme que falta. Sale de datos ya calculados: es sobre todo redacción. Debe explicar `Q × FC × PC / PM`, el EMA (8,892/8,892 hogares, mediana 3.04), y el asunto de las dos secciones con la tabla de tres variantes.
+3. **README.** Primer archivo que abren los supervisores al recibir el enlace.
+4. **Verificar PC-A** antes de devolver PC-B: `git pull`, paquetes (`dplyr readr tidyr readxl writexl here knitr srvyr`), `quarto::quarto_version()`, identidad de git, y que el repo **no** esté en OneDrive.
+
+**Estado de los entregables:** R1 hecho, R3 hecho (pendiente re-render), R2 pendiente, R4 y R5 **descritos y no ejecutados** según lo acordado. D1 y D2 fuera de alcance para esta entrega.
 
 **Cambio de fecha (2026-09-12): la fecha real de cierre es el domingo por la noche**, no el martes 16. El martes es margen. Criterio derivado: ya no se trata de *qué alcanzo a terminar*, sino de **qué queda tan bien documentado que se entienda sin el consultor presente**. Lo que no se ejecute (R4, R5, D1, D2, desglose por quintil) se entrega **descrito**, con método definido, variables verificadas y una nota de qué falta para correrlo. Después, llevar a Daniel/Carlos la decisión sobre la línea base de fortificación (ver "Decisión abierta" al final de Fase 0), que sigue siendo el hallazgo metodológico más importante sin resolver.
 
@@ -135,6 +142,24 @@ Este documento fija el alcance acordado hasta ahora. Cualquier cambio de alcance
 - [ ] **Hallazgo que refuerza la decisión de línea base, ahora con evidencia cuantitativa.** El perfil de la variante sumada es **folato alto (811 µg DFE, EAR ~320) y vitamina A baja (173 µg RAE, EAR ~500)** — exactamente la dirección que predice el problema del crosswalk: el arroz (alimento #1 de la dieta) mapeado a "enriquecido" con 386 µg folato/100g infla el folato; el azúcar mapeada a "sin fortificar" con vitamina A = 0 la deprime. **Deja de ser una observación teórica del crosswalk y pasa a ser efecto medible.** Frase para la reunión: no "el crosswalk asume un escenario que no corresponde a la norma", sino "asume ese escenario, y el efecto medible es folato sobrestimado y vitamina A subestimada, en estas magnitudes".
 
 - [ ] **118 hogares sin ingesta** (8,774 de 8,892 con EMA). Tienen EMA calculado pero ninguna fila de consumo que sobreviviera los filtros. No es un error, pero hay que saber por qué antes de presentar.
+
+- [x] **HITO (2026-09-12): `R3_cobertura_vehiculos.qmd` escrito y renderizado.** Cubre el numeral 4.2 de los TdR e implementa los indicadores 1 y 2 del sistema de evaluación.
+
+  **Cobertura de vehículos (sin ponderar, sobre 8,774 hogares analizados):** Arroz **87.7%** (7,693 hogares), Aceite **87.3%** (7,662), Azúcar **78.6%** (6,900), Harina de trigo **8.0%** (700). Consumo mediano entre consumidores, en g/EMA/día: arroz 207.8, azúcar 48.0, aceite 41.9, harina 31.9. En los cuatro la media supera a la mediana (asimetría por compras al por mayor) — **se cita la mediana, con la media al lado**.
+
+  **R3 es independiente de la decisión de línea base**, porque la cobertura pregunta *si el hogar consume arroz*, no si ese arroz estaba fortificado. Por eso sus cifras son estables aunque la línea base siga sin resolverse.
+
+- [x] **HALLAZGO MAYOR (2026-09-12): la harina de trigo casi no se consume como producto en RD — 8% de los hogares, y CERO hogares en la Sección 2.** No es un vacío de datos: es el patrón de consumo dominicano. La harina llega al hogar **ya procesada**, sobre todo como pan.
+
+  **Consecuencia de política, y es el argumento más fuerte de R3:** la norma dominicana obliga a fortificar la harina **en el molino**, y esa harina llega a la población dentro del pan. Un indicador construido sobre "harina de trigo" mide el consumo de un **insumo intermedio**, no la exposición al nutriente añadido. Medido así, se concluiría que el programa de fortificación de harina alcanza al 8% de los hogares.
+
+  **Decisión adoptada (del consultor, no delegada — es definición de indicador, no cuestión nutricional):** el vehículo se define como **harina de trigo y sus derivados de consumo directo**, reportando ambas cifras. Resultado: **8.0% → 85.7%** (700 → 7,521 hogares). Los derivados que más pesan: Pan sobado (10,055 filas), Pan de agua (6,221), Galletas saladas (3,283 + 1,270 de Sec 2), Fideos (1,703).
+
+  **Dos limitaciones declaradas en el propio reporte:** (a) la norma es obligatoria para harina de panificación pero **voluntaria** para pastas y galletas, así que la cifra ampliada es un **techo**; (b) sin **factores de receta** (cuánta harina contiene cada producto) la definición ampliada sirve para *alcance poblacional* pero **no** para estimar gramos de harina consumidos. Esos factores no están en la ENGIH — línea de trabajo identificada.
+
+  **Trampa evitada, verificada:** el patrón ingenuo de derivados de trigo captura falsos positivos graves — **"Pasta de tomate" con 12,150 registros**, "Ajo en pasta", "Harinas de maíz", "Maicena", "Buen pan o castaña" (fruta de pan, no trigo) y los derivados de maíz. Con exclusiones explícitas quedan 67 alimentos y 26,935 registros; **sin ellas la cifra se infla ~47%**. Inclusiones y exclusiones viven en `_comun.R` (`TRIGO_INCLUIR` / `TRIGO_EXCLUIR`), auditables y modificables en un solo lugar.
+
+- [x] **Bug corregido en `_comun.R` (2026-09-12): `pct()` colapsaba con denominador escalar.** Estaba escrito con `ifelse()` y la condición sobre `n`; `ifelse()` devuelve un resultado del largo de la **condición**, así que con `n` escalar (un total de hogares) todas las filas mostraban el mismo porcentaje. **En R1 no se notó** porque allí `n` siempre era una columna. Reescrita sin `ifelse()`. **Lección: una función compartida se prueba con denominador escalar Y vectorial antes de darla por buena.**
 
 - [ ] **DECISIÓN ABIERTA (2026-09-10) — línea base de fortificación. Corresponde al equipo (Daniel/Carlos/Santiago), NO se automatiza.** El crosswalk actual no representa ningún escenario real de política pública dominicana:
   - **Arroz:** RD **no** tiene norma de fortificación de arroz, pero el crosswalk manda ARROZ (var. 7), Arroz selecto (66) y Súper-selecto (65) a `70213002` "Arroz blanco enriquecido" (Fe 4.36, folato 386/100g). Solo Arroz corriente (67) va a `70213004` sin enriquecer. **Sobrestima** Fe y folato del alimento #1 de la dieta.

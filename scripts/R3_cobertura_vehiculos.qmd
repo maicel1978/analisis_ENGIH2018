@@ -1,0 +1,324 @@
+---
+title: "R3 — Cobertura y consumo de vehículos fortificables"
+subtitle: "ENGIH 2018, República Dominicana | Indicadores 1 y 2 del sistema de evaluación"
+author: "Maicel E. Monzón"
+lang: es
+date: today
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    toc-title: "Contenido"
+    number-sections: true
+    code-fold: true
+    code-tools: true
+    df-print: paged
+    embed-resources: true
+execute:
+  warning: false
+  message: false
+  echo: false
+---
+
+```{r}
+#| label: setup
+ruta_comun <- c(here::here("reports", "_comun.R"),
+                here::here("scripts", "_comun.R"))
+ruta_comun <- ruta_comun[file.exists(ruta_comun)][1]
+if (is.na(ruta_comun)) stop("No encuentro _comun.R ni en reports/ ni en scripts/")
+source(ruta_comun)
+
+gpe   <- cargar_gramos_por_ema() |> marcar_vehiculo()
+pesos <- pesos_hogar()
+
+hogares_total <- n_distinct(gpe$id_hogar_unico)
+```
+
+> Todas las cifras se calculan al renderizar, directamente desde el pipeline.
+> Ninguna está escrita a mano. Fecha de generación: `r format(Sys.Date(), "%d-%m-%Y")`.
+
+## Qué responde este reporte
+
+Los Términos de Referencia (numeral 4.2) piden estimar los dos primeros
+indicadores del sistema de evaluación: **cobertura** y **consumo** de los
+alimentos fortificables. Es también el primer punto de la especificación
+acordada con la contraparte técnica: *qué proporción de la población consume el
+vehículo fortificado*.
+
+La pregunta que responde la cobertura es deliberadamente acotada: **¿el hogar
+consume arroz?** — no si ese arroz en particular estaba fortificado. Esa
+distinción hace que este reporte sea **independiente de la decisión pendiente
+sobre la línea base de fortificación**, y por eso sus cifras son estables.
+
+## Cobertura por vehículo
+
+Un hogar cuenta como consumidor de un vehículo si registró al menos una
+adquisición o existencia de ese alimento durante el período de medición.
+
+```{r}
+#| label: tbl-cobertura
+#| tbl-cap: "Proporción de hogares que consumen cada vehículo de fortificación"
+
+peso_total <- sum(pesos$peso, na.rm = TRUE)
+
+cob <- gpe |>
+  filter(!is.na(vehiculo)) |>
+  distinct(id_hogar_unico, vehiculo) |>
+  left_join(pesos, by = "id_hogar_unico") |>
+  group_by(Vehiculo = vehiculo) |>
+  summarise(
+    `Hogares consumidores` = n(),
+    peso_consumidores      = sum(peso, na.rm = TRUE),
+    .groups = "drop"
+  ) |>
+  mutate(
+    `% sin ponderar` = pct(`Hogares consumidores`, hogares_total),
+    `% ponderado`    = pct(peso_consumidores, peso_total)
+  ) |>
+  select(-peso_consumidores) |>
+  arrange(desc(`Hogares consumidores`))
+
+kable(cob, format.args = list(big.mark = ","))
+```
+
+```{r}
+#| label: fig-cobertura
+#| fig-cap: "Cobertura de los vehículos de fortificación"
+#| fig-height: 3.5
+
+d <- gpe |>
+  filter(!is.na(vehiculo)) |>
+  distinct(id_hogar_unico, vehiculo) |>
+  count(vehiculo) |>
+  mutate(p = 100 * n / hogares_total) |>
+  arrange(p)
+
+par(mar = c(4, 8, 2, 2))
+bp <- barplot(d$p, names.arg = d$vehiculo, horiz = TRUE, las = 1,
+              col = "#4a7c9b", xlim = c(0, 100),
+              xlab = "% de hogares consumidores")
+text(d$p + 3, bp, labels = paste0(round(d$p, 1), "%"), cex = 0.8)
+```
+
+La diferencia entre el porcentaje sin ponderar y el ponderado por el factor de
+expansión indica en qué medida el consumo del vehículo se concentra en hogares
+con distinta representatividad muestral. Una brecha amplia merece lectura
+cuidadosa; una brecha estrecha indica un consumo transversal a la población.
+
+## El caso de la harina de trigo
+
+```{r}
+#| label: tbl-trigo
+#| tbl-cap: "Cobertura del vehículo trigo según cómo se defina el indicador"
+
+gpe_amp <- cargar_gramos_por_ema() |> marcar_vehiculo(ampliado = TRUE)
+
+h_estricto <- gpe |> filter(vehiculo == "Harina de trigo") |>
+  distinct(id_hogar_unico) |> nrow()
+h_ampliado <- gpe_amp |> filter(vehiculo == "Trigo y derivados") |>
+  distinct(id_hogar_unico) |> nrow()
+
+tibble(
+  `Definición` = c("Harina de trigo como producto",
+                   "Harina de trigo y sus derivados"),
+  `Hogares` = c(h_estricto, h_ampliado),
+  `% de hogares` = c(pct(h_estricto, hogares_total), pct(h_ampliado, hogares_total))
+) |>
+  kable(format.args = list(big.mark = ","))
+```
+
+La harina de trigo apenas aparece como producto comprado: en la Sección 2 no la
+registra **ningún** hogar. No es un vacío de los datos, es un hecho del patrón
+de consumo dominicano — la harina se consume ya procesada, principalmente en
+forma de pan.
+
+Esto importa para la evaluación del programa. La normativa dominicana obliga a
+fortificar la harina **en el molino**, y esa harina llega al hogar dentro del
+pan. Un indicador construido sobre "harina de trigo" mide el consumo de un
+insumo intermedio, no la exposición de la población al nutriente añadido.
+
+**Decisión adoptada:** el vehículo se define como *harina de trigo y sus
+derivados de consumo directo*, y se reportan ambas cifras para que la diferencia
+sea visible. Es una decisión de definición de indicador, y sus límites se
+declaran abajo.
+
+```{r}
+#| label: tbl-trigo-detalle
+#| tbl-cap: "Alimentos incluidos en la definición ampliada, por volumen de registros"
+
+gpe_amp |>
+  filter(vehiculo == "Trigo y derivados") |>
+  count(Alimento = descripcion, name = "Filas") |>
+  arrange(desc(Filas)) |>
+  head(15) |>
+  kable(format.args = list(big.mark = ","))
+```
+
+::: {.callout-warning}
+## Dos limitaciones de la definición ampliada
+**No toda la harina contenida en estos productos está fortificada.** La norma es
+obligatoria para la harina de panificación, pero voluntaria para pastas y
+galletas. La cifra ampliada debe leerse como un **techo** del alcance real.
+
+**No permite estimar gramos de harina consumidos.** Sin factores de receta
+—cuánta harina contiene cada producto— la definición ampliada es válida como
+medida de **alcance poblacional**, pero no para calcular el aporte en gramos.
+Esos factores no están disponibles en esta encuesta y su incorporación queda
+identificada como línea de trabajo.
+:::
+
+## Consumo entre quienes consumen
+
+La cobertura por sí sola no basta para evaluar una estrategia de fortificación:
+un vehículo consumido por todos pero en cantidades mínimas aporta poco. Esta
+sección reporta cuánto consume quien consume.
+
+```{r}
+#| label: tbl-consumo
+#| tbl-cap: "Consumo diario por EMA entre hogares consumidores (gramos)"
+
+cons <- gpe |>
+  filter(!is.na(vehiculo)) |>
+  group_by(id_hogar_unico, vehiculo) |>
+  summarise(g_ema_dia = sum(Gramos_por_EMA_dia, na.rm = TRUE), .groups = "drop") |>
+  group_by(Vehiculo = vehiculo) |>
+  summarise(
+    `Hogares`  = n(),
+    `Mediana`  = round(median(g_ema_dia), 1),
+    `Media`    = round(mean(g_ema_dia), 1),
+    `P25`      = round(quantile(g_ema_dia, 0.25), 1),
+    `P75`      = round(quantile(g_ema_dia, 0.75), 1),
+    `P95`      = round(quantile(g_ema_dia, 0.95), 1),
+    .groups = "drop"
+  ) |>
+  arrange(desc(Mediana))
+
+kable(cons, format.args = list(big.mark = ","))
+```
+
+::: {.callout-note}
+## Por qué la mediana y no la media
+En todos los vehículos la media supera a la mediana, señal de una distribución
+sesgada a la derecha por compras al por mayor: un hogar que adquiere un saco de
+arroz en un solo día del período registra un consumo diario aparente muy alto.
+**La mediana es el estimador central que se reporta**; la media se muestra al
+lado para que la diferencia quede visible en lugar de oculta.
+:::
+
+## Consumo simultáneo de vehículos
+
+Una estrategia de fortificación puede apoyarse en un vehículo único o en un
+conjunto. Saber cuántos hogares quedarían alcanzados por al menos uno es
+directamente relevante para el diseño.
+
+```{r}
+#| label: tbl-simultaneo
+#| tbl-cap: "Número de vehículos distintos consumidos por hogar"
+
+simul <- gpe |>
+  filter(!is.na(vehiculo)) |>
+  distinct(id_hogar_unico, vehiculo) |>
+  count(id_hogar_unico, name = "n_vehiculos") |>
+  count(n_vehiculos, name = "hogares") |>
+  mutate(`% de hogares` = pct(hogares, hogares_total),
+         `% acumulado`  = pct(rev(cumsum(rev(hogares))), hogares_total))
+
+kable(simul, format.args = list(big.mark = ","))
+```
+
+```{r}
+#| label: alcance
+#| results: asis
+
+alcanzados <- gpe |> filter(!is.na(vehiculo)) |> distinct(id_hogar_unico) |> nrow()
+
+cat(paste0("**Al menos un vehículo:** ", format(alcanzados, big.mark = ","),
+           " hogares (", pct(alcanzados, hogares_total), " del total analizado).\n\n"))
+
+todos <- gpe |>
+  filter(!is.na(vehiculo)) |>
+  distinct(id_hogar_unico, vehiculo) |>
+  count(id_hogar_unico) |>
+  filter(n == nrow(VEHICULOS)) |>
+  nrow()
+
+cat(paste0("**Los cuatro vehículos a la vez:** ", format(todos, big.mark = ","),
+           " hogares (", pct(todos, hogares_total), ").\n"))
+```
+
+## Aporte por sección del cuestionario
+
+La ENGIH captura el consumo por dos vías distintas: la Sección 2 releva las
+existencias del hogar y la Sección 3A las adquisiciones diarias. **No son
+intercambiables ni redundantes**: capturan alimentos distintos y el análisis
+requiere ambas. Esta tabla muestra de dónde proviene la cobertura de cada
+vehículo.
+
+```{r}
+#| label: tbl-seccion
+#| tbl-cap: "Hogares consumidores según la sección que registró el consumo"
+
+gpe |>
+  filter(!is.na(vehiculo)) |>
+  distinct(id_hogar_unico, vehiculo, seccion) |>
+  count(Vehiculo = vehiculo, Seccion = seccion, name = "Hogares") |>
+  pivot_wider(names_from = Seccion, values_from = Hogares, values_fill = 0) |>
+  kable(format.args = list(big.mark = ","))
+```
+
+::: {.callout-important}
+## Solapamiento en alimentos almacenables
+Un mismo hogar puede aparecer en ambas secciones para el mismo vehículo: tenía
+arroz almacenado **y** compró arroz durante el período. Para los vehículos
+—todos ellos almacenables— esto implica que **el consumo agregado está
+sobrestimado** en una magnitud aún no cuantificada por alimento.
+
+El refinamiento metodológico apropiado es la **disponibilidad neta**
+(existencias iniciales + adquisiciones − existencias finales), para la cual los
+datos necesarios ya están disponibles en la Sección 2. Queda documentado como
+trabajo pendiente; **la cobertura, al ser una medida binaria de consumo sí/no,
+no se ve afectada por este solapamiento** — solo el consumo en gramos.
+:::
+
+## Limitaciones
+
+- **Cobertura del pipeline.** Las cifras se calculan sobre las observaciones
+  que completan la cadena de cálculo (cantidad, factor de conversión y porción
+  comestible). Ver el reporte R1 para el detalle por sección.
+- **Sin intervalos de confianza.** La ENGIH tiene diseño muestral complejo
+  (8 estratos, 933 unidades primarias, factor de expansión). Las variables están
+  disponibles y su incorporación mediante `srvyr` es el siguiente paso; **hasta
+  entonces no se reportan intervalos**, en lugar de reportar intervalos
+  incorrectamente estrechos.
+- **El consumo en gramos está sobrestimado** por el solapamiento entre
+  secciones descrito arriba. La cobertura no lo está.
+- **Definición de los vehículos.** Se identifican por patrón de texto sobre la
+  descripción de la ENGIH, definido en un único lugar (`_comun.R`) y por tanto
+  auditable y modificable sin tocar este reporte.
+
+## Lectura para la toma de decisiones
+
+```{r}
+#| label: lectura
+#| results: asis
+
+for (i in seq_len(nrow(cob))) {
+  cat(paste0("- **", cob$Vehiculo[i], "**: alcanza al ",
+             cob$`% sin ponderar`[i], " de los hogares analizados.\n"))
+}
+```
+
+Un vehículo con cobertura alta y consumo mediano estable es candidato preferente
+para una estrategia de fortificación, porque alcanza a la población de forma
+transversal. Uno con cobertura baja requiere combinarse con otros para lograr
+alcance poblacional suficiente.
+
+La estimación del **aporte efectivo de cada vehículo a la ingesta de
+micronutrientes** —indicadores 3 y 4 del sistema de evaluación— depende de la
+definición de la línea base de fortificación, que es una decisión de política
+pendiente y se documenta por separado.
+
+---
+
+*Generado desde el pipeline reproducible del proyecto:
+`scripts/01_import.R` → `scripts/04_equivalente_adulto.R`.*

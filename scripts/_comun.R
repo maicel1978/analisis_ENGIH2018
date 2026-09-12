@@ -31,6 +31,29 @@ VEHICULOS <- tribble(
   "Azucar",             "azucar|az\u00facar"
 )
 
+# Definición AMPLIADA del vehículo trigo: harina + derivados de consumo directo.
+#
+# Por qué: la norma dominicana obliga a fortificar la harina EN EL MOLINO. Esa
+# harina llega al hogar dentro del pan, no como harina. Medir la cobertura solo
+# por "harina de trigo" mide el consumo de un insumo intermedio (8% de los
+# hogares), no la exposición de la población al nutriente añadido. Es un
+# problema de definición de indicador, no una cuestión nutricional.
+#
+# CUIDADO con el patrón: sin exclusiones captura falsos positivos graves --
+# "Pasta de tomate" (12,150 registros), "Ajo en pasta", "Harinas de maíz",
+# "Maicena", "Buen pan o castaña" (fruta de pan, no trigo) y los derivados de
+# maíz. Verificado 2026-09-12: con exclusiones quedan 67 alimentos y 26,935
+# registros; sin ellas la cifra se infla ~47%.
+TRIGO_INCLUIR <- paste0(
+  "\\bpan\\b|panecillo|galleta|fideo|macarron|espagueti|espaguetti|lasagn|",
+  "harina de trigo|harina integral|bizcocho|croissant|hojaldre|\\bpasta\\b|",
+  "tortilla|dona|sobado"
+)
+TRIGO_EXCLUIR <- paste0(
+  "pasta de tomate|ajo en pasta|pasta de ajo|harina de maiz|harinas de maiz|",
+  "maicena|de maiz|castana|fruta de pan|pan de fruta|masapan|negrito|arroz"
+)
+
 # Nutrientes iniciales del análisis (hoja de ruta: empezar con 4, no con 65)
 NUTRIENTES_INICIALES <- c("Energia", "Hierro", "Acido folico", "Vitamina A")
 
@@ -81,6 +104,33 @@ cargar_crosswalk <- function(hoja) {
   read_excel(f, sheet = hoja, col_types = "text")
 }
 
+# Consumo por EMA (salida de 04_equivalente_adulto.R). Trae `seccion` desde
+# 2026-09-12; si falta, hay que volver a correr el 04.
+cargar_gramos_por_ema <- function() {
+  f <- file.path(RUTA_CLEAN, "data_gramos_por_ema.csv")
+  exigir_archivo(f, "04_equivalente_adulto.R")
+  d <- leer_limpio(f)
+  if (!"seccion" %in% names(d)) {
+    stop("`data_gramos_por_ema.csv` no tiene la columna `seccion`. ",
+         "Volver a correr scripts/04_equivalente_adulto.R.", call. = FALSE)
+  }
+  d
+}
+
+# Peso muestral por hogar. Se toma el primero de cada hogar: el factor es una
+# propiedad del hogar, no de la fila, asi que sumarlo por filas lo multiplicaria
+# por el numero de alimentos registrados.
+pesos_hogar <- function() {
+  d <- cargar_consumo()
+  bind_rows(
+    d$sec2  |> select(id_hogar_unico, peso),
+    d$sec3a |> select(id_hogar_unico, peso)
+  ) |>
+    filter(!is.na(peso)) |>
+    group_by(id_hogar_unico) |>
+    summarise(peso = first(peso), .groups = "drop")
+}
+
 # --- Helpers ------------------------------------------------------------------
 
 # Normaliza texto para emparejar descripciones sin depender de acentos/mayúsculas
@@ -90,11 +140,19 @@ norm_txt <- function(x) {
     trimws()
 }
 
-# Marca a qué vehículo pertenece cada fila (NA si a ninguno)
-marcar_vehiculo <- function(df, col = "descripcion") {
+# Marca a qué vehículo pertenece cada fila (NA si a ninguno).
+# ampliado = TRUE sustituye "Harina de trigo" por "Trigo y derivados".
+marcar_vehiculo <- function(df, col = "descripcion", ampliado = FALSE) {
   d <- norm_txt(df[[col]])
   v <- rep(NA_character_, length(d))
+  
+  if (ampliado) {
+    hit <- grepl(TRIGO_INCLUIR, d) & !grepl(TRIGO_EXCLUIR, d)
+    v[hit] <- "Trigo y derivados"
+  }
+  
   for (i in seq_len(nrow(VEHICULOS))) {
+    if (ampliado && VEHICULOS$vehiculo[i] == "Harina de trigo") next
     hit <- grepl(VEHICULOS$patron[i], d) & is.na(v)
     v[hit] <- VEHICULOS$vehiculo[i]
   }
@@ -120,8 +178,15 @@ marcar_elegible <- function(df) {
 # VECTORIZADO a proposito: se usa dentro de mutate() sobre columnas enteras,
 # donde un if() ordinario falla ("the condition has length > 1").
 pct <- function(x, n, dec = 1) {
-  v <- ifelse(is.na(n) | n == 0, NA_real_, 100 * x / n)
-  ifelse(is.na(v), "--", paste0(round(v, dec), "%"))
+  # OJO: no usar ifelse() con la condicion sobre `n`. ifelse() devuelve un
+  # resultado del largo de la CONDICION, asi que si `n` es un escalar (un total
+  # de hogares, por ejemplo) el resultado se colapsa a un solo valor y todas las
+  # filas muestran el mismo porcentaje. Bug real, detectado en R3 el 2026-09-12.
+  v <- 100 * x / n
+  v[!is.finite(v)] <- NA_real_
+  out <- paste0(round(v, dec), "%")
+  out[is.na(v)] <- "--"
+  out
 }
 
 # Toda cifra de cobertura se reporta como "valor (n/N, %)" -- regla del
