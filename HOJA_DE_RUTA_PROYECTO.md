@@ -10,7 +10,9 @@ Este documento fija el alcance acordado hasta ahora. Cualquier cambio de alcance
 
 ## PRIORIDAD ACTUAL (leer esto primero, antes que Fase 0 de abajo)
 
-**Al 2026-09-12 (tarde): crosswalk cerrado, pipeline corriendo limpio y R1 renderizado con datos reales. Lo que sigue es correr `05_ingesta_micronutrientes.R` por primera vez** — empezando por construir la tabla de equivalencia de columnas INCAP/FNDDS como paso verificado, y con solo 4 nutrientes (Energía, Hierro, Ácido fólico, Vitamina A). Después, llevar a Daniel/Carlos la decisión sobre la línea base de fortificación (ver "Decisión abierta" al final de Fase 0), que sigue siendo el hallazgo metodológico más importante sin resolver.
+**Al 2026-09-12 (noche): el pipeline `01`→`05` corre completo y hay ingesta aparente de micronutrientes por primera vez.** Lo que sigue es **R2 (modelo de base) y R3 (cobertura de vehículos)**, que son compromiso firme y salen de datos ya calculados; después el **README**, que es el primer archivo que abren los supervisores al recibir el enlace del repo.
+
+**Cambio de fecha (2026-09-12): la fecha real de cierre es el domingo por la noche**, no el martes 16. El martes es margen. Criterio derivado: ya no se trata de *qué alcanzo a terminar*, sino de **qué queda tan bien documentado que se entienda sin el consultor presente**. Lo que no se ejecute (R4, R5, D1, D2, desglose por quintil) se entrega **descrito**, con método definido, variables verificadas y una nota de qué falta para correrlo. Después, llevar a Daniel/Carlos la decisión sobre la línea base de fortificación (ver "Decisión abierta" al final de Fase 0), que sigue siendo el hallazgo metodológico más importante sin resolver.
 
 **Fecha límite dura: reunión del 2026-09-16.** Ver "Fase 5 — Presentación" al final de este documento para el alcance comprometido y lo que queda explícitamente fuera.
 
@@ -89,6 +91,50 @@ Este documento fija el alcance acordado hasta ahora. Cualquier cambio de alcance
   - **Agua purificada: 7,774 filas.** Nutricionalmente aporta cero, pero cuenta como observación y deprime la cobertura reportada. **Considerar una categoría explícita `sin_aporte_nutricional`** en vez de dejarla como "sin mapeo": cambia la lectura del indicador sin alterar ningún resultado, y es más honesto que ambas cosas se cuenten juntas.
 
 - [ ] **Detalle menor de R1:** la tabla de atípicos muestra 0% por redondeo (45 de 260,059). Dar más decimales.
+
+- [x] **HITO (2026-09-12): primera corrida de `05_ingesta_micronutrientes.R`. Hay ingesta aparente de micronutrientes por primera vez en el proyecto.** El script ya estaba escrito y versionado desde `8c243ce` (la hoja decía "sin empezar" — desactualizado); solo nunca se había corrido. Bug corregido para que corriera: los encabezados de FNDDS traen saltos de línea **dentro** del nombre (el de hierro es literalmente `Iron` + salto + `(mg)`), así que escribirlos literales fallaba. Ahora se resuelven **por patrón** con `stop()` si el patrón no identifica exactamente una columna — un cambio de formato en la fuente falla ruidosamente en vez de devolver la columna equivocada.
+
+  **Cobertura de composición, por nutriente (no es uniforme, y eso es un hallazgo):** energía 100%, hierro 96.4%, folato 92.3%, **vitamina A 85.5%** de los gramos consumidos. La tabla de composición no cubre todos los nutrientes por igual, así que la vitamina A está más subestimada que la energía. **Se reporta siempre por nutriente, nunca como una cifra global.**
+
+  **Ojo con el 100% de energía:** es 100% *de las filas que llegaron al `05`*, que ya venían filtradas por FC + mapeo + PC. La cadena completa es **76% (Sec 3A) × 100% (composición)**. La cifra citable sigue siendo 76%.
+
+- [x] **HITO (2026-09-12): validación empírica del período de medición (PM).** Era una preocupación abierta: el formulario `docs/Formulario ENGIH B` declara un diseño, y los datos muestran otra cosa. **Resuelto con evidencia, no con lectura del PDF.**
+
+  Los datos: Sec 3A tiene 8,731 hogares; solo 5,330 (61%) tienen registro en los 7 días. El resto tiene menos (1 día: 159 hogares; 2: 247; 3: 342; 4: 514; 5: 793; 6: 1,345). Hay además valores imposibles de `dia` (0, 12, 13, 14, 15, 16, 17, 18, 28), poquísimos registros pero existen y hay que declararlos.
+
+  **La pregunta que decidía todo:** un hogar con 3 días de registro, ¿fue observado 3 días, o fue observado 7 y no compró nada en 4? Si fuera lo segundo, dividir entre 3 inflaría su consumo un 133%.
+
+  **Test aplicado: energía mediana por número de días observados.** Resultado **plano** — 1 día: 2,050 kcal; 2: 2,120; 3: 1,935; 4: 2,168; 5: 2,149; 6: 2,085; 7: 2,189. Si el denominador estuviera inflando, los hogares de 1 día mostrarían ~7× más. No lo hacen. **Queda validado usar `dias_observados_hogar` como PM**, y la corrección que se hizo el 08-09 sobre el `PM = 1` era correcta.
+
+  **Respuesta citable ante la pregunta "¿cuál es el período de medición?":** *el diseño declara 7 días, los datos muestran registro incompleto en el 39% de los hogares, y verifiqué contra los datos cuál interpretación se sostiene — la ingesta mediana es invariante al número de días observados, lo que confirma que el denominador es correcto.*
+
+- [x] **HITO (2026-09-12): Sección 2 y Sección 3A NO son intercambiables ni sumables sin criterio. Cuantificado.** Daniel indicó explícitamente trabajar con **Sec 2** y Santiago con **Sec 3A**. Verificado que **ninguna de las dos indicaciones era errónea: las dos hacen falta.**
+
+  | Variante | Hogares | Energía mediana | Energía media | Hierro | Folato | Vit. A | >6000 kcal |
+  |---|---|---|---|---|---|---|---|
+  | Sec 2 sola | 6,216 | **1,173** | 1,466 | 7.83 | 559 | 30.9 | 78 |
+  | Sec 3A sola | 8,653 | **1,200** | 1,741 | 7.29 | 248 | 136 | 271 |
+  | **Sec 2 + Sec 3A** | 8,774 | **2,153** | 2,755 | 14.2 | 811 | 173 | 572 |
+
+  **Ninguna sección por separado es fisiológicamente plausible** (~1,200 kcal/EMA/día es la mitad del requerimiento). **La única variante creíble es la suma.** Las secciones son mayormente *complementarias*, no redundantes: capturan alimentos distintos (Sec 2 inventario de despensa, Sec 3A compras diarias), y se nota en el perfil — folato 559 vs 248, vitamina A 31 vs 136. Cada una aporta nutrientes distintos porque captura alimentos distintos.
+
+  **Pero hay solapamiento parcial y real en almacenables.** En los 572 hogares con energía > 6,000 kcal, el arroz aparece **tres veces** en el top 15 (Arroz selecto y Arroz corriente en Sec 3A; ARROZ en Sec 2, este último con 386 hogares), y lo mismo aceite (posiciones 4 y 7), azúcar (5 y 9) y leche (8, 11, 12). **Tres de los cuatro vehículos de fortificación están afectados.**
+
+  **Descomposición de la cola (78 + 271 = 349, pero la suma da 572):** **223 hogares (39% de la cola) nacen del solapamiento**; los otros 349 ya estaban en los datos crudos, sobre todo en Sec 3A — son **compras al por mayor** (un saco de arroz en un día), fenómeno real de las encuestas de adquisición, no un error del pipeline.
+
+  **Decisión documentada:** reportar **la suma** como estimación principal (única plausible); **declarar el solapamiento con su magnitud** como limitación conocida que sobrestima arroz, aceite, azúcar y leche; **proponer la disponibilidad neta** (`cantidad_inicial + adquisiciones − cantidad_final`) como refinamiento para almacenables — los datos existen, `cantidad_inicial` y `cantidad_final` están en Sec 2. **Llevar a Daniel y Santiago como decisión suya, con esta tabla como evidencia.** No elegir una sección por cuenta propia: contradiría a uno de los dos supervisores.
+
+  Salida reproducible: `data/clean/comparacion_variantes_seccion.csv`. El `04` conserva ahora la columna `seccion` (antes se perdía en el `bind_rows`), y el `05` produce las tres variantes con `stop()` si esa columna falta.
+
+- [ ] **La media NO es la cifra a citar; la mediana sí.** Energía: mediana 2,153 vs media 2,755 kcal — la media está inflada por la cola. Regla para todos los reportes: **mediana como estimador central, y la media se muestra al lado para que la diferencia sea visible en vez de escondida.**
+
+- [ ] **Control de atípicos a nivel de HOGAR (brecha real detectada 2026-09-12).** La detección actual de `03_transform.R` trabaja **por alimento**: un hogar puede acumular varios valores altos sin que ninguno sea individualmente extremo. Por eso pasan 572 hogares con energía implausible (máximos absurdos: 63,864 kcal, 439 mg de hierro, 65,351 µg de vitamina A) y 2 hogares en 0. **Agregar una guarda a nivel de hogar** sobre energía por EMA/día. No inventar un filtro arbitrario: la disponibilidad neta debería absorber buena parte, y lo que quede se declara.
+
+- [ ] **`SUPUESTO "por 100 g" — VALIDADO empíricamente (2026-09-12).** El `05` lo declaraba como no verificado contra la documentación de INCAP/FNDDS. La energía mediana da **2,153 kcal/EMA/día**, fisiológicamente plausible: un error de factor 10 o 100 en cualquier eslabón de la cadena habría dado 200 o 20,000. Queda validado por consistencia. *Sigue pendiente confirmarlo contra la documentación fuente, pero ya no es un supuesto ciego.*
+
+- [ ] **Hallazgo que refuerza la decisión de línea base, ahora con evidencia cuantitativa.** El perfil de la variante sumada es **folato alto (811 µg DFE, EAR ~320) y vitamina A baja (173 µg RAE, EAR ~500)** — exactamente la dirección que predice el problema del crosswalk: el arroz (alimento #1 de la dieta) mapeado a "enriquecido" con 386 µg folato/100g infla el folato; el azúcar mapeada a "sin fortificar" con vitamina A = 0 la deprime. **Deja de ser una observación teórica del crosswalk y pasa a ser efecto medible.** Frase para la reunión: no "el crosswalk asume un escenario que no corresponde a la norma", sino "asume ese escenario, y el efecto medible es folato sobrestimado y vitamina A subestimada, en estas magnitudes".
+
+- [ ] **118 hogares sin ingesta** (8,774 de 8,892 con EMA). Tienen EMA calculado pero ninguna fila de consumo que sobreviviera los filtros. No es un error, pero hay que saber por qué antes de presentar.
 
 - [ ] **DECISIÓN ABIERTA (2026-09-10) — línea base de fortificación. Corresponde al equipo (Daniel/Carlos/Santiago), NO se automatiza.** El crosswalk actual no representa ningún escenario real de política pública dominicana:
   - **Arroz:** RD **no** tiene norma de fortificación de arroz, pero el crosswalk manda ARROZ (var. 7), Arroz selecto (66) y Súper-selecto (65) a `70213002` "Arroz blanco enriquecido" (Fe 4.36, folato 386/100g). Solo Arroz corriente (67) va a `70213004` sin enriquecer. **Sobrestima** Fe y folato del alimento #1 de la dieta.
