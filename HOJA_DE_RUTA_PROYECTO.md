@@ -10,7 +10,7 @@ Este documento fija el alcance acordado hasta ahora. Cualquier cambio de alcance
 
 ## PRIORIDAD ACTUAL (leer esto primero, antes que Fase 0 de abajo)
 
-**Al 2026-09-12: el crosswalk Sec 3A quedó cerrado y el pipeline corre limpio de punta a punta. Lo que sigue es (1) renderizar `R1_calidad_datos.qmd`, y (2) correr `05_ingesta_micronutrientes.R` por primera vez.** Después, llevar a Daniel/Carlos la decisión sobre la línea base de fortificación (ver "Decisión abierta" al final de Fase 0), que sigue siendo el hallazgo metodológico más importante sin resolver.
+**Al 2026-09-12 (tarde): crosswalk cerrado, pipeline corriendo limpio y R1 renderizado con datos reales. Lo que sigue es correr `05_ingesta_micronutrientes.R` por primera vez** — empezando por construir la tabla de equivalencia de columnas INCAP/FNDDS como paso verificado, y con solo 4 nutrientes (Energía, Hierro, Ácido fólico, Vitamina A). Después, llevar a Daniel/Carlos la decisión sobre la línea base de fortificación (ver "Decisión abierta" al final de Fase 0), que sigue siendo el hallazgo metodológico más importante sin resolver.
 
 **Fecha límite dura: reunión del 2026-09-16.** Ver "Fase 5 — Presentación" al final de este documento para el alcance comprometido y lo que queda explícitamente fuera.
 
@@ -38,9 +38,11 @@ Este documento fija el alcance acordado hasta ahora. Cualquier cambio de alcance
 
   3. **BUG SILENCIOSO corregido: `validado` con tres representaciones distintas** (`97_normalizar_tipos_crosswalk.R`). Al reescribir el crosswalk con `writexl` tras leerlo con `col_types="text"`, la columna quedó con "TRUE" (265 filas), "VERDADERO" (154, las recién cargadas) y "1" (1 fila). `01_import.R` filtra con `validado == TRUE`, así que **las 154 filas nuevas se habrían descartado sin aviso**: el pipeline habría corrido sin un solo error y reportado la cobertura anterior. Lo que lo atrapó fue un error *distinto* y ruidoso (tipos incompatibles en el join de Sec 2) que obligó a abrir el archivo. **Regla adoptada: no reescribir un Excel de entrada leyéndolo con `col_types="text"`** — convierte a texto columnas numéricas y booleanas y rompe supuestos aguas abajo. **Nota incómoda y útil: este fallo estaba anticipado por escrito en esta misma hoja desde el 10-09** (ver backlog del 10-09, "Tipado explícito en las lecturas de Excel", que recomienda `filter(validado %in% c(TRUE, 1))` en lugar de `== TRUE`). La hoja hizo su trabajo; falló el no consultarla antes de actuar. **Regla de proceso: antes de tocar un archivo de entrada, releer el backlog de Fase 0.**
 
-  4. **Corrida completa verificada (12-09).** Sec 3A: 342,046 filas, 36,841 sin `enhance_id` (89.2% mapeado), 36,841 sin PC — **los dos números coinciden, confirmando que ya no queda alimento mapeado sin porción comestible**. Sec 2: 47,837 filas, 62 sin mapeo y 62 sin PC. Outliers: Sec 2 = 11, Sec 3A = 45. EMA: 8,892/8,892 hogares, mediana 3.04. **Gramos por EMA: 303,407 registros** (era 296,969 el 10-09 y 254,905 el 08-09).
+  4. **CORRECCIÓN IMPORTANTE (2026-09-12, tras el primer render de R1): 89.2% es cobertura del *crosswalk*, NO del cálculo.** Son dos métricas distintas y en los mensajes de trabajo de ese día se usaron como si fueran la misma. La cifra citable en la presentación es la segunda: **Sec 3A entra al cálculo al 76.0%** (260,014 de 342,046 filas) y **Sec 2 al 90.7%** (43,393 de 47,837). El 89.2% mide qué proporción de los *registros* tiene alimento mapeado; el 76.0% mide cuántas *observaciones* tienen además FC, PC y no son atípicas — que es lo que exige la fórmula. **Si se presenta 89.2% como cobertura del análisis y alguien recalcula, la cifra se cae.** Regla derivada: al citar cobertura, decir siempre *de qué* (crosswalk / cálculo) y *de qué sección*.
 
-  5. **Cambió el cuello de botella.** Sec 3A tiene 48,684 filas sin factor de conversión contra 36,841 sin mapeo. **De aquí en adelante, el trabajo de cobertura rinde más en la tabla de FC que en el crosswalk.** Esto invierte la conclusión del 10-09, que decía que todo lo que quedaba por ganar estaba en el crosswalk: era cierto entonces, ya no.
+  5. **Corrida completa verificada (12-09).** Sec 3A: 342,046 filas, 36,841 sin `enhance_id` (89.2% mapeado), 36,841 sin PC — **los dos números coinciden, confirmando que ya no queda alimento mapeado sin porción comestible**. Sec 2: 47,837 filas, 62 sin mapeo y 62 sin PC. Outliers: Sec 2 = 11, Sec 3A = 45. EMA: 8,892/8,892 hogares, mediana 3.04. **Gramos por EMA: 303,407 registros** (era 296,969 el 10-09 y 254,905 el 08-09).
+
+  6. **Cambió el cuello de botella.** Sec 3A tiene 48,684 filas sin factor de conversión contra 36,841 sin mapeo. **De aquí en adelante, el trabajo de cobertura rinde más en la tabla de FC que en el crosswalk.** Esto invierte la conclusión del 10-09, que decía que todo lo que quedaba por ganar estaba en el crosswalk: era cierto entonces, ya no.
 
 - [x] **HITO (2026-09-10): dos bugs de corrupción silenciosa corregidos + guardas de integridad en el pipeline + cobertura de PC ampliada.** Origen: auditoría externa independiente (réplica del pipeline en Python), revisada y verificada punto por punto contra los archivos reales antes de aplicar nada.
 
@@ -57,6 +59,36 @@ Este documento fija el alcance acordado hasta ahora. Cualquier cambio de alcance
   Commits: `8c243ce` (bloques 1-3), `be0fd32` (food_factors).
 
   **Regla adoptada hoy:** toda cifra del log va fechada y con la corrida de la que salió. Todo resultado de consumo o ingesta se cita junto a su % de cobertura (hoy: Sec 2 90.7%, Sec 3A 74.1%).
+
+- [x] **HITO (2026-09-12): primer render de `R1_calidad_datos.qmd` con datos reales.** Reporte autogenerado (ninguna cifra escrita a mano), infraestructura compartida en `scripts/_comun.R`. Bug corregido en el camino: `pct()` no estaba vectorizada y fallaba dentro de `mutate()` — al vivir en el archivo común, se arregló una vez para los cinco reportes.
+
+  **Resultado que desbloquea R3: los cuatro vehículos de fortificación están cubiertos casi al 100%.** Aceite 99.6% (Sec 2) / 97.2% (Sec 3A); Arroz 99.1% / 98.7%; Azúcar 100% / 99.6%; Harina de trigo 99.1% (Sec 3A). **R3 es defendible sin salvedad**, pese a que la cobertura general de Sec 3A sea 76%. Tiene sentido: los vehículos son básicos, se compran en unidades estándar y están bien representados en INCAP. Esto responde la pregunta abierta del 11-09 sobre si el hueco del 24% afectaba a los alimentos que importan. **No afecta.**
+
+  **Estado del crosswalk según el reporte:** 769 filas, 407 con código, 308 con `tipo_equivalencia` (181 directa, 106 sustituto_por_criterio, 5 requiere_revision, 1 categoria_compuesta, **114 sin declarar** — el pendiente ya anotado).
+
+- [ ] **PRIORIDAD ALTA DE COBERTURA — peso por unidad de plátano y guineo (decisión 2026-09-12: documentada y pospuesta, NO abandonada).** El primer render de R1 identificó exactamente dónde se pierde el 24% de Sec 3A. El motivo dominante es **falta de FC: 48,683 filas** (contra 33,303 sin mapeo). Y la cola está concentrada en pocos alimentos, todos ya anotados en el pendiente de "peso por unidad":
+
+  | Alimento | Filas sin FC | Sección |
+  |---|---|---|
+  | Plátano verde | 7,690 | Sec 3A |
+  | Guineo verde (guineíto) | 5,577 | Sec 3A |
+  | Aguacate | 2,417 | Sec 3A |
+  | Tomate Barceló o Bugalú | 1,982 | Sec 3A |
+  | PLÁTANO VERDE | 1,836 | Sec 2 |
+  | Plátano maduro | 1,815 | Sec 3A |
+  | Ají gustoso o cachucha | 1,616 | Sec 3A |
+  | GUINEITO VERDE | 1,513 | Sec 2 |
+  | Apio planta, apio gusto | 1,449 | Sec 3A |
+  | Naranja agria | 1,394 | Sec 3A |
+  | Guineo maduro (banano) | 1,313 | Sec 3A |
+
+  **Solo plátano y guineo (las cuatro variantes) suman ~16,400 filas — subirían Sec 3A de 76% a ~81%.** Es pesaje de mercado, metodología ya probada por el consultor (ají cubanela, cilantro), ~30 minutos de trabajo. **Decisión del 12-09: se pospone en favor de `05_ingesta_micronutrientes.R`**, porque el `05` es compromiso firme para el 16 y nunca ha corrido. Retomar en cuanto el `05` esté corriendo, o el domingo 14 si hay margen. *Cilantro (220g/bolsa) y ají cubanela (288g) ya están medidos en campo — mismo procedimiento.*
+
+- [ ] **Dos alimentos sin mapeo que pesan mucho, con caminos distintos:**
+  - **Caldo de pollo (Sopita Concentrada): 18,084 filas**, la mayor pérdida individual del proyecto por falta de mapeo. Ya hay dato de campo propio (etiqueta Knorr verificada: 1 cubito = 10g, 2,320mg sodio, 30kcal) pero **sin `ENHANCE_ID` completo** porque la etiqueta no trae el perfil de micronutrientes. Opciones: buscar equivalente en FNDDS, o declararlo excluido con justificación. **No dejarlo sin decisión escrita.**
+  - **Agua purificada: 7,774 filas.** Nutricionalmente aporta cero, pero cuenta como observación y deprime la cobertura reportada. **Considerar una categoría explícita `sin_aporte_nutricional`** en vez de dejarla como "sin mapeo": cambia la lectura del indicador sin alterar ningún resultado, y es más honesto que ambas cosas se cuenten juntas.
+
+- [ ] **Detalle menor de R1:** la tabla de atípicos muestra 0% por redondeo (45 de 260,059). Dar más decimales.
 
 - [ ] **DECISIÓN ABIERTA (2026-09-10) — línea base de fortificación. Corresponde al equipo (Daniel/Carlos/Santiago), NO se automatiza.** El crosswalk actual no representa ningún escenario real de política pública dominicana:
   - **Arroz:** RD **no** tiene norma de fortificación de arroz, pero el crosswalk manda ARROZ (var. 7), Arroz selecto (66) y Súper-selecto (65) a `70213002` "Arroz blanco enriquecido" (Fe 4.36, folato 386/100g). Solo Arroz corriente (67) va a `70213004` sin enriquecer. **Sobrestima** Fe y folato del alimento #1 de la dieta.
