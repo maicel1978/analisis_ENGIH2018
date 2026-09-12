@@ -140,10 +140,55 @@ consumo_nutrientes <- gramos_por_ema |>
   left_join(composicion |> select(-fuente), by = "enhance_id") |>
   mutate(across(all_of(NUTRIENTES), ~ Gramos_por_EMA_dia * .x / 100))
 
-# Paso 5: ingesta aparente por hogar --------------------------------------
-ingesta_hogar <- consumo_nutrientes |>
-  group_by(id_hogar_unico) |>
-  summarise(across(all_of(NUTRIENTES), ~ sum(.x, na.rm = TRUE)), .groups = "drop")
+# Paso 5: ingesta aparente por hogar, en TRES variantes --------------------
+# Sec 2 (inventario) y Sec 3A (adquisiciones) miden cosas distintas y NO son
+# sumables sin criterio: verificado 2026-09-12 que al sumarlas se duplican los
+# almacenables. En los 572 hogares con energia > 6000 kcal/EMA/dia, el arroz
+# aparece tres veces en el top (Arroz selecto y Arroz corriente en Sec 3A,
+# ARROZ en Sec 2), y lo mismo aceite, azucar y leche -- es decir, TRES DE LOS
+# CUATRO VEHICULOS DE FORTIFICACION estan afectados por el solapamiento.
+#
+# Daniel indico trabajar con Sec 2 y Santiago con Sec 3A. La eleccion es de
+# ellos, no se resuelve aqui: este script produce las tres variantes para que
+# la decision se tome viendo las consecuencias de cada una.
+if (!"seccion" %in% names(consumo_nutrientes)) {
+  stop("Falta la columna `seccion`. Volver a correr 04_equivalente_adulto.R ",
+       "(la conserva desde 2026-09-12).", call. = FALSE)
+}
+
+agregar_por_hogar <- function(df, etiqueta) {
+  df |>
+    group_by(id_hogar_unico) |>
+    summarise(across(all_of(NUTRIENTES), ~ sum(.x, na.rm = TRUE)), .groups = "drop") |>
+    mutate(variante = etiqueta, .after = id_hogar_unico)
+}
+
+ingesta_hogar <- bind_rows(
+  agregar_por_hogar(consumo_nutrientes |> filter(seccion == "Sec 2"),  "Sec 2"),
+  agregar_por_hogar(consumo_nutrientes |> filter(seccion == "Sec 3A"), "Sec 3A"),
+  agregar_por_hogar(consumo_nutrientes,                                "Sec 2 + Sec 3A")
+)
+
+# Comparacion de las tres variantes. La MEDIANA es la cifra citable: la media
+# esta inflada por la cola de hogares con energia implausible.
+comparacion_variantes <- ingesta_hogar |>
+  group_by(variante) |>
+  summarise(
+    hogares          = n(),
+    energia_mediana  = median(energia_kcal),
+    energia_media    = mean(energia_kcal),
+    hierro_mediana   = median(hierro_mg),
+    folato_mediana   = median(folato_mcg_dfe),
+    vit_a_mediana    = median(vitamina_a_mcg_rae),
+    sobre_6000_kcal  = sum(energia_kcal > 6000),
+    .groups = "drop"
+  )
+
+write_delim(comparacion_variantes,
+            here("data", "clean", "comparacion_variantes_seccion.csv"), delim = ";")
+
+message("\nComparacion de variantes (la decision Sec2 / Sec3A / ambas es de los supervisores):")
+print(comparacion_variantes)
 
 # Paso 6: cobertura -- ponderada por gramos, por nutriente ----------------
 # Este numero acompana al resultado siempre: sin el, la ingesta se lee como
@@ -170,7 +215,7 @@ cobertura_filas <- tibble(
     !is.na(consumo_nutrientes$energia_kcal)], na.rm = TRUE) / total_g
 )
 
-message("\nIngesta aparente calculada para ", nrow(ingesta_hogar), " hogares.")
+message("\nIngesta aparente calculada para ", n_distinct(ingesta_hogar$id_hogar_unico), " hogares.")
 message("Cobertura (energia): ", round(cobertura_filas$pct_filas, 1), "% de filas, ",
         round(cobertura_filas$pct_gramos, 1), "% de gramos consumidos.")
 print(cobertura)

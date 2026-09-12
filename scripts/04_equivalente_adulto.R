@@ -217,9 +217,17 @@ consumo_sec2  <- read_delim(here("data", "clean", "data_sec2_consumo.csv"),  del
 consumo_sec3a <- read_delim(here("data", "clean", "data_sec3a_consumo.csv"), delim = ";", show_col_types = FALSE)
 
 # Se excluyen outliers marcados en 03_transform.R y filas sin Consumo_diario_g
+# Se conserva la marca de seccion (`seccion`). Sin ella, 05 no puede reportar
+# por separado Sec 2 (inventario) y Sec 3A (adquisiciones), y esas dos NO son
+# intercambiables: verificado 2026-09-12 que al sumarlas se duplican los
+# almacenables -- arroz, aceite, azucar y leche aparecen en ambas secciones
+# para los mismos hogares. Daniel indico Sec 2 y Santiago Sec 3A; la decision
+# es de ellos, asi que el pipeline debe poder producir las tres variantes.
 consumo_por_hogar_alimento <- bind_rows(
-  consumo_sec2  |> select(id_hogar_unico, descripcion, enhance_id, Consumo_diario_g, es_outlier),
-  consumo_sec3a |> select(id_hogar_unico, descripcion, enhance_id, Consumo_diario_g, es_outlier)
+  consumo_sec2  |> select(id_hogar_unico, descripcion, enhance_id, Consumo_diario_g, es_outlier) |>
+    mutate(seccion = "Sec 2"),
+  consumo_sec3a |> select(id_hogar_unico, descripcion, enhance_id, Consumo_diario_g, es_outlier) |>
+    mutate(seccion = "Sec 3A")
 ) |>
   filter(!is.na(Consumo_diario_g), !es_outlier | is.na(es_outlier))
 
@@ -231,6 +239,12 @@ gramos_por_ema <- consumo_por_hogar_alimento |>
 message(
   "\nGramos por EMA calculado: ", nrow(gramos_por_ema), " filas",
   " (de ", nrow(consumo_por_hogar_alimento), " registros de consumo validos, Sec2+Sec3A, sin outliers)"
+)
+message(
+  "  Por seccion -- Sec 2: ", sum(gramos_por_ema$seccion == "Sec 2"), " filas, ",
+  n_distinct(gramos_por_ema$id_hogar_unico[gramos_por_ema$seccion == "Sec 2"]), " hogares",
+  " | Sec 3A: ", sum(gramos_por_ema$seccion == "Sec 3A"), " filas, ",
+  n_distinct(gramos_por_ema$id_hogar_unico[gramos_por_ema$seccion == "Sec 3A"]), " hogares"
 )
 
 write_delim(gramos_por_ema, here("data", "clean", "data_gramos_por_ema.csv"), delim = ";")
