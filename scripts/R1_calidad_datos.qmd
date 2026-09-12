@@ -1,0 +1,352 @@
+---
+title: "R1 — Calidad y preparación de los datos"
+subtitle: "ENGIH 2018, República Dominicana | Análisis preliminar de Secciones 2 y 3A"
+author: "Maicel E. Monzón"
+lang: es
+date: today
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    toc-title: "Contenido"
+    number-sections: true
+    code-fold: true
+    code-tools: true
+    df-print: paged
+    embed-resources: true
+execute:
+  warning: false
+  message: false
+  echo: false
+---
+
+```{r}
+#| label: setup
+# Busca _comun.R en reports/ o en scripts/, lo que exista.
+ruta_comun <- c(here::here("reports", "_comun.R"),
+                here::here("scripts", "_comun.R"))
+ruta_comun <- ruta_comun[file.exists(ruta_comun)][1]
+if (is.na(ruta_comun)) stop("No encuentro _comun.R ni en reports/ ni en scripts/")
+source(ruta_comun)
+
+d     <- cargar_consumo()
+sec2  <- d$sec2  |> marcar_elegible() |> marcar_vehiculo()
+sec3a <- d$sec3a |> marcar_elegible() |> marcar_vehiculo()
+todo  <- bind_rows(sec2, sec3a)
+```
+
+> **Cómo leer este documento.** Todas las cifras se calculan al momento de
+> renderizar, directamente desde los archivos del pipeline. No hay ningún número
+> escrito a mano. Si los datos mejoran, este reporte mejora solo.
+>
+> Fecha de generación: `r format(Sys.Date(), "%d-%m-%Y")`.
+
+## Qué responde este reporte
+
+Los Términos de Referencia (numerales 4.1 a 4.3) piden un dictamen sobre si la
+ENGIH 2018 permite implementar una metodología de estimación de ingesta de
+micronutrientes: qué variables sirven, cuáles no están disponibles, y qué
+adaptaciones metodológicas hicieron falta.
+
+Este reporte es ese dictamen, expresado en cobertura verificable.
+
+## La regla que se aplica a todo el análisis
+
+La fórmula del modelo de base es:
+
+$$\text{Consumo diario (g)} = \frac{Q \times FC \times PC}{PM}$$
+
+Una observación de la encuesta **solo entra al cálculo** si tiene las tres
+piezas: cantidad registrada ($Q$), factor de conversión a gramos ($FC$) y
+porción comestible ($PC$) — esta última requiere que el alimento esté mapeado
+a una tabla de composición. Si falta una, la fila no produce un resultado
+defendible y queda fuera.
+
+Por eso **ninguna cifra de este proyecto se reporta sin su cobertura**.
+
+## Cobertura general
+
+```{r}
+#| label: tbl-cobertura-general
+#| tbl-cap: "Cobertura por sección — qué proporción de las observaciones llega al cálculo"
+
+resumen <- todo |>
+  group_by(Seccion = seccion) |>
+  summarise(
+    `Filas`            = n(),
+    `Con Q`            = sum(tiene_Q),
+    `Con FC`           = sum(tiene_fc),
+    `Mapeado (TCA)`    = sum(tiene_enhance),
+    `Con PC`           = sum(tiene_pc),
+    `Atipicas`         = sum(es_outlier),
+    `Entran al calculo`= sum(entra_calculo),
+    .groups = "drop"
+  ) |>
+  mutate(`% cobertura` = pct(`Entran al calculo`, `Filas`))
+
+kable(resumen, format.args = list(big.mark = ","))
+```
+
+```{r}
+#| label: fig-embudo
+#| fig-cap: "Dónde se pierde cada observación, por sección"
+#| fig-height: 4
+
+embudo <- todo |>
+  group_by(seccion) |>
+  summarise(
+    `1. Registradas`   = n(),
+    `2. Con FC`        = sum(tiene_Q & tiene_fc),
+    `3. + mapeo TCA`   = sum(tiene_Q & tiene_fc & tiene_enhance),
+    `4. + PC`          = sum(tiene_Q & tiene_fc & tiene_enhance & tiene_pc),
+    `5. Sin atipicos`  = sum(entra_calculo),
+    .groups = "drop"
+  ) |>
+  pivot_longer(-seccion, names_to = "etapa", values_to = "filas")
+
+par(mar = c(8, 5, 2, 1))
+with(
+  embudo |> filter(seccion == "Sec 3A"),
+  barplot(filas, names.arg = etapa, las = 2, col = "#4a7c9b",
+          main = "Sec 3A", ylab = "Filas")
+)
+```
+
+**Lectura.** El embudo muestra en qué paso se pierde cada observación. Eso
+importa porque orienta el trabajo pendiente: no tiene sentido ampliar el
+crosswalk si la pérdida principal está en los factores de conversión, ni al
+revés.
+
+## Los cuatro vehículos de fortificación
+
+Esta es la verificación que decide si los indicadores de cobertura del reporte
+R3 son defendibles. La pregunta no es cuánto cubre el pipeline en general, sino
+**si cubre bien los alimentos que importan para fortificación**.
+
+```{r}
+#| label: tbl-vehiculos
+#| tbl-cap: "Cobertura específica de los vehículos de fortificación"
+
+veh <- todo |>
+  filter(!is.na(vehiculo)) |>
+  group_by(Vehiculo = vehiculo, Seccion = seccion) |>
+  summarise(
+    `Filas`             = n(),
+    `Entran al calculo` = sum(entra_calculo),
+    .groups = "drop"
+  ) |>
+  mutate(`% cobertura` = pct(`Entran al calculo`, `Filas`)) |>
+  arrange(Vehiculo, Seccion)
+
+kable(veh, format.args = list(big.mark = ","))
+```
+
+```{r}
+#| label: veh-veredicto
+#| results: asis
+
+veh_tot <- todo |>
+  filter(!is.na(vehiculo)) |>
+  group_by(vehiculo) |>
+  summarise(n = n(), ok = sum(entra_calculo), .groups = "drop") |>
+  mutate(p = 100 * ok / n)
+
+for (i in seq_len(nrow(veh_tot))) {
+  v <- veh_tot[i, ]
+  estado <- if (v$p >= 90) "Cobertura alta — el indicador es defendible sin salvedad."
+            else if (v$p >= 70) "Cobertura parcial — reportar con la cobertura explícita."
+            else "Cobertura insuficiente — no reportar sin advertencia expresa."
+  cat("- **", v$vehiculo, "**: ", round(v$p, 1), "% — ", estado, "\n", sep = "")
+}
+```
+
+::: {.callout-note}
+## Definición auditable
+Los vehículos se identifican por patrón de texto sobre la descripción de la
+ENGIH, definido en `reports/_comun.R`. La definición es editable y está en un
+solo lugar: si se decide incluir o excluir un producto, cambia acá y se
+propaga a todos los reportes.
+:::
+
+## Qué queda fuera, y cuánto pesa
+
+No todo lo que falta pesa igual. Esta lista ordena el trabajo pendiente por
+impacto real, no por cantidad de filas sueltas.
+
+```{r}
+#| label: tbl-pendientes
+#| tbl-cap: "Alimentos con mayor volumen de observaciones que NO entran al cálculo"
+
+pendientes <- todo |>
+  filter(!entra_calculo) |>
+  mutate(
+    motivo = case_when(
+      !tiene_Q       ~ "Sin cantidad",
+      !tiene_fc      ~ "Sin factor de conversion",
+      !tiene_enhance ~ "Sin mapeo a tabla de composicion",
+      !tiene_pc      ~ "Sin porcion comestible",
+      es_outlier     ~ "Marcada atipica",
+      TRUE           ~ "Otro"
+    )
+  ) |>
+  count(seccion, descripcion, motivo, sort = TRUE, name = "filas") |>
+  slice_head(n = 20)
+
+kable(pendientes, format.args = list(big.mark = ","))
+```
+
+```{r}
+#| label: tbl-motivos
+#| tbl-cap: "Motivo de exclusión, agregado"
+
+todo |>
+  filter(!entra_calculo) |>
+  mutate(
+    motivo = case_when(
+      !tiene_Q       ~ "Sin cantidad",
+      !tiene_fc      ~ "Sin factor de conversion",
+      !tiene_enhance ~ "Sin mapeo a tabla de composicion",
+      !tiene_pc      ~ "Sin porcion comestible",
+      es_outlier     ~ "Marcada atipica",
+      TRUE           ~ "Otro"
+    )
+  ) |>
+  count(Seccion = seccion, Motivo = motivo, name = "Filas") |>
+  arrange(Seccion, desc(Filas)) |>
+  kable(format.args = list(big.mark = ","))
+```
+
+## Estado del crosswalk
+
+```{r}
+#| label: tbl-crosswalk
+#| tbl-cap: "Mapeo de alimentos de la ENGIH a tablas de composición"
+
+cw3a <- cargar_crosswalk("Cuest. B Sec 3A")
+
+cw_resumen <- cw3a |>
+  summarise(
+    `Filas del crosswalk`      = n(),
+    `Con codigo asignado`      = sum(!is.na(enhance_id)),
+    `Con tipo de equivalencia` = sum(!is.na(tipo_equivalencia)),
+    `Fuente INCAP`             = sum(fuente == "INCAP", na.rm = TRUE),
+    `Fuente FNDDS`             = sum(fuente == "FNDDS", na.rm = TRUE)
+  )
+
+kable(cw_resumen, format.args = list(big.mark = ","))
+```
+
+```{r}
+#| label: tbl-tipo-equiv
+#| tbl-cap: "Naturaleza de las equivalencias asignadas"
+
+cw3a |>
+  filter(!is.na(enhance_id)) |>
+  count(`Tipo de equivalencia` = coalesce(tipo_equivalencia, "(sin declarar)"),
+        name = "Filas") |>
+  arrange(desc(Filas)) |>
+  kable()
+```
+
+La distinción entre equivalencia **directa** y **sustituto por criterio** no es
+cosmética: declara en qué casos el alimento dominicano corresponde exactamente
+a la entrada de la tabla de composición, y en cuáles se aplicó un criterio.
+Las filas marcadas *(sin declarar)* son un pendiente conocido, heredado de la
+fase inicial del proyecto.
+
+## Control de calidad: valores atípicos
+
+El Paso 7 de la guía del modelo de base exige identificación de valores
+atípicos. El pipeline los detecta por alimento —comparando cada observación
+contra la distribución del mismo `enhance_id`— y los **marca sin eliminarlos**,
+para que la decisión de tratamiento sea explícita y reversible.
+
+```{r}
+#| label: tbl-outliers
+#| tbl-cap: "Observaciones marcadas como atípicas"
+
+todo |>
+  group_by(Seccion = seccion) |>
+  summarise(
+    `Filas evaluadas` = sum(!is.na(Consumo_diario_g)),
+    `Marcadas atipicas` = sum(es_outlier),
+    .groups = "drop"
+  ) |>
+  mutate(`% del total` = pct(`Marcadas atipicas`, `Filas evaluadas`)) |>
+  kable(format.args = list(big.mark = ","))
+```
+
+::: {.callout-important}
+## Dependencia que conviene declarar
+La detección de atípicos agrupa por `enhance_id`. Para las filas sin mapeo,
+la comparación mezclaría alimentos no relacionados, así que la defensa es
+efectiva solo donde el crosswalk está completo. Es una razón adicional —además
+de la nutricional— para priorizar el mapeo.
+:::
+
+## Adaptaciones metodológicas aplicadas
+
+Lo que el numeral 4.2 de los TdR pide documentar explícitamente.
+
+| Situación encontrada | Adaptación | Estado |
+|---|---|---|
+| Unidades no estándar sin factor de conversión publicado | Factor empírico derivado del propio crudo (mediana por combinación alimento-presentación), clasificado por dispersión | Aplicado |
+| Alimentos sin peso por unidad en ninguna fuente | Pesaje directo en mercado dominicano, documentado con evidencia fotográfica | Aplicado a casos puntuales |
+| Alimentos ausentes de la tabla INCAP | Uso de FNDDS como fuente secundaria, declarada fila por fila en la columna `fuente` | Aplicado |
+| Período de medición variable entre hogares | Uso de días observados por hogar en lugar de constante | Aplicado |
+| Sección 3B (alimentos fuera del hogar) | Excluida: requiere factores de receta y rendimiento no disponibles | Decisión explícita de alcance |
+| Embarazo y lactancia en el cálculo de EMA | No ajustado: la variable no existe en la ENGIH | Limitación declarada |
+
+## Limitaciones
+
+```{r}
+#| label: limitaciones
+#| results: asis
+
+cob_3a <- todo |> filter(seccion == "Sec 3A") |>
+  summarise(p = 100 * sum(entra_calculo) / n()) |> pull(p)
+cob_2  <- todo |> filter(seccion == "Sec 2") |>
+  summarise(p = 100 * sum(entra_calculo) / n()) |> pull(p)
+
+cat("- Cobertura del cálculo: Sec 2 ", round(cob_2, 1),
+    "%, Sec 3A ", round(cob_3a, 1),
+    "%. Ningún resultado de consumo o ingesta debe citarse sin este dato.\n", sep = "")
+```
+
+- Las observaciones que quedan fuera **no son una muestra aleatoria**: se
+  concentran en alimentos sin factor de conversión o sin mapeo. Los agregados
+  representan lo cubierto, no el total de la dieta.
+- Los pesos por unidad de varios alimentos son estimaciones a partir de fuentes
+  externas o de pesaje propio, no medición de la encuesta.
+- El cálculo de EMA no ajusta por embarazo ni lactancia, usa peso fijo por sexo
+  y asume actividad física moderada, según los supuestos de la guía de
+  referencia.
+- El diseño muestral complejo (estrato, UPM, factor de expansión) está
+  disponible en los datos; mientras no se aplique, los intervalos de confianza
+  están subestimados.
+
+## Conclusión sobre factibilidad
+
+```{r}
+#| label: veredicto
+#| results: asis
+
+veh_min <- min(veh_tot$p)
+n_ok    <- sum(veh_tot$p >= 70)
+
+cat("La ENGIH 2018 permite implementar la metodología del modelo de base. ",
+    "Al momento de generar este reporte, ", n_ok, " de ", nrow(veh_tot),
+    " vehículos de fortificación alcanzan cobertura suficiente para reportar ",
+    "indicadores, y la cobertura general del cálculo es de ",
+    round(cob_3a, 1), "% en Sección 3A.\n\n", sep = "")
+```
+
+Lo que limita el alcance no es la encuesta: es el estado de completitud de las
+tablas auxiliares (factores de conversión, porción comestible, crosswalk), que
+sigue ampliándose. Cada ampliación mejora estas cifras sin cambiar el método,
+y este reporte lo refleja automáticamente.
+
+---
+
+*Generado desde el pipeline reproducible del proyecto. Código y datos:
+`scripts/01_import.R` a `scripts/04_equivalente_adulto.R`.*
