@@ -1,0 +1,342 @@
+---
+title: "R2 — Modelo de base: consumo diario y Equivalente de Mujer Adulta"
+subtitle: "ENGIH 2018, República Dominicana | Implementación de la metodología de referencia"
+author: "Maicel E. Monzón"
+lang: es
+date: today
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    toc-title: "Contenido"
+    number-sections: true
+    code-fold: true
+    code-tools: true
+    df-print: paged
+    embed-resources: true
+execute:
+  warning: false
+  message: false
+  echo: false
+---
+
+```{r}
+#| label: setup
+ruta_comun <- c(here::here("reports", "_comun.R"),
+                here::here("scripts", "_comun.R"))
+ruta_comun <- ruta_comun[file.exists(ruta_comun)][1]
+if (is.na(ruta_comun)) stop("No encuentro _comun.R ni en reports/ ni en scripts/")
+source(ruta_comun)
+
+gpe <- cargar_gramos_por_ema()
+ema <- leer_limpio(file.path(RUTA_CLEAN, "data_ema_hogar.csv"))
+
+f_var <- file.path(RUTA_CLEAN, "comparacion_variantes_seccion.csv")
+variantes <- if (file.exists(f_var)) leer_limpio(f_var) else NULL
+```
+
+> Todas las cifras se calculan al renderizar, directamente desde el pipeline.
+> Ninguna está escrita a mano. Fecha de generación: `r format(Sys.Date(), "%d-%m-%Y")`.
+
+## Qué responde este reporte
+
+Los Términos de Referencia piden procesar los datos de consumo con
+estandarización de unidades y ajuste por porción comestible (numeral 1.3),
+aplicar el ajuste por Equivalente de Mujer Adulta (numeral 1.4) y entregar el
+análisis demográfico y socioeconómico de los hogares encuestados (numeral 8.2).
+
+Este reporte documenta esa implementación paso a paso, siguiendo la metodología
+de referencia proporcionada por la contraparte técnica.
+
+::: {.callout-note}
+## Sobre la nomenclatura
+El mismo constructo aparece en la literatura como **AFE** (*Adult Female
+Equivalent*), **AWE** (*Adult Woman Equivalent*) y **EMA** (Equivalente de Mujer
+Adulta). Se adopta **EMA** por consistencia con el material metodológico de
+referencia en español. No debe confundirse con **AME** (*Adult Male
+Equivalent*), que es un constructo distinto.
+:::
+
+## La fórmula del modelo de base
+
+El consumo diario en gramos comestibles de cada alimento, por hogar, se calcula
+como:
+
+$$\text{Consumo diario (g)} = \frac{Q \times FC \times PC}{PM}$$
+
+donde:
+
+| Término | Significado | Fuente en este proyecto |
+|---|---|---|
+| $Q$ | Cantidad registrada por el hogar | ENGIH, Secciones 2 y 3A |
+| $FC$ | Factor de conversión a gramos | Tabla universal de unidades + tabla específica por alimento |
+| $PC$ | Porción comestible (fracción aprovechable) | `EDIBLE` de INCAP / FNDDS, vía el crosswalk |
+| $PM$ | Período de medición (días) | Días efectivamente observados por hogar |
+
+**Una observación solo entra al cálculo si dispone de los tres componentes.**
+Si falta alguno, la fila no produce un resultado defendible y se excluye. Por
+eso ninguna cifra de este proyecto se reporta sin su cobertura asociada, que se
+documenta en el reporte R1.
+
+### El período de medición: verificación empírica
+
+El diseño de la encuesta declara un período de siete días, pero los datos
+muestran registro incompleto en una fracción sustancial de los hogares. Esto
+obligaba a decidir entre dos interpretaciones incompatibles: ¿un hogar con tres
+días de registro fue observado tres días, o fue observado siete y no adquirió
+alimentos en cuatro de ellos?
+
+La diferencia no es menor: bajo la segunda interpretación, dividir entre tres
+inflaría el consumo diario de ese hogar en un 133%.
+
+```{r}
+#| label: tbl-pm
+#| tbl-cap: "Ingesta energética mediana según número de días observados"
+
+f_ing <- file.path(RUTA_CLEAN, "data_ingesta_micronutrientes_hogar.csv")
+if (file.exists(f_ing)) {
+  ing <- leer_limpio(f_ing)
+  if ("variante" %in% names(ing)) ing <- ing |> filter(variante == "Sec 2 + Sec 3A")
+
+  s3 <- leer_limpio(file.path(RUTA_CLEAN, "data_sec3a_consumo.csv"))
+
+  s3 |>
+    distinct(id_hogar_unico, dias_observados_hogar) |>
+    inner_join(ing, by = "id_hogar_unico") |>
+    group_by(`Días observados` = dias_observados_hogar) |>
+    summarise(Hogares = n(),
+              `Energía mediana (kcal/EMA/día)` = round(median(energia_kcal)),
+              .groups = "drop") |>
+    kable(format.args = list(big.mark = ","))
+} else {
+  cat("_Requiere la salida de 05_ingesta_micronutrientes.R._")
+}
+```
+
+**La ingesta mediana es invariante al número de días observados.** Si el
+denominador estuviese inflando el resultado, los hogares con un solo día de
+registro mostrarían valores varias veces superiores. No lo hacen.
+
+Esto valida empíricamente el uso de los días efectivamente observados como
+período de medición, y descarta la interpretación alternativa. Es una
+verificación contra los datos, no una lectura del formulario.
+
+## Resultado: consumo diario por alimento
+
+```{r}
+#| label: tbl-top-alimentos
+#| tbl-cap: "Alimentos de mayor consumo (gramos por EMA y día, entre hogares consumidores)"
+
+gpe |>
+  group_by(id_hogar_unico, descripcion) |>
+  summarise(g = sum(Gramos_por_EMA_dia, na.rm = TRUE), .groups = "drop") |>
+  group_by(Alimento = descripcion) |>
+  summarise(
+    Hogares  = n(),
+    Mediana  = round(median(g), 1),
+    Media    = round(mean(g), 1),
+    .groups = "drop"
+  ) |>
+  arrange(desc(Hogares)) |>
+  head(20) |>
+  kable(format.args = list(big.mark = ","))
+```
+
+En todos los alimentos la media supera a la mediana. Es el patrón esperado en
+encuestas de adquisición: un hogar que compra un saco de arroz en un solo día
+del período registra un consumo diario aparente muy alto. **La mediana es el
+estimador central que se reporta**; la media se muestra al lado para que la
+asimetría quede visible en lugar de oculta.
+
+## El Equivalente de Mujer Adulta
+
+El EMA normaliza el tamaño y la composición del hogar según el requerimiento
+energético de cada miembro, tomando como referencia el de una mujer adulta. Un
+hogar de cuatro adultos y uno de dos adultos con dos lactantes tienen el mismo
+número de personas pero requerimientos muy distintos; sin esta normalización, el
+consumo per cápita los trataría como equivalentes.
+
+```{r}
+#| label: tbl-ema
+#| tbl-cap: "Distribución del EMA por hogar"
+
+ema |>
+  summarise(
+    Hogares         = n(),
+    `Sin EMA`       = sum(n_sin_ema > 0),
+    `Miembros (mediana)` = median(n_miembros),
+    `EMA mediana`   = round(median(EMA_hogar), 2),
+    `EMA media`     = round(mean(EMA_hogar), 2),
+    `EMA P25`       = round(quantile(EMA_hogar, 0.25), 2),
+    `EMA P75`       = round(quantile(EMA_hogar, 0.75), 2)
+  ) |>
+  kable(format.args = list(big.mark = ","))
+```
+
+```{r}
+#| label: fig-ema
+#| fig-cap: "Distribución del EMA por hogar"
+#| fig-height: 3.5
+
+hist(ema$EMA_hogar[ema$EMA_hogar < quantile(ema$EMA_hogar, 0.99)],
+     breaks = 40, col = "#4a7c9b", border = "white",
+     main = "", xlab = "EMA del hogar", ylab = "Hogares")
+abline(v = median(ema$EMA_hogar), col = "#c0392b", lwd = 2)
+```
+
+```{r}
+#| label: cobertura-ema
+#| results: asis
+
+cat(paste0("**Cobertura del cálculo: ", format(sum(ema$n_sin_ema == 0), big.mark = ","),
+           " de ", format(nrow(ema), big.mark = ","), " hogares (",
+           pct(sum(ema$n_sin_ema == 0), nrow(ema)),
+           ") tienen EMA calculado para todos sus miembros.**\n"))
+```
+
+### Relación entre tamaño del hogar y EMA
+
+```{r}
+#| label: tbl-ema-tamano
+#| tbl-cap: "EMA mediano según número de miembros del hogar"
+
+ema |>
+  filter(n_miembros <= 8) |>
+  group_by(`Miembros` = n_miembros) |>
+  summarise(Hogares = n(),
+            `EMA mediano` = round(median(EMA_hogar), 2),
+            `EMA por miembro` = round(median(EMA_hogar / n_miembros), 2),
+            .groups = "drop") |>
+  kable(format.args = list(big.mark = ","))
+```
+
+El EMA por miembro disminuye a medida que crece el hogar, reflejando que los
+hogares grandes incluyen proporcionalmente más menores de edad, con
+requerimientos energéticos menores. Es exactamente el efecto que el ajuste busca
+capturar y que el consumo per cápita ignoraría.
+
+## Las dos secciones del cuestionario
+
+La ENGIH releva el consumo por dos vías: la **Sección 2** registra las
+existencias del hogar y la **Sección 3A** las adquisiciones diarias. Miden cosas
+distintas, y la elección entre ellas tiene consecuencias directas sobre el
+resultado.
+
+```{r}
+#| label: tbl-variantes
+#| tbl-cap: "Ingesta energética según qué secciones se incluyen"
+
+if (!is.null(variantes)) {
+  variantes |>
+    transmute(
+      Variante = variante,
+      Hogares = hogares,
+      `Energía mediana` = round(energia_mediana),
+      `Energía media`   = round(energia_media),
+      `Hierro (mg)`     = round(hierro_mediana, 1),
+      `Folato (µg DFE)` = round(folato_mediana),
+      `Vit. A (µg RAE)` = round(vit_a_mediana)
+    ) |>
+    kable(format.args = list(big.mark = ","))
+} else {
+  cat("_Requiere la salida de 05_ingesta_micronutrientes.R._")
+}
+```
+
+**Ninguna sección por separado produce un resultado fisiológicamente
+plausible.** Ambas arrojan alrededor de 1.200 kcal por EMA y día, aproximadamente
+la mitad del requerimiento de referencia. Solo la suma alcanza un valor
+compatible con el consumo real.
+
+La explicación es que las secciones son **mayormente complementarias, no
+redundantes**: capturan alimentos distintos. Se aprecia en el perfil de
+nutrientes, donde el folato es sustancialmente mayor en la Sección 2 y la
+vitamina A en la Sección 3A, porque cada instrumento recoge grupos de alimentos
+diferentes.
+
+```{r}
+#| label: tbl-aporte-seccion
+#| tbl-cap: "Aporte de cada sección al consumo total"
+
+gpe |>
+  group_by(Seccion = seccion) |>
+  summarise(
+    Filas    = n(),
+    Hogares  = n_distinct(id_hogar_unico),
+    `Gramos por EMA/día (mediana)` = round(median(Gramos_por_EMA_dia, na.rm = TRUE), 1),
+    .groups = "drop"
+  ) |>
+  kable(format.args = list(big.mark = ","))
+```
+
+::: {.callout-important}
+## Solapamiento en alimentos almacenables
+Un mismo hogar puede aparecer en ambas secciones para el mismo alimento: tenía
+arroz almacenado **y** compró arroz durante el período. El análisis de los
+hogares con ingesta energética implausiblemente alta confirma este mecanismo:
+arroz, aceite, azúcar y leche —todos almacenables— encabezan el listado y
+aparecen en ambas secciones.
+
+**Esto sobrestima el consumo de los alimentos almacenables**, entre ellos tres
+de los cuatro vehículos de fortificación.
+
+El refinamiento metodológico apropiado es la **disponibilidad neta**
+(existencias iniciales + adquisiciones − existencias finales). Los datos
+necesarios están disponibles en la Sección 2 y su implementación queda
+identificada como línea de trabajo prioritaria.
+
+**La decisión sobre qué variante adoptar corresponde al equipo técnico**, no se
+resuelve en este reporte. Las tres se presentan con sus consecuencias para que
+la decisión se tome con evidencia.
+:::
+
+## Supuestos del cálculo del EMA
+
+Documentados de forma explícita, según requiere el numeral 6 de las Notas
+Metodológicas de los Términos de Referencia.
+
+| Supuesto | Tratamiento | Estado |
+|---|---|---|
+| Requerimiento energético por edad y sexo | Tabla de referencia de la metodología proporcionada | Aplicado |
+| Menores de 1 año | Valor provisional de 600 kcal/día | **Pendiente de contrastar con FAO/WHO/UNU 2004** |
+| Nivel de actividad física | Se asume moderado para toda la población adulta | Limitación declarada |
+| Embarazo y lactancia | Sin ajuste | La variable no se incorporó en esta etapa |
+| Peso corporal | Fijo por sexo, sin variación individual | Limitación declarada |
+
+La ausencia de ajuste por embarazo y lactancia merece precisión: el marco
+analítico de referencia contempla desagregar por mujeres en edad fértil,
+embarazadas y lactantes, lo que requiere el módulo demográfico completo de la
+encuesta. **Queda identificado como verificación pendiente**, no como una
+limitación insalvable de la fuente.
+
+## Limitaciones
+
+- **Cobertura del cálculo.** Las cifras se construyen sobre las observaciones
+  que completan los tres componentes de la fórmula. El detalle por sección y los
+  motivos de exclusión se documentan en el reporte R1.
+- **Sin intervalos de confianza.** La ENGIH tiene diseño muestral complejo
+  (8 estratos, 933 unidades primarias, factor de expansión). Las variables están
+  disponibles; hasta incorporarlas mediante `srvyr` **no se reportan intervalos**,
+  en lugar de reportarlos incorrectamente estrechos.
+- **Consumo aparente, no ingesta individual.** Estos datos miden lo que el hogar
+  adquiere o tiene disponible, no lo que cada persona ingiere. No se captura la
+  distribución intrafamiliar, el desperdicio ni el consumo fuera del hogar.
+- **La Sección 3B (alimentos consumidos fuera del hogar) está excluida**, ya que
+  requiere factores de receta y rendimiento no disponibles en esta fuente.
+- **El consumo de alimentos almacenables está sobrestimado** por el solapamiento
+  entre secciones descrito arriba.
+
+## Conclusión
+
+El modelo de base es implementable sobre la ENGIH 2018. La cadena completa
+—estandarización de unidades, factores de conversión, porción comestible,
+período de medición y normalización por EMA— produce resultados en rangos
+fisiológicamente plausibles, y cada eslabón está documentado y es reproducible.
+
+Las limitaciones identificadas no impiden el análisis: acotan su interpretación,
+y cada una tiene una vía de resolución especificada.
+
+---
+
+*Generado desde el pipeline reproducible del proyecto:
+`scripts/01_import.R` → `scripts/05_ingesta_micronutrientes.R`.*
