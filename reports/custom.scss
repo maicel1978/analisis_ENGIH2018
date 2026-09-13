@@ -1,0 +1,110 @@
+/* Estilo sobrio para revisión técnica.
+   El contenido es lo que tiene que destacar, no el diseño.
+
+   Quarto exige marcadores de capa en los .scss de tema. `defaults` define
+   variables de Sass (se aplican ANTES del tema base); `rules` son reglas CSS
+   normales (se aplican DESPUES). */
+
+/*-- scss:defaults --*/
+
+$body-color: #1f2d36 !default;
+$link-color: #2c5364 !default;
+$presentation-heading-color: #1a3a4a !default;
+$presentation-heading-font-weight: 600 !default;
+$presentation-font-size-root: 30px !default;
+
+/*-- scss:rules --*/
+
+.reveal h1, .reveal h2, .reveal h3 {
+  color: #1a3a4a;
+  text-transform: none;
+  letter-spacing: normal;
+  font-weight: 600;
+}
+
+.reveal h2 {
+  font-size: 1.45em;
+  border-bottom: 3px solid #4a7c9b;
+  padding-bottom: 0.25em;
+  margin-bottom: 0.6em;
+}
+
+/* Secciones divisorias con fondo oscuro */
+.reveal section[data-background-color] h1,
+.reveal section[data-background-color] h2,
+.reveal section[data-background-color] h3 {
+  color: #ffffff;
+  border-bottom: none;
+}
+
+.reveal section[data-background-color] p,
+.reveal section[data-background-color] li,
+.reveal section[data-background-color] strong {
+  color: #f0f4f7;
+}
+
+/* Tablas legibles a distancia */
+.reveal table {
+  font-size: 0.78em;
+  border-collapse: collapse;
+  margin: 0.8em auto;
+}
+
+.reveal table th {
+  background-color: #4a7c9b;
+  color: white;
+  font-weight: 600;
+  padding: 0.45em 0.8em;
+  border: none;
+}
+
+.reveal table td {
+  padding: 0.35em 0.8em;
+  border-bottom: 1px solid #dde4e9;
+}
+
+.reveal table tr:nth-child(even) {
+  background-color: #f5f8fa;
+}
+
+/* Énfasis */
+.reveal strong {
+  color: #1a3a4a;
+  font-weight: 700;
+}
+
+/* Bloques de advertencia */
+.reveal .callout {
+  font-size: 0.85em;
+}
+
+/* Imágenes del trabajo de campo */
+.reveal .column img {
+  max-height: 460px;
+  width: auto;
+  border-radius: 6px;
+  box-shadow: 0 3px 14px rgba(0,0,0,0.28);
+}
+
+/* Código plegado: discreto pero accesible */
+.reveal .code-tools-button {
+  opacity: 0.45;
+}
+
+.reveal pre code {
+  font-size: 0.62em;
+  max-height: 420px;
+}
+
+/* Listas con más aire */
+.reveal ul li {
+  margin-bottom: 0.45em;
+  line-height: 1.35;
+}
+
+/* Número de lámina discreto */
+.reveal .slide-number {
+  background-color: transparent;
+  color: #7d8f9c;
+  font-size: 0.55em;
+}

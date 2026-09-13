@@ -170,12 +170,14 @@ for (nut in c("hierro_mg", "folato_mcg_dfe")) {
 #| results: asis
 
 r <- resumen |> arrange(Escenario)
-cat("**Rango del efecto de la fortificación sobre la ingesta mediana:**\n\n")
-cat("- Hierro: de ", r$`Hierro (mg)`[1], " a ", r$`Hierro (mg)`[nrow(r)],
-    " mg por EMA y día\n", sep = "")
-cat("- Folato: de ", format(r$`Folato (µg DFE)`[1], big.mark = ","), " a ",
-    format(r$`Folato (µg DFE)`[nrow(r)], big.mark = ","),
-    " µg DFE por EMA y día\n", sep = "")
+linea <- function(...) cat(paste0(..., collapse = ""))
+
+linea("**Rango del efecto de la fortificación sobre la ingesta mediana:**\n\n")
+linea("- Hierro: de ", r$`Hierro (mg)`[1], " a ", r$`Hierro (mg)`[nrow(r)],
+      " mg por EMA y día\n")
+linea("- Folato: de ", format(r$`Folato (µg DFE)`[1], big.mark = ","), " a ",
+      format(r$`Folato (µg DFE)`[nrow(r)], big.mark = ","),
+      " µg DFE por EMA y día\n")
 ```
 
 La magnitud de esa diferencia es, en sí misma, un resultado: **indica cuánto
