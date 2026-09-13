@@ -12,8 +12,8 @@
 #
 # Objetivo: generar evidencia para el informe de factibilidad (ToR 4.1-4.3)
 # Entradas: data/clean/data_sec2.csv, data/clean/data_sec3a.csv
-# Salidas:  mensajes de diagnóstico en consola + data/eda/*.csv
-#           + data/eda/*.html (reporte dlookr, opcional)
+# Salidas:  mensajes de diagnóstico en consola + data/diagnosticos/*.csv
+#           + data/diagnosticos/*.html (reporte dlookr, opcional)
 # =========================================================================
 
 library(dplyr)
@@ -30,7 +30,7 @@ message(sprintf("dlookr version: %s", as.character(packageVersion("dlookr"))))
 data_sec2  <- read_delim(here("data", "clean", "data_sec2.csv"),  delim = ";", show_col_types = FALSE)
 data_sec3a <- read_delim(here("data", "clean", "data_sec3a.csv"), delim = ";", show_col_types = FALSE)
 
-dir_eda <- here("data", "eda")
+dir_eda <- here("data", "diagnosticos")
 if (!dir.exists(dir_eda)) dir.create(dir_eda, recursive = TRUE)
 
 # 1. Cobertura de hogares ---------------------------------------------------

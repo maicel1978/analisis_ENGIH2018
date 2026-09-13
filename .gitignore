@@ -20,7 +20,7 @@ De*ktop.ini
 .Rproj.us*r
 .Rhistory
 .RData
-01_analisis_ENGIH2018.Rproj
+analisis_ENGIH2018.Rproj
 
 # Cache
 _cache*
@@ -30,10 +30,10 @@ data/clean/
 
 
 # Salidas automaticas de 02_eda.R (regenerables, no requieren juicio manual
-# como si lo requieren otros archivos de data/eda/ ej. FC_propuesto_*.csv)
-data/eda/cobertura_dias_sec3a.csv
-data/eda/ranking_unidades_no_estandar.csv
-data/eda/top_atipicos_sec3a.csv
+# como si lo requieren otros archivos de data/diagnosticos/ ej. FC_propuesto_*.csv)
+data/diagnosticos/cobertura_dias_sec3a.csv
+data/diagnosticos/ranking_unidades_no_estandar.csv
+data/diagnosticos/top_atipicos_sec3a.csv
 
 # Reportes renderizados (regenerables con quarto_render)
 output/
@@ -46,3 +46,6 @@ output/
 
 /.quarto/
 **/*.quarto_ipynb
+
+# Reporte HTML de dlookr (regenerable con 02_eda.R)
+data/diagnosticos/*.html

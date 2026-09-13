@@ -233,7 +233,7 @@ faltantes <- consumo_nutrientes |>
             filas = n(), .groups = "drop") |>
   arrange(desc(gramos_perdidos))
 
-write_delim(faltantes, here("data", "eda", "alimentos_sin_composicion.csv"), delim = ";")
+write_delim(faltantes, here("data", "diagnosticos", "alimentos_sin_composicion.csv"), delim = ";")
 
 # Pendiente (no hecho aqui):
 #   - Validar el supuesto "por 100 g" contra la documentacion de INCAP y FNDDS.
