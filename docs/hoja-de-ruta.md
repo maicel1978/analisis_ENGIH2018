@@ -254,6 +254,20 @@ Este documento fija el alcance acordado hasta ahora. Cualquier cambio de alcance
 
 - [ ] **Menor:** los *warnings* de `big.mark`/`decimal.mark` al compilar el informe (se usa "." para ambos). No afecta resultados; limpiar en la próxima pasada.
 
+- [ ] **BRECHAS FRENTE AL ESTÁNDAR INTERNACIONAL — evaluación crítica (2026-09-13).** El producto actual es sólido *como análisis de factibilidad de medio término*: reproducible, documentado, con limitaciones medidas y no supuestas. **No es todavía publicable** según estándar internacional, y la distancia es concreta y acotada. Se anota para no perderla de vista.
+
+  **1. Diseño muestral complejo — la brecha mayor, y la más barata de cerrar.** Un análisis de encuesta compleja sin `srvyr` no cumple el estándar: las variables (`ESTRATO`, `UPM`, `FACTOR_EXPANSION`) estaban disponibles desde el inicio. Media jornada de trabajo. **Ventaja de haberlo dejado para ahora:** el pipeline está estable y los reportes leen de `reports/_comun.R`, así que se implementa una vez y se propaga a todo.
+
+  **ADVERTENCIA: no es un añadido inocuo.** Las medianas ponderadas difieren de las simples, así que **cambiarán cifras de los reportes**, no solo se añadirán intervalos. Exige volver a renderizar todo y verificar. Planificar como bloque con verificaciones, al estilo de la reorganización del 13-09. **No hacerlo la víspera de una entrega.**
+
+  **2. Validación externa — ausente.** Las estimaciones de consumo no se han contrastado contra ninguna fuente independiente. Que la energía dé 2.153 kcal/EMA/día es plausible, pero no está verificado. Candidatos: **Encuesta Nacional de Micronutrientes de RD**, **hojas de balance de FAO**, la **canasta básica del propio Banco Central**. Si se consiguen, es una tarde de trabajo y da un argumento fuerte. Si no, se declara como pendiente.
+
+  **3. Control de atípicos a nivel de hogar.** 45 filas marcadas sobre 300.000 y 572 hogares implausibles declarados pero no resueltos. Técnicamente barato, pero requiere decidir y justificar un umbral. **Hacerlo DESPUÉS de resolver el tratamiento de las dos secciones**: la disponibilidad neta probablemente absorba buena parte de esos hogares y entonces el umbral correcto sería otro.
+
+  **Orden recomendado:** `srvyr` primero (es lo único que cambia lo que se puede afirmar) → después validación externa → disponibilidad neta → atípicos por hogar. Cada uno depende del anterior.
+
+  **4. Retrabajo evitable — lección de proceso.** Hubo que rehacer el README, la presentación y el dashboard (dos veces). Causa: se empezó a producir antes de definir **audiencia y propósito** de cada pieza. Regla adoptada: antes de escribir un entregable, fijar para quién es y qué decisión o acción habilita.
+
 - [ ] **DECISIÓN ABIERTA (2026-09-10) — línea base de fortificación. Corresponde al equipo (Daniel/Carlos/Santiago), NO se automatiza.** El crosswalk actual no representa ningún escenario real de política pública dominicana:
   - **Arroz:** RD **no** tiene norma de fortificación de arroz, pero el crosswalk manda ARROZ (var. 7), Arroz selecto (66) y Súper-selecto (65) a `70213002` "Arroz blanco enriquecido" (Fe 4.36, folato 386/100g). Solo Arroz corriente (67) va a `70213004` sin enriquecer. **Sobrestima** Fe y folato del alimento #1 de la dieta.
   - **Harina de trigo:** fortificación **obligatoria desde 2009** (Fe, ácido fólico, complejo B), pero el crosswalk manda Harina de trigo (58) a `70213038` "s/enriquecer" (Fe 1.17, folato 26). **Subestima.**
