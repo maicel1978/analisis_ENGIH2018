@@ -108,3 +108,91 @@ $presentation-font-size-root: 30px !default;
   color: #7d8f9c;
   font-size: 0.55em;
 }
+
+
+/* ---------- DASHBOARD ---------- */
+
+/* Respiración: el tema por defecto aprieta demasiado las tarjetas */
+.quarto-dashboard .card {
+  border: 1px solid #e6ecef;
+  border-radius: 8px;
+  box-shadow: none;
+  margin: 7px;
+}
+
+.quarto-dashboard .card-header {
+  background-color: transparent;
+  border-bottom: 1px solid #eef2f4;
+  color: #1a3a4a;
+  font-weight: 600;
+  font-size: 0.92rem;
+  padding: 0.75rem 1rem 0.55rem;
+}
+
+.quarto-dashboard .card-body {
+  padding: 0.9rem 1rem;
+}
+
+/* Indicadores: número grande, rótulo discreto */
+.quarto-dashboard .value-box-grid {
+  gap: 10px;
+}
+
+.quarto-dashboard .value-box-title {
+  font-size: 0.78rem;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  opacity: 0.78;
+  line-height: 1.25;
+}
+
+.quarto-dashboard .value-box-value {
+  font-size: 2.1rem;
+  font-weight: 650;
+  line-height: 1.1;
+}
+
+.quarto-dashboard .value-box-showcase {
+  opacity: 0.35;
+}
+
+/* Texto de las tarjetas explicativas */
+.quarto-dashboard .card-body p {
+  font-size: 0.92rem;
+  line-height: 1.5;
+  color: #33444f;
+}
+
+/* Barra superior sobria */
+.quarto-dashboard .navbar {
+  background-color: #1a3a4a;
+  border-bottom: none;
+}
+
+.quarto-dashboard .navbar .navbar-brand,
+.quarto-dashboard .navbar .nav-link {
+  color: #e8eef2;
+}
+
+.quarto-dashboard .navbar .nav-link.active {
+  color: #ffffff;
+  font-weight: 600;
+}
+
+/* Tablas interactivas: menos ruido */
+.quarto-dashboard table.dataTable thead th {
+  background-color: #f5f8fa;
+  color: #1a3a4a;
+  font-weight: 600;
+  border-bottom: 2px solid #dde4e9;
+}
+
+.quarto-dashboard table.dataTable tbody td {
+  font-size: 0.88rem;
+}
+
+.quarto-dashboard .dataTables_filter input,
+.quarto-dashboard .dataTables_wrapper .filter-cell input {
+  border: 1px solid #dde4e9;
+  border-radius: 4px;
+}

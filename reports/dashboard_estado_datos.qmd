@@ -1,7 +1,6 @@
 ---
-title: "Estado de la base de datos"
-subtitle: "ENGIH 2018 — cobertura del procesamiento y trabajo pendiente"
-author: "Maicel E. Monzón, PhD"
+title: "Calidad de los datos"
+author: "ENGIH 2018 · República Dominicana"
 format:
   dashboard:
     theme: [default, custom.scss]
@@ -28,270 +27,216 @@ if (usar_plotly) library(plotly)
 if (usar_dt)     library(DT)
 library(ggplot2)
 
-AZUL <- "#2c5364"; AZUL_C <- "#4a7c9b"; GRIS <- "#b8c4cc"; ACENTO <- "#c0623c"
+AZUL <- "#2c5364"; AZUL_C <- "#7ba3bd"; GRIS <- "#d4dce1"; ACENTO <- "#c0623c"
 
 d     <- cargar_consumo()
-sec2  <- d$sec2  |> marcar_elegible()
 sec3a <- d$sec3a |> marcar_elegible()
-todo  <- bind_rows(sec2, sec3a)
-cw    <- cargar_crosswalk("Cuest. B Sec 3A")
+todo  <- bind_rows(d$sec2 |> marcar_elegible(), sec3a)
 
-p3a <- 100 * sum(sec3a$entra_calculo) / nrow(sec3a)
-p2  <- 100 * sum(sec2$entra_calculo)  / nrow(sec2)
-
-interactivo <- function(g) if (usar_plotly) plotly::ggplotly(g) else g
-
-tabla <- function(df, ...) {
-  if (usar_dt) {
-    DT::datatable(df, rownames = FALSE, filter = "top",
-                  options = list(pageLength = 12, dom = "ftip",
-                                 language = list(
-                                   search = "Buscar:",
-                                   info = "_START_ a _END_ de _TOTAL_",
-                                   paginate = list(previous = "Anterior", `next` = "Siguiente"))),
-                  ...)
-  } else {
-    knitr::kable(head(df, 15))
-  }
-}
+n3a  <- nrow(sec3a)
+p3a  <- 100 * sum(sec3a$entra_calculo) / n3a
+peso <- 100 * sum(!sec3a$tiene_fc) / n3a
+comp <- 100 * sum(sec3a$tiene_fc & !sec3a$tiene_enhance) / n3a
 
 tema_d <- function() {
-  theme_minimal(base_size = 12) +
-    theme(panel.grid.minor = element_blank(),
-          panel.grid.major.x = element_blank(),
-          panel.grid.major.y = element_line(colour = "#e8edf0"),
-          axis.title = element_text(colour = "#5a6b76", size = rel(0.9)),
-          legend.position = "none")
+  theme_minimal(base_size = 13) +
+    theme(panel.grid.minor   = element_blank(),
+          panel.grid.major.y = element_blank(),
+          panel.grid.major.x = element_line(colour = "#f0f4f6"),
+          axis.title = element_blank(),
+          axis.text  = element_text(colour = "#44555f"),
+          axis.text.y = element_text(size = rel(1.02)),
+          legend.position = "none",
+          plot.margin = margin(14, 24, 8, 6))
+}
+
+grafico <- function(g) {
+  if (usar_plotly) {
+    plotly::ggplotly(g, tooltip = "text") |>
+      plotly::config(displayModeBar = FALSE) |>
+      plotly::layout(margin = list(l = 10, r = 20, t = 10, b = 30))
+  } else g
 }
 ```
 
 # Cobertura
 
-## Row {height="18%"}
+## Row {height="22%"}
 
 ```{r}
 #| content: valuebox
-#| title: "Observaciones procesadas"
-list(icon = "database", color = "light",
-     value = format(nrow(todo), big.mark = "."))
-```
-
-```{r}
-#| content: valuebox
-#| title: "Cobertura — Sección 3A"
-list(icon = "percent",
-     color = if (p3a >= 80) "success" else if (p3a >= 70) "warning" else "danger",
-     value = paste0(round(p3a, 1), "%"))
+#| title: "Llegan al cálculo"
+list(icon = "check2-circle", color = "success", value = paste0(round(p3a), "%"))
 ```
 
 ```{r}
 #| content: valuebox
-#| title: "Cobertura — Sección 2"
-list(icon = "percent",
-     color = if (p2 >= 80) "success" else if (p2 >= 70) "warning" else "danger",
-     value = paste0(round(p2, 1), "%"))
+#| title: "Sin peso en gramos"
+list(icon = "rulers", color = "danger", value = paste0(round(peso), "%"))
 ```
 
 ```{r}
 #| content: valuebox
-#| title: "Alimentos mapeados"
-list(icon = "link-45deg", color = "light",
-     value = paste0(sum(!is.na(cw$enhance_id)), " / ", nrow(cw)))
+#| title: "Sin composición"
+list(icon = "clipboard-data", color = "secondary", value = paste0(round(comp), "%"))
 ```
 
-## Row {height="42%"}
-
-### Column {width="55%"}
+## Row {height="52%"}
 
 ```{r}
-#| title: "Dónde se pierde cada observación"
+#| title: "Qué se pierde en el camino"
 
-emb <- bind_rows(
-  lapply(list(sec2, sec3a), function(x) {
-    tibble(
-      seccion = x$seccion[1],
-      etapa = factor(c("Registradas", "Con cantidad", "+ conversión",
-                       "+ composición", "+ porción comestible", "Entran al cálculo"),
-                     levels = c("Registradas", "Con cantidad", "+ conversión",
-                                "+ composición", "+ porción comestible", "Entran al cálculo")),
-      n = c(nrow(x), sum(x$tiene_Q),
-            sum(x$tiene_Q & x$tiene_fc),
-            sum(x$tiene_Q & x$tiene_fc & x$tiene_enhance),
-            sum(x$tiene_Q & x$tiene_fc & x$tiene_enhance & x$tiene_pc),
-            sum(x$entra_calculo))
-    )
-  })
-) |> group_by(seccion) |> mutate(pct = round(100 * n / max(n), 1)) |> ungroup()
+etapas <- c("Alimentos registrados", "Con peso en gramos",
+            "Con composición", "Entran al cálculo")
 
-g <- ggplot(emb, aes(etapa, n, fill = seccion,
-                     text = paste0(seccion, "<br>", format(n, big.mark = "."),
-                                   " observaciones (", pct, "%)"))) +
-  geom_col(position = "dodge", width = 0.75) +
-  scale_fill_manual(values = c("Sec 2" = GRIS, "Sec 3A" = AZUL_C)) +
-  scale_y_continuous(labels = function(x) format(x, big.mark = ".")) +
-  labs(x = NULL, y = "Observaciones") +
-  tema_d() +
-  theme(axis.text.x = element_text(angle = 25, hjust = 1, size = rel(0.85)),
-        legend.position = "top")
+emb <- tibble(
+  etapa = factor(etapas, levels = rev(etapas)),
+  n = c(n3a,
+        sum(sec3a$tiene_fc),
+        sum(sec3a$tiene_fc & sec3a$tiene_enhance),
+        sum(sec3a$entra_calculo))
+) |>
+  mutate(pct = 100 * n / max(n),
+         col = ifelse(etapa == "Entran al cálculo", AZUL, AZUL_C))
 
-if (usar_plotly) plotly::ggplotly(g, tooltip = "text") else g
-```
-
-### Column {width="45%"}
-
-```{r}
-#| title: "Motivo de exclusión"
-
-mot <- todo |>
-  filter(!entra_calculo) |>
-  mutate(motivo = case_when(
-    !tiene_Q       ~ "Sin cantidad",
-    !tiene_fc      ~ "Sin factor de conversión",
-    !tiene_enhance ~ "Sin composición",
-    !tiene_pc      ~ "Sin porción comestible",
-    es_outlier     ~ "Valor atípico",
-    TRUE           ~ "Otro")) |>
-  count(seccion, motivo)
-
-g <- ggplot(mot, aes(reorder(motivo, n), n, fill = seccion,
-                     text = paste0(seccion, "<br>", motivo, "<br>",
+g <- ggplot(emb, aes(pct, etapa, fill = col,
+                     text = paste0(round(pct, 1), "%  ·  ",
                                    format(n, big.mark = "."), " observaciones"))) +
-  geom_col(width = 0.7) +
-  coord_flip() +
-  scale_fill_manual(values = c("Sec 2" = GRIS, "Sec 3A" = ACENTO)) +
-  scale_y_continuous(labels = function(x) format(x, big.mark = ".")) +
-  labs(x = NULL, y = "Observaciones excluidas") +
-  tema_d() + theme(legend.position = "top")
+  geom_col(width = 0.52) +
+  geom_text(aes(label = paste0(round(pct), "%")), hjust = -0.25,
+            size = 4, colour = "#44555f") +
+  scale_fill_identity() +
+  scale_x_continuous(limits = c(0, 112), expand = c(0, 0), labels = NULL) +
+  tema_d()
 
-if (usar_plotly) plotly::ggplotly(g, tooltip = "text") else g
+grafico(g)
 ```
 
-## Row {height="40%"}
+## Row {height="26%"}
+
+::: {.card}
+La encuesta registra cantidades en unidades de mercado —un mazo, una docena, un
+racimo— cuyo peso en gramos no está publicado. **Ese es el obstáculo principal,
+no la falta de alimentos en las tablas de composición.**
+
+Ampliar la tabla de pesos rinde más que ampliar el mapeo nutricional.
+:::
+
+# Prioridades
+
+## Row
 
 ```{r}
-#| title: "Qué falta — alimentos excluidos, ordenados por impacto"
+#| title: "Qué resolver primero"
 
-todo |>
+pend <- todo |>
   filter(!entra_calculo) |>
-  mutate(Motivo = case_when(
-    !tiene_Q       ~ "Sin cantidad",
-    !tiene_fc      ~ "Sin factor de conversión",
-    !tiene_enhance ~ "Sin composición",
-    !tiene_pc      ~ "Sin porción comestible",
-    es_outlier     ~ "Valor atípico",
-    TRUE           ~ "Otro")) |>
-  count(Sección = seccion, Alimento = descripcion, Motivo,
-        name = "Observaciones") |>
+  mutate(
+    Falta = case_when(
+      !tiene_Q       ~ "Cantidad",
+      !tiene_fc      ~ "Peso en gramos",
+      !tiene_enhance ~ "Composición",
+      !tiene_pc      ~ "Porción comestible",
+      es_outlier     ~ "Valor extremo",
+      TRUE           ~ "Otro"),
+    Resolución = case_when(
+      !tiene_fc      ~ "Pesaje en punto de venta",
+      !tiene_enhance ~ "Tabla de composición",
+      !tiene_pc      ~ "Tabla de composición",
+      TRUE           ~ "Revisión caso a caso")
+  ) |>
+  count(Alimento = descripcion, Falta, Resolución, name = "Observaciones") |>
   arrange(desc(Observaciones)) |>
-  tabla()
+  mutate(Ganancia = round(100 * Observaciones / n3a, 2))
+
+if (usar_dt) {
+  DT::datatable(
+    pend, rownames = FALSE, filter = "top",
+    colnames = c("Alimento", "Qué falta", "Cómo se resuelve",
+                 "Observaciones", "Ganancia (pp)"),
+    options = list(pageLength = 14, dom = "ftip", scrollY = "56vh",
+                   order = list(list(3, "desc")),
+                   columnDefs = list(list(className = "dt-right", targets = 3:4)),
+                   language = list(search = "Buscar:",
+                                   info = "_START_–_END_ de _TOTAL_",
+                                   paginate = list(previous = "‹", `next` = "›")))
+  ) |>
+    DT::formatCurrency("Observaciones", currency = "", interval = 3,
+                       mark = ".", digits = 0)
+} else {
+  knitr::kable(head(pend, 20))
+}
 ```
 
-# Composición nutricional
+# Nutrientes
 
-## Row {height="45%"}
+## Row {height="60%"}
 
 ```{r}
-#| title: "Cobertura de las tablas de composición, por nutriente"
+#| title: "Sobre qué parte de la comida conocemos cada nutriente"
 
-gpe  <- cargar_gramos_por_ema()
-comp <- cargar_composicion()
-NUT  <- c("energia_kcal","hierro_mg","folato_mcg_dfe","vitamina_a_mcg_rae")
-ETIQ <- c("Energía","Hierro","Folato","Vitamina A")
+gpe   <- cargar_gramos_por_ema()
+tabla <- cargar_composicion()
+NUT   <- c("energia_kcal","hierro_mg","folato_mcg_dfe","vitamina_a_mcg_rae")
+ETIQ  <- c("Energía","Hierro","Folato","Vitamina A")
 
 cobn <- gpe |>
   mutate(eid = as.numeric(enhance_id)) |>
-  left_join(comp, by = c("eid" = "enhance_id")) |>
+  left_join(tabla, by = c("eid" = "enhance_id")) |>
   summarise(across(all_of(NUT),
                    ~ 100 * sum(Gramos_por_EMA_dia[!is.na(.x)], na.rm = TRUE) /
                      sum(Gramos_por_EMA_dia, na.rm = TRUE))) |>
   tidyr::pivot_longer(everything(), names_to = "n", values_to = "p") |>
-  mutate(Nutriente = factor(ETIQ[match(n, NUT)], levels = rev(ETIQ)))
+  mutate(Nutriente = factor(ETIQ[match(n, NUT)], levels = rev(ETIQ)),
+         col = ifelse(p >= 95, AZUL, ifelse(p >= 90, AZUL_C, ACENTO)))
 
-g <- ggplot(cobn, aes(p, Nutriente,
-                      text = paste0(Nutriente, "<br>", round(p, 1),
-                                    "% de los gramos consumidos"))) +
-  geom_col(fill = AZUL_C, width = 0.6) +
-  geom_text(aes(label = paste0(round(p, 1), "%")), hjust = -0.15, size = 3.6,
-            colour = "#33444f") +
-  scale_x_continuous(limits = c(0, 108), labels = function(x) paste0(x, "%")) +
-  labs(x = "Gramos consumidos con información nutricional", y = NULL) +
+g <- ggplot(cobn, aes(p, Nutriente, fill = col,
+                      text = paste0(round(p, 1), "% de los gramos consumidos"))) +
+  geom_col(width = 0.5) +
+  geom_text(aes(label = paste0(round(p, 1), "%")), hjust = -0.25,
+            size = 4, colour = "#44555f") +
+  scale_fill_identity() +
+  scale_x_continuous(limits = c(0, 112), expand = c(0, 0), labels = NULL) +
   tema_d()
 
-if (usar_plotly) plotly::ggplotly(g, tooltip = "text") else g
+grafico(g)
 ```
 
-::: {.card title="Por qué importa"}
-La cobertura **no es uniforme entre nutrientes**. La vitamina A dispone de
-información para una proporción menor de los gramos consumidos que la energía,
-de modo que su ingesta está más subestimada.
+## Row {height="40%"}
 
-Toda comparación entre micronutrientes debe considerar esta diferencia, que no
-es atribuible al consumo sino a la completitud de las tablas de composición.
+::: {.card}
+**Esto define qué resultados se sostienen.** La energía cubre casi toda la
+comida consumida. La vitamina A, bastante menos: su ingesta está más
+subestimada que la del resto.
 
-Los alimentos sin composición conocida contribuyen cero: **las estimaciones son
-un límite inferior.**
+Comparar micronutrientes entre sí exige tener presente esa diferencia, que no
+viene del consumo sino de las tablas de composición.
+
+Los alimentos sin composición conocida aportan cero, de modo que toda estimación
+de ingesta es un **límite inferior**.
 :::
 
-## Row {height="55%"}
+# Método
 
-```{r}
-#| title: "Estado del mapeo a tablas de composición"
+## Row
 
-cw |>
-  filter(!is.na(enhance_id)) |>
-  transmute(
-    `Tipo de equivalencia` = coalesce(tipo_equivalencia, "(sin declarar)"),
-    Fuente = coalesce(fuente, "(sin declarar)")
-  ) |>
-  count(`Tipo de equivalencia`, Fuente, name = "Alimentos") |>
-  arrange(desc(Alimentos)) |>
-  tabla()
-```
+::: {.card title="Cuándo entra un alimento al cálculo"}
+Para convertir una compra en gramos consumidos hacen falta tres datos: cuánto
+**pesa** la cantidad comprada, qué **contiene** el alimento según una tabla de
+composición, y qué proporción es **comestible**.
 
-# Notas {orientation="columns"}
+Si falta alguno, la observación se excluye. No se imputan valores.
 
-## Column
-
-::: {.card title="Cómo leer este tablero"}
-Todas las cifras se calculan al compilar el documento a partir de los datos del
-pipeline. **Ninguna está escrita a mano**: al ampliarse las tablas auxiliares,
-este tablero refleja el nuevo estado sin intervención manual.
-
-Un dato entra al cálculo únicamente si dispone de cantidad registrada, factor
-de conversión a gramos y porción comestible. Si falta cualquiera de los tres, la
-observación se excluye y no se imputan valores.
-
-De ahí la regla que rige todo el proyecto: **ninguna cifra agregada se cita sin
-la cobertura sobre la que se calcula.**
+Ninguna cifra del proyecto se presenta sin indicar sobre qué proporción de los
+datos se calculó.
 :::
-
-::: {.card title="Qué no muestra"}
-Este tablero describe el estado de la base de datos, no resultados nutricionales.
-Para eso están el informe de factibilidad y los informes R1 a R4.
-
-Las observaciones excluidas **no constituyen una submuestra aleatoria**: se
-concentran en alimentos sin factor de conversión o sin correspondencia en las
-tablas de composición.
-:::
-
-## Column
 
 ::: {.card title="Fuente"}
 ENGIH 2018, Banco Central de la República Dominicana.
-
-Microdatos de acceso público:
-<https://www.bancentral.gov.do/a/d/4796-engih-2018>
+Microdatos públicos: <https://www.bancentral.gov.do/a/d/4796-engih-2018>
 
 Tablas de composición: INCAP y FNDDS (USDA).
 
-Factores de conversión y correspondencia de alimentos: elaborados en el marco de
-esta consultoría, con verificación de campo documentada en el repositorio.
-:::
-
-::: {.card title="Trazabilidad"}
-El registro de cada modificación a las tablas auxiliares —valor anterior, valor
-nuevo y motivo— está en `data/auditoria/` del repositorio.
-
-La bitácora completa de decisiones, hallazgos y errores corregidos está en
-`docs/hoja-de-ruta.md`.
+Las cifras se calculan al compilar este tablero. Registro de decisiones en
+`data/auditoria/`; bitácora en `docs/hoja-de-ruta.md`.
 :::

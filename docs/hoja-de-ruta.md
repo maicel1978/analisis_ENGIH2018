@@ -213,6 +213,47 @@ Este documento fija el alcance acordado hasta ahora. Cualquier cambio de alcance
 
 - [ ] **Refactor pendiente: `cargar_composicion()` está duplicada.** Vive en `reports/_comun.R` y la misma lógica está dentro de `scripts/05_ingesta_micronutrientes.R`. Lo correcto es que el `05` escriba la tabla de composición a `data/clean/` y que ambos la lean de ahí. No urge, pero es deuda técnica real: si se corrige un mapeo de columnas en un sitio y no en el otro, los reportes y el pipeline divergen en silencio.
 
+- [x] **HITO (2026-09-13): entregables reorganizados y estructura del repositorio normalizada.**
+
+  **Reorganización (`93_reorganizar_estructura.R`, ejecutado y verificado):** `referencias/` (material externo) separado de `docs/` (documentación del proyecto); `data/eda/` dividido en `data/auditoria/` (registro de decisiones, se conserva) y `data/diagnosticos/` (regenerable). 25 archivos movidos con `git mv` al 100% de similitud — el historial sigue a cada archivo. Pipeline verificado después: 36.840 sin `enhance_id`, 303.408 filas con gramos por EMA, 8.774 hogares. **Idénticas a antes: la reorganización no alteró ningún resultado.**
+
+  **Convención de nombres adoptada:** minúsculas, sin acentos ni espacios; guiones en documentos, guiones bajos en código; prefijo numérico solo donde el orden de ejecución importa. Documentada en el README.
+
+  **Crosswalk depurado (`94_depurar_crosswalk.R`):** eliminadas 7 columnas de andamiaje (`confianza_sugerencia`, `sugerencia_*`, `tipo_equivalencia_IA`, `nota_IA`) en Sec 2 y Sec 3A. Quedan las 5 de resultado. Criterio: **un archivo de entrada debe contener decisiones, no el borrador del que salieron.** El historial de git conserva todo.
+
+  **Postura sobre el método de trabajo (decisión del consultor, 2026-09-13):** transparencia total sobre el uso de herramientas asistidas. El README documenta que el crosswalk se construyó en dos fases —generación asistida de candidatos y revisión manual registro a registro— y declara la tasa de error encontrada (6,1%). *"Es una habilidad que todo profesional hoy debería tener."* Lo que da valor no es el origen del candidato sino el criterio con que se corrigió.
+
+- [x] **HITO (2026-09-13): tres entregables nuevos.**
+
+  1. **`reports/INFORME_factibilidad.qmd`** — el entregable contractual. Salida a HTML **y Word**. Incluye: delimitación de lo que el análisis no puede establecer (antes de cualquier resultado), validación empírica del período de medición, adaptaciones metodológicas, control de calidad, limitaciones, las tres decisiones pendientes con su evidencia, y una **sección de estado y continuidad** con el criterio de alcance y una guía de cinco pasos para que otra persona retome el trabajo. 20 tablas y 3 figuras, todas con título completo y nota de fuente.
+
+  2. **`reports/presentacion_revision.qmd`** — Quarto revealjs, once láminas. Abre enlazando los cinco informes y el repositorio. Sin animaciones (todo aparece a la vez). El trabajo de campo aparece en una lámina, sin presentarse como mérito.
+
+  3. **`reports/dashboard_estado_datos.qmd`** — tablero de calidad de datos.
+
+- [x] **CONVENCIONES EDITORIALES FIJADAS (2026-09-13). Aplicar a todo lo que se produzca de aquí en adelante:**
+
+  - **Títulos de tabla y figura completos:** *"Tabla 3. Cobertura del procesamiento por sección. República Dominicana, 2018"*, con nota de fuente debajo. Configurado en el YAML (`crossref: tbl-title: "Tabla", title-delim: "."`).
+  - **Fuentes primarias se citan, NO se atribuyen a "elaboración propia".** Corregido en todo el informe: *"Fuente: ENGIH 2018, Banco Central de la República Dominicana"*. "Elaboración propia" solo aplica a lo efectivamente elaborado (crosswalk, factores de conversión).
+  - **Productor de los datos: Banco Central de la República Dominicana** (ejecutor de 4 de las 5 ENGIH del país), con participación de la ONE. **No es la ONE ni el Banco Mundial.** Microdatos públicos: https://www.bancentral.gov.do/a/d/4796-engih-2018
+  - **ORCID 0000-0003-2117-9145** junto al nombre en informes y presentación. Sitio personal: https://bioestadisticaedu.com
+  - **Tono mesurado en afirmaciones sobre el contexto dominicano.** El consultor no es de RD: se presenta el dato observado y se propone una interpretación marcada como tal (*"una lectura posible es que…"*), no se afirma el patrón de consumo como hecho conocido.
+  - **Sin instrucciones de lectura** en documentos ("si dispone de cinco minutos", "empezar por aquí"). El lector decide.
+
+- [ ] **PENDIENTE DE DISEÑO: el dashboard aún no convence (2026-09-13).** Dos iteraciones y sigue *"cargado, abrumador, le falta cultura del detalle"*. Problemas ya identificados y corregidos parcialmente: rótulos de *value box* de 50 caracteres (deben ser 2–3 palabras), etiquetas de eje con frases largas que plotly corta, títulos de tarjeta de 99 caracteres, etapas redundantes en el embudo, explicaciones metidas dentro de los elementos gráficos en vez de en tarjetas aparte. Añadidos estilos propios para el formato `dashboard` en `custom.scss`.
+
+  **Principio adoptado: un tablero existe para DECIDIR algo, no para describir.** El de calidad de datos responde *"¿dónde conviene invertir el esfuerzo que queda?"*, y la tabla de pendientes incluye la **ganancia de cobertura en puntos porcentuales** de resolver cada alimento. Falta una pasada más de diseño.
+
+- [ ] **`reports/dashboard_decision_fortificacion.qmd` — escrito pero SIN RENDERIZAR.** Implementa la especificación de Santiago punto por punto, incluido el que faltaba: **desplazamiento de la distribución respecto al EAR** (curvas de densidad por escenario con línea de corte, y tabla de proporción de hogares por debajo). **Requiere la misma simplificación de diseño que el otro tablero antes de enseñarlo.**
+
+  **Advertencia crítica ya incorporada al propio tablero:** los valores de EAR usados (hierro 8,1 mg; folato 320 µg DFE; vitamina A 500 µg RAE) son **de referencia y están pendientes de confirmación**. El valor aplicable depende de si se adopta FAO/OMS o IOM y, en hierro, de la biodisponibilidad supuesta — además de que la distribución asimétrica del hierro limita el método de punto de corte. **No presentar esos porcentajes sin la salvedad.**
+
+- [ ] **Decisión tomada sobre Shiny: NO.** Un tablero "en construcción pero bonito" es una promesa, no un producto, y un servidor puede fallar en vivo. Se opta por **dashboard estático de Quarto** con gráficos interactivos (plotly) y tablas dinámicas (DT): HTML autocontenido, sin servidor, no puede caerse, y vive en el repositorio.
+
+- [ ] **Borrador de artículo científico — PENDIENTE, no iniciado.** Alcance acordado: introducción con definición del problema científico mediante preguntas e hipótesis, metodología completa (no depende de los resultados), y solo los resultados disponibles. **Es deliberadamente un borrador a medio escribir**, sin nada que no se sostenga. Tono científico, distinto del administrativo del informe de factibilidad y del expositivo de la presentación. Referencia de estilo: `referencias/notas-marco-analitico-tang.docx`.
+
+- [ ] **Menor:** los *warnings* de `big.mark`/`decimal.mark` al compilar el informe (se usa "." para ambos). No afecta resultados; limpiar en la próxima pasada.
+
 - [ ] **DECISIÓN ABIERTA (2026-09-10) — línea base de fortificación. Corresponde al equipo (Daniel/Carlos/Santiago), NO se automatiza.** El crosswalk actual no representa ningún escenario real de política pública dominicana:
   - **Arroz:** RD **no** tiene norma de fortificación de arroz, pero el crosswalk manda ARROZ (var. 7), Arroz selecto (66) y Súper-selecto (65) a `70213002` "Arroz blanco enriquecido" (Fe 4.36, folato 386/100g). Solo Arroz corriente (67) va a `70213004` sin enriquecer. **Sobrestima** Fe y folato del alimento #1 de la dieta.
   - **Harina de trigo:** fortificación **obligatoria desde 2009** (Fe, ácido fólico, complejo B), pero el crosswalk manda Harina de trigo (58) a `70213038` "s/enriquecer" (Fe 1.17, folato 26). **Subestima.**
