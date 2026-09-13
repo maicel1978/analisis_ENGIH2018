@@ -14,13 +14,15 @@ Este documento fija el alcance acordado hasta ahora. Cualquier cambio de alcance
 
 **LA ENTREGA COMPROMETIDA ESTÁ COMPLETA.** Pipeline `01`→`05` corriendo, R1 + R2 + R3 renderizados, README reescrito, PC-A verificada (Quarto 1.9.38 y todos los paquetes cargan).
 
+**CUATRO reportes terminados (R1, R2, R3, R4), repositorio limpio y README reescrito.**
+
 **Lo que sigue, por valor decreciente:**
 
-1. **Limpieza del repositorio** (ver el pendiente detallado en Fase 0). Mejora la impresión de quien abre el enlace y es media hora.
-2. **R4 — ingesta de micronutrientes en dos escenarios.** Todos sus insumos están calculados; es el que más valor añadiría. **Solo se presenta como dos escenarios en paralelo, nunca como cifra única.**
-3. **La presentación.** A partir de aquí el valor está en dominar el material, no en escribir más código.
+1. **La presentación.** A partir de aquí el valor está en dominar el material, no en escribir más código. El guion está en Fase 5.
+2. **Pulir R2** (pendiente del consultor) y el bloque `rango` de R4.
+3. **R5 — desplazamiento respecto al EAR.** R4 ya cubre buena parte de lo que R5 haría; lo que falta es comparar contra requerimientos y derivar prevalencia de ingesta inadecuada. **Requiere definir antes el escenario aplicable**, así que depende de la respuesta de la contraparte.
 
-**Explícitamente fuera de alcance de esta entrega, entregados como método descrito:** R5 (desplazamiento respecto al EAR), D1 y D2 (dashboards), desglose por quintil y zona con `srvyr`.
+**Explícitamente fuera de alcance, entregados como método descrito:** D1 y D2 (dashboards), desglose por quintil y zona con `srvyr`, factores de receta para cuantificar el aporte de los derivados de trigo.
 
 **Cambio de fecha (2026-09-12): la fecha real de cierre es el domingo por la noche**, no el martes 16. El martes es margen. Criterio derivado: ya no se trata de *qué alcanzo a terminar*, sino de **qué queda tan bien documentado que se entienda sin el consultor presente**. Lo que no se ejecute (R4, R5, D1, D2, desglose por quintil) se entrega **descrito**, con método definido, variables verificadas y una nota de qué falta para correrlo. Después, llevar a Daniel/Carlos la decisión sobre la línea base de fortificación (ver "Decisión abierta" al final de Fase 0), que sigue siendo el hallazgo metodológico más importante sin resolver.
 
@@ -182,6 +184,34 @@ Este documento fija el alcance acordado hasta ahora. Cualquier cambio de alcance
   - `.RDataTmp*` al `.gitignore` (la regla actual no lo atrapa por falta de comodín).
   - Scripts de uso único ya ejecutados y commiteados: `96`, `97`, `98`, `99`.
   - `food_factors_BACKUP_2026-09-10.xlsx` y `lote_PC_109.csv` (ambos redundantes).
+
+- [x] **HITO (2026-09-12): `R4_escenarios_fortificacion.qmd` — CUATRO reportes, no tres. Y el hallazgo de política del proyecto.**
+
+  R4 cubre los numerales 4.3 y 4.4 de los TdR (indicador 3 e inicio del 4). **No entrega una cifra única de ingesta, entrega un rango**, porque el resultado depende de un supuesto normativo sin resolver. Se modelan tres escenarios sustituyendo el código de composición de los vehículos y dejando el resto de alimentos intacto.
+
+  | Escenario | Hierro (mg) | Folato (µg DFE) |
+  |---|---|---|
+  | 0. Sin fortificar | 9.0 | 277 |
+  | 1. Solo harina de trigo | 9.2 | 284 |
+  | 2. Harina y arroz | **16.2** | **1,017** |
+
+  **HALLAZGO DE POLÍTICA — es el resultado más importante del proyecto.** Fortificar solo la harina casi no mueve la aguja (+0.2 mg de hierro, +7 µg de folato). Incluir el arroz multiplica el folato por 3.7 y casi duplica el hierro. **La diferencia NO está en el contenido de nutrientes** —arroz enriquecido 4.36 mg Fe / 386 µg folato, harina enriquecida 4.64 / 291, prácticamente iguales— **sino en el ALCANCE**: arroz 87.7% de los hogares con 207.8 g/EMA/día; harina 8% con 31.9 g.
+
+  **Frase para la presentación:** *la eficacia de un programa de fortificación depende tanto del alcance del vehículo como del nutriente añadido. Un vehículo correctamente fortificado pero de consumo minoritario produce un efecto poblacional limitado.* Y la pregunta que se deriva: si el arroz no está normado, hay un vehículo con 87.7% de cobertura sin aprovechar.
+
+  **Salvedad obligatoria, ya escrita en el reporte:** el escenario 1 **subestima** el efecto real de la harina, porque la harina llega vía pan (85.7% de los hogares según R3) y eso no se captura sin **factores de receta**. Se lee como **piso**, no como magnitud real. La conclusión sobre el alcance se mantiene; lo que falta es cuantificar el aporte por derivados.
+
+  **Qué NO se modeló y por qué:** INCAP tiene 18 aceites y **ninguno con vitamina A**, así que no existe par fortificado/no fortificado para construir el escenario. Limitación de la tabla de composición, no del análisis. **No se sustituyó por un valor supuesto.** El azúcar sí tiene versiones fortificadas en INCAP (70215002, 70215034, 70215085), pero su inclusión depende de que exista norma aplicable.
+
+  **Decisión metodológica clave:** cuáles vehículos están sujetos a fortificación obligatoria en RD, con qué nutrientes y niveles, se establece en instrumentos legales. **Eso se verifica con la contraparte, no se deduce ni se busca en fuentes secundarias** — la pregunta previsible es "¿en qué decreto?", y esa respuesta debe poder darse. Por eso se modelan los tres escenarios: cuando el marco se confirme, basta seleccionar el correspondiente y volver a renderizar. El cálculo ya está hecho.
+
+  **Dos bugs corregidos antes de dar R4 por bueno:** (a) el filtro de aceites usaba rango de `enhance_id` y capturaba entradas de FNDDS que no eran aceites — daba "45 aceites, vitamina A máxima 1,172", **contradiciendo la conclusión del propio texto en la misma página**. Corregido a filtro por nombre dentro de INCAP: 18 aceites, 0 con vitamina A. (b) un `cat()` imprimía su propia sintaxis. **Lección: una tabla que contradice el texto que la acompaña es peor que no tener tabla.**
+
+- [x] **HITO (2026-09-12): repositorio limpio y reorganizado** (`95_limpiar_repositorio.R`, ya ejecutado y eliminado). `scripts/` contiene solo el pipeline (`01`→`05`); `reports/` contiene `_comun.R` y los cinco `.qmd`. Los HTML renderizados salen a `output/` y **ya no se versionan**: son regenerables, igual que `data/clean` — *el repositorio contiene lo que genera resultados, no los resultados*. Creado `_quarto.yml` con `output-dir: output`. Completado el `.gitignore` (`output/`, `*.html`, `*_files/`, `*.knit.md`, `.RDataTmp*`). Eliminados los scripts de uso único `96`–`99`, el backup redundante de `food_factors` y `lote_PC_109.csv`.
+
+  **Nota de ubicación para sesiones futuras: `_comun.R` está en `reports/`, NO en `scripts/`.** Los `.qmd` buscan en ambas rutas por compatibilidad, pero la copia válida es la de `reports/`. Tener dos copias produciría resultados distintos según dónde se ejecute.
+
+- [ ] **Refactor pendiente: `cargar_composicion()` está duplicada.** Vive en `reports/_comun.R` y la misma lógica está dentro de `scripts/05_ingesta_micronutrientes.R`. Lo correcto es que el `05` escriba la tabla de composición a `data/clean/` y que ambos la lean de ahí. No urge, pero es deuda técnica real: si se corrige un mapeo de columnas en un sitio y no en el otro, los reportes y el pipeline divergen en silencio.
 
 - [ ] **DECISIÓN ABIERTA (2026-09-10) — línea base de fortificación. Corresponde al equipo (Daniel/Carlos/Santiago), NO se automatiza.** El crosswalk actual no representa ningún escenario real de política pública dominicana:
   - **Arroz:** RD **no** tiene norma de fortificación de arroz, pero el crosswalk manda ARROZ (var. 7), Arroz selecto (66) y Súper-selecto (65) a `70213002` "Arroz blanco enriquecido" (Fe 4.36, folato 386/100g). Solo Arroz corriente (67) va a `70213004` sin enriquecer. **Sobrestima** Fe y folato del alimento #1 de la dieta.
