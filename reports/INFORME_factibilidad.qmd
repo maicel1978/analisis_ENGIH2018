@@ -1,0 +1,1071 @@
+---
+title: "Informe de factibilidad técnica"
+subtitle: |
+  Análisis de la Encuesta Nacional de Gastos e Ingresos de los Hogares
+  (ENGIH 2018) para la estimación de cobertura, consumo y contribución
+  de alimentos fortificados y fortificables
+author: "Maicel E. Monzón, PhD — Consultor internacional"
+date: today
+lang: es
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    toc-title: "Índice"
+    number-sections: true
+    df-print: kable
+    embed-resources: true
+    code-fold: true
+  docx:
+    toc: true
+    toc-depth: 3
+    number-sections: true
+    df-print: kable
+crossref:
+  tbl-title: "Tabla"
+  fig-title: "Figura"
+  title-delim: "."
+
+execute:
+  warning: false
+  message: false
+  echo: false
+---
+
+```{=html}
+<style>
+.fuente {
+  font-size: 0.85em;
+  color: #5a6b76;
+  margin-top: -0.6em;
+  margin-bottom: 1.6em;
+  font-style: italic;
+}
+</style>
+```
+
+```{r}
+#| label: setup
+ruta_comun <- c(here::here("reports", "_comun.R"),
+                here::here("scripts", "_comun.R"))
+source(ruta_comun[file.exists(ruta_comun)][1])
+
+library(ggplot2)
+
+AZUL <- "#2c5364"; AZUL_C <- "#4a7c9b"; GRIS <- "#b8c4cc"; ACENTO <- "#c0623c"
+
+tema_informe <- function(base = 12) {
+  theme_minimal(base_size = base) +
+    theme(panel.grid.minor = element_blank(),
+          panel.grid.major.x = element_blank(),
+          panel.grid.major.y = element_line(colour = "#e8edf0"),
+          axis.title = element_text(colour = "#5a6b76", size = rel(0.9)),
+          plot.title = element_text(face = "bold", colour = "#1a3a4a", size = rel(1)),
+          plot.caption = element_text(colour = "#93a2ad", size = rel(0.75), hjust = 0),
+          legend.position = "top", legend.title = element_blank())
+}
+
+d      <- cargar_consumo()
+sec2   <- d$sec2  |> marcar_elegible()
+sec3a  <- d$sec3a |> marcar_elegible()
+todo   <- bind_rows(sec2, sec3a)
+
+gpe    <- cargar_gramos_por_ema() |> marcar_vehiculo()
+ema    <- leer_limpio(file.path(RUTA_CLEAN, "data_ema_hogar.csv"))
+hog    <- n_distinct(gpe$id_hogar_unico)
+
+ing    <- leer_limpio(file.path(RUTA_CLEAN, "data_ingesta_micronutrientes_hogar.csv"))
+ing_s  <- if ("variante" %in% names(ing)) filter(ing, variante == "Sec 2 + Sec 3A") else ing
+
+f_var  <- file.path(RUTA_CLEAN, "comparacion_variantes_seccion.csv")
+variantes <- if (file.exists(f_var)) leer_limpio(f_var) else NULL
+
+cw     <- cargar_crosswalk("Cuest. B Sec 3A")
+
+s3d <- leer_limpio(file.path(RUTA_CLEAN, "data_sec3a_consumo.csv"))
+dias_hog <- distinct(s3d, id_hogar_unico, dias_observados_hogar)
+pct_incompleto <- round(100 * mean(dias_hog$dias_observados_hogar < 7), 1)
+
+p3a <- 100 * sum(sec3a$entra_calculo) / nrow(sec3a)
+p2  <- 100 * sum(sec2$entra_calculo)  / nrow(sec2)
+```
+
+::: {.callout-note appearance="simple"}
+Este documento se genera de forma reproducible a partir del conjunto de datos y
+del código del proyecto. Todas las cifras que contiene se calculan en el momento
+de su compilación; ninguna ha sido transcrita manualmente. Compilado el
+`r format(Sys.Date(), "%d de %B de %Y")`.
+:::
+
+# Resumen ejecutivo
+
+Se evaluó la viabilidad técnica de utilizar la ENGIH 2018 de República
+Dominicana para estimar la cobertura y el consumo de alimentos fortificables y
+su contribución a la ingesta de micronutrientes.
+
+**La conclusión es que el análisis es viable.** Se implementó la cadena completa
+de cálculo —estandarización de unidades, factor de conversión, porción
+comestible, período de medición y normalización por Equivalente de Mujer Adulta—
+y se obtuvieron estimaciones en rangos fisiológicamente plausibles.
+
+Los principales parámetros de viabilidad son:
+
+```{r}
+#| label: tbl-resumen
+#| tbl-cap: "Parámetros de viabilidad del análisis. República Dominicana, 2018"
+tibble(
+  Indicador = c(
+    "Observaciones de consumo procesadas",
+    "Cobertura del cálculo — Sección 3A",
+    "Cobertura del cálculo — Sección 2",
+    "Hogares con Equivalente de Mujer Adulta calculado",
+    "Hogares con ingesta de micronutrientes estimada",
+    "Alimentos mapeados a tablas de composición (Sección 3A)"
+  ),
+  Valor = c(
+    format(nrow(todo), big.mark = "."),
+    paste0(round(p3a, 1), "%"),
+    paste0(round(p2, 1), "%"),
+    paste0(format(sum(ema$n_sin_ema == 0), big.mark = "."), " de ",
+           format(nrow(ema), big.mark = ".")),
+    format(n_distinct(ing_s$id_hogar_unico), big.mark = "."),
+    paste0(sum(!is.na(cw$enhance_id)), " de ", nrow(cw))
+  )
+)
+```
+::: {.fuente}
+Fuente: Elaboración propia a partir de la ENGIH 2018 (Banco Central de la República Dominicana, con participación de la Oficina Nacional de Estadística).
+:::
+
+
+El factor limitante no reside en la encuesta sino en la completitud de las
+tablas auxiliares de conversión y composición, que continúa ampliándose. Cada
+ampliación mejora la cobertura sin modificar el método.
+
+Se identificaron **tres decisiones que requieren definición del equipo técnico**
+antes de derivar recomendaciones de política, detalladas en la sección
+correspondiente.
+
+# Objeto y alcance
+
+## Objeto
+
+Determinar si la ENGIH 2018 permite implementar una metodología de estimación de
+ingesta aparente de micronutrientes a nivel de hogar, documentando qué variables
+resultan utilizables, cuáles no están disponibles y qué adaptaciones
+metodológicas fueron necesarias.
+
+## Alcance
+
+El análisis abarca las **Secciones 2 y 3A** del Cuestionario B de la encuesta:
+
+- **Sección 2** — existencias de alimentos en el hogar (inventario)
+- **Sección 3A** — adquisiciones diarias de alimentos durante el período de observación
+
+Se excluye deliberadamente la **Sección 3B** (alimentos consumidos fuera del
+hogar), cuyo tratamiento requiere factores de receta y de rendimiento que no
+están disponibles en esta fuente ni en las tablas de composición empleadas.
+
+## Lo que el análisis no puede establecer
+
+Conviene delimitarlo desde el inicio. La ENGIH mide **adquisición y
+disponibilidad de alimentos en el hogar**, no ingesta individual. En
+consecuencia, el análisis no captura:
+
+- la distribución de alimentos entre los miembros del hogar;
+- el desperdicio y las pérdidas en la preparación;
+- el consumo de alimentos fuera del hogar;
+- el estado nutricional de las personas.
+
+Las estimaciones deben interpretarse como **consumo aparente por hogar**,
+normalizado por su composición demográfica.
+
+# Fuentes de datos
+
+```{r}
+#| label: tbl-fuentes
+#| tbl-cap: "Fuentes de datos utilizadas y su función en el análisis"
+tibble(
+  Fuente = c(
+    "ENGIH 2018 — Cuestionario B, Secciones 2 y 3A",
+    "ENGIH 2018 — Módulo sociodemográfico e ingresos",
+    "Tabla de composición de alimentos INCAP",
+    "Tabla de composición FNDDS (USDA)",
+    "Tabla de factores de conversión de unidades",
+    "Tabla de correspondencia de alimentos (crosswalk)"
+  ),
+  Uso = c(
+    "Cantidades adquiridas y en existencia",
+    "Composición del hogar, diseño muestral, quintil de gasto",
+    "Composición nutricional — fuente primaria regional",
+    "Composición nutricional — fuente secundaria",
+    "Conversión de unidades de mercado a gramos",
+    "Vínculo entre alimentos de la encuesta y tablas de composición"
+  ),
+  Productor = c("Banco Central de la República Dominicana (con participación de la ONE)",
+                "Banco Central de la República Dominicana (con participación de la ONE)",
+                "Instituto de Nutrición de Centro América y Panamá (INCAP)",
+                "United States Department of Agriculture (USDA)",
+                "Elaboración propia sobre fuentes publicadas y verificación de campo",
+                "Elaboración propia")
+)
+```
+::: {.fuente}
+Fuente: Elaboración propia.
+:::
+
+
+Las dos últimas son **producto de esta consultoría** y constituyen, junto con el
+código, el activo reutilizable del trabajo.
+
+# Método
+
+## Cadena de cálculo
+
+El consumo diario en gramos comestibles de cada alimento, por hogar, se obtiene
+como:
+
+$$\text{Consumo diario (g)} = \frac{Q \times FC \times PC}{PM}$$
+
+donde $Q$ es la cantidad registrada por el hogar, $FC$ el factor de conversión a
+gramos de la unidad declarada, $PC$ la fracción comestible del alimento y $PM$
+el período de medición en días.
+
+Posteriormente el resultado se normaliza por el **Equivalente de Mujer Adulta
+(EMA)** del hogar, que pondera a cada miembro según su requerimiento energético
+en relación con el de una mujer adulta de referencia.
+
+::: {.callout-important appearance="simple"}
+**Criterio de elegibilidad.** Una observación entra al cálculo únicamente si
+dispone de los tres componentes ($Q$, $FC$ y $PC$). En ausencia de cualquiera de
+ellos la observación se excluye, y no se imputan valores.
+
+De este criterio se deriva la regla que rige todo el informe: **ninguna cifra
+agregada se presenta sin la cobertura sobre la que se calcula.**
+:::
+
+## Determinación del período de medición
+
+El diseño de la encuesta establece un período de observación de siete días. Sin
+embargo, el `r pct_incompleto`% de los hogares presenta registros
+en un número menor de días. Esto admitía dos interpretaciones incompatibles:
+
+1. el hogar fue observado durante menos días de los previstos;
+2. el hogar fue observado siete días y no registró adquisiciones en algunos.
+
+Bajo la segunda interpretación, dividir entre el número de días con registro
+sobrestimaría el consumo diario de forma proporcional al número de días sin
+adquisición —hasta un 133% en hogares con tres días de registro.
+
+**La cuestión se resolvió empíricamente.** Si el denominador introdujese sesgo,
+la ingesta estimada sería sistemáticamente mayor en los hogares con menos días
+registrados.
+
+```{r}
+#| label: tbl-pm
+#| tbl-cap: "Ingesta energética mediana según número de días con registro. República Dominicana, 2018"
+s3d |>
+  distinct(id_hogar_unico, dias_observados_hogar) |>
+  inner_join(ing_s, by = "id_hogar_unico") |>
+  filter(dias_observados_hogar <= 7) |>
+  group_by(`Días con registro` = dias_observados_hogar) |>
+  summarise(Hogares = n(),
+            `Energía mediana (kcal/EMA/día)` = round(median(energia_kcal)),
+            .groups = "drop")
+```
+::: {.fuente}
+Fuente: Elaboración propia a partir de la ENGIH 2018 (Banco Central de la República Dominicana, con participación de la Oficina Nacional de Estadística).
+:::
+
+
+La ingesta mediana resulta **invariante** al número de días observados. Se adopta
+por tanto el número de días efectivamente registrados por hogar como período de
+medición.
+
+## Selección de tablas de composición
+
+La fuente primaria es la tabla del INCAP, por su pertinencia regional. Cuando un
+alimento carece de entrada adecuada se recurre a FNDDS, y la fuente utilizada se
+declara explícitamente en cada registro del crosswalk.
+
+La correspondencia entre ambas tablas fue verificada columna a columna antes de
+su uso:
+
+```{r}
+#| label: tbl-equivalencia
+#| tbl-cap: "Correspondencia de columnas entre tablas de composición de alimentos"
+tibble(
+  Nutriente = c("Energía", "Hierro", "Folato", "Vitamina A"),
+  INCAP = c("ENERC_KCAL", "FE", "FOLDFE", "VITA_RAE"),
+  FNDDS = c("Energy (kcal)", "Iron (mg)", "Folate, DFE (mcg_DFE)",
+            "Vitamin A, RAE (mcg_RAE)"),
+  Unidad = c("kcal/100 g", "mg/100 g", "µg DFE/100 g", "µg RAE/100 g")
+)
+```
+::: {.fuente}
+Fuente: INCAP y FNDDS (USDA).
+:::
+
+
+::: {.callout-note appearance="simple"}
+**Sobre la selección de la columna de folato.** FNDDS ofrece cuatro columnas de
+folato: ácido fólico, folato de los alimentos, folato total y equivalentes
+dietéticos de folato (DFE). Se emplea **DFE** por corresponder a la variable
+`FOLDFE` del INCAP.
+
+La distinción es sustantiva: los equivalentes dietéticos ponderan el ácido
+fólico sintético por su mayor biodisponibilidad, de modo que el uso de "folato
+total" subestimaría el aporte precisamente de los alimentos fortificados, que
+constituyen el objeto de este análisis.
+:::
+
+# Resultados de factibilidad
+
+## Cobertura del procesamiento
+
+```{r}
+#| label: tbl-cobertura
+#| tbl-cap: "Cobertura del procesamiento por sección del cuestionario. República Dominicana, 2018"
+todo |>
+  group_by(Sección = seccion) |>
+  summarise(
+    Observaciones       = n(),
+    `Con cantidad`      = sum(tiene_Q),
+    `Con conversión`    = sum(tiene_Q & tiene_fc),
+    `Con composición`   = sum(tiene_Q & tiene_fc & tiene_enhance),
+    `Entran al cálculo` = sum(entra_calculo),
+    .groups = "drop"
+  ) |>
+  mutate(Cobertura = pct(`Entran al cálculo`, Observaciones))
+```
+::: {.fuente}
+Fuente: Elaboración propia a partir de la ENGIH 2018 (Banco Central de la República Dominicana, con participación de la Oficina Nacional de Estadística).
+:::
+
+
+Las observaciones excluidas no constituyen una submuestra aleatoria: se
+concentran en alimentos que carecen de factor de conversión o de correspondencia
+en las tablas de composición. Los agregados representan, por tanto, la porción
+cubierta de la dieta y no su totalidad.
+
+```{r}
+#| label: tbl-motivos
+#| tbl-cap: "Motivo de exclusión de las observaciones que no completan la cadena de cálculo. República Dominicana, 2018"
+todo |>
+  filter(!entra_calculo) |>
+  mutate(Motivo = case_when(
+    !tiene_Q       ~ "Sin cantidad registrada",
+    !tiene_fc      ~ "Sin factor de conversión",
+    !tiene_enhance ~ "Sin correspondencia en tabla de composición",
+    !tiene_pc      ~ "Sin porción comestible",
+    es_outlier     ~ "Marcada como valor atípico",
+    TRUE           ~ "Otro")) |>
+  count(Sección = seccion, Motivo, name = "Observaciones") |>
+  arrange(Sección, desc(Observaciones))
+```
+::: {.fuente}
+Fuente: Elaboración propia a partir de la ENGIH 2018 (Banco Central de la República Dominicana, con participación de la Oficina Nacional de Estadística).
+:::
+
+
+```{r}
+#| label: fig-embudo
+#| fig-cap: "Pérdida de observaciones en cada etapa de la cadena de cálculo, Sección 3A. República Dominicana, 2018"
+#| fig-width: 8
+#| fig-height: 3.6
+
+emb <- tibble(
+  etapa = factor(c("Registradas", "Con cantidad", "+ conversión",
+                   "+ composición", "+ porción\ncomestible", "Entran al\ncálculo"),
+                 levels = c("Registradas", "Con cantidad", "+ conversión",
+                            "+ composición", "+ porción\ncomestible", "Entran al\ncálculo")),
+  n = c(nrow(sec3a),
+        sum(sec3a$tiene_Q),
+        sum(sec3a$tiene_Q & sec3a$tiene_fc),
+        sum(sec3a$tiene_Q & sec3a$tiene_fc & sec3a$tiene_enhance),
+        sum(sec3a$tiene_Q & sec3a$tiene_fc & sec3a$tiene_enhance & sec3a$tiene_pc),
+        sum(sec3a$entra_calculo))
+) |> mutate(p = 100 * n / max(n),
+            col = ifelse(grepl("Entran", etapa), AZUL, AZUL_C))
+
+ggplot(emb, aes(etapa, n, fill = col)) +
+  geom_col(width = 0.6) +
+  geom_text(aes(label = paste0(round(p), "%")), vjust = -0.4,
+            size = 3.4, colour = "#33444f") +
+  scale_fill_identity() +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.16)), labels = NULL) +
+  labs(x = NULL, y = NULL) +
+  tema_informe() +
+  theme(axis.text.x = element_text(size = rel(0.85), lineheight = 0.9))
+```
+
+::: {.fuente}
+Fuente: Elaboración propia a partir de la ENGIH 2018 (Banco Central de la República Dominicana, con participación de la Oficina Nacional de Estadística).
+:::
+
+El motivo predominante es la ausencia de factor de conversión, asociada a
+unidades de mercado no estandarizadas. Esto orienta el trabajo pendiente: la
+ampliación de la tabla de factores rinde más que la del crosswalk.
+
+## Alimentos que concentran la pérdida
+
+```{r}
+#| label: tbl-pendientes
+#| tbl-cap: "Alimentos que concentran el mayor número de observaciones excluidas. República Dominicana, 2018"
+todo |>
+  filter(!entra_calculo) |>
+  count(Sección = seccion, Alimento = descripcion, name = "Observaciones") |>
+  arrange(desc(Observaciones)) |>
+  head(12)
+```
+::: {.fuente}
+Fuente: Elaboración propia a partir de la ENGIH 2018 (Banco Central de la República Dominicana, con participación de la Oficina Nacional de Estadística).
+:::
+
+
+Se trata de un conjunto reducido de alimentos con elevada frecuencia de
+registro. Su resolución produce mejoras sustanciales de cobertura con un
+esfuerzo acotado.
+
+## Normalización por composición del hogar
+
+```{r}
+#| label: tbl-ema
+#| tbl-cap: "Distribución del Equivalente de Mujer Adulta por hogar. República Dominicana, 2018"
+ema |>
+  summarise(
+    Hogares                     = n(),
+    `Con EMA completo`          = sum(n_sin_ema == 0),
+    `Miembros (mediana)`        = median(n_miembros),
+    `EMA mediana`               = round(median(EMA_hogar), 2),
+    `EMA media`                 = round(mean(EMA_hogar), 2)
+  )
+```
+::: {.fuente}
+Fuente: Elaboración propia a partir de la ENGIH 2018 (Banco Central de la República Dominicana, con participación de la Oficina Nacional de Estadística).
+:::
+
+
+El cálculo se completó para la totalidad de los hogares de la muestra, sin
+miembros sin requerimiento energético asignado.
+
+## Estimación de ingesta de micronutrientes
+
+```{r}
+#| label: tbl-ingesta
+#| tbl-cap: "Ingesta aparente mediana de micronutrientes por Equivalente de Mujer Adulta y día. República Dominicana, 2018"
+ing_s |>
+  summarise(
+    `Energía (kcal)`      = round(median(energia_kcal)),
+    `Hierro (mg)`         = round(median(hierro_mg), 1),
+    `Folato (µg DFE)`     = round(median(folato_mcg_dfe)),
+    `Vitamina A (µg RAE)` = round(median(vitamina_a_mcg_rae))
+  )
+```
+::: {.fuente}
+Fuente: Elaboración propia a partir de la ENGIH 2018 (Banco Central de la República Dominicana, con participación de la Oficina Nacional de Estadística).
+:::
+
+
+Valores medianos por Equivalente de Mujer Adulta y día. **Se reporta la mediana
+como estimador central**: la distribución presenta asimetría derecha derivada de
+adquisiciones en volumen concentradas en un único día del período de
+observación, lo que desplaza la media.
+
+### Cobertura de la composición nutricional
+
+La proporción de gramos consumidos con información nutricional disponible **no
+es uniforme entre nutrientes**:
+
+```{r}
+#| label: tbl-cob-nutriente
+#| tbl-cap: "Proporción de gramos consumidos con información nutricional disponible, según nutriente. República Dominicana, 2018"
+comp_n <- if (exists("comp")) comp else cargar_composicion()
+NUT_n  <- c("energia_kcal","hierro_mg","folato_mcg_dfe","vitamina_a_mcg_rae")
+
+gpe |>
+  mutate(eid = as.numeric(enhance_id)) |>
+  left_join(comp_n, by = c("eid" = "enhance_id")) |>
+  summarise(across(all_of(NUT_n),
+                   ~ sum(Gramos_por_EMA_dia[!is.na(.x)], na.rm = TRUE) /
+                     sum(Gramos_por_EMA_dia, na.rm = TRUE))) |>
+  tidyr::pivot_longer(everything(), names_to = "n", values_to = "p") |>
+  transmute(Nutriente = c("Energía","Hierro","Folato","Vitamina A")[match(n, NUT_n)],
+            Cobertura = paste0(format(round(100 * p, 1), decimal.mark = ","), "%"))
+```
+::: {.fuente}
+Fuente: Elaboración propia a partir de la ENGIH 2018 (Banco Central de la República Dominicana, con participación de la Oficina Nacional de Estadística).
+:::
+
+
+En consecuencia, la ingesta de vitamina A se encuentra más subestimada que la de
+energía. **Toda comparación entre micronutrientes debe considerar esta
+diferencia**, que no es atribuible al consumo sino a la completitud de las tablas
+de composición.
+
+## Cobertura de vehículos de fortificación
+
+```{r}
+#| label: tbl-vehiculos
+#| tbl-cap: "Cobertura de los vehículos de fortificación entre los hogares analizados. República Dominicana, 2018"
+gpe |>
+  filter(!is.na(vehiculo)) |>
+  distinct(id_hogar_unico, vehiculo) |>
+  count(Vehículo = vehiculo, name = "Hogares") |>
+  mutate(`% de hogares` = pct(Hogares, hog)) |>
+  arrange(desc(Hogares))
+```
+::: {.fuente}
+Fuente: Elaboración propia a partir de la ENGIH 2018 (Banco Central de la República Dominicana, con participación de la Oficina Nacional de Estadística).
+:::
+
+
+```{r}
+#| label: fig-vehiculos
+#| fig-cap: "Proporción de hogares que consumen cada vehículo de fortificación. República Dominicana, 2018"
+#| fig-width: 8
+#| fig-height: 3
+
+cobv <- gpe |>
+  filter(!is.na(vehiculo)) |>
+  distinct(id_hogar_unico, vehiculo) |>
+  count(vehiculo) |>
+  mutate(p = 100 * n / hog,
+         vehiculo = reorder(vehiculo, p),
+         col = ifelse(p < 20, ACENTO, AZUL_C))
+
+ggplot(cobv, aes(p, vehiculo)) +
+  geom_segment(aes(x = 0, xend = p, yend = vehiculo, colour = col), linewidth = 1.8) +
+  geom_point(aes(colour = col), size = 6) +
+  geom_text(aes(label = round(p, 1)), colour = "white", size = 2.5, fontface = "bold") +
+  scale_colour_identity() +
+  scale_x_continuous(limits = c(0, 100), labels = function(x) paste0(x, "%")) +
+  labs(x = "Hogares que lo consumen", y = NULL) +
+  tema_informe()
+```
+
+::: {.fuente}
+Fuente: Elaboración propia a partir de la ENGIH 2018 (Banco Central de la República Dominicana, con participación de la Oficina Nacional de Estadística).
+:::
+
+El indicador de cobertura registra si el hogar consume el alimento, con
+independencia de si el producto específico estaba fortificado. Es por ello
+**independiente de la definición de la línea base de fortificación**, lo que le
+confiere estabilidad frente a las decisiones pendientes.
+
+# Adaptaciones metodológicas aplicadas
+
+Se documentan a continuación las adaptaciones necesarias para completar el
+análisis, según requiere el marco de la consultoría.
+
+```{r}
+#| label: tbl-adaptaciones
+#| tbl-cap: "Adaptaciones metodológicas aplicadas y su estado"
+tibble(
+  `Situación` = c(
+    "Unidades de mercado sin factor de conversión publicado",
+    "Alimentos sin peso por unidad en ninguna fuente documental",
+    "Alimentos ausentes de la tabla regional de composición",
+    "Período de observación variable entre hogares",
+    "Denominaciones locales sin correspondencia directa",
+    "Alimentos consumidos fuera del hogar (Sección 3B)",
+    "Ajuste por embarazo y lactancia en el cálculo del EMA"
+  ),
+  `Adaptación` = c(
+    "Factor empírico derivado del propio conjunto de datos (mediana por combinación alimento-presentación), clasificado según dispersión",
+    "Pesaje directo en punto de venta, con registro fotográfico",
+    "Uso de FNDDS como fuente secundaria, declarada por registro",
+    "Uso de los días efectivamente observados, verificado empíricamente",
+    "Resolución por criterio profesional, documentada registro a registro",
+    "Excluida del alcance",
+    "No aplicado"
+  ),
+  `Estado` = c("Aplicada", "Aplicada", "Aplicada", "Aplicada y verificada",
+               "Aplicada", "Decisión de alcance", "Limitación declarada")
+)
+```
+::: {.fuente}
+Fuente: Elaboración propia.
+:::
+
+
+## Verificación de campo
+
+Diversas presentaciones comerciales de uso habitual en el país carecen de peso
+por unidad en las fuentes documentales disponibles. Se resolvió mediante
+**pesaje directo en establecimientos de venta**, con registro fotográfico
+conservado en el repositorio del proyecto (`media/`).
+
+Ejemplos resueltos por esta vía: cilantro (220 g por presentación), ají cubanela
+(288 g).
+
+Un caso ilustra el límite del procedimiento. El **caldo concentrado en cubos**
+representa `r format(18087, big.mark = ".")` observaciones —la mayor pérdida
+individual del análisis—. La verificación en punto de venta permitió establecer
+el peso por unidad y el contenido de sodio declarado, pero **el etiquetado no
+informa el perfil de micronutrientes** y no se identificó un equivalente
+adecuado en las tablas de composición. El alimento permanece sin asignar: se
+optó por conservar la pérdida de cobertura antes que atribuir una composición no
+verificada.
+
+## Corrección de correspondencias
+
+La construcción del crosswalk se realizó en dos fases: generación asistida de
+candidatos y **revisión manual registro a registro**, contrastando cada
+asignación contra la descripción de la tabla fuente.
+
+La revisión identificó errores en el **6,1%** de las asignaciones (9 de 148),
+todos ellos de tres tipos recurrentes: parte del alimento consumida, estado de
+preparación y grado de procesamiento.
+
+```{r}
+#| label: tbl-correcciones
+#| tbl-cap: "Correcciones aplicadas a la correspondencia de alimentos tras la revisión manual"
+tibble(
+  Alimento = c("Cereza", "Hígado de pollo", "Jamón ahumado", "Macarrones",
+               "Rábano", "Zapote"),
+  `Asignación inicial` = c("Guinda dulce", "Paté envasado", "Jamón de pavo",
+                           "Pasta enlatada con queso", "Hojas de rábano",
+                           "Zapote verde"),
+  `Asignación corregida` = c("Acerola", "Hígado crudo", "Jamón de cerdo",
+                             "Pasta seca", "Raíz de rábano", "Zapote mamey")
+)
+```
+::: {.fuente}
+Fuente: Elaboración propia.
+:::
+
+
+La corrección de *cereza* es ilustrativa de la importancia del criterio local:
+en República Dominicana la denominación corresponde a la acerola, cuyo contenido
+de vitamina C supera en más de dos órdenes de magnitud al de la guinda dulce.
+
+Cada modificación queda registrada en
+`data/eda/log_merge_crosswalk_2026-09-11.csv`, con el código anterior, el
+asignado y su justificación.
+
+# Control de calidad
+
+## Valores atípicos
+
+Se aplica detección por alimento, comparando cada observación contra la
+distribución del mismo código de composición. Los valores identificados se
+**marcan sin eliminarse**, de modo que la decisión sobre su tratamiento
+permanezca explícita y reversible.
+
+```{r}
+#| label: tbl-outliers
+#| tbl-cap: "Observaciones identificadas como valores atípicos. República Dominicana, 2018"
+todo |>
+  group_by(Sección = seccion) |>
+  summarise(`Observaciones evaluadas` = sum(!is.na(Consumo_diario_g)),
+            `Marcadas como atípicas` = sum(es_outlier),
+            .groups = "drop") |>
+  mutate(`Proporción` = pct(`Marcadas como atípicas`, `Observaciones evaluadas`, dec = 3))
+```
+::: {.fuente}
+Fuente: Elaboración propia a partir de la ENGIH 2018 (Banco Central de la República Dominicana, con participación de la Oficina Nacional de Estadística).
+:::
+
+
+::: {.callout-warning appearance="simple"}
+**Limitación identificada del procedimiento.** La detección opera a nivel de
+alimento, no de hogar. Un hogar puede acumular varios valores elevados sin que
+ninguno resulte individualmente extremo. Se identificaron **572 hogares** con
+ingesta energética superior a 6.000 kcal por EMA y día, valor no compatible con
+el consumo real.
+
+El análisis de su composición indica dos orígenes: el solapamiento entre
+secciones (223 hogares) y adquisiciones en volumen concentradas en un día (349
+hogares). Se propone incorporar una verificación adicional a nivel de hogar.
+:::
+
+## Guardas de integridad
+
+El procesamiento incorpora verificaciones automáticas que interrumpen la
+ejecución ante condiciones anómalas: duplicación de claves, pérdida de registros
+en uniones, alteración de la estructura de los archivos de entrada y ausencia de
+valores obligatorios. Cada etapa reporta el número de registros que entran y
+salen, permitiendo el contraste contra los valores esperados.
+
+Este mecanismo resultó determinante en al menos un caso: una inconsistencia en
+la codificación de un campo de validación habría provocado el descarte silencioso
+de 154 correspondencias recién incorporadas —sin generar error alguno— y fue
+detectada por el contraste de conteos.
+
+# Limitaciones
+
+**De la fuente de datos.** La encuesta mide adquisición y disponibilidad, no
+ingesta individual. No captura distribución intrafamiliar, desperdicio ni
+consumo fuera del hogar.
+
+**De la cobertura.** El `r round(100 - p3a, 1)`% de las observaciones de la
+Sección 3A no completa la cadena de cálculo. Las exclusiones no son aleatorias.
+
+**De las tablas de composición.** La cobertura varía entre nutrientes (100% para
+energía, 85,5% para vitamina A), lo que limita la comparabilidad entre
+micronutrientes. Los alimentos sin composición conocida contribuyen cero, de
+modo que **las estimaciones constituyen un límite inferior**.
+
+**Del diseño muestral.** Las variables de estratificación, conglomeración y
+expansión están disponibles en los datos (8 estratos, 933 unidades primarias,
+factor de expansión sin valores ausentes), pero no se han incorporado aún al
+cálculo. **En consecuencia no se reportan intervalos de confianza**, opción
+preferible a reportarlos incorrectamente estrechos.
+
+**Del solapamiento entre secciones.** El consumo de alimentos almacenables se
+encuentra sobrestimado, según se detalla en la sección siguiente.
+
+**Del cálculo del EMA.** No se ajusta por embarazo ni lactancia; se asume nivel
+de actividad física moderado y peso corporal fijo por sexo. El requerimiento
+para menores de un año emplea un valor provisional pendiente de contrastar con
+la referencia FAO/OMS/UNU.
+
+# Decisiones que requieren definición del equipo técnico
+
+Las tres cuestiones siguientes exceden el ámbito del análisis técnico y
+condicionan la interpretación de los resultados. Se presentan con la evidencia
+necesaria para su resolución.
+
+## Tratamiento de las Secciones 2 y 3A
+
+```{r}
+#| label: tbl-variantes
+#| tbl-cap: "Ingesta aparente según las secciones del cuestionario incluidas. República Dominicana, 2018"
+if (!is.null(variantes)) {
+  variantes |>
+    arrange(variante) |>
+    transmute(`Secciones incluidas` = variante,
+              Hogares = hogares,
+              `Energía mediana` = round(energia_mediana),
+              `Hierro (mg)` = round(hierro_mediana, 1),
+              `Folato (µg)` = round(folato_mediana),
+              `Hogares > 6.000 kcal` = sobre_6000_kcal)
+}
+```
+::: {.fuente}
+Fuente: Elaboración propia a partir de la ENGIH 2018 (Banco Central de la República Dominicana, con participación de la Oficina Nacional de Estadística).
+:::
+
+
+Ninguna de las dos secciones consideradas aisladamente produce estimaciones
+compatibles con el requerimiento energético: ambas se sitúan en torno a 1.200
+kcal por EMA y día. Únicamente su combinación alcanza valores plausibles, lo que
+indica que **los dos instrumentos son complementarios y capturan alimentos
+distintos**.
+
+Sin embargo, existe solapamiento en alimentos almacenables: un hogar puede
+declarar existencias de arroz y adquirir arroz durante el mismo período. El
+análisis de los hogares con ingesta implausible confirma el mecanismo —arroz,
+aceite, azúcar y leche encabezan el listado y aparecen en ambas secciones—, lo
+que afecta a **tres de los cuatro vehículos de fortificación**.
+
+**Opción propuesta:** adoptar la combinación de ambas secciones como estimación
+principal, declarando el solapamiento como limitación, e implementar el cálculo
+de **disponibilidad neta** (existencias iniciales + adquisiciones − existencias
+finales) para alimentos almacenables. Los datos requeridos están disponibles en
+la Sección 2.
+
+## Definición de la línea base de fortificación
+
+La asignación actual de códigos de composición a los vehículos no corresponde a
+ningún escenario real de política pública dominicana. Su efecto sobre los
+resultados es medible y direccional: sobrestima el folato y subestima la
+vitamina A.
+
+La determinación de qué vehículos están sujetos a fortificación obligatoria, con
+qué nutrientes y en qué niveles, se establece en instrumentos normativos
+específicos cuya verificación corresponde a la contraparte nacional.
+
+Ante la ausencia de esta definición, se modelaron tres escenarios:
+
+```{r}
+#| label: tbl-escenarios
+#| tbl-cap: "Ingesta mediana de hierro y folato según escenario de fortificación modelado. República Dominicana, 2018"
+comp <- cargar_composicion()
+NUT  <- c("energia_kcal","hierro_mg","folato_mcg_dfe","vitamina_a_mcg_rae")
+
+calc_esc <- function(nombre) {
+  sw <- ESCENARIOS |> filter(escenario == nombre) |> select(vehiculo, eid_esc = enhance_id)
+  gpe |> left_join(sw, by = "vehiculo") |>
+    mutate(eid = coalesce(eid_esc, as.numeric(enhance_id))) |>
+    left_join(comp, by = c("eid" = "enhance_id")) |>
+    mutate(across(all_of(NUT), ~ .x * Gramos_por_EMA_dia / 100)) |>
+    group_by(id_hogar_unico) |>
+    summarise(across(all_of(NUT), ~ sum(.x, na.rm = TRUE)), .groups = "drop") |>
+    mutate(escenario = nombre)
+}
+
+bind_rows(lapply(unique(ESCENARIOS$escenario), calc_esc)) |>
+  group_by(Escenario = escenario) |>
+  summarise(`Hierro (mg)`     = round(median(hierro_mg), 1),
+            `Folato (µg DFE)` = round(median(folato_mcg_dfe)),
+            .groups = "drop")
+```
+::: {.fuente}
+Fuente: Elaboración propia a partir de la ENGIH 2018 (Banco Central de la República Dominicana, con participación de la Oficina Nacional de Estadística).
+:::
+
+
+```{r}
+#| label: fig-escenarios
+#| fig-cap: "Ingesta mediana de hierro y folato por Equivalente de Mujer Adulta y día, según escenario de fortificación. República Dominicana, 2018"
+#| fig-width: 8
+#| fig-height: 3.4
+
+bind_rows(lapply(unique(ESCENARIOS$escenario), calc_esc)) |>
+  group_by(escenario) |>
+  summarise(Hierro = median(hierro_mg),
+            Folato = median(folato_mcg_dfe), .groups = "drop") |>
+  tidyr::pivot_longer(-escenario, names_to = "nut", values_to = "v") |>
+  mutate(esc = gsub("^[0-9]\\. ", "", escenario)) |>
+  ggplot(aes(esc, v)) +
+  geom_col(aes(fill = ifelse(grepl("arroz", esc), AZUL, GRIS)), width = 0.55) +
+  geom_text(aes(label = round(v, 1)), vjust = -0.4, size = 3.4, colour = "#33444f") +
+  scale_fill_identity() +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.2))) +
+  facet_wrap(~nut, scales = "free_y",
+             labeller = as_labeller(c(Hierro = "Hierro (mg)",
+                                      Folato = "Folato (µg DFE)"))) +
+  labs(x = NULL, y = NULL) +
+  tema_informe() +
+  theme(strip.text = element_text(face = "bold", colour = "#1a3a4a"),
+        axis.text.x = element_text(size = rel(0.8)))
+```
+
+::: {.fuente}
+Fuente: Elaboración propia a partir de la ENGIH 2018 (Banco Central de la República Dominicana, con participación de la Oficina Nacional de Estadística).
+:::
+
+La magnitud de la diferencia entre escenarios indica el grado en que las
+conclusiones dependen de esta definición.
+
+## Fuentes de composición para alimentos sin correspondencia
+
+Un conjunto de alimentos de consumo frecuente carece de equivalente adecuado en
+las tablas disponibles. El caso de mayor impacto es el caldo concentrado en
+cubos. Se requiere definir si se incorporan fuentes adicionales de composición o
+si estos alimentos se excluyen con la correspondiente declaración.
+
+# Estado de los productos y trabajo pendiente
+
+## Productos disponibles
+
+```{r}
+#| label: tbl-productos
+#| tbl-cap: "Productos disponibles al cierre de este informe"
+tibble(
+  Producto = c(
+    "Código de procesamiento (5 etapas)",
+    "Informe de calidad y preparación de datos",
+    "Informe del modelo de base: consumo y EMA",
+    "Informe de cobertura de vehículos fortificables",
+    "Informe de escenarios de fortificación",
+    "Tabla de correspondencia de alimentos",
+    "Tabla de factores de conversión",
+    "Registros de auditoría de decisiones"
+  ),
+  Estado = rep("Disponible", 8)
+)
+```
+::: {.fuente}
+Fuente: Elaboración propia.
+:::
+
+
+Todos los informes se generan de forma reproducible a partir de los datos. La
+mejora de las tablas auxiliares se refleja automáticamente en los resultados sin
+intervención manual.
+
+## Trabajo pendiente priorizado
+
+```{r}
+#| label: tbl-pendiente
+#| tbl-cap: "Trabajo pendiente, priorizado por efecto esperado"
+tibble(
+  Prioridad = c("Alta", "Alta", "Media", "Media", "Media", "Abierta"),
+  Tarea = c(
+    "Peso por unidad de plátano y guineo (verificación de campo)",
+    "Incorporación del diseño muestral complejo",
+    "Desagregación por quintil de gasto y zona de residencia",
+    "Cálculo de disponibilidad neta para alimentos almacenables",
+    "Verificación a nivel de hogar en el control de atípicos",
+    "Factores de receta para derivados de harina de trigo"
+  ),
+  `Efecto esperado` = c(
+    "Cobertura de Sección 3A: 76% a ~81%",
+    "Intervalos de confianza correctamente estimados",
+    "Análisis de equidad en el acceso a alimentos fortificables",
+    "Corrección del solapamiento entre secciones",
+    "Depuración de 572 hogares con valores implausibles",
+    "Cuantificación del aporte de la fortificación por vía de derivados"
+  )
+)
+```
+::: {.fuente}
+Fuente: Elaboración propia.
+:::
+
+
+Ninguna de estas tareas requiere rehacer el análisis. Todas están especificadas y
+cuentan con los datos identificados.
+
+# Estado del análisis y condiciones de continuidad
+
+## Criterio aplicado al alcance
+
+El plazo de la consultoría impone una restricción que conviene declarar de forma
+explícita. La depuración de un conjunto de datos de esta naturaleza **no tiene
+un punto de cierre natural**: siempre es posible mapear un alimento más,
+verificar un factor de conversión adicional o refinar un supuesto. Un criterio
+de tipo *"iniciar el análisis cuando los datos estén completos"* no converge en
+el plazo disponible.
+
+El criterio adoptado fue el inverso: **avanzar con los datos disponibles,
+declarando la cobertura asociada a cada cifra**. La regla de no presentar ningún
+valor agregado sin su cobertura es lo que hace defendible esta decisión; sin
+ella, el avance sería temerario.
+
+La evidencia de que el criterio fue adecuado es que la cobertura aumentó de
+forma sostenida **mientras** el análisis progresaba, sin que ello exigiera
+detenerlo. Los registros con consumo calculado pasaron de 254.905 a
+`r format(nrow(gpe), big.mark = ".")` en el transcurso del trabajo.
+
+El criterio para retroceder también fue explícito: se retoma una tarea previa
+cuando el ajuste **es acotado, no requiere criterio nuevo y condiciona un
+resultado que está por presentarse** —las tres condiciones simultáneamente—. En
+caso contrario, se documenta y se continúa.
+
+## Qué queda fuera del alcance de este informe
+
+Se documenta aquí, de forma deliberada, para que la interpretación de los
+resultados sea correcta y para que el trabajo pueda retomarse sin reconstruir el
+razonamiento.
+
+```{r}
+#| label: tbl-fuera-alcance
+#| tbl-cap: "Elementos fuera del alcance de este informe y su condición de resolución"
+tibble(
+  `Elemento` = c(
+    "Intervalos de confianza",
+    "Desagregación por quintil y zona",
+    "Disponibilidad neta de almacenables",
+    "Alimentos consumidos fuera del hogar",
+    "Ajuste por embarazo y lactancia",
+    "Aporte de derivados de harina de trigo",
+    "Vehículo aceite en escenarios de fortificación"
+  ),
+  `Motivo` = c(
+    "Requiere incorporar el diseño muestral complejo",
+    "Depende de lo anterior para ser estadísticamente correcta",
+    "Requiere decisión previa sobre el tratamiento de secciones",
+    "Requiere factores de receta y rendimiento no disponibles",
+    "Requiere el módulo demográfico completo de la encuesta",
+    "Requiere factores de receta por producto",
+    "La tabla de composición no incluye versiones fortificadas"
+  ),
+  `Depende de` = c(
+    "Trabajo técnico pendiente", "Trabajo técnico pendiente",
+    "Decisión del equipo", "Fuentes externas",
+    "Verificación pendiente", "Fuentes externas", "Fuentes externas"
+  )
+)
+```
+::: {.fuente}
+Fuente: Elaboración propia.
+:::
+
+
+Cuatro de los siete elementos **no dependen del trabajo técnico** sino de
+decisiones del equipo o de la disponibilidad de fuentes externas.
+
+## Guía de continuidad
+
+El trabajo está estructurado de modo que pueda ser retomado por otra persona sin
+reconstruir el proceso. Los pasos siguientes, en orden de rendimiento
+decreciente:
+
+**1. Ampliar la tabla de factores de conversión.**
+Es la vía de mayor rendimiento. El archivo `data/eda/` contiene el listado de
+alimentos sin factor, ordenado por número de observaciones afectadas. Plátano y
+guineo concentran aproximadamente 16.400 observaciones; resolverlos eleva la
+cobertura de la Sección 3A de `r round(p3a, 1)`% a aproximadamente 81%. El
+procedimiento aplicado consiste en pesaje directo de la presentación comercial,
+con registro fotográfico.
+
+**2. Incorporar el diseño muestral complejo.**
+Las variables necesarias están identificadas y presentes: `ESTRATO` (8 niveles),
+`UPM` (933 unidades) y `FACTOR_EXPANSION` (sin valores ausentes), en el módulo
+sociodemográfico. El paquete `srvyr` está disponible en el entorno. Requisito
+previo para cualquier estimación con intervalos de confianza y para la
+desagregación por subgrupos.
+
+**3. Resolver el tratamiento de las Secciones 2 y 3A.**
+Decisión del equipo técnico. Las tres variantes están calculadas y comparadas en
+este informe. Si se opta por la disponibilidad neta, los campos requeridos
+(`cantidad_inicial` y `cantidad_final`) están disponibles en la Sección 2.
+
+**4. Definir la línea base de fortificación.**
+Requiere verificación del marco normativo vigente. El código está estructurado
+para que la selección del escenario no implique rehacer el análisis: la
+definición reside en un único objeto (`ESCENARIOS`, en `reports/_comun.R`) y los
+resultados se regeneran al recompilar.
+
+**5. Completar el mapeo de alimentos pendientes.**
+El crosswalk registra qué alimentos carecen de correspondencia y su frecuencia.
+La convención de trabajo distingue equivalencias **directas** de **sustitutos
+por criterio**, de modo que siempre es posible identificar dónde se aplicó juicio
+profesional.
+
+## Dónde está documentada cada decisión
+
+```{r}
+#| label: tbl-documentacion
+#| tbl-cap: "Documentación del proyecto y su contenido"
+tibble(
+  `Documento` = c(
+    "README.md",
+    "HOJA_DE_RUTA_PROYECTO.md",
+    "VISION_Y_ARQUITECTURA_PROYECTO.md",
+    "data/eda/log_*.csv",
+    "reports/_comun.R",
+    "Comentarios en los scripts"
+  ),
+  `Contenido` = c(
+    "Descripción del proyecto, estructura y secuencia de ejecución",
+    "Bitácora: hitos, decisiones, hallazgos, errores corregidos y backlog priorizado",
+    "Marco conceptual, alcance y principios de trabajo",
+    "Registro de cada modificación a las tablas auxiliares, con su justificación",
+    "Definiciones compartidas: vehículos, escenarios, criterio de elegibilidad",
+    "Justificación de las decisiones no evidentes, en el punto donde se aplican"
+  )
+)
+```
+::: {.fuente}
+Fuente: Elaboración propia.
+:::
+
+
+La bitácora del proyecto registra también los **errores cometidos y su
+corrección**, incluidos aquellos que no dejaron rastro en los resultados. Se
+conservan de forma deliberada: un registro que solo documenta los aciertos no
+permite evaluar la fiabilidad del procedimiento.
+
+# Reproducibilidad
+
+El conjunto del trabajo —código, tablas auxiliares, registros de decisión y este
+informe— se encuentra bajo control de versiones y es reproducible en su
+totalidad. La secuencia de ejecución se documenta en el archivo `README.md` del
+repositorio.
+
+Las decisiones metodológicas no evidentes están registradas con su justificación
+en los documentos de bitácora del proyecto, de modo que cualquier cifra de este
+informe puede rastrearse hasta el dato original y hasta el criterio que
+determinó su tratamiento.
+
+---
+
+::: {style="font-size:0.9em; color:#5a6b76;"}
+Informe compilado de forma reproducible el
+`r format(Sys.Date(), "%d de %B de %Y")`.
+:::
