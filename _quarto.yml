@@ -1,0 +1,6 @@
+project:
+  output-dir: output
+
+# Los reportes renderizados NO se versionan: se regeneran con
+# quarto::quarto_render(). El repositorio contiene lo que genera
+# resultados, no los resultados.

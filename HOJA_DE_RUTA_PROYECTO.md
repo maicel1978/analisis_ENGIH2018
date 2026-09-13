@@ -12,12 +12,15 @@ Este documento fija el alcance acordado hasta ahora. Cualquier cambio de alcance
 
 **Al 2026-09-12 (noche): pipeline `01`→`05` completo, R1 y R3 renderizados. Lo que sigue, en este orden:**
 
-1. **Re-renderizar R3** con el `pct()` corregido y verificar que los porcentajes ya no se repiten (Arroz 87.7 / Aceite 87.3 / Azúcar 78.6 / Harina 8.0). Re-renderizar R1 también (usa la misma función).
-2. **R2 — modelo de base: consumo diario y EMA.** Único reporte de compromiso firme que falta. Sale de datos ya calculados: es sobre todo redacción. Debe explicar `Q × FC × PC / PM`, el EMA (8,892/8,892 hogares, mediana 3.04), y el asunto de las dos secciones con la tabla de tres variantes.
-3. **README.** Primer archivo que abren los supervisores al recibir el enlace.
-4. **Verificar PC-A** antes de devolver PC-B: `git pull`, paquetes (`dplyr readr tidyr readxl writexl here knitr srvyr`), `quarto::quarto_version()`, identidad de git, y que el repo **no** esté en OneDrive.
+**LA ENTREGA COMPROMETIDA ESTÁ COMPLETA.** Pipeline `01`→`05` corriendo, R1 + R2 + R3 renderizados, README reescrito, PC-A verificada (Quarto 1.9.38 y todos los paquetes cargan).
 
-**Estado de los entregables:** R1 hecho, R3 hecho (pendiente re-render), R2 pendiente, R4 y R5 **descritos y no ejecutados** según lo acordado. D1 y D2 fuera de alcance para esta entrega.
+**Lo que sigue, por valor decreciente:**
+
+1. **Limpieza del repositorio** (ver el pendiente detallado en Fase 0). Mejora la impresión de quien abre el enlace y es media hora.
+2. **R4 — ingesta de micronutrientes en dos escenarios.** Todos sus insumos están calculados; es el que más valor añadiría. **Solo se presenta como dos escenarios en paralelo, nunca como cifra única.**
+3. **La presentación.** A partir de aquí el valor está en dominar el material, no en escribir más código.
+
+**Explícitamente fuera de alcance de esta entrega, entregados como método descrito:** R5 (desplazamiento respecto al EAR), D1 y D2 (dashboards), desglose por quintil y zona con `srvyr`.
 
 **Cambio de fecha (2026-09-12): la fecha real de cierre es el domingo por la noche**, no el martes 16. El martes es margen. Criterio derivado: ya no se trata de *qué alcanzo a terminar*, sino de **qué queda tan bien documentado que se entienda sin el consultor presente**. Lo que no se ejecute (R4, R5, D1, D2, desglose por quintil) se entrega **descrito**, con método definido, variables verificadas y una nota de qué falta para correrlo. Después, llevar a Daniel/Carlos la decisión sobre la línea base de fortificación (ver "Decisión abierta" al final de Fase 0), que sigue siendo el hallazgo metodológico más importante sin resolver.
 
@@ -160,6 +163,25 @@ Este documento fija el alcance acordado hasta ahora. Cualquier cambio de alcance
   **Trampa evitada, verificada:** el patrón ingenuo de derivados de trigo captura falsos positivos graves — **"Pasta de tomate" con 12,150 registros**, "Ajo en pasta", "Harinas de maíz", "Maicena", "Buen pan o castaña" (fruta de pan, no trigo) y los derivados de maíz. Con exclusiones explícitas quedan 67 alimentos y 26,935 registros; **sin ellas la cifra se infla ~47%**. Inclusiones y exclusiones viven en `_comun.R` (`TRIGO_INCLUIR` / `TRIGO_EXCLUIR`), auditables y modificables en un solo lugar.
 
 - [x] **Bug corregido en `_comun.R` (2026-09-12): `pct()` colapsaba con denominador escalar.** Estaba escrito con `ifelse()` y la condición sobre `n`; `ifelse()` devuelve un resultado del largo de la **condición**, así que con `n` escalar (un total de hogares) todas las filas mostraban el mismo porcentaje. **En R1 no se notó** porque allí `n` siempre era una columna. Reescrita sin `ifelse()`. **Lección: una función compartida se prueba con denominador escalar Y vectorial antes de darla por buena.**
+
+- [x] **HITO (2026-09-12): `R2_modelo_base.qmd` escrito y renderizado. Los TRES reportes de compromiso firme están terminados.** R2 cubre los numerales 1.3, 1.4 y 8.2 de los TdR: la fórmula `Q × FC × PC / PM` con la fuente de cada término, la validación empírica del período de medición, el EMA con su distribución, la comparación de las tres variantes de sección, y los supuestos del EMA en tabla (incluido el provisional de 600 kcal/día para menores de 1 año, marcado como pendiente de contrastar con FAO/WHO/UNU 2004).
+
+  **Resultado limpio y algo inesperado: el EMA por miembro se mantiene en ~1.00 en todos los tamaños de hogar**, de 1 a 8 miembros (1.04, 1.09, 1.01, 1.00, 1.00, 0.99, 1.00, 0.99). La composición etaria promedio de los hogares dominicanos es notablemente estable: los hogares grandes NO tienen proporcionalmente más menores. **Implicación honesta para la presentación:** en el agregado nacional la diferencia entre EMA y per cápita es pequeña; el ajuste importa para comparar hogares individuales y para desagregar por quintil. Decirlo así es más creíble que sobrevender el método.
+
+  **Aporte por sección (mediana de gramos por EMA/día):** Sec 2 = 25.3 con 43,393 filas; Sec 3A = 11.6 con 260,014 filas. Coherente con que son instrumentos distintos: el inventario registra cantidades grandes de pocos alimentos, las compras diarias muchos alimentos en cantidades pequeñas.
+
+  **Alimentos de mayor alcance (hogares consumidores):** Pollo fresco 5,811; Cebolla roja 5,349; Huevos de granja 5,004; ACEITE 4,920; Pasta de tomate 4,597; ARROZ 4,595 (mediana 163.9 g/EMA/día). *Nota: "Pasta de tomate" aparece aquí legítimamente, y es el mismo alimento excluido del vehículo trigo por el filtro `TRIGO_EXCLUIR`. Si alguien ve ambas tablas, la explicación es el filtro auditable en `_comun.R`.*
+
+- [x] **HITO (2026-09-12): README reescrito como puerta de entrada para revisión externa.** El anterior decía "Fase activa: Fase 0" con fecha 05-09 y estaba escrito para uso propio. El nuevo está pensado para quien abre el enlace sin contexto: los tres reportes con su numeral de TdR, los tres hallazgos principales antes de cualquier detalle técnico, el pipeline en cinco líneas, los comandos exactos para reproducir, la estructura de carpetas con su criterio, una sección sobre trazabilidad de decisiones, y las limitaciones y decisiones pendientes sin maquillar. **Se quitó el bloque "Estado actual / Qué hacer ahora"**: era útil internamente pero delataba trabajo en curso a quien revisa, y ese contenido ya vive en esta hoja.
+
+- [ ] **Pulir R2 (pendiente del consultor, 2026-09-12).** El contenido está validado; falta una pasada de forma. *Definir qué se quiere cambiar antes de abrirlo, para no rehacerlo por rehacerlo.*
+
+- [ ] **Limpieza del repositorio — ampliada con lo detectado el 12-09:**
+  - Los HTML renderizados (`scripts/R1_calidad_datos.html`, `R2_modelo_base.html`, `R3_cobertura_vehiculos.html`) **están versionados y no deberían**: son regenerables, igual que `data/clean`. Mover a `output/` con `_quarto.yml` (`output-dir: output`) y añadir `output/` al `.gitignore`.
+  - Los reportes viven en `scripts/` junto al pipeline. Separarlos en `reports/`: `scripts/` es el flujo de datos, `reports/` son los entregables.
+  - `.RDataTmp*` al `.gitignore` (la regla actual no lo atrapa por falta de comodín).
+  - Scripts de uso único ya ejecutados y commiteados: `96`, `97`, `98`, `99`.
+  - `food_factors_BACKUP_2026-09-10.xlsx` y `lote_PC_109.csv` (ambos redundantes).
 
 - [ ] **DECISIÓN ABIERTA (2026-09-10) — línea base de fortificación. Corresponde al equipo (Daniel/Carlos/Santiago), NO se automatiza.** El crosswalk actual no representa ningún escenario real de política pública dominicana:
   - **Arroz:** RD **no** tiene norma de fortificación de arroz, pero el crosswalk manda ARROZ (var. 7), Arroz selecto (66) y Súper-selecto (65) a `70213002` "Arroz blanco enriquecido" (Fe 4.36, folato 386/100g). Solo Arroz corriente (67) va a `70213004` sin enriquecer. **Sobrestima** Fe y folato del alimento #1 de la dieta.

@@ -34,3 +34,15 @@ data/clean/
 data/eda/cobertura_dias_sec3a.csv
 data/eda/ranking_unidades_no_estandar.csv
 data/eda/top_atipicos_sec3a.csv
+
+# Reportes renderizados (regenerables con quarto_render)
+output/
+*.html
+*_files/
+*.knit.md
+
+# Temporales de RStudio (la regla anterior no los atrapaba: faltaba el comodin)
+.RDataTmp*
+
+/.quarto/
+**/*.quarto_ipynb

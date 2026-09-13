@@ -57,6 +57,29 @@ TRIGO_EXCLUIR <- paste0(
 # Nutrientes iniciales del análisis (hoja de ruta: empezar con 4, no con 65)
 NUTRIENTES_INICIALES <- c("Energia", "Hierro", "Acido folico", "Vitamina A")
 
+# Escenarios de fortificación.
+#
+# IMPORTANTE: cuál de estos corresponde al marco normativo dominicano vigente
+# es una pregunta para la contraparte técnica, NO un supuesto del análisis.
+# Se modelan los tres y el resultado se presenta como RANGO, nunca como cifra
+# única. Los códigos son ENHANCE_ID de INCAP, verificados 2026-09-12.
+#
+# Nota: INCAP NO tiene aceite fortificado con vitamina A (los 19 aceites del
+# catálogo tienen VITA_RAE = 0), así que ese vehículo no es modelable con esta
+# fuente. Se declara como limitación, no se inventa un valor.
+ESCENARIOS <- tribble(
+  ~escenario,               ~vehiculo,         ~enhance_id,
+  # Escenario 0 -- sin fortificación (línea base biológica)
+  "0. Sin fortificar",      "Arroz",            70213004,  # blanco grano mediano crudo, s/enriquecer
+  "0. Sin fortificar",      "Harina de trigo",  70213038,  # todo uso, s/enriquecer
+  # Escenario 1 -- solo harina de trigo
+  "1. Solo harina",         "Arroz",            70213004,
+  "1. Solo harina",         "Harina de trigo",  70213039,  # enriquecida, todo uso
+  # Escenario 2 -- harina y arroz
+  "2. Harina y arroz",      "Arroz",            70213002,  # blanco grano mediano crudo, enriquecido
+  "2. Harina y arroz",      "Harina de trigo",  70213039
+)
+
 # --- Rutas --------------------------------------------------------------------
 RUTA_CLEAN <- here("data", "clean")
 RUTA_RAW   <- here("data", "raw")
@@ -129,6 +152,47 @@ pesos_hogar <- function() {
     filter(!is.na(peso)) |>
     group_by(id_hogar_unico) |>
     summarise(peso = first(peso), .groups = "drop")
+}
+
+# Tabla de composición unificada INCAP + FNDDS, con los 4 nutrientes iniciales.
+# Misma lógica que 05_ingesta_micronutrientes.R (pendiente: que el 05 escriba
+# esta tabla a data/clean y que ambos la lean de ahí, en vez de duplicarla).
+cargar_composicion <- function() {
+  incap <- read_excel(file.path(RUTA_RAW, "food_composition_INCAP.xlsx"),
+                      sheet = "nutrient_values") |>
+    transmute(
+      enhance_id         = as.numeric(ENHANCE_ID),
+      energia_kcal       = as.numeric(ENERC_KCAL),
+      hierro_mg          = as.numeric(FE),
+      folato_mcg_dfe     = as.numeric(FOLDFE),
+      vitamina_a_mcg_rae = as.numeric(VITA_RAE)
+    )
+  
+  # Los encabezados de FNDDS traen saltos de línea internos: se resuelven por
+  # patrón, con error si no identifican exactamente una columna.
+  fn <- read_excel(file.path(RUTA_RAW, "food_composition_FNDDS.xlsx"),
+                   sheet = "nutrient_values", skip = 1, .name_repair = "minimal")
+  col_fn <- function(patron, etiqueta) {
+    nn <- gsub("[[:space:]]+", " ", trimws(names(fn)))
+    i <- grep(patron, nn, ignore.case = TRUE, perl = TRUE)
+    if (length(i) != 1) {
+      stop("El patron de '", etiqueta, "' identifica ", length(i),
+           " columnas en FNDDS (deberia ser 1)", call. = FALSE)
+    }
+    names(fn)[i]
+  }
+  fndds <- fn |>
+    transmute(
+      enhance_id         = as.numeric(.data[[col_fn("^Food code$", "id")]]),
+      energia_kcal       = as.numeric(.data[[col_fn("^Energy \\(kcal\\)$", "energia")]]),
+      hierro_mg          = as.numeric(.data[[col_fn("^Iron ?\\(mg\\)$", "hierro")]]),
+      folato_mcg_dfe     = as.numeric(.data[[col_fn("^Folate, DFE", "folato")]]),
+      vitamina_a_mcg_rae = as.numeric(.data[[col_fn("^Vitamin A, RAE", "vitamina A")]])
+    )
+  
+  bind_rows(incap, fndds) |>
+    filter(!is.na(enhance_id)) |>
+    distinct(enhance_id, .keep_all = TRUE)
 }
 
 # --- Helpers ------------------------------------------------------------------

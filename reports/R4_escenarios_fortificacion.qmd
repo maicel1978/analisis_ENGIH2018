@@ -1,0 +1,308 @@
+---
+title: "R4 — Ingesta aparente de micronutrientes bajo escenarios de fortificación"
+subtitle: "ENGIH 2018, República Dominicana | Indicador 3 del sistema de evaluación"
+author: "Maicel E. Monzón"
+lang: es
+date: today
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    toc-title: "Contenido"
+    number-sections: true
+    code-fold: true
+    code-tools: true
+    df-print: paged
+    embed-resources: true
+execute:
+  warning: false
+  message: false
+  echo: false
+---
+
+```{r}
+#| label: setup
+ruta_comun <- c(here::here("reports", "_comun.R"),
+                here::here("scripts", "_comun.R"))
+ruta_comun <- ruta_comun[file.exists(ruta_comun)][1]
+if (is.na(ruta_comun)) stop("No encuentro _comun.R")
+source(ruta_comun)
+
+gpe  <- cargar_gramos_por_ema() |> marcar_vehiculo()
+comp <- cargar_composicion()
+
+NUTRIENTES <- c("energia_kcal", "hierro_mg", "folato_mcg_dfe", "vitamina_a_mcg_rae")
+```
+
+```{r}
+#| label: calculo-escenarios
+
+# Para cada escenario se sustituye el codigo de composicion de los vehiculos
+# afectados y se recalcula la ingesta. El resto de los alimentos no cambia.
+calcular_escenario <- function(nombre) {
+  swaps <- ESCENARIOS |> filter(escenario == nombre) |>
+    select(vehiculo, enhance_id_esc = enhance_id)
+
+  gpe |>
+    left_join(swaps, by = "vehiculo") |>
+    mutate(enhance_id_usado = coalesce(enhance_id_esc, as.numeric(enhance_id))) |>
+    left_join(comp, by = c("enhance_id_usado" = "enhance_id")) |>
+    mutate(across(all_of(NUTRIENTES), ~ .x * Gramos_por_EMA_dia / 100)) |>
+    group_by(id_hogar_unico) |>
+    summarise(across(all_of(NUTRIENTES), ~ sum(.x, na.rm = TRUE)), .groups = "drop") |>
+    mutate(escenario = nombre, .after = id_hogar_unico)
+}
+
+resultados <- bind_rows(lapply(unique(ESCENARIOS$escenario), calcular_escenario))
+```
+
+> Todas las cifras se calculan al renderizar. Fecha: `r format(Sys.Date(), "%d-%m-%Y")`.
+
+## Qué responde este reporte
+
+Los Términos de Referencia piden estimar la ingesta aparente de micronutrientes
+mediante tablas de composición (numeral 4.3, indicador 3 del sistema de
+evaluación) y modelar escenarios de fortificación (numeral 4.4).
+
+Este reporte no entrega una cifra única de ingesta. Entrega **un rango**, porque
+el resultado depende de un supuesto que aún no está resuelto.
+
+## Por qué un rango y no una cifra
+
+La tabla de composición asigna a cada alimento un perfil nutricional. Para los
+vehículos de fortificación, ese perfil **depende de si el alimento está
+fortificado o no**, y la diferencia es sustancial:
+
+```{r}
+#| label: tbl-diferencia
+#| tbl-cap: "Perfil nutricional de los vehículos según estén fortificados o no (por 100 g)"
+
+codigos <- c(70213004, 70213002, 70213038, 70213039)
+etiquetas <- c("Arroz blanco, sin enriquecer", "Arroz blanco, enriquecido",
+               "Harina de trigo, sin enriquecer", "Harina de trigo, enriquecida")
+
+comp |>
+  filter(enhance_id %in% codigos) |>
+  mutate(Alimento = etiquetas[match(enhance_id, codigos)]) |>
+  transmute(Alimento,
+            `Energía (kcal)` = energia_kcal,
+            `Hierro (mg)` = hierro_mg,
+            `Folato (µg DFE)` = folato_mcg_dfe) |>
+  kable()
+```
+
+El arroz enriquecido aporta más de cinco veces el hierro y más de cuarenta veces
+el folato que el no enriquecido. **Asignar uno u otro cambia el resultado del
+análisis**, y la asignación correcta depende del marco normativo vigente.
+
+::: {.callout-important}
+## Un supuesto que corresponde verificar, no deducir
+Cuáles vehículos están sujetos a fortificación obligatoria en República
+Dominicana, con qué nutrientes y en qué niveles, se establece en instrumentos
+legales específicos. **Esa verificación corresponde a la contraparte técnica y
+no se resuelve en este análisis.**
+
+En consecuencia, se modelan tres escenarios y el resultado se presenta como
+rango. Cuando el marco normativo se confirme, basta seleccionar el escenario
+correspondiente: el cálculo ya está hecho.
+:::
+
+## Los escenarios
+
+```{r}
+#| label: tbl-escenarios
+#| tbl-cap: "Definición de los escenarios modelados"
+
+ESCENARIOS |>
+  left_join(comp |> select(enhance_id, folato = folato_mcg_dfe, hierro = hierro_mg),
+            by = "enhance_id") |>
+  transmute(Escenario = escenario, Vehículo = vehiculo,
+            Código = enhance_id,
+            `Hierro (mg/100g)` = hierro,
+            `Folato (µg/100g)` = folato) |>
+  kable()
+```
+
+El **escenario 0** es la línea base biológica: el aporte de los alimentos sin
+ninguna fortificación. No corresponde a una situación real, sirve de referencia
+para medir cuánto aporta la fortificación.
+
+El **escenario 1** modela fortificación únicamente de harina de trigo. El
+**escenario 2** añade el arroz.
+
+## Resultado: ingesta aparente por escenario
+
+```{r}
+#| label: tbl-resultado
+#| tbl-cap: "Ingesta aparente mediana por EMA y día, según escenario"
+
+resumen <- resultados |>
+  group_by(Escenario = escenario) |>
+  summarise(
+    Hogares = n(),
+    `Energía (kcal)`   = round(median(energia_kcal)),
+    `Hierro (mg)`      = round(median(hierro_mg), 1),
+    `Folato (µg DFE)`  = round(median(folato_mcg_dfe)),
+    `Vit. A (µg RAE)`  = round(median(vitamina_a_mcg_rae)),
+    .groups = "drop"
+  )
+
+kable(resumen, format.args = list(big.mark = ","))
+```
+
+```{r}
+#| label: fig-escenarios
+#| fig-cap: "Efecto de la fortificación sobre la ingesta mediana de hierro y folato"
+#| fig-height: 4
+
+par(mfrow = c(1, 2), mar = c(7, 4, 3, 1))
+for (nut in c("hierro_mg", "folato_mcg_dfe")) {
+  v <- resultados |> group_by(escenario) |>
+    summarise(m = median(.data[[nut]]), .groups = "drop") |> arrange(escenario)
+  barplot(v$m, names.arg = v$escenario, las = 2, col = "#4a7c9b",
+          main = if (nut == "hierro_mg") "Hierro (mg)" else "Folato (µg DFE)",
+          ylab = "Mediana por EMA/día", cex.names = 0.75)
+}
+```
+
+```{r}
+#| label: rango
+#| results: asis
+
+r <- resumen |> arrange(Escenario)
+cat("**Rango del efecto de la fortificación sobre la ingesta mediana:**\n\n")
+cat("- Hierro: de ", r$`Hierro (mg)`[1], " a ", r$`Hierro (mg)`[nrow(r)],
+    " mg por EMA y día\n", sep = "")
+cat("- Folato: de ", format(r$`Folato (µg DFE)`[1], big.mark = ","), " a ",
+    format(r$`Folato (µg DFE)`[nrow(r)], big.mark = ","),
+    " µg DFE por EMA y día\n", sep = "")
+```
+
+La magnitud de esa diferencia es, en sí misma, un resultado: **indica cuánto
+depende la conclusión del supuesto normativo**, y por tanto con qué urgencia
+conviene resolverlo antes de derivar recomendaciones de política.
+
+## Lectura de política: alcance frente a contenido
+
+El resultado más relevante de este análisis no es la magnitud de la ingesta sino
+**la diferencia entre los escenarios 1 y 2**.
+
+```{r}
+#| label: tbl-lectura
+#| tbl-cap: "Alcance y consumo de cada vehículo, junto al efecto de fortificarlo"
+
+hog_tot <- n_distinct(gpe$id_hogar_unico)
+
+gpe |>
+  filter(vehiculo %in% c("Arroz", "Harina de trigo")) |>
+  group_by(id_hogar_unico, vehiculo) |>
+  summarise(g = sum(Gramos_por_EMA_dia, na.rm = TRUE), .groups = "drop") |>
+  group_by(Vehículo = vehiculo) |>
+  summarise(
+    `Hogares` = n(),
+    `% de hogares` = pct(n(), hog_tot),
+    `Consumo mediano (g/EMA/día)` = round(median(g), 1),
+    .groups = "drop"
+  ) |>
+  kable(format.args = list(big.mark = ","))
+```
+
+Fortificar únicamente la harina de trigo modifica la ingesta mediana de forma
+marginal. Incorporar el arroz la transforma. La explicación no está en el
+contenido de nutrientes —ambos productos enriquecidos tienen perfiles
+similares— sino en el **alcance**: el arroz llega a la gran mayoría de los
+hogares y en cantidades varias veces superiores.
+
+**Implicación para el diseño de la estrategia:** la eficacia de un programa de
+fortificación depende tanto del alcance del vehículo como del nutriente añadido.
+Un vehículo correctamente fortificado pero de consumo minoritario produce un
+efecto poblacional limitado.
+
+::: {.callout-warning}
+## Una salvedad que matiza esta lectura
+El escenario 1 **subestima el efecto real de la fortificación de harina**, por
+una razón documentada en el reporte R3: la harina de trigo apenas se consume
+como producto (8% de los hogares), pero sus derivados —principalmente pan—
+alcanzan al 85.7%. Esa harina también está fortificada.
+
+Modelar correctamente ese aporte requiere **factores de receta** (cuánta harina
+contiene cada producto), no disponibles en esta fuente. Hasta incorporarlos, el
+escenario 1 debe leerse como un **piso** del efecto de la fortificación de
+harina, no como su magnitud real.
+
+La conclusión sobre la importancia del alcance se mantiene; lo que queda
+pendiente es cuantificar con precisión el aporte por la vía de los derivados.
+:::
+
+## Vehículos no modelables con la fuente disponible
+
+```{r}
+#| label: tbl-aceite
+#| tbl-cap: "Contenido de vitamina A en los aceites de la tabla INCAP"
+
+# Se filtra por NOMBRE dentro de INCAP, no por rango de codigo: el rango
+# numerico captura entradas de FNDDS que no son aceites y producia una tabla
+# que contradecia la conclusion de esta seccion.
+aceites <- read_excel(file.path(RUTA_RAW, "food_composition_INCAP.xlsx"),
+                      sheet = "nutrient_values") |>
+  transmute(nombre = food_name_other,
+            vita = as.numeric(VITA_RAE)) |>
+  filter(grepl("^aceite", norm_txt(nombre)))
+
+tibble(
+  `Aceites en INCAP`                = nrow(aceites),
+  `Con vitamina A > 0`              = sum(aceites$vita > 0, na.rm = TRUE),
+  `Vitamina A máxima (µg RAE/100g)` = max(aceites$vita, na.rm = TRUE)
+) |> kable()
+```
+
+**El aceite no puede modelarse como vehículo de vitamina A con esta fuente.**
+Ninguno de los aceites de la tabla de composición registra contenido de
+vitamina A, de modo que no existe un par fortificado/no fortificado que permita
+construir el escenario.
+
+Esto no es una limitación del análisis sino de la tabla de composición
+disponible. Modelarlo requeriría el nivel de adición establecido por la norma y
+una entrada de composición que lo refleje. **Queda identificado como requisito
+para completar el análisis de escenarios**, no se sustituye por un valor
+supuesto.
+
+El azúcar sí dispone de versiones fortificadas con vitamina A en la tabla, pero
+su inclusión depende igualmente de que exista norma aplicable.
+
+## Limitaciones
+
+- **La ingesta reportada es un límite inferior.** Los alimentos sin composición
+  nutricional conocida suman cero; no se imputan valores.
+- **Cobertura desigual entre nutrientes.** La tabla de composición cubre el 100%
+  de los gramos consumidos para energía, 96% para hierro, 92% para folato y 86%
+  para vitamina A. La vitamina A está, por tanto, más subestimada que el resto.
+- **Consumo aparente, no ingesta individual.** No se captura la distribución
+  intrafamiliar ni el consumo fuera del hogar.
+- **El consumo de alimentos almacenables está sobrestimado** por el solapamiento
+  entre las Secciones 2 y 3A, que afecta a los propios vehículos de
+  fortificación.
+- **Sin intervalos de confianza**, por no haberse incorporado aún el diseño
+  muestral complejo.
+- **No se evalúa adecuación de la ingesta.** Comparar contra requerimientos
+  estimados —y derivar prevalencia de ingesta inadecuada— es el indicador 4 del
+  sistema de evaluación, y requiere definir previamente el escenario aplicable.
+
+## Qué falta para cerrar el análisis de escenarios
+
+1. **Confirmar el marco normativo vigente**: qué vehículos, qué nutrientes, qué
+   niveles de adición. Determina cuál de los escenarios modelados aplica.
+2. **Incorporar una entrada de composición para aceite fortificado**, si la
+   norma lo contempla.
+3. **Resolver el tratamiento de las Secciones 2 y 3A**, que afecta directamente
+   al consumo estimado de los vehículos.
+4. **Aplicar el diseño muestral complejo** para reportar con intervalos de
+   confianza y desagregar por quintil de gasto y zona.
+
+Los cuatro puntos están especificados y los datos necesarios, identificados. El
+cálculo está construido de modo que resolverlos no exige rehacer el análisis:
+basta seleccionar el escenario y volver a generar este documento.
+
+---
+
+*Generado desde el pipeline reproducible del proyecto.*
