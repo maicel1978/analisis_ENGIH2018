@@ -10,43 +10,72 @@ fortificables.
 
 ---
 
-## Empezar por aquí
+## Informes
 
-Si dispone de cinco minutos y quiere entender qué hace este proyecto y qué
-encontró, lea los tres reportes. Son documentos HTML autocontenidos: se abren
-con doble clic, sin instalar nada.
+Cuatro informes generados desde los datos. **Ninguna cifra está escrita a mano**:
+al ampliar las tablas auxiliares, los resultados se actualizan al recompilar.
 
-| Reporte | Qué responde | TdR |
-|---|---|---|
-| **R1 — Calidad y preparación de los datos** | ¿Sirven estos datos? Cobertura, factores de conversión, porción comestible, adaptaciones metodológicas | 4.1–4.3, 7 |
-| **R2 — Modelo de base** | Consumo diario (`Q × FC × PC / PM`) y Equivalente de Mujer Adulta | 1.3, 1.4, 8.2 |
-| **R3 — Cobertura de vehículos fortificables** | ¿A qué proporción de hogares alcanza cada vehículo, y cuánto consumen? | 8.1, 4.2 |
-
-Los tres se generan automáticamente desde los datos: **ninguna cifra está
-escrita a mano**. Al mejorar los datos de origen, los reportes se actualizan
-solos.
+| Informe | Qué responde |
+|---|---|
+| **R1 — Calidad y preparación de los datos** | Qué proporción de las observaciones llega al cálculo, dónde se pierde el resto y qué adaptaciones metodológicas fueron necesarias |
+| **R2 — Modelo de base** | Consumo diario (`Q × FC × PC / PM`) y normalización por Equivalente de Mujer Adulta |
+| **R3 — Cobertura de vehículos fortificables** | A qué proporción de hogares alcanza cada vehículo y en qué cantidad |
+| **R4 — Escenarios de fortificación** | Cómo varía la ingesta de micronutrientes según qué vehículo se fortifique |
 
 ---
 
-## Qué se encontró
+## Hallazgos principales
 
-Tres resultados que conviene conocer antes de leer el detalle.
-
-**La ENGIH 2018 permite implementar la metodología.** El 76% de las
+**La metodología es implementable sobre esta fuente.** El 76% de las
 observaciones de la Sección 3A y el 91% de la Sección 2 completan la cadena de
-cálculo. Lo que limita el alcance no es la encuesta sino el estado de
-completitud de las tablas auxiliares, que sigue ampliándose.
+cálculo. El factor limitante no es la encuesta sino la completitud de las tablas
+auxiliares de conversión y composición, que continúa ampliándose: cada
+ampliación mejora la cobertura sin modificar el método.
 
-**Los cuatro vehículos de fortificación están cubiertos casi en su totalidad**
-(97–100% de las observaciones que los mencionan), de modo que los indicadores de
-cobertura son sólidos pese a que la cobertura general sea menor.
+**Los vehículos de fortificación están bien cubiertos.** Entre las observaciones
+que los mencionan, la cadena de cálculo se completa en el 97–100% de los casos.
+Los indicadores de cobertura son por tanto sólidos aun cuando la cobertura
+general sea menor.
 
-**La harina de trigo casi no se consume como producto: 8% de los hogares.** No
-es un vacío de datos, es el patrón de consumo dominicano — la harina llega al
-hogar ya procesada, como pan. Medir la cobertura del programa de fortificación
-por "harina de trigo" mide un insumo intermedio, no la exposición de la
-población al nutriente añadido. Definido como *harina y sus derivados*, el
-alcance pasa de 8% a **85.7%**.
+**El indicador de harina de trigo mide el insumo equivocado.** Solo el 8% de los
+hogares adquiere harina como producto —ningún hogar la declara en existencias—,
+lo que sugeriría un programa de fortificación de alcance marginal. El patrón de
+consumo dominicano explica la discrepancia: la harina llega al hogar ya
+procesada, principalmente como pan. Definido el vehículo como *harina y sus
+derivados*, el alcance pasa de 8% a **85,7%**.
+
+Este último hallazgo no es específico de República Dominicana: **afecta a
+cualquier evaluación donde el vehículo fortificado se consuma mayoritariamente
+transformado.**
+
+---
+
+## Estructura del repositorio
+
+```
+.
+├── scripts/           Pipeline de procesamiento (01 → 05)
+├── reports/           Fuentes de los informes e infraestructura compartida
+├── output/            Informes renderizados (no versionado — se regeneran)
+│
+├── data/
+│   ├── raw/           Fuentes originales y tablas auxiliares
+│   ├── clean/         Salidas del pipeline (no versionado — se regeneran)
+│   ├── auditoria/     Registro de decisiones: qué cambió, por qué y cuándo
+│   └── diagnosticos/  Exploración de calidad de datos (regenerable)
+│
+├── docs/              Documentación del proyecto
+├── referencias/       Material metodológico externo consultado
+└── media/             Evidencia fotográfica del trabajo de campo
+```
+
+**Convención de nombres.** Minúsculas, sin acentos ni espacios. Guiones en
+documentos, guiones bajos en código. Prefijo numérico únicamente donde el orden
+de ejecución importa.
+
+**Los productos derivados no se versionan, se reproducen.** El repositorio
+contiene lo que genera resultados, no los resultados. Esto aplica a
+`data/clean/`, `output/` y a los diagnósticos regenerables.
 
 ---
 
@@ -56,15 +85,17 @@ Cinco scripts secuenciales. Cada uno consume la salida del anterior y deja
 constancia en pantalla de cuántos registros entran y cuántos se pierden.
 
 ```
-01_import.R          Carga, valida y une las fuentes. Aplica factores de
-                     conversión y porción comestible.
-02_eda.R             Exploración y diagnóstico de calidad.
-03_transform.R       Consumo diario: Q × FC × PC / PM. Marca valores atípicos
-                     sin eliminarlos.
-04_equivalente_      Requerimiento energético por edad y sexo → EMA por hogar
-adulto.R             → gramos por EMA y día.
-05_ingesta_          Une con tablas de composición (INCAP / FNDDS) → ingesta
-micronutrientes.R    aparente de energía, hierro, folato y vitamina A.
+01_import.R               Carga, valida y une las fuentes. Aplica factores de
+                          conversión y porción comestible.
+02_eda.R                  Exploración y diagnóstico de calidad.
+03_transform.R            Consumo diario: Q × FC × PC / PM. Marca valores
+                          atípicos sin eliminarlos.
+04_equivalente_adulto.R   Requerimiento energético por edad y sexo → EMA por
+                          hogar → gramos por EMA y día.
+05_ingesta_micronutrientes.R
+                          Une con tablas de composición (INCAP / FNDDS) →
+                          ingesta aparente de energía, hierro, folato y
+                          vitamina A.
 ```
 
 ### Reproducir
@@ -75,35 +106,19 @@ source(here::here("scripts", "03_transform.R"))
 source(here::here("scripts", "04_equivalente_adulto.R"))
 source(here::here("scripts", "05_ingesta_micronutrientes.R"))
 
-quarto::quarto_render(here::here("scripts", "R1_calidad_datos.qmd"))
-quarto::quarto_render(here::here("scripts", "R2_modelo_base.qmd"))
-quarto::quarto_render(here::here("scripts", "R3_cobertura_vehiculos.qmd"))
+quarto::quarto_render(here::here("reports", "R1_calidad_datos.qmd"))
+quarto::quarto_render(here::here("reports", "R2_modelo_base.qmd"))
+quarto::quarto_render(here::here("reports", "R3_cobertura_vehiculos.qmd"))
+quarto::quarto_render(here::here("reports", "R4_escenarios_fortificacion.qmd"))
 ```
 
 Requiere R con `dplyr`, `readr`, `tidyr`, `readxl`, `writexl`, `here`, `knitr`,
-`srvyr`, `dlookr`, `conflicted`, y Quarto.
+`janitor`, `srvyr`, `dlookr`, `conflicted`, `ggplot2`, y Quarto.
 
-`scripts/_comun.R` centraliza rutas, carga de datos, definición de los vehículos
-de fortificación y la regla de elegibilidad compartida por los reportes. **Una
-definición se cambia allí y se propaga a todos**, lo que evita que dos reportes
-publiquen cifras incompatibles.
-
----
-
-## Estructura
-
-```
-data/raw/       Fuentes originales y tablas auxiliares (crosswalk, factores
-                de conversión, composición de alimentos). Versionado.
-data/clean/     Salidas del pipeline. NO versionado: es regenerable.
-data/eda/       Diagnósticos y registros de auditoría de las decisiones
-                de mapeo. Versionado.
-scripts/        Pipeline y reportes.
-docs/           Material metodológico de referencia y evidencia de campo.
-```
-
-**Los productos derivados no se versionan, se reproducen.** El repositorio
-contiene lo que genera resultados, no los resultados.
+`reports/_comun.R` centraliza rutas, carga de datos, definición de los vehículos
+de fortificación, escenarios y la regla de elegibilidad compartida. **Una
+definición se cambia allí y se propaga a todos los informes**, lo que evita que
+dos documentos publiquen cifras incompatibles.
 
 ---
 
@@ -112,28 +127,41 @@ contiene lo que genera resultados, no los resultados.
 Cada decisión metodológica que no es evidente queda registrada con su
 justificación y su evidencia:
 
-- **[`HOJA_DE_RUTA_PROYECTO.md`](./HOJA_DE_RUTA_PROYECTO.md)** — bitácora
-  completa: hitos, decisiones, hallazgos, errores cometidos y corregidos, y
-  backlog priorizado. Es la fuente de verdad del proyecto.
-- **[`VISION_Y_ARQUITECTURA_PROYECTO.md`](./VISION_Y_ARQUITECTURA_PROYECTO.md)** —
-  marco conceptual, alcance y principios de trabajo.
-- **`data/eda/log_*.csv`** — registro fila por fila de cada modificación a las
-  tablas auxiliares, con el motivo de cada una.
+- **[`docs/hoja-de-ruta.md`](docs/hoja-de-ruta.md)** — bitácora completa: hitos,
+  decisiones, hallazgos, errores cometidos y corregidos, y backlog priorizado.
+  Es la fuente de verdad del proyecto.
+- **[`docs/vision-y-arquitectura.md`](docs/vision-y-arquitectura.md)** — marco
+  conceptual, alcance y principios de trabajo.
+- **`data/auditoria/`** — registro fila por fila de cada modificación a las
+  tablas auxiliares, con el valor anterior, el nuevo y el motivo.
 
 El mapeo de alimentos a tablas de composición distingue explícitamente
 equivalencias **directas** de **sustitutos por criterio**, de modo que siempre
 es posible saber dónde se aplicó juicio profesional y dónde hubo
 correspondencia exacta.
 
+### Construcción del crosswalk
+
+La correspondencia entre los alimentos de la encuesta y las tablas de
+composición se construyó en dos fases: generación asistida de candidatos y
+revisión manual registro a registro, contrastando cada asignación contra la
+descripción de la tabla fuente.
+
+La revisión identificó errores en el **6,1%** de las asignaciones, todos de tres
+tipos recurrentes: parte del alimento consumida, estado de preparación y grado
+de procesamiento. Un ejemplo ilustra la importancia del criterio local: en
+República Dominicana *cereza* designa la acerola, cuyo contenido de vitamina C
+supera en más de dos órdenes de magnitud al de la guinda dulce.
+
 Cuando una tabla de composición internacional no cubría un producto dominicano,
-se resolvió con **trabajo de campo propio**: pesaje directo en mercado local con
-evidencia fotográfica, documentado en `docs/`.
+se resolvió con **trabajo de campo**: pesaje directo en mercado local con
+registro fotográfico, documentado en `media/`.
 
 ---
 
 ## Limitaciones
 
-Declaradas en detalle dentro de cada reporte. En resumen:
+Declaradas en detalle dentro de cada informe. En resumen:
 
 - **Consumo aparente, no ingesta individual.** Se mide lo que el hogar adquiere
   o tiene disponible, no lo que cada persona ingiere. No se captura distribución
@@ -169,5 +197,5 @@ documentada con su evidencia en la hoja de ruta.
 
 ---
 
-*Análisis y desarrollo: Maicel E. Monzón — Consultor internacional, Programa
-Mundial de Alimentos, República Dominicana.*
+*Análisis y desarrollo: Maicel E. Monzón, PhD — Consultor internacional,
+Programa Mundial de Alimentos, República Dominicana.*
