@@ -1,0 +1,349 @@
+---
+title: "Fortificación de alimentos — apoyo a la decisión"
+subtitle: "ENGIH 2018, República Dominicana"
+author: "Maicel E. Monzón, PhD"
+format:
+  dashboard:
+    theme: [default, custom.scss]
+    orientation: rows
+    nav-buttons:
+      - icon: github
+        href: https://github.com/maicel1978/analisis_ENGIH2018
+lang: es
+execute:
+  warning: false
+  message: false
+  echo: false
+---
+
+```{r}
+#| label: setup
+ruta_comun <- c(here::here("reports", "_comun.R"),
+                here::here("scripts", "_comun.R"))
+source(ruta_comun[file.exists(ruta_comun)][1])
+
+usar_plotly <- requireNamespace("plotly", quietly = TRUE)
+usar_dt     <- requireNamespace("DT", quietly = TRUE)
+if (usar_plotly) library(plotly)
+if (usar_dt)     library(DT)
+library(ggplot2)
+
+AZUL <- "#2c5364"; AZUL_C <- "#4a7c9b"; GRIS <- "#b8c4cc"
+ACENTO <- "#c0623c"; VERDE <- "#3d7068"
+
+gpe  <- cargar_gramos_por_ema() |> marcar_vehiculo()
+comp <- cargar_composicion()
+hog  <- n_distinct(gpe$id_hogar_unico)
+
+NUT <- c("energia_kcal","hierro_mg","folato_mcg_dfe","vitamina_a_mcg_rae")
+
+calc_esc <- function(nombre) {
+  sw <- ESCENARIOS |> filter(escenario == nombre) |>
+    select(vehiculo, eid_esc = enhance_id)
+  gpe |> left_join(sw, by = "vehiculo") |>
+    mutate(eid = coalesce(eid_esc, as.numeric(enhance_id))) |>
+    left_join(comp, by = c("eid" = "enhance_id")) |>
+    mutate(across(all_of(NUT), ~ .x * Gramos_por_EMA_dia / 100)) |>
+    group_by(id_hogar_unico) |>
+    summarise(across(all_of(NUT), ~ sum(.x, na.rm = TRUE)), .groups = "drop") |>
+    mutate(escenario = gsub("^[0-9]\\. ", "", nombre))
+}
+res <- bind_rows(lapply(unique(ESCENARIOS$escenario), calc_esc))
+
+# Requerimientos promedio estimados (EAR) de referencia para mujer adulta.
+# SE USAN COMO VALOR DE REFERENCIA, PENDIENTE DE CONFIRMACION por la contraparte
+# tecnica: el valor aplicable depende de la referencia adoptada (FAO/OMS o IOM)
+# y, en el caso del hierro, de la biodisponibilidad supuesta en la dieta.
+EAR <- tibble(
+  nutriente = c("hierro_mg", "folato_mcg_dfe", "vitamina_a_mcg_rae"),
+  etiqueta  = c("Hierro (mg)", "Folato (µg DFE)", "Vitamina A (µg RAE)"),
+  valor     = c(8.1, 320, 500)
+)
+
+tema_d <- function() {
+  theme_minimal(base_size = 12) +
+    theme(panel.grid.minor = element_blank(),
+          panel.grid.major.x = element_blank(),
+          panel.grid.major.y = element_line(colour = "#e8edf0"),
+          axis.title = element_text(colour = "#5a6b76", size = rel(0.9)),
+          legend.position = "top", legend.title = element_blank())
+}
+
+tabla <- function(df) {
+  if (usar_dt) {
+    DT::datatable(df, rownames = FALSE, filter = "top",
+                  options = list(pageLength = 10, dom = "ftip",
+                                 language = list(search = "Buscar:",
+                                   info = "_START_ a _END_ de _TOTAL_",
+                                   paginate = list(previous = "Anterior", `next` = "Siguiente"))))
+  } else knitr::kable(head(df, 12))
+}
+```
+
+# Cobertura de vehículos
+
+## Row {height="20%"}
+
+```{r}
+#| content: valuebox
+#| title: "Hogares analizados"
+list(icon = "house", color = "light", value = format(hog, big.mark = "."))
+```
+
+```{r}
+#| content: valuebox
+#| title: "Arroz"
+v <- gpe |> filter(vehiculo == "Arroz") |> distinct(id_hogar_unico) |> nrow()
+list(icon = "check-circle", color = "success",
+     value = paste0(round(100 * v / hog, 1), "%"))
+```
+
+```{r}
+#| content: valuebox
+#| title: "Aceite"
+v <- gpe |> filter(vehiculo == "Aceite") |> distinct(id_hogar_unico) |> nrow()
+list(icon = "check-circle", color = "success",
+     value = paste0(round(100 * v / hog, 1), "%"))
+```
+
+```{r}
+#| content: valuebox
+#| title: "Harina de trigo"
+v <- gpe |> filter(vehiculo == "Harina de trigo") |> distinct(id_hogar_unico) |> nrow()
+list(icon = "exclamation-triangle", color = "warning",
+     value = paste0(round(100 * v / hog, 1), "%"))
+```
+
+## Row {height="45%"}
+
+```{r}
+#| title: "Alcance de cada vehículo entre los hogares analizados"
+
+cob <- gpe |> filter(!is.na(vehiculo)) |>
+  distinct(id_hogar_unico, vehiculo) |> count(vehiculo) |>
+  mutate(p = 100 * n / hog, vehiculo = reorder(vehiculo, p))
+
+g <- ggplot(cob, aes(p, vehiculo,
+                     text = paste0(vehiculo, "<br>", format(n, big.mark = "."),
+                                   " hogares (", round(p, 1), "%)"))) +
+  geom_col(fill = AZUL_C, width = 0.6) +
+  scale_x_continuous(limits = c(0, 100), labels = function(x) paste0(x, "%")) +
+  labs(x = "Hogares que lo consumen", y = NULL) +
+  tema_d()
+
+if (usar_plotly) plotly::ggplotly(g, tooltip = "text") else g
+```
+
+```{r}
+#| title: "Consumo entre hogares consumidores (g por EMA y día)"
+
+cons <- gpe |> filter(!is.na(vehiculo)) |>
+  group_by(id_hogar_unico, vehiculo) |>
+  summarise(g = sum(Gramos_por_EMA_dia, na.rm = TRUE), .groups = "drop") |>
+  filter(g > 0, g < quantile(g, 0.99))
+
+g <- ggplot(cons, aes(reorder(vehiculo, g, median), g)) +
+  geom_boxplot(fill = AZUL_C, colour = AZUL, outlier.alpha = 0.12, width = 0.55) +
+  coord_flip() +
+  labs(x = NULL, y = "Gramos por EMA y día") +
+  tema_d()
+
+if (usar_plotly) plotly::ggplotly(g) else g
+```
+
+## Row {height="35%"}
+
+::: {.card title="El caso de la harina de trigo"}
+```{r}
+gpe_amp <- cargar_gramos_por_ema() |> marcar_vehiculo(ampliado = TRUE)
+h_est <- gpe |> filter(vehiculo == "Harina de trigo") |> distinct(id_hogar_unico) |> nrow()
+h_amp <- gpe_amp |> filter(vehiculo == "Trigo y derivados") |> distinct(id_hogar_unico) |> nrow()
+
+tibble(
+  `Definición del indicador` = c("Harina de trigo como producto",
+                                 "Harina de trigo y sus derivados"),
+  Hogares = c(format(h_est, big.mark = "."), format(h_amp, big.mark = ".")),
+  Alcance = c(pct(h_est, hog), pct(h_amp, hog))
+) |> knitr::kable()
+```
+
+Ningún hogar de la muestra declara harina en existencias y solo una minoría
+registra su compra, mientras los derivados de trigo aparecen en la mayoría.
+
+Una lectura posible es que la harina llegue al hogar ya procesada. Si así fuera,
+y dado que la fortificación se realiza en el molino, el indicador construido
+sobre harina mediría un insumo intermedio y no la exposición de la población.
+
+**Límites:** la norma es voluntaria para pastas y galletas, y sin factores de
+receta esto mide alcance, no gramos de harina.
+:::
+
+# Escenarios
+
+## Row {height="12%"}
+
+::: {.card}
+**Los escenarios modelan qué ocurriría si se fortificaran distintos vehículos.**
+Cuál corresponde al marco normativo vigente en República Dominicana es una
+verificación pendiente de la contraparte técnica: aquí se presenta el rango, no
+una cifra única.
+:::
+
+## Row {height="48%"}
+
+```{r}
+#| title: "Ingesta mediana por escenario"
+
+comp_esc <- res |>
+  group_by(escenario) |>
+  summarise(across(all_of(NUT[-1]), median), .groups = "drop") |>
+  tidyr::pivot_longer(-escenario, names_to = "nutriente", values_to = "v") |>
+  left_join(EAR, by = "nutriente")
+
+g <- ggplot(comp_esc, aes(escenario, v, fill = escenario,
+                          text = paste0(escenario, "<br>", etiqueta, ": ",
+                                        round(v, 1)))) +
+  geom_col(width = 0.6) +
+  geom_hline(aes(yintercept = valor), linetype = "22", colour = ACENTO) +
+  facet_wrap(~etiqueta, scales = "free_y") +
+  scale_fill_manual(values = c(GRIS, AZUL_C, AZUL)) +
+  labs(x = NULL, y = NULL,
+       caption = "Línea punteada: requerimiento promedio estimado de referencia") +
+  tema_d() +
+  theme(axis.text.x = element_blank(),
+        strip.text = element_text(face = "bold", colour = "#1a3a4a"))
+
+if (usar_plotly) plotly::ggplotly(g, tooltip = "text") else g
+```
+
+## Row {height="40%"}
+
+```{r}
+#| title: "Desplazamiento de la distribución respecto al requerimiento"
+
+nut_sel <- "folato_mcg_dfe"
+ear_sel <- EAR$valor[EAR$nutriente == nut_sel]
+
+dist <- res |>
+  select(escenario, v = all_of(nut_sel)) |>
+  filter(v > 0, v < quantile(v, 0.98))
+
+g <- ggplot(dist, aes(v, colour = escenario, fill = escenario)) +
+  geom_density(alpha = 0.18, linewidth = 0.9) +
+  geom_vline(xintercept = ear_sel, linetype = "22", colour = ACENTO, linewidth = 0.9) +
+  annotate("text", x = ear_sel, y = 0, label = "  requerimiento",
+           colour = ACENTO, hjust = 0, vjust = -0.5, size = 3.4) +
+  scale_colour_manual(values = c(GRIS, AZUL_C, AZUL)) +
+  scale_fill_manual(values = c(GRIS, AZUL_C, AZUL)) +
+  labs(x = "Folato (µg DFE por EMA y día)", y = "Densidad") +
+  tema_d()
+
+if (usar_plotly) plotly::ggplotly(g) else g
+```
+
+```{r}
+#| title: "Hogares por debajo del requerimiento"
+
+bajo <- res |>
+  tidyr::pivot_longer(all_of(NUT[-1]), names_to = "nutriente", values_to = "v") |>
+  left_join(EAR, by = "nutriente") |>
+  group_by(Escenario = escenario, Nutriente = etiqueta) |>
+  summarise(`% por debajo` = round(100 * mean(v < valor), 1), .groups = "drop") |>
+  tidyr::pivot_wider(names_from = Nutriente, values_from = `% por debajo`)
+
+knitr::kable(bajo)
+```
+
+# Decisiones
+
+## Row {height="55%"}
+
+```{r}
+#| title: "Decisiones que condicionan la interpretación"
+
+tibble(
+  Decisión = c("Tratamiento de las Secciones 2 y 3A",
+               "Línea base de fortificación",
+               "Fuentes de composición faltantes",
+               "Requerimientos de referencia (EAR)"),
+  `Situación` = c(
+    "Ninguna sección por separado produce valores plausibles; su suma duplica los alimentos almacenables",
+    "El mapeo actual no representa ningún escenario real de política dominicana",
+    "Alimentos de consumo frecuente sin equivalencia en INCAP ni FNDDS",
+    "El valor aplicable depende de la referencia adoptada y, en hierro, de la biodisponibilidad supuesta"
+  ),
+  `Efecto si no se resuelve` = c(
+    "Sobrestimación del consumo de arroz, aceite, azúcar y leche",
+    "Folato sobrestimado y vitamina A subestimada",
+    "Pérdida de cobertura concentrada en pocos alimentos de alta frecuencia",
+    "La proporción por debajo del requerimiento no es comparable con otras fuentes"
+  ),
+  `Evidencia disponible` = c(
+    "Tres variantes calculadas y comparadas",
+    "Tres escenarios modelados; rango presentado",
+    "Listado de alimentos por número de observaciones afectadas",
+    "Cálculo parametrizado: cambiar el valor no exige rehacer el análisis"
+  )
+) |> tabla()
+```
+
+## Row {height="45%"}
+
+::: {.card title="Qué permite decidir este tablero"}
+**Qué vehículo prioriza una estrategia de fortificación.** El alcance y el
+consumo mediano de cada vehículo están medidos. Un vehículo de consumo
+mayoritario produce un efecto poblacional mayor aunque su contenido de nutriente
+sea equivalente.
+
+**Cuánto se ganaría.** El desplazamiento de la distribución respecto al
+requerimiento muestra qué proporción de hogares dejaría de estar por debajo en
+cada escenario.
+
+**Dónde conviene invertir esfuerzo de mejora.** El trabajo pendiente está
+ordenado por número de observaciones afectadas.
+:::
+
+::: {.card title="Qué no permite decidir todavía"}
+**No hay intervalos de confianza.** El diseño muestral complejo aún no está
+incorporado, de modo que no se reporta precisión estadística.
+
+**No hay desagregación por quintil ni zona.** El análisis de equidad requiere el
+paso anterior para ser estadísticamente correcto.
+
+**El aceite no se modeló como vehículo de vitamina A**: la tabla de composición
+no incluye versiones fortificadas, y no se sustituyó por un valor supuesto.
+
+**Los requerimientos de referencia están pendientes de confirmación.** La
+proporción por debajo del requerimiento debe leerse como ilustrativa del método,
+no como estimación definitiva.
+:::
+
+# Notas
+
+::: {.card title="Fuente"}
+ENGIH 2018, Banco Central de la República Dominicana. Microdatos de acceso
+público: <https://www.bancentral.gov.do/a/d/4796-engih-2018>
+
+Tablas de composición: INCAP y FNDDS (USDA).
+:::
+
+::: {.card title="Advertencia sobre los requerimientos de referencia"}
+Los valores utilizados como requerimiento promedio estimado son **de
+referencia y están pendientes de confirmación** por la contraparte técnica.
+
+El valor aplicable depende de la referencia adoptada (FAO/OMS o IOM) y, en el
+caso del hierro, de la biodisponibilidad supuesta para la dieta dominicana. El
+hierro presenta además una distribución de requerimientos asimétrica, para la
+cual el método de punto de corte tiene limitaciones conocidas.
+
+El cálculo está parametrizado: modificar estos valores no exige rehacer el
+análisis, solo recompilar el documento.
+:::
+
+::: {.card title="Cómo se generó"}
+Todas las cifras se calculan al compilar a partir de los datos del pipeline.
+Ninguna está escrita a mano.
+
+El código, la bitácora de decisiones y el registro de auditoría del mapeo de
+alimentos están en el repositorio del proyecto.
+:::
