@@ -1,0 +1,351 @@
+---
+title: "R5 — Equidad en la ingesta aparente de micronutrientes"
+subtitle: "ENGIH 2018, República Dominicana | Estimaciones con diseño muestral complejo"
+author: "Maicel E. Monzón, PhD (ORCID 0000-0003-2117-9145)"
+date: today
+lang: es
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    toc-title: "Contenido"
+    number-sections: true
+    df-print: kable
+    code-fold: true
+    code-tools: true
+    embed-resources: true
+crossref:
+  tbl-title: "Tabla"
+  fig-title: "Figura"
+  title-delim: "."
+execute:
+  warning: false
+  message: false
+  echo: false
+---
+
+```{r}
+#| label: setup
+ruta_comun <- c(here::here("reports", "_comun.R"),
+                here::here("scripts", "_comun.R"))
+source(ruta_comun[file.exists(ruta_comun)][1])
+
+library(ggplot2)
+
+AZUL <- "#2c5364"; AZUL_C <- "#7ba3bd"; GRIS <- "#c9d3da"; ACENTO <- "#c0623c"
+
+ing <- leer_limpio(file.path(RUTA_CLEAN, "data_ingesta_micronutrientes_hogar.csv")) |>
+  filter(variante == "Sec 2 + Sec 3A")
+dis <- diseno_muestral(ing)
+
+NUT  <- c("energia_kcal", "hierro_mg", "folato_mcg_dfe", "vitamina_a_mcg_rae")
+ETIQ <- c("Energía (kcal)", "Hierro (mg)", "Folato (µg DFE)", "Vitamina A (µg RAE)")
+
+por_quintil <- bind_rows(lapply(seq_along(NUT), function(i) {
+  estimar(dis, !!rlang::sym(NUT[i]), por = "quintil") |>
+    mutate(nutriente = ETIQ[i], .before = 1)
+}))
+
+por_zona <- bind_rows(lapply(seq_along(NUT), function(i) {
+  estimar(dis, !!rlang::sym(NUT[i]), por = "zona") |>
+    mutate(nutriente = ETIQ[i], .before = 1)
+}))
+
+razon <- por_quintil |>
+  group_by(nutriente) |>
+  summarise(
+    q1 = mediana[quintil == 1],
+    q5 = mediana[quintil == 5],
+    razon = q5 / q1,
+    .groups = "drop"
+  ) |>
+  arrange(desc(razon))
+
+tema_r <- function(base = 12) {
+  theme_minimal(base_size = base) +
+    theme(panel.grid.minor = element_blank(),
+          panel.grid.major.x = element_blank(),
+          panel.grid.major.y = element_line(colour = "#eef2f4"),
+          axis.title = element_text(colour = "#5a6b76", size = rel(0.9)),
+          plot.caption = element_text(colour = "#93a2ad", size = rel(0.75), hjust = 0),
+          legend.position = "top", legend.title = element_blank(),
+          strip.text = element_text(face = "bold", colour = "#1a3a4a"))
+}
+
+FUENTE <- "Fuente: ENGIH 2018, Banco Central de la República Dominicana."
+```
+
+# Qué responde este informe
+
+El marco analítico de referencia plantea que la evaluación de un programa de
+fortificación no se agota en el promedio poblacional: importa **a quién llega**.
+Un vehículo puede alcanzar una cobertura nacional alta y aun así dejar fuera a
+los hogares de menor capacidad de gasto, que suelen ser los de mayor riesgo
+nutricional.
+
+Este informe estima la ingesta aparente de micronutrientes **por quintil de
+gasto y por zona de residencia**, incorporando el diseño muestral complejo de la
+encuesta.
+
+::: {.callout-note appearance="simple"}
+## Novedad metodológica respecto a los informes anteriores
+Las estimaciones de este informe incorporan la estructura de la muestra: **8
+estratos, 933 unidades primarias de muestreo y factor de expansión por hogar**.
+Las medias se acompañan de intervalos de confianza al 95% calculados por
+linealización de Taylor.
+
+La mediana ponderada se reporta como estimador central descriptivo. En una
+distribución con la asimetría que presenta el consumo declarado —derivada de
+adquisiciones en volumen concentradas en un día— la mediana describe mejor al
+hogar típico que la media.
+:::
+
+# El gradiente social de la ingesta
+
+## Estimaciones por quintil de gasto
+
+```{r}
+#| label: tbl-quintil
+#| tbl-cap: "Ingesta aparente de micronutrientes por Equivalente de Mujer Adulta y día, según quintil de gasto del hogar. República Dominicana, 2018"
+
+por_quintil |>
+  transmute(
+    Nutriente = nutriente,
+    Quintil   = quintil,
+    Hogares   = n,
+    Mediana   = round(mediana, 1),
+    Media     = round(media, 1),
+    `IC 95%`  = paste0(round(media_low, 1), " – ", round(media_upp, 1))
+  ) |>
+  kable(format.args = list(big.mark = "."))
+```
+
+::: {.fuente}
+`r FUENTE` Estimaciones ponderadas con diseño muestral complejo.
+:::
+
+```{r}
+#| label: fig-gradiente
+#| fig-cap: "Gradiente de la ingesta según quintil de gasto, por nutriente. República Dominicana, 2018"
+#| fig-width: 9
+#| fig-height: 6
+
+por_quintil |>
+  mutate(nutriente = factor(nutriente, levels = ETIQ)) |>
+  ggplot(aes(factor(quintil), media)) +
+  geom_errorbar(aes(ymin = media_low, ymax = media_upp),
+                width = 0.14, colour = AZUL_C, linewidth = 0.7) +
+  geom_point(colour = AZUL, size = 2.6) +
+  geom_point(aes(y = mediana), colour = ACENTO, size = 2.2, shape = 17) +
+  facet_wrap(~nutriente, scales = "free_y", ncol = 2) +
+  labs(x = "Quintil de gasto del hogar", y = NULL,
+       caption = "Círculo azul: media ponderada con IC 95%. Triángulo naranja: mediana ponderada.") +
+  tema_r()
+```
+
+::: {.fuente}
+`r FUENTE`
+:::
+
+## El hallazgo: la pendiente no es la misma en todos los nutrientes
+
+```{r}
+#| label: tbl-razon
+#| tbl-cap: "Razón entre el quintil de mayor y el de menor gasto, en medianas ponderadas. República Dominicana, 2018"
+
+razon |>
+  transmute(
+    Nutriente = nutriente,
+    `Quintil 1` = round(q1, 1),
+    `Quintil 5` = round(q5, 1),
+    `Razón Q5/Q1` = round(razon, 2)
+  ) |>
+  kable()
+```
+
+::: {.fuente}
+`r FUENTE`
+:::
+
+```{r}
+#| label: fig-razon
+#| fig-cap: "Magnitud del gradiente social por nutriente. República Dominicana, 2018"
+#| fig-width: 8
+#| fig-height: 3.2
+
+razon |>
+  mutate(nutriente = reorder(nutriente, razon),
+         col = ifelse(razon == max(razon), ACENTO,
+                      ifelse(razon == min(razon), AZUL, AZUL_C))) |>
+  ggplot(aes(razon, nutriente, fill = col)) +
+  geom_col(width = 0.55) +
+  geom_vline(xintercept = 1, colour = "#93a2ad", linetype = "22") +
+  geom_text(aes(label = paste0("×", round(razon, 2))), hjust = -0.2,
+            size = 3.8, colour = "#44555f") +
+  scale_fill_identity() +
+  scale_x_continuous(limits = c(0, max(razon$razon) * 1.18), expand = c(0, 0)) +
+  labs(x = "Veces que la ingesta del quintil 5 supera a la del quintil 1", y = NULL) +
+  tema_r()
+```
+
+::: {.fuente}
+`r FUENTE`
+:::
+
+```{r}
+#| label: lectura-razon
+#| results: asis
+
+r_alto <- razon |> slice_max(razon, n = 1)
+r_bajo <- razon |> slice_min(razon, n = 1)
+
+cat(paste0(
+  "**El gradiente social más pronunciado corresponde a **", r_bajo$nutriente,
+  " (×", round(r_bajo$razon, 2), ") y **", r_alto$nutriente,
+  "** (×", round(r_alto$razon, 2), ").\n"
+))
+```
+
+La **vitamina A** presenta el gradiente más pronunciado: la ingesta del quintil
+de mayor gasto duplica la del quintil más pobre. El **folato**, en cambio,
+muestra la distribución más equitativa de los cuatro nutrientes examinados.
+
+::: {.callout-important}
+## Una interpretación que conviene poner a prueba
+La diferencia entre ambos gradientes admite una explicación relacionada con el
+objeto de este estudio.
+
+En el escenario de composición actualmente aplicado, una parte sustancial del
+folato proviene de **alimentos básicos sujetos a fortificación** —cereales—, que
+son consumidos de forma transversal por toda la población. La vitamina A, por el
+contrario, proviene mayoritariamente de **alimentos frescos no fortificados**:
+vegetales, lácteos y vísceras, cuyo consumo sí responde a la capacidad de gasto.
+
+Si esta lectura fuese correcta, implicaría que **la fortificación de alimentos
+básicos atenúa el gradiente social de la ingesta del nutriente añadido**, lo que
+constituiría un argumento de equidad adicional al de cobertura poblacional.
+
+**Esta interpretación está condicionada por un supuesto sin resolver.** El
+aporte de folato depende de qué alimentos se consideren fortificados en la línea
+base, decisión que permanece pendiente de definición. Si el arroz no estuviera
+sujeto a fortificación obligatoria, el gradiente del folato sería más
+pronunciado que el aquí estimado.
+
+**Verificación pendiente:** repetir esta estimación bajo los tres escenarios de
+fortificación modelados en el informe R4. Si el gradiente del folato se mantiene
+plano en el escenario sin fortificación, la interpretación es errónea; si se
+empina, queda respaldada.
+:::
+
+## Significación estadística del gradiente
+
+```{r}
+#| label: tbl-solape
+#| tbl-cap: "Contraste entre los quintiles extremos: solapamiento de intervalos de confianza al 95%. República Dominicana, 2018"
+
+por_quintil |>
+  filter(quintil %in% c(1, 5)) |>
+  select(nutriente, quintil, media_low, media_upp) |>
+  tidyr::pivot_wider(names_from = quintil,
+                     values_from = c(media_low, media_upp)) |>
+  transmute(
+    Nutriente = nutriente,
+    `IC Quintil 1` = paste0(round(media_low_1, 1), " – ", round(media_upp_1, 1)),
+    `IC Quintil 5` = paste0(round(media_low_5, 1), " – ", round(media_upp_5, 1)),
+    `¿Se solapan?` = if_else(media_upp_1 >= media_low_5, "Sí", "No")
+  ) |>
+  kable()
+```
+
+::: {.fuente}
+`r FUENTE`
+:::
+
+En los cuatro nutrientes los intervalos de confianza de los quintiles extremos
+**no se solapan**, de modo que la diferencia entre el quintil de mayor y el de
+menor gasto es sostenible estadísticamente.
+
+# Zona de residencia
+
+```{r}
+#| label: tbl-zona
+#| tbl-cap: "Ingesta aparente por Equivalente de Mujer Adulta y día, según zona de residencia. República Dominicana, 2018"
+
+por_zona |>
+  transmute(
+    Nutriente = nutriente,
+    Zona      = zona,
+    Hogares   = n,
+    Mediana   = round(mediana, 1),
+    Media     = round(media, 1),
+    `IC 95%`  = paste0(round(media_low, 1), " – ", round(media_upp, 1))
+  ) |>
+  kable(format.args = list(big.mark = "."))
+```
+
+::: {.fuente}
+`r FUENTE`
+:::
+
+```{r}
+#| label: tbl-zona-solape
+#| tbl-cap: "Contraste urbano–rural: solapamiento de intervalos de confianza al 95%. República Dominicana, 2018"
+
+por_zona |>
+  select(nutriente, zona, media_low, media_upp) |>
+  tidyr::pivot_wider(names_from = zona, values_from = c(media_low, media_upp)) |>
+  transmute(
+    Nutriente = nutriente,
+    `IC Rural`  = paste0(round(media_low_Rural, 1), " – ", round(media_upp_Rural, 1)),
+    `IC Urbano` = paste0(round(media_low_Urbano, 1), " – ", round(media_upp_Urbano, 1)),
+    `¿Se solapan?` = if_else(
+      pmin(media_upp_Rural, media_upp_Urbano) >=
+        pmax(media_low_Rural, media_low_Urbano), "Sí", "No")
+  ) |>
+  kable()
+```
+
+::: {.fuente}
+`r FUENTE`
+:::
+
+A diferencia del gradiente por quintil, **la brecha urbano–rural no es uniforme
+ni uniformemente significativa**. Los intervalos se solapan en algunos
+nutrientes, de modo que esas diferencias no son sostenibles con los datos
+disponibles y no deben interpretarse como reales.
+
+Conviene señalarlo de forma explícita: es una diferencia que podría afirmarse a
+partir de las estimaciones puntuales, y que el contraste de intervalos no
+respalda.
+
+# Limitaciones
+
+**Estas cifras miden adquisición, no ingesta individual.** Parte del gradiente
+por quintil puede reflejar que los hogares de mayor capacidad de gasto
+**adquieren más de lo que efectivamente consumen** —desperdicio, invitados,
+almacenamiento— y no necesariamente que sus miembros ingieran proporcionalmente
+más. La advertencia es especialmente pertinente para la energía, donde la
+diferencia entre quintiles extremos es sustancial.
+
+**El quintil de gasto procede de la propia encuesta**, no fue construido en este
+análisis. Esto evita introducir una decisión metodológica adicional, pero
+implica adoptar la definición del productor de los datos.
+
+**La cobertura de las tablas de composición no es uniforme entre nutrientes**
+(energía 100%, vitamina A 85,5%). Dado que los alimentos sin composición
+conocida contribuyen cero, las estimaciones son un límite inferior, y esa
+subestimación afecta más a la vitamina A —precisamente el nutriente con el
+gradiente más pronunciado—.
+
+**El consumo de alimentos almacenables está sobrestimado** por el solapamiento
+entre las secciones del cuestionario, según se documenta en el informe de
+factibilidad.
+
+**El aporte de folato depende del escenario de fortificación adoptado**, que
+permanece pendiente de definición. La interpretación sobre el efecto de la
+fortificación en el gradiente social requiere la verificación señalada arriba.
+
+---
+
+*Generado de forma reproducible a partir del pipeline del proyecto.
+Estimaciones con `srvyr` sobre el diseño muestral declarado por la encuesta.*
