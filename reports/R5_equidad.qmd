@@ -117,7 +117,7 @@ por_quintil |>
     Media     = round(media, 1),
     `IC 95%`  = paste0(round(media_low, 1), " – ", round(media_upp, 1))
   ) |>
-  kable(format.args = list(big.mark = "."))
+  kable(format.args = list(big.mark = ".", decimal.mark = ","))
 ```
 
 ::: {.fuente}
@@ -200,9 +200,9 @@ r_alto <- razon |> slice_max(razon, n = 1)
 r_bajo <- razon |> slice_min(razon, n = 1)
 
 cat(paste0(
-  "**El gradiente social más pronunciado corresponde a **", r_bajo$nutriente,
-  " (×", round(r_bajo$razon, 2), ") y **", r_alto$nutriente,
-  "** (×", round(r_alto$razon, 2), ").\n"
+  "El gradiente más pronunciado corresponde a **", r_alto$nutriente,
+  "** (×", round(r_alto$razon, 2), "); el más plano, a **", r_bajo$nutriente,
+  "** (×", round(r_bajo$razon, 2), ").\n"
 ))
 ```
 
@@ -280,7 +280,7 @@ por_zona |>
     Media     = round(media, 1),
     `IC 95%`  = paste0(round(media_low, 1), " – ", round(media_upp, 1))
   ) |>
-  kable(format.args = list(big.mark = "."))
+  kable(format.args = list(big.mark = ".", decimal.mark = ","))
 ```
 
 ::: {.fuente}
@@ -309,14 +309,58 @@ por_zona |>
 `r FUENTE`
 :::
 
-A diferencia del gradiente por quintil, **la brecha urbano–rural no es uniforme
-ni uniformemente significativa**. Los intervalos se solapan en algunos
-nutrientes, de modo que esas diferencias no son sostenibles con los datos
-disponibles y no deben interpretarse como reales.
+A diferencia del gradiente por quintil, **la brecha urbano–rural no es
+uniformemente significativa**.
 
-Conviene señalarlo de forma explícita: es una diferencia que podría afirmarse a
-partir de las estimaciones puntuales, y que el contraste de intervalos no
-respalda.
+```{r}
+#| label: zona-hallazgo
+#| results: asis
+
+solape <- por_zona |>
+  select(nutriente, zona, media_low, media_upp) |>
+  tidyr::pivot_wider(names_from = zona, values_from = c(media_low, media_upp)) |>
+  mutate(solapan = pmin(media_upp_Rural, media_upp_Urbano) >=
+                   pmax(media_low_Rural, media_low_Urbano))
+
+dif <- solape |> filter(!solapan) |> pull(nutriente)
+
+if (length(dif) == 0) {
+  cat("Ninguna diferencia entre zonas resulta sostenible con los datos disponibles.\n")
+} else {
+  medianas <- por_zona |> filter(nutriente %in% dif) |>
+    select(nutriente, zona, mediana) |>
+    tidyr::pivot_wider(names_from = zona, values_from = mediana)
+  mayor <- if_else(medianas$Rural[1] > medianas$Urbano[1], "rural", "urbana")
+  cat(paste0(
+    "De los cuatro nutrientes examinados, la única diferencia sostenible ",
+    "estadísticamente corresponde a **", paste(dif, collapse = ", "),
+    "**, con valores mayores en la zona **", mayor, "** ",
+    "(medianas de ", round(medianas$Rural[1], 1), " y ",
+    round(medianas$Urbano[1], 1), " respectivamente).\n"
+  ))
+}
+```
+
+En los demás nutrientes los intervalos se solapan, de modo que esas diferencias
+**no son sostenibles con los datos disponibles y no deben interpretarse como
+reales**. Conviene señalarlo de forma explícita: son diferencias que las
+estimaciones puntuales sugieren y que el contraste de intervalos no respalda.
+
+::: {.callout-note}
+## Una segunda evidencia en la misma dirección
+El resultado por zona es coherente con la interpretación planteada en la sección
+anterior. Si el folato proviene mayoritariamente de cereales básicos sujetos a
+fortificación, cabría esperar una ingesta mayor allí donde esos alimentos pesan
+más en la dieta.
+
+Se trata de **dos evidencias independientes que apuntan a lo mismo**: un
+gradiente por capacidad de gasto más plano que el del resto de nutrientes, y una
+ventaja del área donde el consumo de cereales es proporcionalmente mayor.
+
+Ambas se ponen a prueba con el mismo procedimiento: repetir la estimación bajo
+los escenarios de fortificación. Si el patrón persiste en el escenario sin
+fortificación, la explicación debe buscarse en otra parte.
+:::
 
 # Limitaciones
 
