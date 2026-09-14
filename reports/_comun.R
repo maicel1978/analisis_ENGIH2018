@@ -195,6 +195,91 @@ cargar_composicion <- function() {
     distinct(enhance_id, .keep_all = TRUE)
 }
 
+# --- Diseno muestral complejo -------------------------------------------------
+# La ENGIH es una muestra estratificada por conglomerados: 8 estratos, 933
+# unidades primarias de muestreo (UPM) y factor de expansion por hogar.
+#
+# Ignorar la estructura NO sesga las estimaciones puntuales de forma
+# sistematica, pero SI subestima los errores estandar: los intervalos salen
+# demasiado estrechos y cualquier contraste se vuelve optimista.
+#
+# Requiere que 04_equivalente_adulto.R haya conservado estrato, upm y
+# factor_expansion en data_ema_hogar.csv (desde 2026-09-13).
+
+cargar_ema_hogar <- function() {
+  f <- file.path(RUTA_CLEAN, "data_ema_hogar.csv")
+  exigir_archivo(f, "04_equivalente_adulto.R")
+  d <- leer_limpio(f)
+  faltan <- setdiff(c("estrato", "upm", "factor_expansion"), names(d))
+  if (length(faltan) > 0) {
+    stop("`data_ema_hogar.csv` no tiene: ", paste(faltan, collapse = ", "),
+         ". Volver a correr scripts/04_equivalente_adulto.R.", call. = FALSE)
+  }
+  d
+}
+
+# Construye el objeto de diseno a partir de un data frame a nivel de HOGAR.
+# `datos` debe traer id_hogar_unico; las variables de diseno se unen desde
+# data_ema_hogar.csv, que es donde viven.
+diseno_muestral <- function(datos) {
+  if (!requireNamespace("srvyr", quietly = TRUE)) {
+    stop("Falta el paquete `srvyr`. Instalar con install.packages(\"srvyr\").",
+         call. = FALSE)
+  }
+
+  dis <- cargar_ema_hogar() |>
+    select(id_hogar_unico, estrato, upm, factor_expansion,
+           quintil, zona, grupo_region)
+
+  d <- datos |>
+    inner_join(dis, by = "id_hogar_unico", suffix = c("", "_dis"))
+
+  perdidos <- nrow(datos) - nrow(d)
+  if (perdidos > 0) {
+    warning(perdidos, " filas sin correspondencia en el marco muestral; ",
+            "quedan fuera de la estimacion.", call. = FALSE)
+  }
+
+  srvyr::as_survey_design(d, ids = upm, strata = estrato,
+                          weights = factor_expansion, nest = TRUE)
+}
+
+# Media ponderada con intervalo (Taylor) + mediana ponderada como descriptivo.
+# `por` admite variables de agrupacion: quintil, zona, grupo_region.
+estimar <- function(diseno, variable, por = NULL, nivel = 0.95) {
+  v <- rlang::ensym(variable)
+  d <- if (is.null(por)) diseno else dplyr::group_by(diseno, dplyr::across(all_of(por)))
+
+  media <- d |>
+    srvyr::summarise(
+      n        = srvyr::unweighted(dplyr::n()),
+      media    = srvyr::survey_mean(!!v, vartype = "ci", level = nivel,
+                                    na.rm = TRUE)
+    )
+
+  mediana <- d |>
+    srvyr::summarise(
+      mediana = srvyr::survey_median(!!v, vartype = NULL, na.rm = TRUE)
+    )
+
+  if (is.null(por)) dplyr::bind_cols(media, mediana)
+  else dplyr::left_join(media, mediana, by = por)
+}
+
+# Proporcion ponderada con intervalo, para indicadores de cobertura.
+# `condicion` debe ser una columna logica ya calculada en `datos`.
+estimar_proporcion <- function(diseno, condicion, por = NULL, nivel = 0.95) {
+  v <- rlang::ensym(condicion)
+  d <- if (is.null(por)) diseno else dplyr::group_by(diseno, dplyr::across(all_of(por)))
+
+  d |>
+    srvyr::summarise(
+      n = srvyr::unweighted(dplyr::n()),
+      p = srvyr::survey_mean(!!v, vartype = "ci", level = nivel, na.rm = TRUE)
+    ) |>
+    dplyr::mutate(dplyr::across(dplyr::starts_with("p"), ~ .x * 100))
+}
+
 # --- Helpers ------------------------------------------------------------------
 
 # Normaliza texto para emparejar descripciones sin depender de acentos/mayúsculas
