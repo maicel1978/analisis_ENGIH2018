@@ -10,43 +10,46 @@ Este documento fija el alcance acordado hasta ahora. Cualquier cambio de alcance
 
 ## PRIORIDAD ACTUAL (leer esto primero, antes que Fase 0 de abajo)
 
-**Estado al 2026-09-14.** El pipeline `01`→`05` corre completo e incorpora el
-**diseño muestral complejo**. Hay **seis documentos terminados**: el informe de
-factibilidad (entregable contractual, en HTML y Word), R1 a R5, la presentación
-para la revisión, y dos tableros. El repositorio está reorganizado, con
-convención de nombres, README reescrito y trazabilidad documentada.
+**Estado al 2026-09-14 (madrugada).** Pipeline `01`→`05` con **diseño muestral
+complejo incorporado**. Seis documentos: informe de factibilidad (HTML y Word),
+R1 a R5, presentación como reporte de avance, y dos tableros escritos. Repositorio
+reorganizado, README reescrito, validación externa hecha.
 
-**Hallazgo principal del proyecto (2026-09-14):** la fortificación del arroz
-**aplana el gradiente social del folato** —de ×1,21 a ×1,01 entre quintiles
-extremos— porque el arroz se consume en cantidades equivalentes en toda la
-distribución de gasto. Añade un argumento de **equidad** al de cobertura. Ver
-R5 y el registro detallado en Fase 0.
+**Las dos brechas mayores frente al estándar internacional están cerradas:**
+diseño muestral (intervalos de confianza correctos) y validación externa.
 
-**Lo que sigue, por valor decreciente:**
+**Hallazgo principal:** la fortificación del arroz reduce la razón de ingesta de
+folato entre quintiles extremos de **1,21 a 1,01**. El mecanismo es el consumo
+transversal del vehículo —los hogares pobres no consumen más arroz, consumen lo
+mismo—, lo que hace el argumento generalizable a cualquier alimento básico.
 
-1. **Dominar el material para la reunión.** A partir de aquí el valor está en
-   poder defender cada decisión sin notas, no en escribir más código. El guion
-   está en Fase 5.
-2. **Incorporar intervalos de confianza a R1, R2 y R4.** `reports/_comun.R` ya
-   tiene el diseño muestral; R3 y R5 ya los usan.
-3. **Corregir `03_transform.R`**, que imprime un intervalo con una advertencia
-   de subestimación que ya no aplica.
-4. **Pulir el diseño de los dos tableros** (ver pendiente en Fase 0) y el
-   borrador de artículo científico.
+**Lo que sigue, por orden:**
 
-**Las tres decisiones que corresponden al equipo técnico** —línea base de
-fortificación, tratamiento de las Secciones 2 y 3A, y fuentes de composición
-faltantes— siguen abiertas y están documentadas con su evidencia. Se llevan a la
-reunión; no se resuelven por cuenta propia.
+1. **Terminar de renderizar y verificar la presentación.** Es lo del martes.
+2. **Revisión de tono en el repositorio** — comentarios de los scripts y
+   encabezados. Daniel lo revisará con detalle. Ver el pendiente detallado más
+   abajo con los tres patrones a eliminar.
+3. **Revisión de tono en la documentación** — hoja de ruta, README, informes.
+4. **Pulir el diseño de los dos tableros** y el borrador de artículo.
+
+**Estado de las dos máquinas.** PC-B (prestada) tiene todo y está al día. **PC-A
+sigue pendiente de `git pull`, con un error sin diagnosticar.** Es lo primero al
+retomar: PC-A está dentro de OneDrive del PMA y puede dar el cuelgue conocido en
+`.git/objects`; si falla, mover el repositorio fuera de OneDrive.
+
+**Las tres decisiones del equipo técnico** —línea base de fortificación,
+tratamiento de Secciones 2 y 3A, fuentes de composición faltantes— siguen
+abiertas y documentadas con su evidencia.
 
 **Criterios de trabajo vigentes:**
 
-- *Avanzar con los datos como están, declarando la cobertura de cada cifra.* La
-  depuración no tiene final natural; esperar a tenerla completa no converge.
+- *Avanzar con los datos como están, declarando la cobertura de cada cifra.*
 - *Volver atrás solo cuando el arreglo es acotado, no requiere criterio nuevo y
   bloquea algo que ya se está por mostrar* — los tres a la vez.
 - *Antes de escribir un entregable, fijar para quién es y qué decisión habilita.*
-  Lección del retrabajo del 13-09.
+- *Verificar siempre que un archivo se reemplazó antes de renderizar:*
+  `any(grepl("texto nuevo", readLines(ruta)))`. Costó varias iteraciones
+  perdidas.
 
 ## Fase 0 — Cerrar la base de datos (prerrequisito, en curso)
 
@@ -321,6 +324,32 @@ reunión; no se resuelven por cuenta propia.
   **Verificar que todos los entregables digan 3,09** (media ponderada 3,24; IC 3,20–3,28). La presentación y el informe de factibilidad pueden conservar la cifra antigua. **Dos documentos con cifras distintas para lo mismo es lo primero que un revisor nota.**
 
   *Las demás estimaciones apenas se movieron:* energía mediana 2.148 ponderada vs 2.153 sin ponderar.
+
+- [x] **HITO (2026-09-14): validación externa incorporada al informe de factibilidad.** Cierra la segunda brecha frente al estándar internacional.
+
+  **Vía 1 — estructura de la dieta.** El IDIAF publicó un análisis de la misma ENGIH 2018 a partir de las ponderaciones del IPC del Banco Central, es decir, **midiendo gasto y no cantidad física**. Ocho de sus diez alimentos de mayor peso figuran entre los de mayor volumen en este análisis. Los dos que faltan tienen explicación: agua purificada (excluida por no aportar nutrientes) y salami (alto en gasto, bajo en gramos). El orden de los dos primeros se invierte —arroz y pollo— por el precio unitario. **Dos procedimientos independientes sobre la misma fuente producen la misma estructura de la dieta**; un error sistemático en la cadena de conversión no daría ese resultado. Referencia: del Rosario P. *El consumo de alimentos en República Dominicana*. IDIAF, 2021. ISBN 978-9945-448-30-6.
+
+  **Vía 2 — orden de magnitud.** FAO sitúa la disponibilidad energética de RD por encima de 3.000 kcal/persona/día; la estimación propia es ~2.150 kcal/EMA/día, **cerca del 70%**. Es la dirección correcta y el rango documentado para encuestas de hogares (70–90%), por el extremo que corresponde a un país con más de 7 millones de visitantes anuales.
+
+  **Lo que NO establece, declarado en el propio informe:** que las cifras absolutas sean correctas. Eso requeriría una encuesta de consumo individual sobre la misma población.
+
+- [ ] **PRESENTACIÓN — reconvertida en REPORTE DE AVANCE (2026-09-14). Formato adoptado, se actualizará en cada revisión.**
+
+  **Motivo del cambio:** la reunión siempre empieza con *"Maicel, muéstranos en qué has avanzado"*. Una presentación cerrada con narrativa pulida no encaja con esa situación. El formato de reporte de avance sí, y además resuelve el problema de tono: si el documento es un estado vivo, no hay motivo para escribirlo con efectos retóricos, y las dudas genuinas dejan de ser algo que disimular.
+
+  **Estructura (18 láminas):** marco metodológico → desarrollo del procedimiento (con enlaces al repositorio) → documentación disponible → qué entra al análisis → vehículos → escenarios y equidad → definiciones pendientes → verificaciones pendientes → trabajo pendiente → líneas en curso.
+
+  **Convenciones editoriales fijadas para todo el proyecto:**
+  - **Las fuentes primarias NO se citan en cada tabla.** La ENGIH es fuente primaria y el análisis es propio: se declara una vez en el marco metodológico. **Solo se citan fuentes secundarias** (IDIAF, FAO). Esto liberó el espacio que estrangulaba las tablas.
+  - Tampoco se escribe "elaboración propia" en ningún pie.
+  - Notas al pie con prefijo **NOTA:** en negrita.
+  - Títulos de tabla y figura completos, con lugar y año. Unidades en los encabezados. Alineación por tipo de dato.
+  - **Enlaces a elementos concretos del repositorio** en cada sección, para que los revisores puedan auditar por su cuenta al recibir la presentación por correo.
+  - Un elemento visual por lámina; si hay dos, se separan en dos láminas.
+
+  **Función `tabla()` en `reports/_comun.R`** (script `88_helper_tablas.R`): devuelve `gt` en HTML y `flextable` en Word, con la nota al pie **dentro del objeto**. Constantes `FUENTE_ENGIH`, `NOTA_DISENO`, `NOTA_EMA`.
+
+  **REGLA TÉCNICA aprendida (costó tres iteraciones):** `kable()` NO se auto-imprime si le sigue otra expresión en el mismo bloque, y `print()` sobre un objeto `kable` emite el markdown como texto crudo. **Las notas al pie van dentro del objeto (gt/flextable) o fuera del bloque como markdown — nunca como llamada a función después del `kable()`.**
 
 - [ ] **REVISIÓN DE TONO — pendiente en los seis documentos (identificado 2026-09-14).** El texto de los informes está escrito como si hubiera que explicarle el método al lector. **La audiencia son dos expertos en fortificación y un oficial de nutrición: saben más del dominio que el consultor.** El registro actual resulta condescendiente y no corresponde a un reporte científico.
 
