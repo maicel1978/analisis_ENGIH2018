@@ -196,3 +196,77 @@ $presentation-font-size-root: 30px !default;
   border: 1px solid #dde4e9;
   border-radius: 4px;
 }
+
+
+/* Títulos de tabla y figura en formato de publicación */
+.reveal caption,
+.reveal figcaption,
+.reveal .quarto-float-caption {
+  font-size: 0.62em;
+  color: #1a3a4a;
+  text-align: left;
+  line-height: 1.35;
+  margin-bottom: 0.5em;
+  font-weight: 500;
+}
+
+.reveal .quarto-float-caption-top {
+  margin-bottom: 0.6em;
+}
+
+
+/* Nota al pie de tabla o figura */
+.reveal .notapie {
+  font-size: 0.6em;
+  color: #6b7a85;
+  line-height: 1.4;
+  margin-top: 0.4em;
+  margin-bottom: 0.8em;
+  text-align: left;
+}
+
+/* Tablas: más aire y jerarquía */
+.reveal table {
+  font-size: 0.72em;
+  width: auto;
+  margin: 0.4em 0 0.2em 0;
+}
+
+.reveal table th {
+  font-size: 0.95em;
+  padding: 0.4em 0.9em;
+}
+
+.reveal table td {
+  padding: 0.32em 0.9em;
+}
+
+
+/* Tablas gt dentro de revealjs */
+.reveal .gt_table {
+  font-size: 0.68em !important;
+  margin: 0.3em auto !important;
+}
+
+.reveal .gt_col_heading,
+.reveal .gt_column_spanner {
+  padding: 0.45em 0.8em !important;
+  font-size: 0.95em !important;
+}
+
+.reveal .gt_row {
+  padding: 0.3em 0.8em !important;
+}
+
+.reveal .gt_sourcenote,
+.reveal .gt_footnote {
+  padding: 0.5em 0.2em 0 0.2em !important;
+  line-height: 1.35 !important;
+  text-align: left !important;
+}
+
+/* Que la tabla no fuerce scroll dentro de la lámina */
+.reveal .cell-output-display {
+  max-height: none;
+  overflow: visible;
+}
