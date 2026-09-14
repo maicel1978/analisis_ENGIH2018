@@ -193,7 +193,7 @@ Pendiente por esta vía: plátano y guineo, **16.400 observaciones**.
 
 ::: {.columns}
 ::: {.column width="46%"}
-![](../media/fotos_investigacion_mercado/aji_cubanela02.jpg.jpg)
+![](../media/fotos_investigacion_mercado/aji_cubanela02.jpg)
 :::
 ::: {.column width="54%"}
 ::: {style="font-size:0.95em;"}

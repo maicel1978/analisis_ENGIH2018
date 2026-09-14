@@ -10,10 +10,11 @@ Este documento fija el alcance acordado hasta ahora. Cualquier cambio de alcance
 
 ## PRIORIDAD ACTUAL (leer esto primero, antes que Fase 0 de abajo)
 
-**Estado al 2026-09-14 (madrugada).** Pipeline `01`→`05` con **diseño muestral
-complejo incorporado**. Seis documentos: informe de factibilidad (HTML y Word),
-R1 a R5, presentación como reporte de avance, y dos tableros escritos. Repositorio
-reorganizado, README reescrito, validación externa hecha.
+**Estado al 2026-09-14.** Pipeline `01`→`05` con **diseño muestral complejo
+incorporado**. Seis documentos terminados y renderizados: informe de factibilidad
+(HTML y Word), R1 a R5, y la presentación como reporte de avance. Dos tableros
+escritos, pendientes de pulido. Repositorio reorganizado, README reescrito,
+validación externa hecha y **depuración de comentarios completada**.
 
 **Las dos brechas mayores frente al estándar internacional están cerradas:**
 diseño muestral (intervalos de confianza correctos) y validación externa.
@@ -25,17 +26,22 @@ mismo—, lo que hace el argumento generalizable a cualquier alimento básico.
 
 **Lo que sigue, por orden:**
 
-1. **Terminar de renderizar y verificar la presentación.** Es lo del martes.
-2. **Revisión de tono en el repositorio** — comentarios de los scripts y
-   encabezados. Daniel lo revisará con detalle. Ver el pendiente detallado más
-   abajo con los tres patrones a eliminar.
-3. **Revisión de tono en la documentación** — hoja de ruta, README, informes.
-4. **Pulir el diseño de los dos tableros** y el borrador de artículo.
+1. **PC-A: correr el pipeline y verificar las cifras de control.** Es lo único
+   con fecha límite — hay que hacerlo **antes de devolver PC-B**. Cifras:
+   36.840 sin `enhance_id` · 303.408 filas con gramos por EMA · 8.774 hogares.
+2. **Estudiar el guion conceptual** para la reunión del miércoles. A partir de
+   aquí el valor está en el dominio del material, no en más código.
+3. **Cerrar la limpieza del repositorio:** archivos de `media/` con doble
+   extensión y eliminación de los diez scripts de uso único (`84` a `93`).
+4. **Pulir los dos tableros** y redactar el borrador de artículo. No son
+   necesarios para la reunión.
 
-**Estado de las dos máquinas.** PC-B (prestada) tiene todo y está al día. **PC-A
-sigue pendiente de `git pull`, con un error sin diagnosticar.** Es lo primero al
-retomar: PC-A está dentro de OneDrive del PMA y puede dar el cuelgue conocido en
-`.git/objects`; si falla, mover el repositorio fuera de OneDrive.
+**Estado de las máquinas.** PC-B (prestada) se devuelve; tiene todo y está al
+día. **PC-A quedó operativa:** repositorio clonado limpio en
+`C:\proyectos\analisis_ENGIH2018`, **fuera de OneDrive**, lo que elimina el
+cuelgue conocido en `.git/objects`. La copia antigua dentro de OneDrive y la
+descarga en ZIP de `Downloads` están obsoletas: **borrar ambas**. En PC-A falta
+correr el pipeline una vez, porque `data/clean/` no se versiona.
 
 **Las tres decisiones del equipo técnico** —línea base de fortificación,
 tratamiento de Secciones 2 y 3A, fuentes de composición faltantes— siguen
@@ -48,8 +54,9 @@ abiertas y documentadas con su evidencia.
   bloquea algo que ya se está por mostrar* — los tres a la vez.
 - *Antes de escribir un entregable, fijar para quién es y qué decisión habilita.*
 - *Verificar siempre que un archivo se reemplazó antes de renderizar:*
-  `any(grepl("texto nuevo", readLines(ruta)))`. Costó varias iteraciones
-  perdidas.
+  `any(grepl("texto nuevo", readLines(ruta)))`.
+- *Una afirmación que dejó de ser cierta es peor que un comentario mal
+  redactado.* Al cambiar algo, revisar qué documentación lo daba por imposible.
 
 ## Fase 0 — Cerrar la base de datos (prerrequisito, en curso)
 
