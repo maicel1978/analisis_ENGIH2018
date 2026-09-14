@@ -211,30 +211,19 @@ de mayor gasto duplica la del quintil más pobre. El **folato**, en cambio,
 muestra la distribución más equitativa de los cuatro nutrientes examinados.
 
 ::: {.callout-important}
-## Una interpretación que conviene poner a prueba
+## Una interpretación puesta a prueba
 La diferencia entre ambos gradientes admite una explicación relacionada con el
 objeto de este estudio.
 
 En el escenario de composición actualmente aplicado, una parte sustancial del
 folato proviene de **alimentos básicos sujetos a fortificación** —cereales—, que
-son consumidos de forma transversal por toda la población. La vitamina A, por el
-contrario, proviene mayoritariamente de **alimentos frescos no fortificados**:
-vegetales, lácteos y vísceras, cuyo consumo sí responde a la capacidad de gasto.
+se consumen de forma transversal en toda la población. La vitamina A, en cambio,
+proviene mayoritariamente de **alimentos frescos no fortificados**: vegetales,
+lácteos y vísceras, cuyo consumo responde a la capacidad de gasto del hogar.
 
-Si esta lectura fuese correcta, implicaría que **la fortificación de alimentos
-básicos atenúa el gradiente social de la ingesta del nutriente añadido**, lo que
-constituiría un argumento de equidad adicional al de cobertura poblacional.
-
-**Esta interpretación está condicionada por un supuesto sin resolver.** El
-aporte de folato depende de qué alimentos se consideren fortificados en la línea
-base, decisión que permanece pendiente de definición. Si el arroz no estuviera
-sujeto a fortificación obligatoria, el gradiente del folato sería más
-pronunciado que el aquí estimado.
-
-**Verificación pendiente:** repetir esta estimación bajo los tres escenarios de
-fortificación modelados en el informe R4. Si el gradiente del folato se mantiene
-plano en el escenario sin fortificación, la interpretación es errónea; si se
-empina, queda respaldada.
+Si esta lectura fuese correcta, el gradiente del folato debería **empinarse** al
+retirar la fortificación del escenario. La sección siguiente somete la
+interpretación a esa prueba.
 :::
 
 ## Significación estadística del gradiente
@@ -357,9 +346,181 @@ Se trata de **dos evidencias independientes que apuntan a lo mismo**: un
 gradiente por capacidad de gasto más plano que el del resto de nutrientes, y una
 ventaja del área donde el consumo de cereales es proporcionalmente mayor.
 
-Ambas se ponen a prueba con el mismo procedimiento: repetir la estimación bajo
-los escenarios de fortificación. Si el patrón persiste en el escenario sin
-fortificación, la explicación debe buscarse en otra parte.
+Ambas se someten a prueba en la sección siguiente, mediante la estimación bajo
+los distintos escenarios de fortificación.
+:::
+
+# El efecto distributivo de la fortificación
+
+## La prueba
+
+La interpretación anterior predice que el gradiente social del folato debería
+ser más pronunciado en ausencia de fortificación. Se estima la ingesta de folato
+por quintil bajo los tres escenarios modelados en el informe R4.
+
+```{r}
+#| label: calc-escenarios
+gpe  <- cargar_gramos_por_ema() |> marcar_vehiculo()
+comp <- cargar_composicion()
+
+calc_esc <- function(nombre) {
+  sw <- ESCENARIOS |> filter(escenario == nombre) |>
+    select(vehiculo, eid_esc = enhance_id)
+  gpe |> left_join(sw, by = "vehiculo") |>
+    mutate(eid = coalesce(eid_esc, as.numeric(enhance_id))) |>
+    left_join(comp, by = c("eid" = "enhance_id")) |>
+    mutate(across(all_of(NUT), ~ .x * Gramos_por_EMA_dia / 100)) |>
+    group_by(id_hogar_unico) |>
+    summarise(across(all_of(NUT), ~ sum(.x, na.rm = TRUE)), .groups = "drop")
+}
+
+esc <- bind_rows(lapply(unique(ESCENARIOS$escenario), function(e) {
+  estimar(diseno_muestral(calc_esc(e)), folato_mcg_dfe, por = "quintil") |>
+    mutate(escenario = gsub("^[0-9]\\. ", "", e), .before = 1)
+}))
+
+razon_esc <- esc |>
+  group_by(escenario) |>
+  summarise(q1 = mediana[quintil == 1],
+            q5 = mediana[quintil == 5],
+            razon = q5 / q1, .groups = "drop")
+```
+
+```{r}
+#| label: tbl-esc-quintil
+#| tbl-cap: "Ingesta mediana de folato por quintil de gasto, según escenario de fortificación. República Dominicana, 2018"
+
+esc |>
+  transmute(Escenario = escenario, Quintil = quintil,
+            Mediana = round(mediana, 1),
+            Media = round(media, 1),
+            `IC 95%` = paste0(round(media_low, 1), " – ", round(media_upp, 1))) |>
+  kable(format.args = list(big.mark = ".", decimal.mark = ","))
+```
+
+::: {.fuente}
+`r FUENTE` Estimaciones ponderadas con diseño muestral complejo.
+:::
+
+```{r}
+#| label: tbl-esc-razon
+#| tbl-cap: "Magnitud del gradiente social del folato según escenario. República Dominicana, 2018"
+
+razon_esc |>
+  transmute(Escenario = escenario,
+            `Quintil 1` = round(q1, 1),
+            `Quintil 5` = round(q5, 1),
+            `Razón Q5/Q1` = round(razon, 2)) |>
+  kable(format.args = list(big.mark = ".", decimal.mark = ","))
+```
+
+::: {.fuente}
+`r FUENTE`
+:::
+
+```{r}
+#| label: fig-esc
+#| fig-cap: "Gradiente social del folato bajo distintos escenarios de fortificación. República Dominicana, 2018"
+#| fig-width: 9
+#| fig-height: 3.8
+
+esc |>
+  ggplot(aes(factor(quintil), mediana, group = escenario, colour = escenario)) +
+  geom_line(linewidth = 1) +
+  geom_point(size = 2.6) +
+  facet_wrap(~escenario, scales = "free_y", nrow = 1) +
+  scale_colour_manual(values = c(GRIS, AZUL_C, AZUL)) +
+  labs(x = "Quintil de gasto del hogar", y = "Folato (µg DFE por EMA y día)") +
+  tema_r() +
+  theme(legend.position = "none")
+```
+
+::: {.fuente}
+`r FUENTE`
+:::
+
+```{r}
+#| label: veredicto
+#| results: asis
+
+sin <- razon_esc |> filter(grepl("Sin", escenario))
+con <- razon_esc |> filter(grepl("arroz", escenario))
+
+cat(paste0(
+  "Sin fortificación, la ingesta de folato del quintil de mayor gasto supera a ",
+  "la del más pobre en un factor de **", round(sin$razon, 2), "**. ",
+  "Incorporando el arroz como vehículo fortificado, esa razón desciende a **",
+  round(con$razon, 2), "**.\n"
+))
+```
+
+**La predicción se cumple.** El gradiente social del folato se atenúa hasta
+prácticamente desaparecer cuando el arroz entra como vehículo fortificado.
+
+Fortificar únicamente la harina de trigo no modifica el gradiente de forma
+apreciable, lo cual es coherente con su cobertura: alcanza a una minoría de los
+hogares.
+
+## El mecanismo
+
+Cabría suponer que el aplanamiento se debe a que los hogares de menor gasto
+consumen más arroz. Los datos muestran que el mecanismo es distinto.
+
+```{r}
+#| label: tbl-arroz
+#| tbl-cap: "Consumo de arroz por Equivalente de Mujer Adulta y día, según quintil de gasto. República Dominicana, 2018"
+
+arroz <- gpe |> filter(vehiculo == "Arroz") |>
+  group_by(id_hogar_unico) |>
+  summarise(arroz_g = sum(Gramos_por_EMA_dia, na.rm = TRUE), .groups = "drop")
+
+estimar(diseno_muestral(arroz), arroz_g, por = "quintil") |>
+  transmute(Quintil = quintil, Hogares = n,
+            `Mediana (g)` = round(mediana, 1),
+            `Media (g)` = round(media, 1),
+            `IC 95%` = paste0(round(media_low, 1), " – ", round(media_upp, 1))) |>
+  kable(format.args = list(big.mark = ".", decimal.mark = ","))
+```
+
+::: {.fuente}
+`r FUENTE` Estimaciones ponderadas con diseño muestral complejo.
+:::
+
+El consumo mediano de arroz es **prácticamente constante entre el segundo y el
+quinto quintil**, con una diferencia menor en el quintil de menor gasto.
+
+No se trata, por tanto, de que los hogares pobres consuman más arroz: **consumen
+aproximadamente la misma cantidad que el resto**. Y esa uniformidad basta para
+producir el efecto observado.
+
+Si la cantidad consumida es similar en toda la distribución, el nutriente
+añadido se incorpora en cantidades absolutas similares. Como la ingesta total de
+folato de los hogares de mayor gasto es superior por otras vías, el aporte del
+vehículo fortificado representa una **fracción mayor de la dieta de los hogares
+de menor gasto**, lo que reduce la desigualdad relativa.
+
+::: {.callout-note}
+## Implicación general
+La condición que produce el efecto no es que el alimento se consuma *más* entre
+los hogares pobres, sino que se consuma **de forma transversal** en toda la
+distribución.
+
+Se trata de una condición considerablemente menos exigente, y que cumplen los
+alimentos básicos de consumo generalizado. La fortificación de un vehículo con
+esta característica tiene, en consecuencia, un **efecto distributivo
+progresivo**: añade un argumento de equidad al de cobertura poblacional.
+:::
+
+::: {.callout-warning}
+## Salvedad sobre la magnitud
+Los escenarios asignan un único código de composición a todas las variedades de
+arroz registradas. Esta uniformización es adecuada para contrastar la
+**dirección** del efecto, pero puede afectar a su **magnitud**: el crosswalk
+actual distingue variedades con perfiles diferentes.
+
+La conclusión sobre el sentido del efecto distributivo es robusta a este
+supuesto; la cuantificación precisa del aplanamiento requiere resolver
+previamente la definición de la línea base de fortificación.
 :::
 
 # Limitaciones
@@ -386,8 +547,9 @@ entre las secciones del cuestionario, según se documenta en el informe de
 factibilidad.
 
 **El aporte de folato depende del escenario de fortificación adoptado**, que
-permanece pendiente de definición. La interpretación sobre el efecto de la
-fortificación en el gradiente social requiere la verificación señalada arriba.
+permanece pendiente de definición. El contraste entre escenarios establece la
+dirección del efecto distributivo, pero su magnitud precisa requiere resolver
+esa definición.
 
 ---
 
