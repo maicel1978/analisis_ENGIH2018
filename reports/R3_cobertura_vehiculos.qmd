@@ -358,11 +358,10 @@ no se ve afectada por este solapamiento** — solo el consumo en gramos.
 - **Cobertura del pipeline.** Las cifras se calculan sobre las observaciones
   que completan la cadena de cálculo (cantidad, factor de conversión y porción
   comestible). Ver el reporte R1 para el detalle por sección.
-- **Sin intervalos de confianza.** La ENGIH tiene diseño muestral complejo
-  (8 estratos, 933 unidades primarias, factor de expansión). Las variables están
-  disponibles y su incorporación mediante `srvyr` es el siguiente paso; **hasta
-  entonces no se reportan intervalos**, en lugar de reportar intervalos
-  incorrectamente estrechos.
+- **Estimaciones con diseño muestral complejo.** Las proporciones de cobertura
+  se estiman incorporando la estratificación (8 estratos), la conglomeración
+  (933 unidades primarias) y el factor de expansión, con intervalos de confianza
+  por linealización de Taylor.
 - **El consumo en gramos está sobrestimado** por el solapamiento entre
   secciones descrito arriba. La cobertura no lo está.
 - **Definición de los vehículos.** Se identifican por patrón de texto sobre la

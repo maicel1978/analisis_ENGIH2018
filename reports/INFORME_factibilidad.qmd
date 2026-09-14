@@ -806,11 +806,11 @@ energía, 85,5% para vitamina A), lo que limita la comparabilidad entre
 micronutrientes. Los alimentos sin composición conocida contribuyen cero, de
 modo que **las estimaciones constituyen un límite inferior**.
 
-**Del diseño muestral.** Las variables de estratificación, conglomeración y
-expansión están disponibles en los datos (8 estratos, 933 unidades primarias,
-factor de expansión sin valores ausentes), pero no se han incorporado aún al
-cálculo. **En consecuencia no se reportan intervalos de confianza**, opción
-preferible a reportarlos incorrectamente estrechos.
+**Del diseño muestral.** Las estimaciones poblacionales incorporan la
+estratificación, la conglomeración y el factor de expansión, con intervalos por
+linealización de Taylor. Las cifras de cobertura del procesamiento son conteos
+de registros y no estimaciones poblacionales: no llevan intervalo porque no
+procede.
 
 **Del solapamiento entre secciones.** El consumo de alimentos almacenables se
 encuentra sobrestimado, según se detalla en la sección siguiente.

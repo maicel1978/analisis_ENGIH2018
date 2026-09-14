@@ -166,10 +166,11 @@ Declaradas en detalle dentro de cada informe. En resumen:
 - **Consumo aparente, no ingesta individual.** Se mide lo que el hogar adquiere
   o tiene disponible, no lo que cada persona ingiere. No se captura distribución
   intrafamiliar, desperdicio ni consumo fuera del hogar.
-- **Sin intervalos de confianza.** La encuesta tiene diseño muestral complejo
-  (8 estratos, 933 unidades primarias, factor de expansión). Las variables están
-  disponibles; hasta incorporarlas no se reportan intervalos, en lugar de
-  reportarlos incorrectamente estrechos.
+- **Estimaciones con diseño muestral complejo.** Se incorporan la
+  estratificación (8 estratos), la conglomeración (933 unidades primarias) y el
+  factor de expansión, con intervalos de confianza por linealización de Taylor.
+  Las cifras de cobertura del procesamiento son conteos de registros y no llevan
+  intervalo.
 - **El consumo de alimentos almacenables está sobrestimado**, porque las
   Secciones 2 y 3A se solapan parcialmente en ellos. El refinamiento propuesto
   es la disponibilidad neta.

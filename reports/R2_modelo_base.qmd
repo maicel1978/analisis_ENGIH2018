@@ -322,10 +322,10 @@ limitación insalvable de la fuente.
 - **Cobertura del cálculo.** Las cifras se construyen sobre las observaciones
   que completan los tres componentes de la fórmula. El detalle por sección y los
   motivos de exclusión se documentan en el reporte R1.
-- **Sin intervalos de confianza.** La ENGIH tiene diseño muestral complejo
-  (8 estratos, 933 unidades primarias, factor de expansión). Las variables están
-  disponibles; hasta incorporarlas mediante `srvyr` **no se reportan intervalos**,
-  en lugar de reportarlos incorrectamente estrechos.
+- **Estimaciones con diseño muestral complejo.** Se incorporan la
+  estratificación (8 estratos), la conglomeración (933 unidades primarias) y el
+  factor de expansión, con intervalos de confianza por linealización de Taylor.
+  La mediana ponderada se reporta como descriptivo, sin intervalo.
 - **Consumo aparente, no ingesta individual.** Estos datos miden lo que el hogar
   adquiere o tiene disponible, no lo que cada persona ingiere. No se captura la
   distribución intrafamiliar, el desperdicio ni el consumo fuera del hogar.
