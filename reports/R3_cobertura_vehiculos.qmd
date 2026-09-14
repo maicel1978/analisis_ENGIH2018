@@ -269,10 +269,32 @@ simul <- gpe |>
   distinct(id_hogar_unico, vehiculo) |>
   count(id_hogar_unico, name = "n_vehiculos") |>
   count(n_vehiculos, name = "hogares") |>
-  mutate(`% de hogares` = pct(hogares, hogares_total),
-         `% acumulado`  = pct(rev(cumsum(rev(hogares))), hogares_total))
+  transmute(
+    `Vehículos consumidos` = n_vehiculos,
+    Hogares                = hogares,
+    `% de hogares`         = paste0(fmt(100 * hogares / hogares_total), "%"),
+    `% con al menos esos`  = paste0(fmt(100 * rev(cumsum(rev(hogares))) /
+                                          hogares_total), "%")
+  )
 
 kable(simul, format.args = list(big.mark = "."))
+```
+
+```{r}
+#| label: lectura-simultaneo
+#| results: asis
+
+tres <- gpe |> filter(!is.na(vehiculo)) |> distinct(id_hogar_unico, vehiculo) |>
+  count(id_hogar_unico) |> filter(n >= 3) |> nrow()
+
+knitr::asis_output(paste0(
+  "La mayoría de los hogares consume **tres de los cuatro vehículos** (",
+  fmt(100 * tres / hogares_total), "% consume tres o más). Con la definición ",
+  "estricta, el vehículo ausente es casi siempre la harina de trigo. Arroz, ",
+  "aceite y azúcar alcanzan por tanto de forma conjunta a la mayor parte de la ",
+  "población, lo que resulta pertinente para el diseño de una estrategia que ",
+  "combine vehículos."
+))
 ```
 
 ```{r}
