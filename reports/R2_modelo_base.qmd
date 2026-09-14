@@ -1,7 +1,7 @@
 ---
 title: "R2 — Modelo de base: consumo diario y Equivalente de Mujer Adulta"
 subtitle: "ENGIH 2018, República Dominicana | Implementación de la metodología de referencia"
-author: "Maicel E. Monzón"
+author: "Maicel E. Monzón, PhD (ORCID 0000-0003-2117-9145)"
 lang: es
 date: today
 format:
@@ -107,7 +107,7 @@ if (file.exists(f_ing)) {
     summarise(Hogares = n(),
               `Energía mediana (kcal/EMA/día)` = round(median(energia_kcal)),
               .groups = "drop") |>
-    kable(format.args = list(big.mark = ","))
+    kable(format.args = list(big.mark = "."))
 } else {
   cat("_Requiere la salida de 05_ingesta_micronutrientes.R._")
 }
@@ -139,7 +139,7 @@ gpe |>
   ) |>
   arrange(desc(Hogares)) |>
   head(20) |>
-  kable(format.args = list(big.mark = ","))
+  kable(format.args = list(big.mark = "."))
 ```
 
 En todos los alimentos la media supera a la mediana. Es el patrón esperado en
@@ -160,17 +160,18 @@ consumo per cápita los trataría como equivalentes.
 #| label: tbl-ema
 #| tbl-cap: "Distribución del EMA por hogar"
 
-ema |>
-  summarise(
-    Hogares         = n(),
-    `Sin EMA`       = sum(n_sin_ema > 0),
-    `Miembros (mediana)` = median(n_miembros),
-    `EMA mediana`   = round(median(EMA_hogar), 2),
-    `EMA media`     = round(mean(EMA_hogar), 2),
-    `EMA P25`       = round(quantile(EMA_hogar, 0.25), 2),
-    `EMA P75`       = round(quantile(EMA_hogar, 0.75), 2)
-  ) |>
-  kable(format.args = list(big.mark = ","))
+dis_ema <- diseno_muestral(ema |> select(id_hogar_unico, EMA_hogar, n_miembros))
+
+bind_cols(
+  tibble(Hogares = nrow(ema), `Sin EMA` = sum(ema$n_sin_ema > 0)),
+  estimar(dis_ema, EMA_hogar) |>
+    transmute(`EMA mediana` = fmt(mediana, 2),
+              `EMA media`   = fmt(media, 2),
+              `IC 95%`      = ic(media_low, media_upp, 2)),
+  estimar(dis_ema, n_miembros) |>
+    transmute(`Miembros (mediana)` = fmt(mediana, 1))
+) |>
+  kable(format.args = list(big.mark = "."))
 ```
 
 ```{r}
@@ -188,10 +189,11 @@ abline(v = median(ema$EMA_hogar), col = "#c0392b", lwd = 2)
 #| label: cobertura-ema
 #| results: asis
 
-cat(paste0("**Cobertura del cálculo: ", format(sum(ema$n_sin_ema == 0), big.mark = ","),
-           " de ", format(nrow(ema), big.mark = ","), " hogares (",
-           pct(sum(ema$n_sin_ema == 0), nrow(ema)),
-           ") tienen EMA calculado para todos sus miembros.**\n"))
+knitr::asis_output(paste0(
+  "**Cobertura del cálculo: ", format(sum(ema$n_sin_ema == 0), big.mark = "."),
+  " de ", format(nrow(ema), big.mark = "."), " hogares (",
+  fmt(100 * sum(ema$n_sin_ema == 0) / nrow(ema)),
+  "%) tienen EMA calculado para todos sus miembros.**"))
 ```
 
 ### Relación entre tamaño del hogar y EMA
@@ -200,14 +202,20 @@ cat(paste0("**Cobertura del cálculo: ", format(sum(ema$n_sin_ema == 0), big.mar
 #| label: tbl-ema-tamano
 #| tbl-cap: "EMA mediano según número de miembros del hogar"
 
-ema |>
+ema_t <- ema |>
   filter(n_miembros <= 8) |>
-  group_by(`Miembros` = n_miembros) |>
-  summarise(Hogares = n(),
-            `EMA mediano` = round(median(EMA_hogar), 2),
-            `EMA por miembro` = round(median(EMA_hogar / n_miembros), 2),
-            .groups = "drop") |>
-  kable(format.args = list(big.mark = ","))
+  mutate(ema_por_miembro = EMA_hogar / n_miembros)
+
+dis_t <- diseno_muestral(ema_t |>
+  select(id_hogar_unico, EMA_hogar, ema_por_miembro, n_miembros))
+
+estimar(dis_t, ema_por_miembro, por = "n_miembros") |>
+  transmute(Miembros = n_miembros,
+            Hogares = n,
+            `EMA por miembro` = fmt(mediana, 2),
+            `Media` = fmt(media, 2),
+            `IC 95%` = ic(media_low, media_upp, 2)) |>
+  kable(format.args = list(big.mark = "."))
 ```
 
 El EMA por miembro disminuye a medida que crece el hogar, reflejando que los
@@ -237,7 +245,7 @@ if (!is.null(variantes)) {
       `Folato (µg DFE)` = round(folato_mediana),
       `Vit. A (µg RAE)` = round(vit_a_mediana)
     ) |>
-    kable(format.args = list(big.mark = ","))
+    kable(format.args = list(big.mark = "."))
 } else {
   cat("_Requiere la salida de 05_ingesta_micronutrientes.R._")
 }
@@ -266,7 +274,7 @@ gpe |>
     `Gramos por EMA/día (mediana)` = round(median(Gramos_por_EMA_dia, na.rm = TRUE), 1),
     .groups = "drop"
   ) |>
-  kable(format.args = list(big.mark = ","))
+  kable(format.args = list(big.mark = "."))
 ```
 
 ::: {.callout-important}

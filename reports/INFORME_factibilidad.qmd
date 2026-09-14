@@ -93,8 +93,13 @@ p2  <- 100 * sum(sec2$entra_calculo)  / nrow(sec2)
 ::: {.callout-note appearance="simple"}
 Este documento se genera de forma reproducible a partir del conjunto de datos y
 del código del proyecto. Todas las cifras que contiene se calculan en el momento
-de su compilación; ninguna ha sido transcrita manualmente. Compilado el
-`r format(Sys.Date(), "%d de %B de %Y")`.
+de su compilación; ninguna ha sido transcrita manualmente.
+
+Las estimaciones poblacionales incorporan el diseño muestral complejo de la
+encuesta —8 estratos, 933 unidades primarias de muestreo y factor de expansión
+por hogar— con intervalos de confianza al 95% por linealización de Taylor.
+
+Compilado el `r format(Sys.Date(), "%d de %B de %Y")`.
 :::
 
 # Resumen ejecutivo
@@ -432,14 +437,18 @@ esfuerzo acotado.
 ```{r}
 #| label: tbl-ema
 #| tbl-cap: "Distribución del Equivalente de Mujer Adulta por hogar. República Dominicana, 2018"
-ema |>
-  summarise(
-    Hogares                     = n(),
-    `Con EMA completo`          = sum(n_sin_ema == 0),
-    `Miembros (mediana)`        = median(n_miembros),
-    `EMA mediana`               = round(median(EMA_hogar), 2),
-    `EMA media`                 = round(mean(EMA_hogar), 2)
-  )
+
+dis_ema <- diseno_muestral(ema |> select(id_hogar_unico, EMA_hogar))
+
+bind_cols(
+  tibble(Hogares = nrow(ema),
+         `Con EMA completo` = sum(ema$n_sin_ema == 0),
+         `Miembros (mediana)` = median(ema$n_miembros)),
+  estimar(dis_ema, EMA_hogar) |>
+    transmute(`EMA mediana` = fmt(mediana, 2),
+              `EMA media`   = fmt(media, 2),
+              `IC 95%`      = ic(media_low, media_upp, 2))
+)
 ```
 ::: {.fuente}
 Fuente: Elaboración propia a partir de la ENGIH 2018 (Banco Central de la República Dominicana, con participación de la Oficina Nacional de Estadística).
@@ -707,11 +716,11 @@ energía, 85,5% para vitamina A), lo que limita la comparabilidad entre
 micronutrientes. Los alimentos sin composición conocida contribuyen cero, de
 modo que **las estimaciones constituyen un límite inferior**.
 
-**Del diseño muestral.** Las variables de estratificación, conglomeración y
-expansión están disponibles en los datos (8 estratos, 933 unidades primarias,
-factor de expansión sin valores ausentes), pero no se han incorporado aún al
-cálculo. **En consecuencia no se reportan intervalos de confianza**, opción
-preferible a reportarlos incorrectamente estrechos.
+**Del diseño muestral.** Las estimaciones poblacionales incorporan la
+estratificación, la conglomeración y el factor de expansión. Los intervalos se
+calculan por linealización de Taylor. Las cifras de cobertura del procesamiento,
+en cambio, son conteos de registros y no estimaciones poblacionales: no llevan
+intervalo porque no procede.
 
 **Del solapamiento entre secciones.** El consumo de alimentos almacenables se
 encuentra sobrestimado, según se detalla en la sección siguiente.

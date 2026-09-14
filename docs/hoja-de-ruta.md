@@ -60,7 +60,7 @@ reunión; no se resuelven por cuenta propia.
 
   4. **CORRECCIÓN IMPORTANTE (2026-09-12, tras el primer render de R1): 89.2% es cobertura del *crosswalk*, NO del cálculo.** Son dos métricas distintas y en los mensajes de trabajo de ese día se usaron como si fueran la misma. La cifra citable en la presentación es la segunda: **Sec 3A entra al cálculo al 76.0%** (260,014 de 342,046 filas) y **Sec 2 al 90.7%** (43,393 de 47,837). El 89.2% mide qué proporción de los *registros* tiene alimento mapeado; el 76.0% mide cuántas *observaciones* tienen además FC, PC y no son atípicas — que es lo que exige la fórmula. **Si se presenta 89.2% como cobertura del análisis y alguien recalcula, la cifra se cae.** Regla derivada: al citar cobertura, decir siempre *de qué* (crosswalk / cálculo) y *de qué sección*.
 
-  5. **Corrida completa verificada (12-09).** Sec 3A: 342,046 filas, 36,841 sin `enhance_id` (89.2% mapeado), 36,841 sin PC — **los dos números coinciden, confirmando que ya no queda alimento mapeado sin porción comestible**. Sec 2: 47,837 filas, 62 sin mapeo y 62 sin PC. Outliers: Sec 2 = 11, Sec 3A = 45. EMA: 8,892/8,892 hogares, mediana 3.04. **Gramos por EMA: 303,407 registros** (era 296,969 el 10-09 y 254,905 el 08-09).
+  5. **Corrida completa verificada (12-09).** Sec 3A: 342,046 filas, 36,841 sin `enhance_id` (89.2% mapeado), 36,841 sin PC — **los dos números coinciden, confirmando que ya no queda alimento mapeado sin porción comestible**. Sec 2: 47,837 filas, 62 sin mapeo y 62 sin PC. Outliers: Sec 2 = 11, Sec 3A = 45. EMA: 8,892/8,892 hogares, mediana 3.04 **(sin ponderar; la mediana ponderada es 3,09 — ver el hito del diseño muestral)**. **Gramos por EMA: 303,407 registros** (era 296,969 el 10-09 y 254,905 el 08-09).
 
   6. **Cambió el cuello de botella.** Sec 3A tiene 48,684 filas sin factor de conversión contra 36,841 sin mapeo. **De aquí en adelante, el trabajo de cobertura rinde más en la tabla de FC que en el crosswalk.** Esto invierte la conclusión del 10-09, que decía que todo lo que quedaba por ganar estaba en el crosswalk: era cierto entonces, ya no.
 
@@ -74,7 +74,7 @@ reunión; no se resuelven por cuenta propia.
   **Cifras de la corrida del 2026-09-10 (post-fix, `01`→`04`):**
   Sec 2: 47,837 filas | universal 22,316 | específica 21,108 | sin FC 4,413 | con FC sin PC 20 | **entran al cálculo 43,404 (90.7%)**.
   Sec 3A: 342,046 filas | universal 107,095 | específica 186,268 | sin FC 48,683 | con FC sin PC 39,742 | **entran al cálculo 253,621 (74.1%)**.
-  Outliers marcados: Sec 2 = 11, Sec 3A = 45. Hogares con EMA: 8,892/8,892, mediana 3.04.
+  Outliers marcados: Sec 2 = 11, Sec 3A = 45. Hogares con EMA: 8,892/8,892, mediana 3.04 sin ponderar.
   **Gramos por EMA: 296,969 registros** (era 289,249 antes de cargar el lote de 109, y 254,905 en el hito del 08-09 — cifra que quedó desactualizada al día siguiente).
   Commits: `8c243ce` (bloques 1-3), `be0fd32` (food_factors).
 
@@ -316,6 +316,28 @@ reunión; no se resuelven por cuenta propia.
   - **R1 a R4 siguen sin intervalos de confianza.** Ahora que `_comun.R` tiene el diseño muestral, conviene incorporarlos — especialmente R3 (cobertura de vehículos), donde los porcentajes deberían ir con IC.
   - `03_transform.R` imprime un IC de cobertura ponderada con la advertencia de que está subestimado. **Esa advertencia ya no aplica**: corregir para que use el diseño.
 
+- [ ] **CIFRA QUE CAMBIÓ AL PONDERAR (2026-09-14): la mediana del EMA es 3,09, no 3,04.** Es el efecto anunciado al incorporar `srvyr` — no solo añade intervalos, mueve estimaciones puntuales. La muestra sobre-representa ligeramente hogares pequeños; al corregirlo, el EMA sube.
+
+  **Verificar que todos los entregables digan 3,09** (media ponderada 3,24; IC 3,20–3,28). La presentación y el informe de factibilidad pueden conservar la cifra antigua. **Dos documentos con cifras distintas para lo mismo es lo primero que un revisor nota.**
+
+  *Las demás estimaciones apenas se movieron:* energía mediana 2.148 ponderada vs 2.153 sin ponderar.
+
+- [ ] **REVISIÓN DE TONO — pendiente en los seis documentos (identificado 2026-09-14).** El texto de los informes está escrito como si hubiera que explicarle el método al lector. **La audiencia son dos expertos en fortificación y un oficial de nutrición: saben más del dominio que el consultor.** El registro actual resulta condescendiente y no corresponde a un reporte científico.
+
+  **Tres tics concretos a eliminar** (ejemplos reales de R4):
+
+  1. **Explicar lo que el lector ya sabe.** *"La tabla de composición asigna a cada alimento un perfil nutricional."* Es una definición dirigida a quien no conoce el método.
+  2. **Redundancia entre tabla y prosa.** *"El arroz enriquecido aporta más de cinco veces el hierro…"* cuando la tabla con los valores exactos está inmediatamente arriba. El redondeo verbal además empobrece el dato.
+  3. **Meta-comentario sobre el propio trabajo.** *"Cuando el marco normativo se confirme, basta seleccionar el escenario: el cálculo ya está hecho."* Son notas de implementación, no resultados.
+
+  **Criterio de corrección: decir solo lo que el dato no dice.** El remedio no es acortar sino sustituir. Ejemplo de reescritura del punto 2: *"La diferencia entre versiones enriquecida y sin enriquecer es de 3,6 mg de hierro y 377 µg de folato por 100 g. La asignación de una u otra determina el resultado."* — aporta magnitudes exactas y consecuencia, sin narrar la tabla.
+
+  **Alcance:** informe de factibilidad, R1 a R5 y la presentación. Es trabajo de redacción cuidadosa; no hacerlo con prisa.
+
+- [ ] **REGLA TÉCNICA (2026-09-14): no usar `n`, `x` ni `i` como variable de bucle dentro de `mutate()` o `summarise()`.** El contexto de evaluación de dplyr es el data frame, así que una columna con ese nombre enmascara la variable. Caso real en R4: `estimar()` devuelve una columna `n` (hogares) que tapó la variable del `lapply`, y `NUT_ETIQ[[n]]` recibió un entero en vez de un nombre — error `subscript out of bounds` a mitad del render.
+
+- [ ] **Pendiente menor:** varios archivos de `media/` tienen doble extensión (`aji_cubanela02.jpg.jpg`, `platano_verde00.jpg02.jpeg`). Funcionan, pero desentonan. Corregir junto con las rutas que los referencian en la presentación, no por separado.
+
 - [ ] **DECISIÓN ABIERTA (2026-09-10) — línea base de fortificación. Corresponde al equipo (Daniel/Carlos/Santiago), NO se automatiza.** El crosswalk actual no representa ningún escenario real de política pública dominicana:
   - **Arroz:** RD **no** tiene norma de fortificación de arroz, pero el crosswalk manda ARROZ (var. 7), Arroz selecto (66) y Súper-selecto (65) a `70213002` "Arroz blanco enriquecido" (Fe 4.36, folato 386/100g). Solo Arroz corriente (67) va a `70213004` sin enriquecer. **Sobrestima** Fe y folato del alimento #1 de la dieta.
   - **Harina de trigo:** fortificación **obligatoria desde 2009** (Fe, ácido fólico, complejo B), pero el crosswalk manda Harina de trigo (58) a `70213038` "s/enriquecer" (Fe 1.17, folato 26). **Subestima.**
@@ -400,7 +422,7 @@ Sec 3A superó la proyección (155,770 vs. ~113,700 esperados) — probablemente
 - [x] `01_import.R` — Q, FC (3 niveles), `enhance_id`, PC ensamblados. Corriendo limpio contra datos reales desde 2026-09-08.
 - [x] `02_eda.R` — corregido y confirmado corriendo limpio (2026-09-08): overlap de hogares, estandarización de unidades, missingness, atípicos por alimento, cobertura del diario. Ver HITO arriba.
 - [x] `03_transform.R` — corregido y confirmado corriendo limpio (2026-09-08): `Q × FC × PC / PM`, outliers marcados, ejemplo de cobertura ponderada real. Ver HITO arriba. Queda pendiente afinar: disponibilidad neta para alimentos almacenables, y el aviso de diseño muestral (IC subestimado).
-- [x] **`04_equivalente_adulto.R` — completo y conectado con consumo diario (2026-09-08).** EMA por persona (fuente: FAO/WHO/UNU 2004, Tablas 4.2/4.3/5.2, no el documento de Daniel que solo las cita) y por hogar (8,892/8,892 con EMA, mediana 3.04), unido con `03_transform.R` → `Gramos_por_EMA_dia` (**303,407 registros** en la corrida del 12-09; las cifras de 254,905 y 296,969 son de corridas anteriores y quedaron desactualizadas al ampliarse la cobertura). **Limitaciones documentadas en el propio script:** sin ajuste embarazo/lactancia (dato no existe en la ENGIH), peso fijo por sexo (65/55kg, no individual), menores de 1 año con valor provisional (600 kcal, sin verificar contra FAO sección 3).
+- [x] **`04_equivalente_adulto.R` — completo y conectado con consumo diario (2026-09-08).** EMA por persona (fuente: FAO/WHO/UNU 2004, Tablas 4.2/4.3/5.2, no el documento de Daniel que solo las cita) y por hogar (8,892/8,892 con EMA, mediana 3.04 sin ponderar / **3,09 ponderada**), unido con `03_transform.R` → `Gramos_por_EMA_dia` (**303,407 registros** en la corrida del 12-09; las cifras de 254,905 y 296,969 son de corridas anteriores y quedaron desactualizadas al ampliarse la cobertura). **Limitaciones documentadas en el propio script:** sin ajuste embarazo/lactancia (dato no existe en la ENGIH), peso fijo por sexo (65/55kg, no individual), menores de 1 año con valor provisional (600 kcal, sin verificar contra FAO sección 3).
 - [ ] `05_ingesta_micronutrientes.R` — join con INCAP/FNDDS completos (~65 nutrientes) sobre `data_gramos_por_ema.csv` (ya listo); consumo aparente de energía, macro y micronutrientes por EMA. **Único script del pipeline básico sin empezar** — pendiente por la complejidad de armonizar esquemas INCAP/FNDDS, no por falta de piezas previas (esas ya están).
 - [ ] `06_report.qmd` — reporte reproducible base.
 
