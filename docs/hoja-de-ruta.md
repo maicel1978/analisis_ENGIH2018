@@ -268,6 +268,48 @@ Este documento fija el alcance acordado hasta ahora. Cualquier cambio de alcance
 
   **4. Retrabajo evitable — lección de proceso.** Hubo que rehacer el README, la presentación y el dashboard (dos veces). Causa: se empezó a producir antes de definir **audiencia y propósito** de cada pieza. Regla adoptada: antes de escribir un entregable, fijar para quién es y qué decisión o acción habilita.
 
+- [x] **HITO (2026-09-13/14): DISEÑO MUESTRAL COMPLEJO INCORPORADO. Cerrada la brecha más seria frente al estándar internacional.**
+
+  **Etapa 1 (`92_incorporar_diseno_muestral.R`).** `01_import.R` conservaba solo `factor_expansion`; se añadieron `estrato`, `upm`, `quintil`, `des_estrato` y `grupo_region`, y `04_equivalente_adulto.R` los lleva al nivel de hogar con `first()` — **el diseño es propiedad del hogar, no de la persona: sumarlo multiplicaría el peso por el número de miembros**. Se deriva además `zona` (urbano/rural) desde `des_estrato`. Verificación: las tres cifras de control quedaron idénticas (36.840 / 303.408 / 8.774), confirmando que solo se arrastraron variables. El `04` imprime ahora: **8 estratos, 933 UPM, 5 quintiles, 0 hogares sin factor de expansión**.
+
+  **Etapa 2 (`91_helper_diseno_muestral.R`).** En `reports/_comun.R`: `cargar_ema_hogar()`, `diseno_muestral()`, `estimar()` y `estimar_proporcion()`.
+
+  **Criterio adoptado (decisión del consultor, que es bioestadístico):** medias ponderadas con varianza por **linealización de Taylor** (lo estándar en `survey`/`srvyr`) y **mediana ponderada al lado como descriptivo, sin intervalo**. Se descartó bootstrap de réplicas por innecesario. **Se descartó también aplicar estimadores robustos a los 572 hogares implausibles:** no son ruido estadístico sino un problema identificado con causa conocida (solapamiento entre secciones) — se resuelve con datos, no se tapa con método. Principio: *adaptarse a lo que los datos llevan, sin torturarlos.* PCA descartado: con 4 nutrientes correlacionados por volumen, el primer componente sería "cantidad total" y no aportaría.
+
+  **RESULTADO TRANQUILIZADOR: el ponderar casi no mueve las estimaciones puntuales.** Energía mediana ponderada 2.148 kcal vs 2.153 sin ponderar — **5 kcal de diferencia**. La muestra está bien balanceada respecto al consumo y las cifras anteriores no estaban sesgadas. **Lo que se gana no es corregir, es poder acompañar cada cifra de un intervalo correcto.** Media ponderada 2.732 kcal (IC 2.661–2.802): ±5%, razonable con 933 UPM.
+
+- [x] **HITO (2026-09-14): `reports/R5_equidad.qmd` — el hallazgo más importante del proyecto.**
+
+  **1. El gradiente social existe y es afirmable.** Razón entre quintil 5 y quintil 1, en medianas ponderadas: **Vitamina A ×2,10 · Energía ×1,44 · Hierro ×1,36 · Folato ×1,27**. En los cuatro nutrientes **los IC de los quintiles extremos NO se solapan**: la desigualdad es sostenible estadísticamente.
+
+  **2. Las pendientes NO son iguales, y eso pedía explicación.** El folato es el nutriente más equitativamente distribuido y la vitamina A el menos — gradiente casi el doble de empinado. **Hipótesis:** el folato viene de cereales básicos sujetos a fortificación (consumo transversal); la vitamina A de frescos no fortificados (consumo ligado al gasto). **Planteada como predicción falsable:** sin fortificación, el gradiente del folato debería empinarse.
+
+  **3. Segunda evidencia independiente, por zona.** De los cuatro nutrientes, **el único con diferencia urbano-rural sostenible es el folato, y es MAYOR en zona rural** (medianas 869,0 vs 799,4; IC sin solapar). Energía, hierro y vitamina A se solapan y **no son afirmables** — advertencia explícita en el reporte contra afirmar lo que las estimaciones puntuales sugieren y los intervalos no respaldan.
+
+  **4. LA PRUEBA — la predicción se cumple.** Razón Q5/Q1 del folato según escenario:
+
+  | Escenario | Q1 | Q5 | Razón |
+  |---|---|---|---|
+  | Sin fortificar | 256,5 | 311,3 | **1,21** |
+  | Solo harina | 261,3 | 316,7 | **1,21** |
+  | Harina y arroz | 955,9 | 965,5 | **1,01** |
+
+  **Fortificar el arroz aplana el gradiente social casi por completo.** Fortificar solo harina no lo mueve — coherente con su cobertura del 8%. En el escenario con arroz la distribución deja incluso de ser monótona (el Q3 supera al Q5).
+
+  **5. EL MECANISMO, verificado — y NO es el que parecía.** Consumo de arroz por EMA/día, medianas ponderadas: Q1 = 188,3 · Q2 = 202,8 · Q3 = 201,9 · Q4 = 201,9 · Q5 = 205,1. **Los hogares pobres NO consumen más arroz: consumen prácticamente lo mismo que el resto.** Y esa uniformidad basta. Si la cantidad es similar en toda la distribución, el nutriente añadido entra en cantidades absolutas similares; como la ingesta total de los quintiles altos es mayor por otras vías, el aporte del vehículo representa una **fracción mayor de la dieta de los hogares pobres**, reduciendo la desigualdad relativa.
+
+  **6. Implicación general — es lo que hace el hallazgo citable.** La condición NO es que el alimento se consuma *más* entre los pobres, sino que se consuma **de forma transversal**. Condición mucho menos exigente, que cumplen los alimentos básicos de consumo generalizado. **La fortificación de un vehículo transversal tiene efecto distributivo progresivo:** añade un argumento de EQUIDAD al de cobertura.
+
+  **Para la reunión:** hasta ahora el argumento sobre el arroz era de *alcance* (88% de los hogares). Ahora hay un segundo argumento, independiente y más fino: **llega especialmente a quien más lo necesita.**
+
+  **Salvedad declarada en el propio reporte:** los escenarios asignan un único código de composición a todas las variedades de arroz. Adecuado para contrastar la **dirección** del efecto; puede afectar a la **magnitud**. La cuantificación precisa requiere resolver la línea base.
+
+- [ ] **Pendientes menores de esta sesión:**
+  - `fmt()` e `ic()` (formato español: miles con punto, decimales con coma, aplicado también dentro de los intervalos construidos con `paste0`) **viven dentro de R5 y deberían estar en `reports/_comun.R`** para que los demás reportes los usen. No se movieron para no tocar el archivo común, que usan seis documentos.
+  - **REGLA TÉCNICA APRENDIDA:** en bloques con `results: asis` que generen markdown, usar **`knitr::asis_output()`, nunca `cat()`**. `cat()` escribe por partes al flujo de salida y rompe las negritas — el texto sale cortado justo donde va el valor. Apareció en R4, se dio por resuelto sin estarlo, y se diagnosticó correctamente en R5.
+  - **R1 a R4 siguen sin intervalos de confianza.** Ahora que `_comun.R` tiene el diseño muestral, conviene incorporarlos — especialmente R3 (cobertura de vehículos), donde los porcentajes deberían ir con IC.
+  - `03_transform.R` imprime un IC de cobertura ponderada con la advertencia de que está subestimado. **Esa advertencia ya no aplica**: corregir para que use el diseño.
+
 - [ ] **DECISIÓN ABIERTA (2026-09-10) — línea base de fortificación. Corresponde al equipo (Daniel/Carlos/Santiago), NO se automatiza.** El crosswalk actual no representa ningún escenario real de política pública dominicana:
   - **Arroz:** RD **no** tiene norma de fortificación de arroz, pero el crosswalk manda ARROZ (var. 7), Arroz selecto (66) y Súper-selecto (65) a `70213002` "Arroz blanco enriquecido" (Fe 4.36, folato 386/100g). Solo Arroz corriente (67) va a `70213004` sin enriquecer. **Sobrestima** Fe y folato del alimento #1 de la dieta.
   - **Harina de trigo:** fortificación **obligatoria desde 2009** (Fe, ácido fólico, complejo B), pero el crosswalk manda Harina de trigo (58) a `70213038` "s/enriquecer" (Fe 1.17, folato 26). **Subestima.**
