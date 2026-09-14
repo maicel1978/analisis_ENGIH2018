@@ -12,28 +12,23 @@
 #     3. Conectar los pesos muestrales (factor_anual / factor_expansion) para
 #        que cualquier agregado sea representativo a nivel nacional
 #
-# LO QUE ESTA ETAPA *NO* HACE TODAVÍA (ver HOJA_DE_RUTA_PROYECTO.md, Fase 0/1):
+# Lo que esta etapa no hace
 #   - Disponibilidad neta Sec 2 + Sec 3A para alimentos almacenables
-#     (inventario_inicial + adquisiciones - inventario_final). Es una pieza
-#     grande aparte -- se aborda en un próximo tramo, no acá.
-#   - Corrección real de outliers (reemplazo por mediana u otro método). Acá
-#     solo se marcan (`es_outlier`); decidir el método de corrección es una
-#     decisión metodológica que hay que documentar explícitamente, 
-#   - Diseño muestral completo (estratos/conglomerados). Ver advertencia
-#     abajo -- es una limitación conocida, no un olvido.
+#     (inventario_inicial + adquisiciones - inventario_final). Requiere decidir
+#     antes el tratamiento de las dos secciones.
+#   - Corrección de outliers. Aquí solo se marcan (`es_outlier`); el método de
+#     corrección es una decisión metodológica pendiente de documentar.
+#   - Control de outliers a nivel de hogar. La detección opera por alimento, de
+#     modo que un hogar puede acumular varios valores altos sin que ninguno sea
+#     individualmente extremo.
 #
-# LIMITACIÓN CONOCIDA E IMPORTANTE:
-#   No tenemos el Cuestionario A (características del hogar), donde
-#   probablemente viven región/zona/estrato/conglomerado (las variables de
-#   diseño muestral). Con lo que hay (factor_anual/factor_expansion) se
-#   pueden calcular promedios y totales ponderados CORRECTOS, pero NO
-#   errores estándar con diseño muestral completo (esos requieren
-#   `svydesign(strata=..., ids=..., weights=...)`, no solo `weights=`).
-#   Los `svymean()`/`svytotal()` de este script usan `ids = ~1` (sin
-#   conglomerados) -- esto es una aproximación conservadora-optimista: el
-#   punto estimado es correcto, el error estándar reportado probablemente
-#   subestima la varianza real del diseño complejo. Documentar esto en
-#   cualquier resultado que se publique.
+# Diseño muestral
+#   Las variables de estratificación y conglomeración (ESTRATO, UPM) están en el
+#   módulo sociodemográfico y se incorporaron al pipeline el 2026-09-13. El
+#   ejemplo de estimación ponderada de este script declara el diseño completo
+#   (strata, ids, weights), no solo los pesos.
+#
+#   Ver docs/hoja-de-ruta.md para el estado de las decisiones abiertas.
 
 # Configuración general ---------------------------------------------------
 rm(list = ls())
@@ -176,12 +171,9 @@ message(
 # guardados en data/clean/data_sec{2,3a}_consumo.csv, más un ejemplo de
 # agregado ponderado correcto (cobertura de un alimento).
 #
-# PENDIENTE (no acá, ver HOJA_DE_RUTA_PROYECTO.md):
+# PENDIENTE (no acá, ver docs/hoja-de-ruta.md):
 #   - Disponibilidad neta Sec 2 + Sec 3A para alimentos almacenables.
 #   - Decidir y documentar el método de corrección de outliers (hoy solo
 #     se marcan, no se corrigen).
-#   - Conseguir variables de diseño muestral (Cuestionario A) para errores
-#     estándar correctos, o documentar explícitamente esta limitación en
-#     cualquier resultado publicado mientras tanto.
-#   - 04_equivalente_adulto.R: AME/AFE por hogar, para expresar consumo per
-#     cápita ajustado en vez de solo por hogar.
+#   - Control de outliers a nivel de hogar, una vez resuelto el tratamiento de
+#     las dos secciones.

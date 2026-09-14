@@ -351,6 +351,23 @@ abiertas y documentadas con su evidencia.
 
   **REGLA TÉCNICA aprendida (costó tres iteraciones):** `kable()` NO se auto-imprime si le sigue otra expresión en el mismo bloque, y `print()` sobre un objeto `kable` emite el markdown como texto crudo. **Las notas al pie van dentro del objeto (gt/flextable) o fuera del bloque como markdown — nunca como llamada a función después del `kable()`.**
 
+- [x] **HITO (2026-09-14): depuración del repositorio, primera pasada.**
+
+  **Comentarios reescritos** en `reports/_comun.R` (20 bloques, script `87`) y en el pipeline (7 bloques, script `86`). Criterio: **un comentario dice lo que el código no dice**. Se eliminan justificaciones de diseño, advertencias en mayúsculas y frases de cierre; se conservan los datos concretos (sin las exclusiones la cifra del trigo se infla 47%; los 19 aceites de INCAP tienen VITA_RAE = 0).
+
+  **Referencias personales sustituidas** (script `85`, 11 sustituciones). Una fuente se cita por su título, no por quien la entregó — menos aún en un repositorio que revisan esas mismas personas. Se cita el documento metodológico, que está en `referencias/`.
+
+  **Encabezado de `03_transform.R` corregido — el problema más serio.** Afirmaba que faltaban las variables de diseño muestral, que estarían en el Cuestionario A, y que se usaba `ids = ~1`. **Las tres cosas dejaron de ser ciertas el 13-09.** Un desfase así es peor que un comentario mal redactado: presenta como limitación algo ya resuelto. También se depuró su lista de pendientes, que incluía tareas ya hechas.
+
+  **Verificado tras cada cambio:** pipeline completo con las cifras de control intactas (36.840 / 303.408 / 8.774) y R5 renderizando.
+
+- [ ] **LIMPIEZA FINAL DEL REPOSITORIO — lo que queda, en orden:**
+
+  1. **Buscar más desfases como el de `03_transform.R`**: afirmaciones que dejaron de ser ciertas. Sospechosos: encabezados de `01`, `02`, `04` y `05`; `docs/vision-y-arquitectura.md`; y las secciones de limitaciones de R1 a R5, que pueden seguir diciendo que no se reportan intervalos de confianza.
+  2. **Archivos de `media/` con doble extensión** (`aji_cubanela02.jpg.jpg`, `platano_verde00.jpg02.jpeg`), junto con las rutas que los referencian.
+  3. **Eliminar los nueve scripts de uso único** (`85` a `93`) — al final del todo. Sus resultados están aplicados y el historial los conserva.
+  4. **Verificar que `data/clean/` y `output/` siguen ignorados.**
+
 - [ ] **REVISIÓN DE TONO — pendiente en los seis documentos (identificado 2026-09-14).** El texto de los informes está escrito como si hubiera que explicarle el método al lector. **La audiencia son dos expertos en fortificación y un oficial de nutrición: saben más del dominio que el consultor.** El registro actual resulta condescendiente y no corresponde a un reporte científico.
 
   **Tres tics concretos a eliminar** (ejemplos reales de R4):
