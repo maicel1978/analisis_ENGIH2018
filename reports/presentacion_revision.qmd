@@ -218,26 +218,59 @@ composición no verificada.
 #| label: tbl-crosswalk
 #| tbl-cap: "Estructura de la correspondencia entre alimentos de la encuesta y tablas de composición. República Dominicana, 2018"
 
-cargar_crosswalk("Cuest. B Sec 3A") |>
+cw <- cargar_crosswalk("Cuest. B Sec 3A")
+
+cw |>
   filter(!is.na(enhance_id)) |>
-  slice(c(1, 2, 3)) |>
+  slice(1:3) |>
   transmute(`Alimento (ENGIH)` = descripcion_engih,
             `Código` = enhance_id,
             `Fuente` = fuente,
-            `Equivalencia` = tipo_equivalencia) |>
+            `Equivalencia` = tipo_equivalencia,
+            `Validado` = validado) |>
   tabla(fuente = NULL,
         notas = paste("Cada registro vincula un alimento de la encuesta con una",
-                      "entrada de tabla de composición, declarando la fuente y",
-                      "si la correspondencia es directa o por criterio."))
+                      "entrada de tabla de composición, declarando su procedencia",
+                      "y si la correspondencia es directa o por criterio."))
 ```
 
-::: {style="font-size:0.88em; margin-top:0.5em;"}
-407 de 769 alimentos mapeados. La distinción entre equivalencia **directa** y
-**sustituto por criterio** permite identificar dónde se aplicó juicio
-profesional.
+::: {style="font-size:0.9em; margin-top:0.4em;"}
+Un mismo análisis integra dos tablas de composición de distinta procedencia.
+La columna de fuente mantiene la trazabilidad de cada valor.
+:::
 
-[Archivo completo](https://github.com/maicel1978/analisis_ENGIH2018/blob/main/data/raw/crosswalk_tablas_composicion.xlsx) ·
-[registro de auditoría de cada cambio](https://github.com/maicel1978/analisis_ENGIH2018/tree/main/data/auditoria)
+## Cómo entra una revisión al análisis
+
+```{r}
+#| label: tbl-estado-cw
+#| tbl-cap: "Estado de la correspondencia de alimentos de la Sección 3A. República Dominicana, 2018"
+
+val <- function(x) toupper(trimws(as.character(x))) %in% c("TRUE","VERDADERO","1")
+
+n_tot <- nrow(cw)
+n_map <- sum(!is.na(cw$enhance_id))
+n_val <- sum(!is.na(cw$enhance_id) & val(cw$validado))
+
+tibble(
+  `Estado` = c("Mapeado y validado — entra al cálculo",
+               "Pendiente de mapeo o validación"),
+  `Alimentos` = format(c(n_val, n_tot - n_val), big.mark = "."),
+  `%` = fmt(100 * c(n_val, n_tot - n_val) / n_tot)
+) |>
+  tabla(fuente = NULL,
+        notas = paste("Un registro contribuye al cálculo únicamente cuando",
+                      "dispone de código de composición y está marcado como",
+                      "validado."))
+```
+
+::: {style="font-size:0.9em; margin-top:0.4em;"}
+La validación no es un trámite: **es lo que habilita el dato**. Al validar un
+alimento pendiente, las cifras de todos los informes se actualizan al
+recompilar, sin intervención manual.
+
+Cada modificación queda registrada con su valor anterior, el nuevo y su
+justificación —
+[registro de auditoría](https://github.com/maicel1978/analisis_ENGIH2018/tree/main/data/auditoria).
 :::
 
 ## Contraste con un análisis independiente
