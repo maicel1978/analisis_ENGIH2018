@@ -178,7 +178,7 @@ comparacion_variantes <- ingesta_hogar |>
 write_delim(comparacion_variantes,
             here("data", "clean", "comparacion_variantes_seccion.csv"), delim = ";")
 
-message("\nComparacion de variantes (la decision Sec2 / Sec3A / ambas es de los supervisores):")
+message("\nComparacion de variantes (el tratamiento aplicable es decision del equipo tecnico):")
 print(comparacion_variantes)
 
 # Paso 6: cobertura -- ponderada por gramos, por nutriente ----------------
@@ -230,5 +230,5 @@ write_delim(faltantes, here("data", "diagnosticos", "alimentos_sin_composicion.c
 #   - Validar el supuesto "por 100 g" contra la documentacion de INCAP y FNDDS.
 #   - 04_equivalente_adulto.R pierde la marca de seccion (Sec2/Sec3A) al hacer
 #     bind_rows: agregar una columna `seccion` alli permitiria reportar
-#     cobertura separada por seccion, que es como Daniel/Carlos la van a pedir.
+#     cobertura separada por seccion.
 #   - Comparar contra benchmark ENM 2009/2024 (siguiente script, no este).

@@ -4,7 +4,7 @@
 # por hogar, para poder normalizar la ingesta aparente de micronutrientes
 # entre hogares de distinta composición demográfica (Weisell & Dop, 2012).
 #
-# Formula (documento de Daniel, "Modelo de Base - Equivalente de Mujer
+# Formula (documento metodologico "Modelo de Base - Equivalente de Mujer
 # Adulta (EMA)", agosto 2026, docs/20260903 Modelo de Base - Equivalente
 # de Mujer Adulta (EMA).pdf):
 #
@@ -16,7 +16,7 @@
 #            55kg, actividad fisica moderada PAL=1.76, no embarazada,
 #            no lactando -- FAO/WHO/UNU 2004)
 #
-# IMPORTANTE: el documento de Daniel CITA las tablas de requerimiento
+# El documento metodologico cita las tablas de requerimiento
 # energetico por edad/sexo (FAO/WHO/UNU 2004, Tablas 4.2, 4.3, 5.2) pero
 # no incluye los numeros. Los valores de este script se sacaron
 # directamente de la fuente primaria:
@@ -32,7 +32,7 @@
 #
 # Verificacion propia: BMR mujer 18-30, 55kg (14.818*55+486.6=1301.6
 # kcal) x PAL 1.76 = 2290.8 kcal =~ 2291 kcal -- coincide exactamente
-# con el valor de referencia del documento de Daniel. La formula esta
+# con el valor del documento metodologico. La formula esta
 # bien aplicada.
 #
 # LIMITACIONES DOCUMENTADAS (no resueltas en esta version, ver mas abajo):
@@ -41,11 +41,11 @@
 #      "Diccionario de variables" completa, no se encontro ninguna variable
 #      de este tipo. Este script NO aplica el ajuste de +275 kcal
 #      (embarazo) ni +505/460 kcal (lactancia) que menciona el documento
-#      de Daniel, porque no hay como identificar a esas mujeres en los
+#      del documento metodologico, porque no hay como identificar a esas mujeres en los
 #      datos. Esto subestima levemente el requerimiento de esos hogares.
 #   2. Para adultos (>=18 anos) se usa un peso FIJO por sexo (65kg
 #      hombres, 55kg mujeres -- las mismas hipotesis del documento de
-#      Daniel), no el peso real de cada persona, porque la ENGIH no
+#      metodologico), no el peso real de cada persona, porque la ENGIH no
 #      registra peso individual.
 #   3. Infantes menores de 1 ano: la Tabla 4.2/4.3 de FAO/WHO/UNU 2004
 #      empieza en 1-2 anos. Para edad=0 se usa un valor provisional
@@ -113,7 +113,7 @@ tabla_ninos <- tribble(
 )
 
 # Adultos: BMR (Schofield 1985, Tabla 5.2) x PAL 1.76 (moderado).
-# Peso fijo por hipotesis del documento de Daniel: 65kg hombres, 55kg
+# Peso fijo por hipotesis del documento metodologico: 65kg hombres, 55kg
 # mujeres. Formulas fuente (kcal/dia): ver comentario de cada fila.
 PAL <- 1.76
 peso_hombre <- 65
@@ -132,7 +132,7 @@ tabla_adultos <- tribble(
 tabla_requerimiento <- bind_rows(tabla_ninos, tabla_adultos)
 
 # Referencia EMA = 1 mujer adulta 18-30, 55kg, PAL 1.76 (documento de
-# Daniel dice 2291 kcal exacto; usamos el valor calculado 2290.8 para
+# El documento de referencia indica 2291 kcal; se usa el valor calculado 2290,8 para
 # consistencia interna con la tabla de arriba -- la diferencia es
 # redondeo, no una discrepancia real).
 REFERENCIA_EMA_KCAL <- tabla_adultos |>
@@ -220,7 +220,7 @@ write_delim(ema_hogar, here("data", "clean", "data_ema_hogar.csv"), delim = ";")
 # ----------------------------------------------------------------------
 # OJO: esto da "gramos de alimento consumidos por EMA por dia", TODAVIA NO
 # la "ingesta aparente de micronutrientes por EMA" completa de la formula
-# de Daniel -- para eso falta multiplicar por la composicion nutricional
+# del documento metodologico -- para eso falta multiplicar por la composicion nutricional
 # (INCAP/FNDDS), que es 05_ingesta_micronutrientes.R, dejado pendiente a
 # proposito por la complejidad de armonizar los esquemas de columnas de
 # INCAP y FNDDS (ver HOJA_DE_RUTA). Esta pieza intermedia sí se puede
@@ -273,4 +273,4 @@ write_delim(gramos_por_ema, here("data", "clean", "data_gramos_por_ema.csv"), de
 # 4. 05_ingesta_micronutrientes.R: multiplicar data_gramos_por_ema.csv por
 #    la composicion nutricional (INCAP/FNDDS, armonizando esquemas) para
 #    obtener la ingesta aparente de cada micronutriente por EMA -- la
-#    formula completa del documento de Daniel.
+#    formula completa del documento metodologico.
