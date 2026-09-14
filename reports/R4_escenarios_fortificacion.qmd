@@ -327,8 +327,8 @@ su inclusión depende igualmente de que exista norma aplicable.
 - **El consumo de alimentos almacenables está sobrestimado** por el solapamiento
   entre las Secciones 2 y 3A, que afecta a los propios vehículos de
   fortificación.
-- **Sin intervalos de confianza**, por no haberse incorporado aún el diseño
-  muestral complejo.
+- **Estimaciones con diseño muestral complejo**, con intervalos de
+  confianza por linealización de Taylor.
 - **No se evalúa adecuación de la ingesta.** Comparar contra requerimientos
   estimados —y derivar prevalencia de ingesta inadecuada— es el indicador 4 del
   sistema de evaluación, y requiere definir previamente el escenario aplicable.
