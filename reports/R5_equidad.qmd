@@ -73,6 +73,15 @@ tema_r <- function(base = 12) {
 }
 
 FUENTE <- "Fuente: ENGIH 2018, Banco Central de la República Dominicana."
+
+# Formato numérico en convención española: miles con punto, decimales con coma.
+# Se aplica también dentro de los intervalos, que se construyen con paste0 y por
+# tanto no pasan por format.args de kable.
+fmt <- function(x, dec = 1) {
+  formatC(round(x, dec), format = "f", digits = dec,
+          big.mark = ".", decimal.mark = ",")
+}
+ic <- function(lo, hi, dec = 1) paste0(fmt(lo, dec), " – ", fmt(hi, dec))
 ```
 
 # Qué responde este informe
@@ -115,7 +124,7 @@ por_quintil |>
     Hogares   = n,
     Mediana   = round(mediana, 1),
     Media     = round(media, 1),
-    `IC 95%`  = paste0(round(media_low, 1), " – ", round(media_upp, 1))
+    `IC 95%`  = ic(media_low, media_upp)
   ) |>
   kable(format.args = list(big.mark = ".", decimal.mark = ","))
 ```
@@ -156,9 +165,9 @@ por_quintil |>
 razon |>
   transmute(
     Nutriente = nutriente,
-    `Quintil 1` = round(q1, 1),
-    `Quintil 5` = round(q5, 1),
-    `Razón Q5/Q1` = round(razon, 2)
+    `Quintil 1` = fmt(q1),
+    `Quintil 5` = fmt(q5),
+    `Razón Q5/Q1` = fmt(razon, 2)
   ) |>
   kable()
 ```
@@ -199,11 +208,12 @@ razon |>
 r_alto <- razon |> slice_max(razon, n = 1)
 r_bajo <- razon |> slice_min(razon, n = 1)
 
-cat(paste0(
+texto <- paste0(
   "El gradiente más pronunciado corresponde a **", r_alto$nutriente,
-  "** (×", round(r_alto$razon, 2), "); el más plano, a **", r_bajo$nutriente,
-  "** (×", round(r_bajo$razon, 2), ").\n"
-))
+  "** (×", fmt(r_alto$razon, 2), "); el más plano, a **", r_bajo$nutriente,
+  "** (×", fmt(r_bajo$razon, 2), ")."
+)
+knitr::asis_output(texto)
 ```
 
 La **vitamina A** presenta el gradiente más pronunciado: la ingesta del quintil
@@ -239,8 +249,8 @@ por_quintil |>
                      values_from = c(media_low, media_upp)) |>
   transmute(
     Nutriente = nutriente,
-    `IC Quintil 1` = paste0(round(media_low_1, 1), " – ", round(media_upp_1, 1)),
-    `IC Quintil 5` = paste0(round(media_low_5, 1), " – ", round(media_upp_5, 1)),
+    `IC Quintil 1` = ic(media_low_1, media_upp_1),
+    `IC Quintil 5` = ic(media_low_5, media_upp_5),
     `¿Se solapan?` = if_else(media_upp_1 >= media_low_5, "Sí", "No")
   ) |>
   kable()
@@ -267,7 +277,7 @@ por_zona |>
     Hogares   = n,
     Mediana   = round(mediana, 1),
     Media     = round(media, 1),
-    `IC 95%`  = paste0(round(media_low, 1), " – ", round(media_upp, 1))
+    `IC 95%`  = ic(media_low, media_upp)
   ) |>
   kable(format.args = list(big.mark = ".", decimal.mark = ","))
 ```
@@ -285,8 +295,8 @@ por_zona |>
   tidyr::pivot_wider(names_from = zona, values_from = c(media_low, media_upp)) |>
   transmute(
     Nutriente = nutriente,
-    `IC Rural`  = paste0(round(media_low_Rural, 1), " – ", round(media_upp_Rural, 1)),
-    `IC Urbano` = paste0(round(media_low_Urbano, 1), " – ", round(media_upp_Urbano, 1)),
+    `IC Rural`  = ic(media_low_Rural, media_upp_Rural),
+    `IC Urbano` = ic(media_low_Urbano, media_upp_Urbano),
     `¿Se solapan?` = if_else(
       pmin(media_upp_Rural, media_upp_Urbano) >=
         pmax(media_low_Rural, media_low_Urbano), "Sí", "No")
@@ -314,18 +324,18 @@ solape <- por_zona |>
 dif <- solape |> filter(!solapan) |> pull(nutriente)
 
 if (length(dif) == 0) {
-  cat("Ninguna diferencia entre zonas resulta sostenible con los datos disponibles.\n")
+  knitr::asis_output("Ninguna diferencia entre zonas resulta sostenible con los datos disponibles.")
 } else {
   medianas <- por_zona |> filter(nutriente %in% dif) |>
     select(nutriente, zona, mediana) |>
     tidyr::pivot_wider(names_from = zona, values_from = mediana)
   mayor <- if_else(medianas$Rural[1] > medianas$Urbano[1], "rural", "urbana")
-  cat(paste0(
+  knitr::asis_output(paste0(
     "De los cuatro nutrientes examinados, la única diferencia sostenible ",
     "estadísticamente corresponde a **", paste(dif, collapse = ", "),
     "**, con valores mayores en la zona **", mayor, "** ",
-    "(medianas de ", round(medianas$Rural[1], 1), " y ",
-    round(medianas$Urbano[1], 1), " respectivamente).\n"
+    "(medianas de ", fmt(medianas$Rural[1]), " y ",
+    fmt(medianas$Urbano[1]), " respectivamente)."
   ))
 }
 ```
@@ -394,7 +404,7 @@ esc |>
   transmute(Escenario = escenario, Quintil = quintil,
             Mediana = round(mediana, 1),
             Media = round(media, 1),
-            `IC 95%` = paste0(round(media_low, 1), " – ", round(media_upp, 1))) |>
+            `IC 95%` = ic(media_low, media_upp)) |>
   kable(format.args = list(big.mark = ".", decimal.mark = ","))
 ```
 
@@ -408,10 +418,10 @@ esc |>
 
 razon_esc |>
   transmute(Escenario = escenario,
-            `Quintil 1` = round(q1, 1),
-            `Quintil 5` = round(q5, 1),
-            `Razón Q5/Q1` = round(razon, 2)) |>
-  kable(format.args = list(big.mark = ".", decimal.mark = ","))
+            `Quintil 1` = fmt(q1),
+            `Quintil 5` = fmt(q5),
+            `Razón Q5/Q1` = fmt(razon, 2)) |>
+  kable()
 ```
 
 ::: {.fuente}
@@ -446,12 +456,13 @@ esc |>
 sin <- razon_esc |> filter(grepl("Sin", escenario))
 con <- razon_esc |> filter(grepl("arroz", escenario))
 
-cat(paste0(
+texto <- paste0(
   "Sin fortificación, la ingesta de folato del quintil de mayor gasto supera a ",
-  "la del más pobre en un factor de **", round(sin$razon, 2), "**. ",
+  "la del más pobre en un factor de **", fmt(sin$razon, 2), "**. ",
   "Incorporando el arroz como vehículo fortificado, esa razón desciende a **",
-  round(con$razon, 2), "**.\n"
-))
+  fmt(con$razon, 2), "**."
+)
+knitr::asis_output(texto)
 ```
 
 **La predicción se cumple.** El gradiente social del folato se atenúa hasta
@@ -478,7 +489,7 @@ estimar(diseno_muestral(arroz), arroz_g, por = "quintil") |>
   transmute(Quintil = quintil, Hogares = n,
             `Mediana (g)` = round(mediana, 1),
             `Media (g)` = round(media, 1),
-            `IC 95%` = paste0(round(media_low, 1), " – ", round(media_upp, 1))) |>
+            `IC 95%` = ic(media_low, media_upp)) |>
   kable(format.args = list(big.mark = ".", decimal.mark = ","))
 ```
 
