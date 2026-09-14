@@ -28,7 +28,7 @@ VEHICULOS <- tribble(
   "Arroz",              "arroz",
   "Harina de trigo",    "harina de trigo|harina integral",
   "Aceite",             "aceite",
-  "Azucar",             "azucar|az\u00facar"
+  "Azúcar",             "azucar|az\u00facar"
 )
 
 # Definición AMPLIADA del vehículo trigo: harina + derivados de consumo directo.

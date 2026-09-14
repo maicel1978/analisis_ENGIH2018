@@ -1,7 +1,7 @@
 ---
 title: "R3 — Cobertura y consumo de vehículos fortificables"
 subtitle: "ENGIH 2018, República Dominicana | Indicadores 1 y 2 del sistema de evaluación"
-author: "Maicel E. Monzón"
+author: "Maicel E. Monzón, PhD (ORCID 0000-0003-2117-9145)"
 lang: es
 date: today
 format:
@@ -32,6 +32,24 @@ gpe   <- cargar_gramos_por_ema() |> marcar_vehiculo()
 pesos <- pesos_hogar()
 
 hogares_total <- n_distinct(gpe$id_hogar_unico)
+
+# Formato español: miles con punto, decimales con coma. Se aplica también dentro
+# de los intervalos, que se construyen con paste0 y no pasan por format.args.
+fmt <- function(x, dec = 1) {
+  formatC(round(x, dec), format = "f", digits = dec,
+          big.mark = ".", decimal.mark = ",")
+}
+ic <- function(lo, hi, dec = 1) paste0(fmt(lo, dec), " – ", fmt(hi, dec))
+
+# Marco de hogares con indicador de consumo por vehículo. Se necesita la base
+# COMPLETA de hogares (no solo los consumidores) para estimar una proporción:
+# los no consumidores son los ceros del indicador.
+marco <- tibble(id_hogar_unico = unique(gpe$id_hogar_unico))
+for (v in unique(na.omit(gpe$vehiculo))) {
+  consumidores <- gpe |> filter(vehiculo == v) |> distinct(id_hogar_unico) |> pull()
+  marco[[v]] <- marco$id_hogar_unico %in% consumidores
+}
+dis_veh <- diseno_muestral(marco)
 ```
 
 > Todas las cifras se calculan al renderizar, directamente desde el pipeline.
@@ -50,6 +68,17 @@ consume arroz?** — no si ese arroz en particular estaba fortificado. Esa
 distinción hace que este reporte sea **independiente de la decisión pendiente
 sobre la línea base de fortificación**, y por eso sus cifras son estables.
 
+::: {.callout-note appearance="simple"}
+## Estimaciones con diseño muestral
+Las proporciones se estiman incorporando la estructura de la muestra —8
+estratos, 933 unidades primarias y factor de expansión por hogar— con
+intervalos de confianza al 95% calculados por linealización de Taylor.
+
+El porcentaje sin ponderar se muestra al lado para que la diferencia entre
+ambos quede visible: una brecha amplia indicaría que el consumo del vehículo se
+concentra en hogares con distinta representatividad muestral.
+:::
+
 ## Cobertura por vehículo
 
 Un hogar cuenta como consumidor de un vehículo si registró al menos una
@@ -57,29 +86,33 @@ adquisición o existencia de ese alimento durante el período de medición.
 
 ```{r}
 #| label: tbl-cobertura
-#| tbl-cap: "Proporción de hogares que consumen cada vehículo de fortificación"
+#| tbl-cap: "Proporción de hogares que consumen cada vehículo de fortificación. República Dominicana, 2018"
 
-peso_total <- sum(pesos$peso, na.rm = TRUE)
+vehiculos <- unique(na.omit(gpe$vehiculo))
 
-cob <- gpe |>
-  filter(!is.na(vehiculo)) |>
-  distinct(id_hogar_unico, vehiculo) |>
-  left_join(pesos, by = "id_hogar_unico") |>
-  group_by(Vehiculo = vehiculo) |>
-  summarise(
-    `Hogares consumidores` = n(),
-    peso_consumidores      = sum(peso, na.rm = TRUE),
-    .groups = "drop"
+cob <- bind_rows(lapply(vehiculos, function(v) {
+  estimar_proporcion(dis_veh, !!rlang::sym(v)) |>
+    transmute(Vehiculo = v,
+              `Hogares consumidores` = sum(marco[[v]]),
+              cobertura = p, lo = p_low, hi = p_upp)
+})) |>
+  arrange(desc(cobertura))
+
+cob |>
+  transmute(
+    Vehículo = Vehiculo,
+    `Hogares consumidores` = `Hogares consumidores`,
+    `% sin ponderar` = paste0(fmt(100 * `Hogares consumidores` / hogares_total), "%"),
+    `% ponderado`    = paste0(fmt(cobertura), "%"),
+    `IC 95%`         = ic(lo, hi)
   ) |>
-  mutate(
-    `% sin ponderar` = pct(`Hogares consumidores`, hogares_total),
-    `% ponderado`    = pct(peso_consumidores, peso_total)
-  ) |>
-  select(-peso_consumidores) |>
-  arrange(desc(`Hogares consumidores`))
-
-kable(cob, format.args = list(big.mark = ","))
+  kable(format.args = list(big.mark = "."))
 ```
+
+::: {.fuente}
+Fuente: ENGIH 2018, Banco Central de la República Dominicana. Estimaciones
+ponderadas con diseño muestral complejo (8 estratos, 933 UPM).
+:::
 
 ```{r}
 #| label: fig-cobertura
@@ -100,10 +133,19 @@ bp <- barplot(d$p, names.arg = d$vehiculo, horiz = TRUE, las = 1,
 text(d$p + 3, bp, labels = paste0(round(d$p, 1), "%"), cex = 0.8)
 ```
 
-La diferencia entre el porcentaje sin ponderar y el ponderado por el factor de
-expansión indica en qué medida el consumo del vehículo se concentra en hogares
-con distinta representatividad muestral. Una brecha amplia merece lectura
-cuidadosa; una brecha estrecha indica un consumo transversal a la población.
+```{r}
+#| label: lectura-cobertura
+#| results: asis
+
+amplitud <- cob |> mutate(a = hi - lo) |> summarise(max = max(a)) |> pull(max)
+
+knitr::asis_output(paste0(
+  "La amplitud máxima de los intervalos es de ", fmt(amplitud),
+  " puntos porcentuales, lo que indica estimaciones precisas para los cuatro ",
+  "vehículos. Las diferencias de cobertura entre ellos no son atribuibles a ",
+  "error de muestreo."
+))
+```
 
 ## El caso de la harina de trigo
 
@@ -122,9 +164,9 @@ tibble(
   `Definición` = c("Harina de trigo como producto",
                    "Harina de trigo y sus derivados"),
   `Hogares` = c(h_estricto, h_ampliado),
-  `% de hogares` = c(pct(h_estricto, hogares_total), pct(h_ampliado, hogares_total))
+  `% de hogares` = paste0(fmt(100 * c(h_estricto, h_ampliado) / hogares_total), "%")
 ) |>
-  kable(format.args = list(big.mark = ","))
+  kable(format.args = list(big.mark = ".", decimal.mark = ","))
 ```
 
 La harina de trigo apenas aparece como producto comprado: en la Sección 2 no la
@@ -151,7 +193,7 @@ gpe_amp |>
   count(Alimento = descripcion, name = "Filas") |>
   arrange(desc(Filas)) |>
   head(15) |>
-  kable(format.args = list(big.mark = ","))
+  kable(format.args = list(big.mark = ".", decimal.mark = ","))
 ```
 
 ::: {.callout-warning}
@@ -181,19 +223,26 @@ cons <- gpe |>
   filter(!is.na(vehiculo)) |>
   group_by(id_hogar_unico, vehiculo) |>
   summarise(g_ema_dia = sum(Gramos_por_EMA_dia, na.rm = TRUE), .groups = "drop") |>
-  group_by(Vehiculo = vehiculo) |>
+  group_by(Vehículo = vehiculo) |>
   summarise(
-    `Hogares`  = n(),
-    `Mediana`  = round(median(g_ema_dia), 1),
-    `Media`    = round(mean(g_ema_dia), 1),
-    `P25`      = round(quantile(g_ema_dia, 0.25), 1),
-    `P75`      = round(quantile(g_ema_dia, 0.75), 1),
-    `P95`      = round(quantile(g_ema_dia, 0.95), 1),
+    n        = n(),
+    mediana  = median(g_ema_dia),
+    media    = mean(g_ema_dia),
+    p25      = quantile(g_ema_dia, 0.25),
+    p75      = quantile(g_ema_dia, 0.75),
+    p95      = quantile(g_ema_dia, 0.95),
     .groups = "drop"
   ) |>
-  arrange(desc(Mediana))
+  arrange(desc(mediana)) |>
+  transmute(Vehículo,
+            Hogares = n,
+            Mediana = fmt(mediana),
+            Media   = fmt(media),
+            P25     = fmt(p25),
+            P75     = fmt(p75),
+            P95     = fmt(p95))
 
-kable(cons, format.args = list(big.mark = ","))
+kable(cons, format.args = list(big.mark = "."))
 ```
 
 ::: {.callout-note}
@@ -223,7 +272,7 @@ simul <- gpe |>
   mutate(`% de hogares` = pct(hogares, hogares_total),
          `% acumulado`  = pct(rev(cumsum(rev(hogares))), hogares_total))
 
-kable(simul, format.args = list(big.mark = ","))
+kable(simul, format.args = list(big.mark = "."))
 ```
 
 ```{r}
@@ -232,8 +281,9 @@ kable(simul, format.args = list(big.mark = ","))
 
 alcanzados <- gpe |> filter(!is.na(vehiculo)) |> distinct(id_hogar_unico) |> nrow()
 
-cat(paste0("**Al menos un vehículo:** ", format(alcanzados, big.mark = ","),
-           " hogares (", pct(alcanzados, hogares_total), " del total analizado).\n\n"))
+knitr::asis_output(paste0(
+  "**Al menos un vehículo:** ", format(alcanzados, big.mark = "."),
+  " hogares (", fmt(100 * alcanzados / hogares_total), "% del total analizado).\n\n"))
 
 todos <- gpe |>
   filter(!is.na(vehiculo)) |>
@@ -242,8 +292,9 @@ todos <- gpe |>
   filter(n == nrow(VEHICULOS)) |>
   nrow()
 
-cat(paste0("**Los cuatro vehículos a la vez:** ", format(todos, big.mark = ","),
-           " hogares (", pct(todos, hogares_total), ").\n"))
+knitr::asis_output(paste0(
+  "**Los cuatro vehículos a la vez:** ", format(todos, big.mark = "."),
+  " hogares (", fmt(100 * todos / hogares_total), "%)."))
 ```
 
 ## Aporte por sección del cuestionario
@@ -263,7 +314,7 @@ gpe |>
   distinct(id_hogar_unico, vehiculo, seccion) |>
   count(Vehiculo = vehiculo, Seccion = seccion, name = "Hogares") |>
   pivot_wider(names_from = Seccion, values_from = Hogares, values_fill = 0) |>
-  kable(format.args = list(big.mark = ","))
+  kable(format.args = list(big.mark = ".", decimal.mark = ","))
 ```
 
 ::: {.callout-important}
@@ -302,10 +353,10 @@ no se ve afectada por este solapamiento** — solo el consumo en gramos.
 #| label: lectura
 #| results: asis
 
-for (i in seq_len(nrow(cob))) {
-  cat(paste0("- **", cob$Vehiculo[i], "**: alcanza al ",
-             cob$`% sin ponderar`[i], " de los hogares analizados.\n"))
-}
+knitr::asis_output(paste0(
+  "- **", cob$Vehiculo, "**: alcanza al ", fmt(cob$cobertura),
+  "% de los hogares (IC 95%: ", ic(cob$lo, cob$hi), ").",
+  collapse = "\n"))
 ```
 
 Un vehículo con cobertura alta y consumo mediano estable es candidato preferente
