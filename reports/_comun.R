@@ -323,6 +323,19 @@ marcar_elegible <- function(df) {
     )
 }
 
+# Formato numerico en convencion espanola: miles con punto, decimales con coma.
+#
+# Necesario porque `kable(format.args = ...)` NO alcanza a los valores que se
+# construyen con paste0 antes de llegar a la tabla -- tipicamente los intervalos
+# de confianza. Sin esto, una misma tabla mezcla "1.831,6" con "2084.3".
+fmt <- function(x, dec = 1) {
+  formatC(round(x, dec), format = "f", digits = dec,
+          big.mark = ".", decimal.mark = ",")
+}
+
+# Intervalo formateado, con guion largo como separador.
+ic <- function(lo, hi, dec = 1) paste0(fmt(lo, dec), " – ", fmt(hi, dec))
+
 # Porcentaje formateado, para no repetir round() en cada reporte.
 # VECTORIZADO a proposito: se usa dentro de mutate() sobre columnas enteras,
 # donde un if() ordinario falla ("the condition has length > 1").

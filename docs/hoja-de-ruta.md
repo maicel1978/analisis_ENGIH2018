@@ -10,37 +10,43 @@ Este documento fija el alcance acordado hasta ahora. Cualquier cambio de alcance
 
 ## PRIORIDAD ACTUAL (leer esto primero, antes que Fase 0 de abajo)
 
-**Al 2026-09-12 (noche): pipeline `01`→`05` completo, R1 y R3 renderizados. Lo que sigue, en este orden:**
+**Estado al 2026-09-14.** El pipeline `01`→`05` corre completo e incorpora el
+**diseño muestral complejo**. Hay **seis documentos terminados**: el informe de
+factibilidad (entregable contractual, en HTML y Word), R1 a R5, la presentación
+para la revisión, y dos tableros. El repositorio está reorganizado, con
+convención de nombres, README reescrito y trazabilidad documentada.
 
-**LA ENTREGA COMPROMETIDA ESTÁ COMPLETA.** Pipeline `01`→`05` corriendo, R1 + R2 + R3 renderizados, README reescrito, PC-A verificada (Quarto 1.9.38 y todos los paquetes cargan).
-
-**CUATRO reportes terminados (R1, R2, R3, R4), repositorio limpio y README reescrito.**
+**Hallazgo principal del proyecto (2026-09-14):** la fortificación del arroz
+**aplana el gradiente social del folato** —de ×1,21 a ×1,01 entre quintiles
+extremos— porque el arroz se consume en cantidades equivalentes en toda la
+distribución de gasto. Añade un argumento de **equidad** al de cobertura. Ver
+R5 y el registro detallado en Fase 0.
 
 **Lo que sigue, por valor decreciente:**
 
-1. **La presentación.** A partir de aquí el valor está en dominar el material, no en escribir más código. El guion está en Fase 5.
-2. **Pulir R2** (pendiente del consultor) y el bloque `rango` de R4.
-3. **R5 — desplazamiento respecto al EAR.** R4 ya cubre buena parte de lo que R5 haría; lo que falta es comparar contra requerimientos y derivar prevalencia de ingesta inadecuada. **Requiere definir antes el escenario aplicable**, así que depende de la respuesta de la contraparte.
+1. **Dominar el material para la reunión.** A partir de aquí el valor está en
+   poder defender cada decisión sin notas, no en escribir más código. El guion
+   está en Fase 5.
+2. **Incorporar intervalos de confianza a R1, R2 y R4.** `reports/_comun.R` ya
+   tiene el diseño muestral; R3 y R5 ya los usan.
+3. **Corregir `03_transform.R`**, que imprime un intervalo con una advertencia
+   de subestimación que ya no aplica.
+4. **Pulir el diseño de los dos tableros** (ver pendiente en Fase 0) y el
+   borrador de artículo científico.
 
-**Explícitamente fuera de alcance, entregados como método descrito:** D1 y D2 (dashboards), desglose por quintil y zona con `srvyr`, factores de receta para cuantificar el aporte de los derivados de trigo.
+**Las tres decisiones que corresponden al equipo técnico** —línea base de
+fortificación, tratamiento de las Secciones 2 y 3A, y fuentes de composición
+faltantes— siguen abiertas y están documentadas con su evidencia. Se llevan a la
+reunión; no se resuelven por cuenta propia.
 
-**Cambio de fecha (2026-09-12): la fecha real de cierre es el domingo por la noche**, no el martes 16. El martes es margen. Criterio derivado: ya no se trata de *qué alcanzo a terminar*, sino de **qué queda tan bien documentado que se entienda sin el consultor presente**. Lo que no se ejecute (R4, R5, D1, D2, desglose por quintil) se entrega **descrito**, con método definido, variables verificadas y una nota de qué falta para correrlo. Después, llevar a Daniel/Carlos la decisión sobre la línea base de fortificación (ver "Decisión abierta" al final de Fase 0), que sigue siendo el hallazgo metodológico más importante sin resolver.
+**Criterios de trabajo vigentes:**
 
-**Fecha límite dura: reunión del 2026-09-16.** Ver "Fase 5 — Presentación" al final de este documento para el alcance comprometido y lo que queda explícitamente fuera.
-
-*(Anterior, 2026-09-10: revisar y cargar los 154 mapeos confirmados + correr el `05`. El primero quedó hecho el 12-09; el segundo sigue vigente.)*
-
-*(Anterior, 2026-09-09: avanzar por fases con los datos como están, no perfeccionar datos antes de avanzar. Sigue vigente, con el matiz aprendido el 12-09: **se justifica volver atrás cuando el arreglo es acotado, no requiere criterio nuevo y bloquea algo que ya se está por mostrar — los tres a la vez.** Si falta alguno, se anota y se sigue. Ejemplo real: completar el PC de 154 alimentos costó 30 minutos y subió la cobertura efectiva de 86.5% a 89.2% antes de publicarla en R1; postergarlo habría obligado a rehacer el reporte.)*
-
-**Al 2026-09-10: lo que sigue es (1) revisar y cargar los 154 mapeos confirmados del crosswalk Sec 3A, y (2) correr `05_ingesta_micronutrientes.R` por primera vez** — el script ya está escrito y versionado. Después de eso, llevar a Daniel/Carlos la decisión sobre la línea base de fortificación (ver "Decisión abierta" al final de Fase 0), que hoy es el hallazgo metodológico más importante sin resolver: el crosswalk actual asume arroz fortificado y harina/azúcar sin fortificar, que es lo inverso a la norma dominicana de 2018.
-
-*(Anterior, 2026-09-09: empezar `05_ingesta_micronutrientes.R` (Fase 1), NO seguir la lista de pendientes de Fase 0 — esa lista es real pero se retoma después, ver "ESTRATEGIA ACORDADA" en Fase 1. Sigue vigente como criterio.)*
-
-**Para no caer en un ciclo infinito intentando mapear los ~65 nutrientes de una vez:** empezar con solo 4 — **Energía, Hierro, Ácido fólico, Vitamina A** (los que Santiago nombró explícitamente + los que ya tienen benchmark de comparación, la ENM 2009/2024 mencionada más abajo). Conseguir esos 4 corriendo de punta a punta primero. Ampliar a más nutrientes después de tener ese resultado, no antes.
-
-**Antes de escribir el join:** revisar los nombres exactos de columna en `food_composition_INCAP.xlsx` (ej. `ENERC_KCAL`, `FE`, `FOLDFE`, `VITA_RAE`) vs. `food_composition_FNDDS.xlsx` (nombres en inglés tipo "Energy (kcal)", "Iron, Fe (mg)") — **no son los mismos nombres ni necesariamente las mismas unidades** (mg vs mcg, por ejemplo). Construir la tabla de equivalencia de columnas primero, como un paso explícito y verificado, no asumido.
-
----
+- *Avanzar con los datos como están, declarando la cobertura de cada cifra.* La
+  depuración no tiene final natural; esperar a tenerla completa no converge.
+- *Volver atrás solo cuando el arreglo es acotado, no requiere criterio nuevo y
+  bloquea algo que ya se está por mostrar* — los tres a la vez.
+- *Antes de escribir un entregable, fijar para quién es y qué decisión habilita.*
+  Lección del retrabajo del 13-09.
 
 ## Fase 0 — Cerrar la base de datos (prerrequisito, en curso)
 

@@ -1,7 +1,7 @@
 ---
 title: "R4 — Ingesta aparente de micronutrientes bajo escenarios de fortificación"
 subtitle: "ENGIH 2018, República Dominicana | Indicador 3 del sistema de evaluación"
-author: "Maicel E. Monzón"
+author: "Maicel E. Monzón, PhD (ORCID 0000-0003-2117-9145)"
 lang: es
 date: today
 format:
@@ -134,51 +134,94 @@ El **escenario 1** modela fortificación únicamente de harina de trigo. El
 
 ```{r}
 #| label: tbl-resultado
-#| tbl-cap: "Ingesta aparente mediana por EMA y día, según escenario"
+#| tbl-cap: "Ingesta aparente por Equivalente de Mujer Adulta y día, según escenario de fortificación. República Dominicana, 2018"
 
-resumen <- resultados |>
-  group_by(Escenario = escenario) |>
-  summarise(
-    Hogares = n(),
-    `Energía (kcal)`   = round(median(energia_kcal)),
-    `Hierro (mg)`      = round(median(hierro_mg), 1),
-    `Folato (µg DFE)`  = round(median(folato_mcg_dfe)),
-    `Vit. A (µg RAE)`  = round(median(vitamina_a_mcg_rae)),
-    .groups = "drop"
-  )
+NUT_ETIQ <- c(energia_kcal = "Energía (kcal)",
+              hierro_mg = "Hierro (mg)",
+              folato_mcg_dfe = "Folato (µg DFE)",
+              vitamina_a_mcg_rae = "Vitamina A (µg RAE)")
 
-kable(resumen, format.args = list(big.mark = ","))
+# OJO: la variable del bucle NO puede llamarse `n`: estimar() devuelve una
+# columna `n` (hogares) que la enmascara dentro de mutate().
+estim <- bind_rows(lapply(unique(resultados$escenario), function(esc_i) {
+  dis <- diseno_muestral(filter(resultados, escenario == esc_i))
+  bind_rows(lapply(names(NUT_ETIQ), function(var_nut) {
+    etiqueta <- unname(NUT_ETIQ[var_nut])
+    estimar(dis, !!rlang::sym(var_nut)) |>
+      mutate(escenario = esc_i, nutriente = etiqueta, .before = 1)
+  }))
+}))
+
+resumen <- estim |>
+  transmute(Escenario = escenario,
+            Nutriente = nutriente,
+            Hogares   = n,
+            Mediana   = fmt(mediana),
+            Media     = fmt(media),
+            `IC 95%`  = ic(media_low, media_upp))
+
+kable(resumen, format.args = list(big.mark = "."))
 ```
+
+::: {.fuente}
+Fuente: ENGIH 2018, Banco Central de la República Dominicana. Estimaciones
+ponderadas con diseño muestral complejo (8 estratos, 933 UPM); intervalos por
+linealización de Taylor.
+:::
 
 ```{r}
 #| label: fig-escenarios
-#| fig-cap: "Efecto de la fortificación sobre la ingesta mediana de hierro y folato"
-#| fig-height: 4
+#| fig-cap: "Efecto de la fortificación sobre la ingesta de hierro y folato. República Dominicana, 2018"
+#| fig-width: 9
+#| fig-height: 3.8
 
-par(mfrow = c(1, 2), mar = c(7, 4, 3, 1))
-for (nut in c("hierro_mg", "folato_mcg_dfe")) {
-  v <- resultados |> group_by(escenario) |>
-    summarise(m = median(.data[[nut]]), .groups = "drop") |> arrange(escenario)
-  barplot(v$m, names.arg = v$escenario, las = 2, col = "#4a7c9b",
-          main = if (nut == "hierro_mg") "Hierro (mg)" else "Folato (µg DFE)",
-          ylab = "Mediana por EMA/día", cex.names = 0.75)
-}
+library(ggplot2)
+
+estim |>
+  filter(nutriente %in% c("Hierro (mg)", "Folato (µg DFE)")) |>
+  mutate(esc = gsub("^[0-9]\\. ", "", escenario)) |>
+  ggplot(aes(esc, media)) +
+  geom_errorbar(aes(ymin = media_low, ymax = media_upp), width = 0.12,
+                colour = "#93a2ad") +
+  geom_point(aes(colour = ifelse(grepl("arroz", esc), "#2c5364", "#7ba3bd")),
+             size = 3.2) +
+  geom_point(aes(y = mediana), colour = "#c0623c", size = 2.4, shape = 17) +
+  scale_colour_identity() +
+  facet_wrap(~nutriente, scales = "free_y") +
+  labs(x = NULL, y = NULL,
+       caption = "Círculo: media ponderada con IC 95%. Triángulo: mediana ponderada.") +
+  theme_minimal(base_size = 12) +
+  theme(panel.grid.minor = element_blank(),
+        panel.grid.major.x = element_blank(),
+        strip.text = element_text(face = "bold", colour = "#1a3a4a"),
+        axis.text.x = element_text(size = rel(0.85)),
+        plot.caption = element_text(colour = "#93a2ad", size = rel(0.75), hjust = 0))
 ```
+
+::: {.fuente}
+Fuente: ENGIH 2018, Banco Central de la República Dominicana.
+:::
+
+
 
 ```{r}
 #| label: rango
 #| results: asis
 
-r <- resumen |> arrange(Escenario)
-linea <- function(...) cat(paste0(..., collapse = ""))
+rng <- estim |>
+  filter(nutriente %in% c("Hierro (mg)", "Folato (µg DFE)")) |>
+  group_by(nutriente) |>
+  summarise(lo = min(mediana), hi = max(mediana), .groups = "drop")
 
-linea("**Rango del efecto de la fortificación sobre la ingesta mediana:**\n\n")
-linea("- Hierro: de ", r$`Hierro (mg)`[1], " a ", r$`Hierro (mg)`[nrow(r)],
-      " mg por EMA y día\n")
-linea("- Folato: de ", format(r$`Folato (µg DFE)`[1], big.mark = ","), " a ",
-      format(r$`Folato (µg DFE)`[nrow(r)], big.mark = ","),
-      " µg DFE por EMA y día\n")
+texto <- paste0(
+  "**Rango del efecto de la fortificación sobre la ingesta mediana:**\n\n",
+  paste0("- ", rng$nutriente, ": de ", fmt(rng$lo), " a ", fmt(rng$hi),
+         " por EMA y día", collapse = "\n")
+)
+knitr::asis_output(texto)
 ```
+
+
 
 La magnitud de esa diferencia es, en sí misma, un resultado: **indica cuánto
 depende la conclusión del supuesto normativo**, y por tanto con qué urgencia
@@ -206,7 +249,7 @@ gpe |>
     `Consumo mediano (g/EMA/día)` = round(median(g), 1),
     .groups = "drop"
   ) |>
-  kable(format.args = list(big.mark = ","))
+  kable(format.args = list(big.mark = "."))
 ```
 
 Fortificar únicamente la harina de trigo modifica la ingesta mediana de forma
