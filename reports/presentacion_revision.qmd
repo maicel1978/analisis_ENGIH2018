@@ -1,6 +1,6 @@
 ---
-title: "ENGIH 2018 y fortificación de alimentos"
-subtitle: "Análisis de factibilidad — resumen de avance"
+title: "ENGIH 2018 — reporte de avance"
+subtitle: "Cobertura, consumo y contribución de alimentos fortificables"
 author: "Maicel E. Monzón, PhD — ORCID 0000-0003-2117-9145"
 date: today
 lang: es
@@ -12,7 +12,7 @@ format:
     code-fold: true
     code-tools: true
     embed-resources: true
-    transition: fade
+    transition: none
     width: 1330
     height: 780
     fig-align: center
@@ -30,15 +30,15 @@ source(ruta_comun[file.exists(ruta_comun)][1])
 
 library(ggplot2)
 
-AZUL <- "#2c5364"; AZUL_C <- "#4a7c9b"; GRIS <- "#b8c4cc"; ACENTO <- "#c0623c"
+AZUL <- "#2c5364"; AZUL_C <- "#7ba3bd"; GRIS <- "#c9d3da"; ACENTO <- "#c0623c"
 
-tema <- function(base = 17) {
+tema <- function(base = 16) {
   theme_minimal(base_size = base) +
     theme(panel.grid.minor = element_blank(),
           panel.grid.major.x = element_blank(),
-          panel.grid.major.y = element_line(colour = "#e8edf0"),
+          panel.grid.major.y = element_line(colour = "#eef2f4"),
           axis.title = element_text(colour = "#5a6b76", size = rel(0.85)),
-          plot.title = element_text(face = "bold", colour = "#1a3a4a", size = rel(1)),
+          plot.title = element_text(face = "bold", colour = "#1a3a4a", size = rel(0.95)),
           legend.position = "none")
 }
 
@@ -48,35 +48,33 @@ sec3a <- d$sec3a |> marcar_elegible()
 gpe   <- cargar_gramos_por_ema() |> marcar_vehiculo()
 ema   <- leer_limpio(file.path(RUTA_CLEAN, "data_ema_hogar.csv"))
 hog   <- n_distinct(gpe$id_hogar_unico)
+comp  <- cargar_composicion()
+NUT   <- c("energia_kcal","hierro_mg","folato_mcg_dfe","vitamina_a_mcg_rae")
 
 f_var <- file.path(RUTA_CLEAN, "comparacion_variantes_seccion.csv")
 variantes <- if (file.exists(f_var)) leer_limpio(f_var) else NULL
 ```
 
-## Lo que está disponible para revisión
+## Estado al `r format(Sys.Date(), "%d de %B de %Y")`
 
-[**Informe de factibilidad**](INFORME_factibilidad.html) — método, resultados,
-limitaciones y guía de continuidad.
-
-[**R1 · Calidad y preparación de los datos**](R1_calidad_datos.html) · [**R2 ·
-Modelo de base**](R2_modelo_base.html) · [**R3 · Cobertura de
-vehículos**](R3_cobertura_vehiculos.html) · [**R4 ·
-Escenarios**](R4_escenarios_fortificacion.html) · [**R5 ·
-Equidad**](R5_equidad.html)
+| | |
+|---|---|
+| Pipeline | `01` a `05`, completo y corriendo |
+| Diseño muestral | Incorporado (8 estratos, 933 UPM) |
+| Documentos | Informe de factibilidad + R1 a R5 |
+| Decisiones pendientes | 3, requieren definición del equipo |
 
 <br>
 
-::: {style="font-size:0.9em;"}
-El código, las tablas auxiliares, la bitácora de decisiones y el registro de
-auditoría del mapeo están en
-[`github.com/maicel1978/analisis_ENGIH2018`](https://github.com/maicel1978/analisis_ENGIH2018).
+::: {style="font-size:0.88em;"}
+[Informe de factibilidad](INFORME_factibilidad.html) ·
+[R1](R1_calidad_datos.html) · [R2](R2_modelo_base.html) ·
+[R3](R3_cobertura_vehiculos.html) · [R4](R4_escenarios_fortificacion.html) ·
+[R5](R5_equidad.html) ·
+[repositorio](https://github.com/maicel1978/analisis_ENGIH2018)
 :::
 
-# {background-color="#2c5364"}
-
-::: {style="color:#f0f4f7; font-size:1.2em; text-align:center; margin-top:1.5em;"}
-Qué se puede medir con esta fuente
-:::
+# 1 · Qué entra al análisis {background-color="#2c5364"}
 
 ## Cobertura del cálculo
 
@@ -87,52 +85,71 @@ bind_rows(sec2, sec3a) |>
   summarise(Observaciones = n(), `Entran al cálculo` = sum(entra_calculo),
             .groups = "drop") |>
   mutate(Cobertura = pct(`Entran al cálculo`, Observaciones)) |>
-  kable(format.args = list(big.mark = "."),
-        caption = "Cobertura del procesamiento por sección. República Dominicana, 2018")
+  kable(format.args = list(big.mark = "."))
 ```
 
-Una observación entra al cálculo solo si tiene cantidad, factor de conversión y
-porción comestible.
+El cálculo requiere cantidad, factor de conversión a gramos y porción
+comestible. La exclusión se concentra en el factor de conversión: unidades de
+mercado sin peso publicado.
 
-El motivo dominante de exclusión son los **factores de conversión**: unidades
-como un mazo, una docena, un racimo.
+R1 desglosa las exclusiones alimento por alimento.
 
-::: {style="margin-top:1em; font-size:0.86em; color:#5a6b76;"}
-Ninguna cifra se cita sin su cobertura. R1 detalla las exclusiones alimento por
-alimento.
-:::
-
-## Parte de eso se resolvió en el mercado
+## Pesos por unidad resueltos en campo
 
 ::: {.columns}
-::: {.column width="50%"}
+::: {.column width="48%"}
 ![](../media/fotos_investigacion_mercado/platano_verde00.jpg)
 :::
-::: {.column width="50%"}
+::: {.column width="52%"}
 ![](../media/fotos_investigacion_mercado/aji_cubanela02.jpg.jpg)
 :::
 :::
 
-::: {style="margin-top:0.7em; font-size:0.9em;"}
-INCAP no registra el peso de una bolsa de cilantro dominicana: 220 g. Ají
-cubanela: 288 g.
+::: {style="margin-top:0.6em; font-size:0.9em;"}
+Cilantro 220 g por bolsa, ají cubanela 288 g. Pendiente: plátano y guineo,
+16.400 observaciones.
 
-El caldo concentrado —18.087 observaciones— sí tiene peso en la etiqueta, pero
-no perfil de micronutrientes. Quedó sin asignar.
+Caldo concentrado (18.087 observaciones): peso en etiqueta, sin perfil de
+micronutrientes ni equivalente en INCAP. Sin asignar.
 :::
 
-# {background-color="#2c5364"}
+## Contraste con un análisis independiente
 
-::: {style="color:#f0f4f7; font-size:1.2em; text-align:center; margin-top:1.5em;"}
-Cobertura de los vehículos de fortificación
+::: {.columns}
+::: {.column width="52%"}
+```{r}
+#| label: tbl-validacion
+tibble(
+  `Mayor peso en el gasto (IDIAF)` =
+    c("Pollo fresco", "Arroz", "Agua purificada", "Plátano verde", "Salami",
+      "Refrescos", "Huevos", "Leche líquida", "Aceite de soya", "Pan sobado"),
+  `Aquí` = c("Sí","Sí","—","Sí","Sí","Sí","Sí","Sí","Sí","Sí")
+) |> kable()
+```
+:::
+::: {.column width="48%"}
+::: {style="font-size:0.88em;"}
+El IDIAF analizó la misma encuesta por participación en el gasto, a partir de
+las ponderaciones del IPC del Banco Central.
+
+Ocho de sus diez primeros figuran entre los de mayor volumen aquí. El agua
+purificada se excluye por no aportar nutrientes.
+
+La ingesta estimada equivale a cerca del 70% de la disponibilidad que reportan
+las hojas de balance de FAO, dentro del rango habitual para encuestas de
+hogares.
+:::
+:::
 :::
 
-## Alcance por vehículo
+# 2 · Vehículos de fortificación {background-color="#2c5364"}
+
+## Cobertura por vehículo
 
 ```{r}
 #| label: fig-vehiculos
-#| fig-width: 11
-#| fig-height: 4
+#| fig-width: 10.5
+#| fig-height: 3.6
 
 marco <- tibble(id_hogar_unico = unique(gpe$id_hogar_unico))
 for (v in unique(na.omit(gpe$vehiculo))) {
@@ -145,36 +162,21 @@ cob <- bind_rows(lapply(unique(na.omit(gpe$vehiculo)), function(v) {
   estimar_proporcion(dis_veh, !!rlang::sym(v)) |>
     transmute(vehiculo = v, p, lo = p_low, hi = p_upp)
 })) |>
-  mutate(vehiculo = reorder(vehiculo, p),
-         col = ifelse(p < 20, ACENTO, AZUL_C))
+  mutate(vehiculo = reorder(vehiculo, p))
 
 ggplot(cob, aes(p, vehiculo)) +
-  geom_errorbarh(aes(xmin = lo, xmax = hi), height = 0.15, colour = "#93a2ad",
-                 linewidth = 0.8) +
-  geom_point(aes(colour = col), size = 8) +
-  geom_text(aes(label = round(p)), colour = "white", size = 3.4, fontface = "bold") +
-  scale_colour_identity() +
+  geom_errorbarh(aes(xmin = lo, xmax = hi), height = 0.14, colour = "#93a2ad") +
+  geom_point(colour = AZUL, size = 3.4) +
   scale_x_continuous(limits = c(0, 100), labels = function(x) paste0(x, "%")) +
-  labs(x = "Hogares que lo consumen", y = NULL,
-       title = "Figura 1. Cobertura de los vehículos de fortificación. República Dominicana, 2018",
-       caption = "Estimaciones ponderadas con diseño muestral complejo. Barras: intervalo de confianza al 95%.") +
+  labs(x = "Hogares que lo consumen", y = NULL) +
   tema()
 ```
 
 ::: {style="font-size:0.85em; color:#5a6b76;"}
-Fuente: ENGIH 2018, Banco Central de la República Dominicana.
+Estimaciones ponderadas, IC 95%. Fuente: ENGIH 2018, Banco Central.
 :::
 
-## La harina de trigo al 8%
-
-Ningún hogar de la muestra declara harina de trigo en existencias, y solo una
-minoría registra su compra. Los derivados de trigo, en cambio, aparecen en la
-mayoría de los hogares.
-
-Una lectura posible es que la harina llegue al hogar ya procesada. Si así fuera,
-y dado que la fortificación se realiza en el molino, el indicador construido
-sobre harina estaría midiendo un insumo intermedio y no la exposición de la
-población al nutriente.
+## Definición del vehículo trigo
 
 ```{r}
 #| label: tbl-trigo
@@ -183,27 +185,30 @@ h_est <- gpe |> filter(vehiculo == "Harina de trigo") |> distinct(id_hogar_unico
 h_amp <- gpe_amp |> filter(vehiculo == "Trigo y derivados") |> distinct(id_hogar_unico) |> nrow()
 
 tibble(
-  `Definición del indicador` = c("Harina de trigo como producto",
-                                 "Harina de trigo y sus derivados"),
-  `Hogares alcanzados` = c(pct(h_est, hog), pct(h_amp, hog))
-) |>
-  kable(caption = "Alcance del vehículo trigo según la definición del indicador. República Dominicana, 2018")
+  Definición = c("Harina de trigo como producto", "Harina y derivados"),
+  Hogares    = c(h_est, h_amp),
+  Alcance    = paste0(fmt(100 * c(h_est, h_amp) / hog), "%")
+) |> kable(format.args = list(big.mark = "."))
 ```
 
-::: {style="font-size:0.86em;"}
-Límites de la definición ampliada: la norma es voluntaria para pastas y
-galletas, y sin factores de receta esto mide **alcance**, no gramos de harina.
+Ningún hogar declara harina en existencias y una minoría registra su compra,
+mientras los derivados aparecen en la mayoría. La fortificación se aplica en el
+molino: un indicador construido sobre harina mide un insumo intermedio.
+
+::: {style="font-size:0.85em; color:#5a6b76;"}
+La norma es obligatoria para panificación y voluntaria para pastas y galletas.
+Sin factores de receta, la cifra ampliada mide alcance, no gramos de harina.
 :::
 
-## Escenarios de fortificación
+# 3 · Escenarios y equidad {background-color="#2c5364"}
+
+## Ingesta según qué se fortifique
 
 ```{r}
 #| label: fig-escenarios
-#| fig-width: 11.5
-#| fig-height: 3.9
+#| fig-width: 10.5
+#| fig-height: 3.5
 
-comp <- cargar_composicion()
-NUT <- c("energia_kcal","hierro_mg","folato_mcg_dfe","vitamina_a_mcg_rae")
 calc <- function(nombre) {
   sw <- ESCENARIOS |> filter(escenario == nombre) |> select(vehiculo, eid_esc = enhance_id)
   gpe |> left_join(sw, by = "vehiculo") |>
@@ -212,7 +217,7 @@ calc <- function(nombre) {
     mutate(across(all_of(NUT), ~ .x * Gramos_por_EMA_dia / 100)) |>
     group_by(id_hogar_unico) |>
     summarise(across(all_of(NUT), ~ sum(.x, na.rm = TRUE)), .groups = "drop") |>
-    mutate(escenario = nombre)
+    mutate(escenario = gsub("^[0-9]\\. ", "", nombre))
 }
 res <- bind_rows(lapply(unique(ESCENARIOS$escenario), calc))
 
@@ -220,68 +225,51 @@ res |> group_by(escenario) |>
   summarise(Hierro = median(hierro_mg), Folato = median(folato_mcg_dfe),
             .groups = "drop") |>
   tidyr::pivot_longer(-escenario, names_to = "nut", values_to = "v") |>
-  mutate(esc = gsub("^[0-9]\\. ", "", escenario)) |>
-  ggplot(aes(esc, v, fill = ifelse(grepl("arroz", esc), AZUL, GRIS))) +
-  geom_col(width = 0.55) +
-  geom_text(aes(label = round(v, 1)), vjust = -0.35, size = 4.4, colour = "#33444f") +
-  scale_fill_identity() +
+  ggplot(aes(escenario, v)) +
+  geom_col(fill = AZUL_C, width = 0.5) +
+  geom_text(aes(label = fmt(v)), vjust = -0.35, size = 4, colour = "#44555f") +
   scale_y_continuous(expand = expansion(mult = c(0, 0.2))) +
   facet_wrap(~nut, scales = "free_y",
              labeller = as_labeller(c(Hierro = "Hierro (mg)",
                                       Folato = "Folato (µg DFE)"))) +
-  labs(x = NULL, y = NULL,
-       title = "Figura 2. Ingesta mediana por EMA y día según escenario. República Dominicana, 2018") +
-  tema() +
+  labs(x = NULL, y = NULL) +
+  tema(14) +
   theme(strip.text = element_text(face = "bold", colour = "#1a3a4a"),
-        axis.text.x = element_text(size = rel(0.78)))
+        axis.text.x = element_text(size = rel(0.85)))
 ```
 
-::: {style="font-size:0.86em;"}
-Arroz y harina enriquecidos tienen perfiles casi iguales. La diferencia está en
-el alcance: 88% frente a 8% de los hogares.
-:::
+El arroz enriquecido aporta 4,36 mg de hierro por 100 g y la harina enriquecida
+4,64. La diferencia de efecto proviene del alcance: 88% de los hogares consumen
+arroz, 8% harina.
 
-## Un efecto que no esperaba encontrar
+## Gradiente social del folato
 
 ```{r}
 #| label: fig-equidad
-#| fig-width: 11.5
-#| fig-height: 4
+#| fig-width: 10.5
+#| fig-height: 3.4
 
-calc_q <- function(nombre) {
-  sw <- ESCENARIOS |> filter(escenario == nombre) |> select(vehiculo, eid_esc = enhance_id)
-  d <- gpe |> left_join(sw, by = "vehiculo") |>
-    mutate(eid = coalesce(eid_esc, as.numeric(enhance_id))) |>
-    left_join(comp, by = c("eid" = "enhance_id")) |>
-    mutate(across(all_of(NUT), ~ .x * Gramos_por_EMA_dia / 100)) |>
-    group_by(id_hogar_unico) |>
-    summarise(across(all_of(NUT), ~ sum(.x, na.rm = TRUE)), .groups = "drop")
-  estimar(diseno_muestral(d), folato_mcg_dfe, por = "quintil") |>
-    mutate(escenario = gsub("^[0-9]\\. ", "", nombre))
-}
+eq <- bind_rows(lapply(unique(ESCENARIOS$escenario), function(e) {
+  estimar(diseno_muestral(calc(e)), folato_mcg_dfe, por = "quintil") |>
+    mutate(escenario = gsub("^[0-9]\\. ", "", e))
+}))
 
-eq <- bind_rows(lapply(unique(ESCENARIOS$escenario), calc_q))
-
-ggplot(eq, aes(factor(quintil), mediana, group = escenario, colour = escenario)) +
-  geom_line(linewidth = 1.2) +
-  geom_point(size = 3) +
+ggplot(eq, aes(factor(quintil), mediana, group = escenario)) +
+  geom_line(colour = AZUL, linewidth = 1) +
+  geom_point(colour = AZUL, size = 2.4) +
   facet_wrap(~escenario, scales = "free_y", nrow = 1) +
-  scale_colour_manual(values = c(GRIS, AZUL_C, AZUL)) +
-  labs(x = "Quintil de gasto del hogar", y = "Folato (µg DFE por EMA y día)",
-       title = "Figura 3. Gradiente social del folato según escenario. República Dominicana, 2018") +
-  tema(15) + theme(legend.position = "none")
+  labs(x = "Quintil de gasto", y = "Folato (µg DFE / EMA / día)") +
+  tema(14) +
+  theme(strip.text = element_text(face = "bold", colour = "#1a3a4a"))
 ```
 
-::: {style="font-size:0.88em;"}
-Sin fortificación, el quintil más rico ingiere **1,21 veces** más folato que el
-más pobre. Incorporando el arroz, la razón baja a **1,01**: el gradiente
-desaparece.
-:::
+Razón entre el quintil de mayor y el de menor gasto: 1,21 sin fortificación,
+1,21 fortificando solo harina, 1,01 incorporando el arroz.
 
-## Y el mecanismo no es el que parece
+## Consumo de arroz por quintil
 
 ::: {.columns}
-::: {.column width="52%"}
+::: {.column width="46%"}
 ```{r}
 #| label: tbl-arroz-q
 arroz <- gpe |> filter(vehiculo == "Arroz") |>
@@ -289,90 +277,87 @@ arroz <- gpe |> filter(vehiculo == "Arroz") |>
   summarise(g = sum(Gramos_por_EMA_dia, na.rm = TRUE), .groups = "drop")
 
 estimar(diseno_muestral(arroz), g, por = "quintil") |>
-  transmute(Quintil = quintil,
-            `Arroz (g/EMA/día)` = formatC(round(mediana, 1), format = "f",
-                                          digits = 1, decimal.mark = ",")) |>
+  transmute(Quintil = quintil, `g / EMA / día` = fmt(mediana)) |>
   kable()
 ```
 :::
-::: {.column width="48%"}
-::: {style="font-size:0.92em;"}
-Los hogares pobres **no consumen más arroz**: consumen prácticamente lo mismo
-que el resto.
+::: {.column width="54%"}
+::: {style="font-size:0.9em;"}
+El consumo mediano es equivalente entre el segundo y el quinto quintil, con una
+diferencia menor en el primero.
 
-Y esa uniformidad basta. Si la cantidad es similar, el nutriente añadido entra
-en cantidades similares; como la ingesta total de los hogares ricos es mayor por
-otras vías, el aporte pesa **más en la dieta de los pobres**.
+Con cantidades similares, el nutriente añadido entra en cantidades absolutas
+similares. Como la ingesta total de los hogares de mayor gasto es superior por
+otras vías, el aporte del vehículo representa una fracción mayor de la dieta en
+los hogares de menor gasto.
+
+La condición para este efecto es el consumo transversal, no el consumo mayor
+entre los hogares pobres.
 :::
 :::
 :::
 
-::: {style="margin-top:0.8em; font-size:0.9em;"}
-La condición no es que el alimento se consuma *más* entre los pobres, sino que
-se consuma **de forma transversal**. La cumplen los alimentos básicos.
-:::
+# 4 · Dónde necesito criterio {background-color="#8b5a2b"}
 
-# {background-color="#8b5a2b"}
-
-::: {style="color:#f7f0ea; font-size:1.2em; text-align:center; margin-top:1.5em;"}
-Tres decisiones que quisiera consultar
-:::
-
-## Las dos secciones del cuestionario
+## Secciones 2 y 3A
 
 ```{r}
 #| label: tbl-variantes
 if (!is.null(variantes)) {
   variantes |> arrange(variante) |>
     transmute(`Qué se incluye` = variante, Hogares = hogares,
-              `Energía mediana` = round(energia_mediana),
-              `Hierro (mg)` = round(hierro_mediana, 1),
-              `Folato (µg)` = round(folato_mediana)) |>
-    kable(format.args = list(big.mark = "."),
-          caption = "Ingesta aparente según las secciones incluidas. República Dominicana, 2018")
+              `Energía mediana` = fmt(energia_mediana, 0),
+              `Hierro (mg)` = fmt(hierro_mediana),
+              `Folato (µg)` = fmt(folato_mediana, 0)) |>
+    kable(format.args = list(big.mark = "."))
 }
 ```
 
-Ninguna sección por separado alcanza valores plausibles: cerca de 1.200 kcal por
-EMA, la mitad del requerimiento. Solo la suma lo hace.
+Cada sección por separado arroja cerca de 1.200 kcal por EMA y día,
+aproximadamente la mitad del requerimiento. Ambas registran arroz, aceite,
+azúcar y leche, de modo que su suma duplica los almacenables: de los 572 hogares
+con energía implausible, 223 se explican por ese solapamiento.
 
-Pero se solapan en alimentos almacenables —arroz, aceite, azúcar y leche
-aparecen en ambas—. De 572 hogares con energía implausible, 223 provienen de ese
-solapamiento.
+El refinamiento aplicable es la disponibilidad neta. Los campos están en la
+Sección 2.
 
-::: {style="margin-top:0.8em; font-size:0.86em; color:#5a6b76;"}
-La salida probable es la disponibilidad neta. Los datos están en la Sección 2.
-:::
+## Línea base y fuentes de composición
 
-## Las otras dos
+**Línea base de fortificación.** El mapeo actual no corresponde a ningún
+escenario real de política dominicana. Efecto medible: sobrestima el folato,
+subestima la vitamina A. Los tres escenarios están calculados.
 
-**Línea base de fortificación.** El mapeo actual no representa ningún escenario
-real de política dominicana. El efecto es medible y direccional: sobrestima el
-folato, subestima la vitamina A.
+**Fuentes de composición.** Alimentos sin equivalencia en INCAP ni FNDDS,
+empezando por el caldo concentrado (18.087 observaciones).
+
+**Requerimientos de referencia.** El valor aplicable depende de si se adopta
+FAO/OMS o IOM y, en hierro, de la biodisponibilidad supuesta.
+
+## Dudas que tengo
+
+**Cerveza clara.** 177.140 g en 512 hogares — tres veces el consumo de arroz por
+hogar. Puede ser real o un factor de conversión mal aplicado. Sin verificar.
+
+**Menores de un año.** El EMA usa un valor provisional de 600 kcal/día, sin
+contrastar contra FAO/OMS/UNU 2004.
+
+**Embarazo y lactancia.** Sin ajuste. Falta confirmar si el módulo demográfico
+de la encuesta permite identificarlos.
+
+**Atípicos por hogar.** La detección opera por alimento; 572 hogares con energía
+implausible quedan marcados pero sin tratar.
+
+## Trabajo pendiente
+
+| | |
+|---|---|
+| Plátano y guineo | Cobertura de Sec 3A: 76% → ~81% |
+| Disponibilidad neta | Corrige el solapamiento entre secciones |
+| Atípicos por hogar | Depende de lo anterior |
+| Factores de receta | Cuantificar el aporte vía derivados de trigo |
 
 <br>
 
-**Fuentes de composición** para los alimentos sin equivalencia en INCAP ni
-FNDDS, empezando por el caldo concentrado.
-
-<br>
-
-::: {style="font-size:0.9em;"}
-También hay trabajo técnico pendiente, priorizado en el informe: peso por unidad
-de plátano y guineo, diseño muestral complejo para los intervalos de confianza,
-y desagregación por quintil y zona.
-:::
-
-## {background-color="#2c5364"}
-
-::: {style="text-align:center; margin-top:2em; color:#f0f4f7;"}
-### Gracias
-
-::: {style="font-size:0.78em; margin-top:1.5em; color:#c8d4dc;"}
-`github.com/maicel1978/analisis_ENGIH2018`
-
-Microdatos: Banco Central de la República Dominicana, ENGIH 2018
-
-ORCID 0000-0003-2117-9145
-:::
+::: {style="font-size:0.88em; color:#5a6b76;"}
+Detalle y guía de continuidad en el informe de factibilidad.
 :::
