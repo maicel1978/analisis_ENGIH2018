@@ -1,7 +1,7 @@
 ---
 title: "ENGIH 2018 y fortificación de alimentos"
 subtitle: "Análisis de factibilidad — resumen de avance"
-author: "Maicel E. Monzón, PhD"
+author: "Maicel E. Monzón, PhD — ORCID 0000-0003-2117-9145"
 date: today
 lang: es
 format:
@@ -55,19 +55,21 @@ variantes <- if (file.exists(f_var)) leer_limpio(f_var) else NULL
 
 ## Lo que está disponible para revisión
 
-**Informe de factibilidad** — método, resultados, limitaciones y guía de
-continuidad.
+[**Informe de factibilidad**](INFORME_factibilidad.html) — método, resultados,
+limitaciones y guía de continuidad.
 
-**Cuatro informes técnicos** — calidad de datos, modelo de base, cobertura de
-vehículos, escenarios de fortificación.
-
-**Repositorio** — código, tablas auxiliares, bitácora de decisiones y registro
-de auditoría del mapeo de alimentos.
+[**R1 · Calidad y preparación de los datos**](R1_calidad_datos.html) · [**R2 ·
+Modelo de base**](R2_modelo_base.html) · [**R3 · Cobertura de
+vehículos**](R3_cobertura_vehiculos.html) · [**R4 ·
+Escenarios**](R4_escenarios_fortificacion.html) · [**R5 ·
+Equidad**](R5_equidad.html)
 
 <br>
 
-::: {style="font-size:0.88em; color:#5a6b76;"}
-Lo que sigue es un resumen. El detalle está en esos documentos.
+::: {style="font-size:0.9em;"}
+El código, las tablas auxiliares, la bitácora de decisiones y el registro de
+auditoría del mapeo están en
+[`github.com/maicel1978/analisis_ENGIH2018`](https://github.com/maicel1978/analisis_ENGIH2018).
 :::
 
 # {background-color="#2c5364"}
@@ -107,7 +109,7 @@ alimento.
 ![](../media/fotos_investigacion_mercado/platano_verde00.jpg)
 :::
 ::: {.column width="50%"}
-![](../media/fotos_investigacion_mercado/sopita_concentrada03.jpg)
+![](../media/fotos_investigacion_mercado/aji_cubanela02.jpg.jpg)
 :::
 :::
 
@@ -130,36 +132,49 @@ Cobertura de los vehículos de fortificación
 ```{r}
 #| label: fig-vehiculos
 #| fig-width: 11
-#| fig-height: 4.2
+#| fig-height: 4
 
-cob <- gpe |> filter(!is.na(vehiculo)) |>
-  distinct(id_hogar_unico, vehiculo) |> count(vehiculo) |>
-  mutate(p = 100 * n / hog, vehiculo = reorder(vehiculo, p),
+marco <- tibble(id_hogar_unico = unique(gpe$id_hogar_unico))
+for (v in unique(na.omit(gpe$vehiculo))) {
+  cons <- gpe |> filter(vehiculo == v) |> distinct(id_hogar_unico) |> pull()
+  marco[[v]] <- marco$id_hogar_unico %in% cons
+}
+dis_veh <- diseno_muestral(marco)
+
+cob <- bind_rows(lapply(unique(na.omit(gpe$vehiculo)), function(v) {
+  estimar_proporcion(dis_veh, !!rlang::sym(v)) |>
+    transmute(vehiculo = v, p, lo = p_low, hi = p_upp)
+})) |>
+  mutate(vehiculo = reorder(vehiculo, p),
          col = ifelse(p < 20, ACENTO, AZUL_C))
 
 ggplot(cob, aes(p, vehiculo)) +
-  geom_segment(aes(x = 0, xend = p, yend = vehiculo, colour = col), linewidth = 2.4) +
+  geom_errorbarh(aes(xmin = lo, xmax = hi), height = 0.15, colour = "#93a2ad",
+                 linewidth = 0.8) +
   geom_point(aes(colour = col), size = 8) +
   geom_text(aes(label = round(p)), colour = "white", size = 3.4, fontface = "bold") +
   scale_colour_identity() +
   scale_x_continuous(limits = c(0, 100), labels = function(x) paste0(x, "%")) +
   labs(x = "Hogares que lo consumen", y = NULL,
-       title = "Figura 1. Cobertura de los vehículos de fortificación. República Dominicana, 2018") +
+       title = "Figura 1. Cobertura de los vehículos de fortificación. República Dominicana, 2018",
+       caption = "Estimaciones ponderadas con diseño muestral complejo. Barras: intervalo de confianza al 95%.") +
   tema()
 ```
 
 ::: {style="font-size:0.85em; color:#5a6b76;"}
-Fuente: elaboración propia a partir de la ENGIH 2018 (Banco Central de la
-República Dominicana).
+Fuente: ENGIH 2018, Banco Central de la República Dominicana.
 :::
 
 ## La harina de trigo al 8%
 
-En República Dominicana la harina no se compra como harina: se consume
-procesada, principalmente como pan. Ningún hogar la declara en existencias.
+Ningún hogar de la muestra declara harina de trigo en existencias, y solo una
+minoría registra su compra. Los derivados de trigo, en cambio, aparecen en la
+mayoría de los hogares.
 
-La norma obliga a fortificar en el molino, y esa harina llega al hogar dentro
-del pan.
+Una lectura posible es que la harina llegue al hogar ya procesada. Si así fuera,
+y dado que la fortificación se realiza en el molino, el indicador construido
+sobre harina estaría midiendo un insumo intermedio y no la exposición de la
+población al nutriente.
 
 ```{r}
 #| label: tbl-trigo
@@ -226,6 +241,77 @@ Arroz y harina enriquecidos tienen perfiles casi iguales. La diferencia está en
 el alcance: 88% frente a 8% de los hogares.
 :::
 
+## Un efecto que no esperaba encontrar
+
+```{r}
+#| label: fig-equidad
+#| fig-width: 11.5
+#| fig-height: 4
+
+calc_q <- function(nombre) {
+  sw <- ESCENARIOS |> filter(escenario == nombre) |> select(vehiculo, eid_esc = enhance_id)
+  d <- gpe |> left_join(sw, by = "vehiculo") |>
+    mutate(eid = coalesce(eid_esc, as.numeric(enhance_id))) |>
+    left_join(comp, by = c("eid" = "enhance_id")) |>
+    mutate(across(all_of(NUT), ~ .x * Gramos_por_EMA_dia / 100)) |>
+    group_by(id_hogar_unico) |>
+    summarise(across(all_of(NUT), ~ sum(.x, na.rm = TRUE)), .groups = "drop")
+  estimar(diseno_muestral(d), folato_mcg_dfe, por = "quintil") |>
+    mutate(escenario = gsub("^[0-9]\\. ", "", nombre))
+}
+
+eq <- bind_rows(lapply(unique(ESCENARIOS$escenario), calc_q))
+
+ggplot(eq, aes(factor(quintil), mediana, group = escenario, colour = escenario)) +
+  geom_line(linewidth = 1.2) +
+  geom_point(size = 3) +
+  facet_wrap(~escenario, scales = "free_y", nrow = 1) +
+  scale_colour_manual(values = c(GRIS, AZUL_C, AZUL)) +
+  labs(x = "Quintil de gasto del hogar", y = "Folato (µg DFE por EMA y día)",
+       title = "Figura 3. Gradiente social del folato según escenario. República Dominicana, 2018") +
+  tema(15) + theme(legend.position = "none")
+```
+
+::: {style="font-size:0.88em;"}
+Sin fortificación, el quintil más rico ingiere **1,21 veces** más folato que el
+más pobre. Incorporando el arroz, la razón baja a **1,01**: el gradiente
+desaparece.
+:::
+
+## Y el mecanismo no es el que parece
+
+::: {.columns}
+::: {.column width="52%"}
+```{r}
+#| label: tbl-arroz-q
+arroz <- gpe |> filter(vehiculo == "Arroz") |>
+  group_by(id_hogar_unico) |>
+  summarise(g = sum(Gramos_por_EMA_dia, na.rm = TRUE), .groups = "drop")
+
+estimar(diseno_muestral(arroz), g, por = "quintil") |>
+  transmute(Quintil = quintil,
+            `Arroz (g/EMA/día)` = formatC(round(mediana, 1), format = "f",
+                                          digits = 1, decimal.mark = ",")) |>
+  kable()
+```
+:::
+::: {.column width="48%"}
+::: {style="font-size:0.92em;"}
+Los hogares pobres **no consumen más arroz**: consumen prácticamente lo mismo
+que el resto.
+
+Y esa uniformidad basta. Si la cantidad es similar, el nutriente añadido entra
+en cantidades similares; como la ingesta total de los hogares ricos es mayor por
+otras vías, el aporte pesa **más en la dieta de los pobres**.
+:::
+:::
+:::
+
+::: {style="margin-top:0.8em; font-size:0.9em;"}
+La condición no es que el alimento se consuma *más* entre los pobres, sino que
+se consuma **de forma transversal**. La cumplen los alimentos básicos.
+:::
+
 # {background-color="#8b5a2b"}
 
 ::: {style="color:#f7f0ea; font-size:1.2em; text-align:center; margin-top:1.5em;"}
@@ -286,5 +372,7 @@ y desagregación por quintil y zona.
 `github.com/maicel1978/analisis_ENGIH2018`
 
 Microdatos: Banco Central de la República Dominicana, ENGIH 2018
+
+ORCID 0000-0003-2117-9145
 :::
 :::
