@@ -127,17 +127,25 @@ write_delim(sec2_data,  here("data", "clean", "data_sec2_consumo.csv"),  delim =
 write_delim(sec3a_data, here("data", "clean", "data_sec3a_consumo.csv"), delim = ";")
 
 # Paso 5: Ejemplo de agregado PONDERADO (demuestra el método correcto) -------
-# OJO: `ids = ~1` porque no tenemos las variables de conglomerado/estrato
-# (ver advertencia al inicio del script). El punto estimado (media, total,
-# proporción) es correcto; el error estándar es una aproximación.
+# Desde 2026-09-13 el diseño muestral se declara COMPLETO: estrato, UPM y factor
+# de expansión. `01_import.R` escribe estrato y upm en data_sociodemografia.csv.
+#
+# La diferencia no es menor: con `ids = 1` (sin conglomerados) el error estándar
+# se subestima de forma sistemática y los intervalos salen demasiado estrechos.
+# El punto estimado apenas cambia; la precisión declarada, mucho.
 
-sec3a_hogar <- sec3a_data |>
-  filter(!is.na(Consumo_diario_g), !es_outlier) |>
-  distinct(id_hogar_unico, factor_expansion) |>
-  filter(!is.na(factor_expansion))
-
-diseno_ejemplo <- sec3a_hogar |>
-  as_survey_design(ids = 1, weights = factor_expansion)
+# Variables de diseño, a nivel de hogar. Se toma el primer registro de cada
+# hogar: el diseño es propiedad del hogar, no de la persona.
+diseno_vars <- read_delim(
+  here("data", "clean", "data_sociodemografia.csv"),
+  delim = ";", show_col_types = FALSE
+) |>
+  group_by(id_hogar_unico) |>
+  summarise(estrato          = first(estrato),
+            upm              = first(upm),
+            factor_expansion = first(factor_expansion),
+            .groups = "drop") |>
+  filter(!is.na(estrato), !is.na(upm), !is.na(factor_expansion))
 
 # Ejemplo: cobertura ponderada de un alimento (reemplazar 70213002 = arroz
 # blanco enriquecido, ya validado, por el enhance_id que se quiera revisar)
@@ -147,9 +155,10 @@ cobertura_hogares <- sec3a_data |>
   filter(!es_outlier | is.na(es_outlier)) |>
   mutate(consume_item = if_else(enhance_id == ejemplo_enhance_id & !is.na(Consumo_diario_g), 1, 0)) |>
   group_by(id_hogar_unico) |>
-  summarise(consume_item = max(consume_item), factor_expansion = first(factor_expansion), .groups = "drop") |>
-  filter(!is.na(factor_expansion)) |>
-  as_survey_design(ids = 1, weights = factor_expansion) |>
+  summarise(consume_item = max(consume_item), .groups = "drop") |>
+  inner_join(diseno_vars, by = "id_hogar_unico") |>
+  as_survey_design(ids = upm, strata = estrato,
+                   weights = factor_expansion, nest = TRUE) |>
   summarise(cobertura_pct = survey_mean(consume_item, vartype = "ci") * 100)
 
 message(
@@ -157,7 +166,8 @@ message(
   round(cobertura_hogares$cobertura_pct, 1), "% (IC ",
   round(cobertura_hogares$cobertura_pct_low, 1), "-",
   round(cobertura_hogares$cobertura_pct_upp, 1),
-  "%) -- ojo: IC probablemente subestimado, ver advertencia de diseño muestral arriba."
+  "%) -- diseño completo: ", n_distinct(diseno_vars$estrato), " estratos, ",
+  n_distinct(diseno_vars$upm), " UPM."
 )
 
 # Resumen y siguientes pasos --------------------------------------------------
