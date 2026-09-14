@@ -185,10 +185,25 @@ ema_hogar <- sociodemografia_data |>
     n_miembros = n(),
     n_sin_ema = sum(is.na(EMA_individual)),
     EMA_hogar = sum(EMA_individual, na.rm = TRUE),
+    # El diseno muestral es propiedad del HOGAR, no de la persona: se toma el
+    # primero de cada hogar. Sumarlo multiplicaria el peso por el numero de
+    # miembros, que es un error frecuente y silencioso.
     factor_expansion = first(factor_expansion),
+    estrato          = first(estrato),
+    upm              = first(upm),
+    quintil          = first(quintil),
+    des_estrato      = first(des_estrato),
+    grupo_region     = first(grupo_region),
+    zona             = if_else(grepl("Rural", first(des_estrato)), "Rural", "Urbano"),
     .groups = "drop"
   )
 
+message(
+  "Diseno muestral -- estratos: ", n_distinct(ema_hogar$estrato),
+  " | UPM: ", n_distinct(ema_hogar$upm),
+  " | quintiles: ", n_distinct(ema_hogar$quintil),
+  " | hogares sin factor de expansion: ", sum(is.na(ema_hogar$factor_expansion))
+)
 message(
   "Hogares con EMA calculado: ", sum(ema_hogar$n_sin_ema == 0), " de ", nrow(ema_hogar),
   " (", nrow(ema_hogar) - sum(ema_hogar$n_sin_ema == 0), " hogares con al menos 1 miembro sin EMA)"

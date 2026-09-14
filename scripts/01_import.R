@@ -367,6 +367,14 @@ sociodemografia_data <- read_excel(
     sexo       = a402,
     edad       = a403,
     parentesco = a404,
+    # --- Diseno muestral complejo (incorporado 2026-09-13) ---------------
+    # Sin estrato y UPM los errores estandar salen subestimados. Se arrastran
+    # hasta el nivel de hogar para poder usar srvyr aguas abajo.
+    estrato          = estrato,
+    upm,
+    quintil,
+    des_estrato,       # region + zona: de aqui se deriva urbano/rural
+    grupo_region,
     factor_expansion
   )
 
