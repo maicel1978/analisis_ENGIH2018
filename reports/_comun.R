@@ -1,10 +1,8 @@
 # ==============================================================================
-# _comun.R  --  Base compartida por TODOS los reportes (R1..R5)
+# _comun.R -- definiciones compartidas por los informes R1 a R5.
 #
-# Por qué existe: si cada .qmd carga y define lo suyo, al mejorar un dato hay
-# que tocar cinco archivos y se desincronizan. Acá se cambia una vez.
-#
-# No calcula resultados. Solo: rutas, carga, definiciones editables y helpers.
+# Rutas, carga de datos, parametros del analisis y funciones auxiliares.
+# No calcula resultados.
 # ==============================================================================
 
 library(dplyr)
@@ -16,13 +14,10 @@ library(knitr)
 
 options(scipen = 999)
 
-# --- Parámetros editables -----------------------------------------------------
-# Esto es lo que se toca cuando cambia una definición. Nada más.
+# --- Parametros del analisis --------------------------------------------------
 
-# Vehículos de fortificación (actuales y potenciales en RD).
-# El patrón se aplica sobre `descripcion` de la ENGIH, sin distinguir
-# mayúsculas ni acentos. Editar acá si se decide incluir/excluir algo:
-# el cambio se propaga a todos los reportes.
+# Vehiculos de fortificacion. El patron se aplica sobre `descripcion`,
+# normalizada sin acentos ni mayusculas.
 VEHICULOS <- tribble(
   ~vehiculo,            ~patron,
   "Arroz",              "arroz",
@@ -31,19 +26,13 @@ VEHICULOS <- tribble(
   "Azúcar",             "azucar|az\u00facar"
 )
 
-# Definición AMPLIADA del vehículo trigo: harina + derivados de consumo directo.
+# Definicion ampliada del vehiculo trigo: harina y derivados de consumo directo.
+# La fortificacion se aplica en el molino, de modo que la harina llega al hogar
+# mayoritariamente procesada.
 #
-# Por qué: la norma dominicana obliga a fortificar la harina EN EL MOLINO. Esa
-# harina llega al hogar dentro del pan, no como harina. Medir la cobertura solo
-# por "harina de trigo" mide el consumo de un insumo intermedio (8% de los
-# hogares), no la exposición de la población al nutriente añadido. Es un
-# problema de definición de indicador, no una cuestión nutricional.
-#
-# CUIDADO con el patrón: sin exclusiones captura falsos positivos graves --
-# "Pasta de tomate" (12,150 registros), "Ajo en pasta", "Harinas de maíz",
-# "Maicena", "Buen pan o castaña" (fruta de pan, no trigo) y los derivados de
-# maíz. Verificado 2026-09-12: con exclusiones quedan 67 alimentos y 26,935
-# registros; sin ellas la cifra se infla ~47%.
+# Las exclusiones evitan falsos positivos: "Pasta de tomate" (12.150 registros),
+# "Ajo en pasta", derivados de maiz y "Buen pan o castana" (fruta de pan).
+# Sin ellas la cifra se infla un 47%.
 TRIGO_INCLUIR <- paste0(
   "\\bpan\\b|panecillo|galleta|fideo|macarron|espagueti|espaguetti|lasagn|",
   "harina de trigo|harina integral|bizcocho|croissant|hojaldre|\\bpasta\\b|",
@@ -54,19 +43,16 @@ TRIGO_EXCLUIR <- paste0(
   "maicena|de maiz|castana|fruta de pan|pan de fruta|masapan|negrito|arroz"
 )
 
-# Nutrientes iniciales del análisis (hoja de ruta: empezar con 4, no con 65)
+# Nutrientes incluidos en esta etapa del analisis.
 NUTRIENTES_INICIALES <- c("Energia", "Hierro", "Acido folico", "Vitamina A")
 
-# Escenarios de fortificación.
+# Escenarios de fortificacion. Codigos ENHANCE_ID de INCAP.
 #
-# IMPORTANTE: cuál de estos corresponde al marco normativo dominicano vigente
-# es una pregunta para la contraparte técnica, NO un supuesto del análisis.
-# Se modelan los tres y el resultado se presenta como RANGO, nunca como cifra
-# única. Los códigos son ENHANCE_ID de INCAP, verificados 2026-09-12.
+# El marco normativo vigente esta pendiente de confirmacion, de modo que los
+# resultados se presentan como rango entre los tres escenarios.
 #
-# Nota: INCAP NO tiene aceite fortificado con vitamina A (los 19 aceites del
-# catálogo tienen VITA_RAE = 0), así que ese vehículo no es modelable con esta
-# fuente. Se declara como limitación, no se inventa un valor.
+# El aceite no se modela: los 19 aceites de INCAP tienen VITA_RAE = 0 y no
+# existe par fortificado / sin fortificar.
 ESCENARIOS <- tribble(
   ~escenario,               ~vehiculo,         ~enhance_id,
   # Escenario 0 -- sin fortificación (línea base biológica)
@@ -85,9 +71,7 @@ RUTA_CLEAN <- here("data", "clean")
 RUTA_RAW   <- here("data", "raw")
 
 # --- Carga --------------------------------------------------------------------
-# Los CSV de data/clean NO están en git (son regenerables). Si faltan, hay que
-# correr el pipeline. Fallar acá con mensaje claro es mejor que un reporte
-# a medias.
+# data/clean no esta versionado: se regenera con el pipeline.
 exigir_archivo <- function(ruta, script_que_lo_genera) {
   if (!file.exists(ruta)) {
     stop(
@@ -99,8 +83,7 @@ exigir_archivo <- function(ruta, script_que_lo_genera) {
   invisible(TRUE)
 }
 
-# delim=";" explícito y decimal "." : read_csv2() asume coma decimal y corrompe
-# las columnas numéricas (bug real, 2026-09-08).
+# read_csv2() asume coma decimal y corrompe las columnas numericas.
 leer_limpio <- function(ruta) {
   read_delim(ruta, delim = ";", show_col_types = FALSE,
              locale = locale(decimal_mark = "."),
@@ -127,8 +110,7 @@ cargar_crosswalk <- function(hoja) {
   read_excel(f, sheet = hoja, col_types = "text")
 }
 
-# Consumo por EMA (salida de 04_equivalente_adulto.R). Trae `seccion` desde
-# 2026-09-12; si falta, hay que volver a correr el 04.
+# Consumo por EMA, salida de 04_equivalente_adulto.R.
 cargar_gramos_por_ema <- function() {
   f <- file.path(RUTA_CLEAN, "data_gramos_por_ema.csv")
   exigir_archivo(f, "04_equivalente_adulto.R")
@@ -140,9 +122,8 @@ cargar_gramos_por_ema <- function() {
   d
 }
 
-# Peso muestral por hogar. Se toma el primero de cada hogar: el factor es una
-# propiedad del hogar, no de la fila, asi que sumarlo por filas lo multiplicaria
-# por el numero de alimentos registrados.
+# Peso muestral por hogar. Se toma el primer registro: el factor es propiedad
+# del hogar, y sumarlo por filas lo multiplicaria por el numero de alimentos.
 pesos_hogar <- function() {
   d <- cargar_consumo()
   bind_rows(
@@ -154,9 +135,8 @@ pesos_hogar <- function() {
     summarise(peso = first(peso), .groups = "drop")
 }
 
-# Tabla de composición unificada INCAP + FNDDS, con los 4 nutrientes iniciales.
-# Misma lógica que 05_ingesta_micronutrientes.R (pendiente: que el 05 escriba
-# esta tabla a data/clean y que ambos la lean de ahí, en vez de duplicarla).
+# Composicion unificada INCAP + FNDDS.
+# Duplica la logica de 05_ingesta_micronutrientes.R -- pendiente de unificar.
 cargar_composicion <- function() {
   incap <- read_excel(file.path(RUTA_RAW, "food_composition_INCAP.xlsx"),
                       sheet = "nutrient_values") |>
@@ -168,8 +148,7 @@ cargar_composicion <- function() {
       vitamina_a_mcg_rae = as.numeric(VITA_RAE)
     )
   
-  # Los encabezados de FNDDS traen saltos de línea internos: se resuelven por
-  # patrón, con error si no identifican exactamente una columna.
+  # Los encabezados de FNDDS contienen saltos de linea internos.
   fn <- read_excel(file.path(RUTA_RAW, "food_composition_FNDDS.xlsx"),
                    sheet = "nutrient_values", skip = 1, .name_repair = "minimal")
   col_fn <- function(patron, etiqueta) {
@@ -195,16 +174,11 @@ cargar_composicion <- function() {
     distinct(enhance_id, .keep_all = TRUE)
 }
 
-# --- Diseno muestral complejo -------------------------------------------------
-# La ENGIH es una muestra estratificada por conglomerados: 8 estratos, 933
-# unidades primarias de muestreo (UPM) y factor de expansion por hogar.
+# --- Diseno muestral ----------------------------------------------------------
+# Muestra estratificada por conglomerados: 8 estratos, 933 UPM, factor de
+# expansion por hogar. Ignorar la estructura subestima los errores estandar.
 #
-# Ignorar la estructura NO sesga las estimaciones puntuales de forma
-# sistematica, pero SI subestima los errores estandar: los intervalos salen
-# demasiado estrechos y cualquier contraste se vuelve optimista.
-#
-# Requiere que 04_equivalente_adulto.R haya conservado estrato, upm y
-# factor_expansion en data_ema_hogar.csv (desde 2026-09-13).
+# Requiere estrato, upm y factor_expansion en data_ema_hogar.csv.
 
 cargar_ema_hogar <- function() {
   f <- file.path(RUTA_CLEAN, "data_ema_hogar.csv")
@@ -218,9 +192,8 @@ cargar_ema_hogar <- function() {
   d
 }
 
-# Construye el objeto de diseno a partir de un data frame a nivel de HOGAR.
-# `datos` debe traer id_hogar_unico; las variables de diseno se unen desde
-# data_ema_hogar.csv, que es donde viven.
+# `datos` debe estar a nivel de hogar y traer id_hogar_unico. Las variables de
+# diseno se unen desde data_ema_hogar.csv.
 diseno_muestral <- function(datos) {
   if (!requireNamespace("srvyr", quietly = TRUE)) {
     stop("Falta el paquete `srvyr`. Instalar con install.packages(\"srvyr\").",
@@ -244,8 +217,8 @@ diseno_muestral <- function(datos) {
                           weights = factor_expansion, nest = TRUE)
 }
 
-# Media ponderada con intervalo (Taylor) + mediana ponderada como descriptivo.
-# `por` admite variables de agrupacion: quintil, zona, grupo_region.
+# Media con intervalo por linealizacion de Taylor y mediana ponderada.
+# `por`: quintil, zona o grupo_region.
 estimar <- function(diseno, variable, por = NULL, nivel = 0.95) {
   v <- rlang::ensym(variable)
   d <- if (is.null(por)) diseno else dplyr::group_by(diseno, dplyr::across(all_of(por)))
@@ -280,8 +253,7 @@ estimar_proporcion <- function(diseno, condicion, por = NULL, nivel = 0.95) {
     dplyr::mutate(dplyr::across(dplyr::starts_with("p"), ~ .x * 100))
 }
 
-# --- Tablas con formato editorial ---------------------------------------------
-# Notas de uso frecuente, para no repetirlas en cada documento.
+# --- Tablas -------------------------------------------------------------------
 FUENTE_ENGIH <- paste(
   "Fuente: Encuesta Nacional de Gastos e Ingresos de los Hogares 2018,",
   "Banco Central de la República Dominicana."
@@ -293,9 +265,7 @@ NOTA_DISENO <- paste(
 )
 NOTA_EMA <- "EMA: Equivalente de Mujer Adulta. IC: intervalo de confianza."
 
-# Devuelve gt en salidas HTML y flextable en Word. La nota al pie va DENTRO del
-# objeto, de modo que la tabla se mantiene autocontenida al copiarla o al
-# cambiar de formato.
+# Devuelve gt en HTML y flextable en Word, con la nota al pie dentro del objeto.
 #
 #   datos    data frame ya formateado (columnas con su unidad en el nombre)
 #   fuente   linea de procedencia; por defecto la ENGIH
@@ -350,7 +320,7 @@ norm_txt <- function(x) {
     trimws()
 }
 
-# Marca a qué vehículo pertenece cada fila (NA si a ninguno).
+# Asigna vehiculo a cada fila, NA si no corresponde a ninguno.
 # ampliado = TRUE sustituye "Harina de trigo" por "Trigo y derivados".
 marcar_vehiculo <- function(df, col = "descripcion", ampliado = FALSE) {
   d <- norm_txt(df[[col]])
@@ -370,8 +340,7 @@ marcar_vehiculo <- function(df, col = "descripcion", ampliado = FALSE) {
   df
 }
 
-# Una fila "entra al cálculo" solo si tiene las tres piezas de la fórmula
-# Q x FC x PC / PM y no fue marcada como atípica.
+# Una fila entra al calculo si tiene Q, FC y PC, y no es atipica.
 marcar_elegible <- function(df) {
   df |>
     mutate(
@@ -384,11 +353,8 @@ marcar_elegible <- function(df) {
     )
 }
 
-# Formato numerico en convencion espanola: miles con punto, decimales con coma.
-#
-# Necesario porque `kable(format.args = ...)` NO alcanza a los valores que se
-# construyen con paste0 antes de llegar a la tabla -- tipicamente los intervalos
-# de confianza. Sin esto, una misma tabla mezcla "1.831,6" con "2084.3".
+# Formato numerico espanol. `kable(format.args = ...)` no alcanza a los valores
+# construidos con paste0, como los intervalos de confianza.
 fmt <- function(x, dec = 1) {
   formatC(round(x, dec), format = "f", digits = dec,
           big.mark = ".", decimal.mark = ",")
@@ -397,9 +363,7 @@ fmt <- function(x, dec = 1) {
 # Intervalo formateado, con guion largo como separador.
 ic <- function(lo, hi, dec = 1) paste0(fmt(lo, dec), " – ", fmt(hi, dec))
 
-# Porcentaje formateado, para no repetir round() en cada reporte.
-# VECTORIZADO a proposito: se usa dentro de mutate() sobre columnas enteras,
-# donde un if() ordinario falla ("the condition has length > 1").
+# Porcentaje formateado. Vectorizado: se usa dentro de mutate() sobre columnas.
 pct <- function(x, n, dec = 1) {
   # OJO: no usar ifelse() con la condicion sobre `n`. ifelse() devuelve un
   # resultado del largo de la CONDICION, asi que si `n` es un escalar (un total
