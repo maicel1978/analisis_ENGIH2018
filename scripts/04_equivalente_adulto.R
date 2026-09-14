@@ -185,9 +185,8 @@ ema_hogar <- sociodemografia_data |>
     n_miembros = n(),
     n_sin_ema = sum(is.na(EMA_individual)),
     EMA_hogar = sum(EMA_individual, na.rm = TRUE),
-    # El diseno muestral es propiedad del HOGAR, no de la persona: se toma el
-    # primero de cada hogar. Sumarlo multiplicaria el peso por el numero de
-    # miembros, que es un error frecuente y silencioso.
+    # El diseno es propiedad del hogar: se toma el primer registro. Sumarlo
+    # multiplicaria el peso por el numero de miembros.
     factor_expansion = first(factor_expansion),
     estrato          = first(estrato),
     upm              = first(upm),
@@ -232,12 +231,9 @@ consumo_sec2  <- read_delim(here("data", "clean", "data_sec2_consumo.csv"),  del
 consumo_sec3a <- read_delim(here("data", "clean", "data_sec3a_consumo.csv"), delim = ";", show_col_types = FALSE)
 
 # Se excluyen outliers marcados en 03_transform.R y filas sin Consumo_diario_g
-# Se conserva la marca de seccion (`seccion`). Sin ella, 05 no puede reportar
-# por separado Sec 2 (inventario) y Sec 3A (adquisiciones), y esas dos NO son
-# intercambiables: verificado 2026-09-12 que al sumarlas se duplican los
-# almacenables -- arroz, aceite, azucar y leche aparecen en ambas secciones
-# para los mismos hogares. Daniel indico Sec 2 y Santiago Sec 3A; la decision
-# es de ellos, asi que el pipeline debe poder producir las tres variantes.
+# Se conserva la marca de seccion para que 05 pueda reportar Sec 2 (existencias)
+# y Sec 3A (adquisiciones) por separado. Al sumarlas se duplican los alimentos
+# almacenables -- arroz, aceite, azucar y leche aparecen en ambas.
 consumo_por_hogar_alimento <- bind_rows(
   consumo_sec2  |> select(id_hogar_unico, descripcion, enhance_id, Consumo_diario_g, es_outlier) |>
     mutate(seccion = "Sec 2"),

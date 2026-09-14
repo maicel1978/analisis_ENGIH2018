@@ -82,12 +82,9 @@ nutrientes_incap <- read_excel(
     vitamina_a_mcg_rae = VITA_RAE
   )
 
-# Los encabezados de FNDDS traen saltos de linea DENTRO del nombre: el de
-# hierro es literalmente "Iron" + salto + "(mg)". Escribirlos literales es
-# fragil (falla segun como R interprete el escape, y se rompe si la fuente
-# cambia el formato). Se resuelven por patron sobre el nombre normalizado,
-# con stop() si el patron no identifica exactamente una columna -- asi un
-# cambio en FNDDS falla ruidosamente en vez de devolver la columna equivocada.
+# Los encabezados de FNDDS contienen saltos de linea internos ("Iron" + salto +
+# "(mg)"). Se resuelven por patron sobre el nombre normalizado, con stop() si el
+# patron no identifica exactamente una columna.
 fndds_raw <- read_excel(
   here("data", "raw", "food_composition_FNDDS.xlsx"),
   sheet = "nutrient_values",
@@ -113,12 +110,9 @@ nutrientes_fndds <- fndds_raw |>
     fuente             = "FNDDS",
     energia_kcal       = as.numeric(.data[[col_fndds("^Energy \\(kcal\\)$", "energia")]]),
     hierro_mg          = as.numeric(.data[[col_fndds("^Iron ?\\(mg\\)$", "hierro")]]),
-    # De las CUATRO columnas de folato de FNDDS (acido folico, folato de los
-    # alimentos, folato total y DFE), solo DFE corresponde a FOLDFE de INCAP:
-    # los equivalentes dietéticos ponderan el acido folico sintetico por su
-    # mayor biodisponibilidad (factor 1.7). Usar "folato total" mezclaria dos
-    # escalas y SUBESTIMARIA el aporte de los alimentos fortificados -- que es
-    # justo lo que este analisis busca medir.
+    # De las cuatro columnas de folato de FNDDS solo DFE corresponde a FOLDFE
+    # de INCAP: los equivalentes dieteticos ponderan el acido folico sintetico
+    # por su mayor biodisponibilidad (factor 1,7).
     folato_mcg_dfe     = as.numeric(.data[[col_fndds("^Folate, DFE", "folato DFE")]]),
     vitamina_a_mcg_rae = as.numeric(.data[[col_fndds("^Vitamin A, RAE", "vitamina A")]])
   )
@@ -140,17 +134,14 @@ consumo_nutrientes <- gramos_por_ema |>
   left_join(composicion |> select(-fuente), by = "enhance_id") |>
   mutate(across(all_of(NUTRIENTES), ~ Gramos_por_EMA_dia * .x / 100))
 
-# Paso 5: ingesta aparente por hogar, en TRES variantes --------------------
-# Sec 2 (inventario) y Sec 3A (adquisiciones) miden cosas distintas y NO son
-# sumables sin criterio: verificado 2026-09-12 que al sumarlas se duplican los
-# almacenables. En los 572 hogares con energia > 6000 kcal/EMA/dia, el arroz
-# aparece tres veces en el top (Arroz selecto y Arroz corriente en Sec 3A,
-# ARROZ en Sec 2), y lo mismo aceite, azucar y leche -- es decir, TRES DE LOS
-# CUATRO VEHICULOS DE FORTIFICACION estan afectados por el solapamiento.
+# Paso 5: ingesta aparente por hogar, en tres variantes --------------------
+# Sec 2 (existencias) y Sec 3A (adquisiciones) miden cosas distintas. Al
+# sumarlas se duplican los alimentos almacenables: de los 572 hogares con
+# energia > 6.000 kcal/EMA/dia, 223 se explican por ese solapamiento, que
+# afecta a arroz, aceite, azucar y leche.
 #
-# Daniel indico trabajar con Sec 2 y Santiago con Sec 3A. La eleccion es de
-# ellos, no se resuelve aqui: este script produce las tres variantes para que
-# la decision se tome viendo las consecuencias de cada una.
+# El tratamiento aplicable es una decision del equipo tecnico. Se producen las
+# tres variantes para poder compararlas.
 if (!"seccion" %in% names(consumo_nutrientes)) {
   stop("Falta la columna `seccion`. Volver a correr 04_equivalente_adulto.R ",
        "(la conserva desde 2026-09-12).", call. = FALSE)
