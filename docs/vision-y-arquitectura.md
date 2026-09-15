@@ -12,7 +12,7 @@ La ENGIH 2018 de República Dominicana constituye el caso de aplicación de una 
 
 Este documento define el problema, las preguntas estratégicas y la ruta general para resolverlo.
 
-Para el estado operativo y los próximos pasos consultar `README.md`.
+Para el estado operativo, las decisiones tomadas y los próximos pasos consultar `docs/hoja-de-ruta.md`. El `README.md` es la puerta de entrada al repositorio.
 
 ---
 
@@ -72,7 +72,11 @@ Sin este cálculo bien hecho, ningún indicador de las fases siguientes es confi
 
 ---
 
-# 5. Hoja de ruta
+# 5. Fases del trabajo
+
+Las fases *Importar*, *Limpieza y EDA*, *Transformar*, *Analizar* y *Modelar*
+están implementadas. *Comunicar* está en curso. El estado detallado de cada una,
+con sus decisiones y pendientes, está en `docs/hoja-de-ruta.md`.
 
 ## Importar
 
@@ -158,6 +162,11 @@ Incluye:
 - Cobertura de vehículos de fortificación.
 - Equidad por quintil, región y área urbana/rural.
 
+Las estimaciones poblacionales incorporan el diseño muestral complejo de la
+encuesta —estratificación, conglomeración y factor de expansión— con intervalos
+de confianza por linealización de Taylor. Las cifras de cobertura del
+procesamiento son conteos de registros y no llevan intervalo.
+
 ## Modelar
 
 Objetivo: evaluar escenarios contrafactuales de fortificación.
@@ -200,7 +209,7 @@ Reglas de trabajo, no aspiraciones. Aplican a cualquier persona o herramienta qu
 2. Ninguna nota o etiqueta heredada (ej. "revisar", un comentario antiguo) se repite como hecho sin comprobarla de nuevo.
 3. Toda cifra que llegue a un resultado final (FC, prevalencia, cobertura, consumo aparente) debe ser trazable a: (a) el dato crudo más la transformación exacta que la produjo, o (b) una fuente externa citada con documento y sección específicos.
 4. Ningún vacío de información se llena con un valor "plausible" sin marcarlo explícitamente como supuesto pendiente de validar. Un supuesto sin validar no entra al pipeline final.
-5. Antes de reportar una cifra agregada importante, se contrasta su orden de magnitud contra un benchmark externo conocido (ENM 2009/2024, líneas de pobreza, ENDESA). Si no cuadra, se investiga antes de publicar.
+5. Antes de reportar una cifra agregada importante, se contrasta su orden de magnitud contra una referencia externa. Aplicado: estructura de la dieta contra el análisis del IDIAF (2021) sobre la misma encuesta, e ingesta energética contra las hojas de balance de FAO. Si no cuadra, se investiga antes de publicar.
 6. Cualquier corrección a un dato existente conserva el valor original (columna aparte o historial de git) junto con la justificación y la fuente del cambio.
 7. Citas de literatura (Tang et al., Imhoff-Kunsch, guía MIMI/WFP, ENM) se usan solo verificadas contra el documento primario — nunca una síntesis sin bibliografía comprobable.
 8. No se guardan en el repositorio transcripciones de conversaciones con asistentes de IA ni borradores sin fuente verificable. Si algo de valor sale de esas conversaciones, se reescribe como decisión propia, verificada, e incorporada al documento correspondiente.
