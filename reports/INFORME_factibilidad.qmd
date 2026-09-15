@@ -134,7 +134,7 @@ tibble(
 )
 ```
 ::: {.fuente}
-Fuente: Elaboración propia a partir de la ENGIH 2018 (Banco Central de la República Dominicana, con participación de la Oficina Nacional de Estadística).
+Fuente: ENGIH 2018 (Banco Central de la República Dominicana, con participación de la Oficina Nacional de Estadística).
 :::
 
 
