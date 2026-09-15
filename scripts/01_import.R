@@ -162,21 +162,14 @@ sec3a_data_raw <- read_excel(
 # OJO -- 15 filas de la hoja Sec 2 (Galón, Litro, Botellón, Libra, Quintal
 # por alimento) están 1000x infladas respecto a diccionario_conversion
 # (ej. Galón: 3785.41 vs 3,785,410 para ACEITE). Al priorizar la tabla
-# universal esas filas nunca se usan, pero convendría corregirlas o
-# borrarlas de la fuente para que no muerdan más adelante.
+# universal esas filas nunca se usan.
 #
 # OJO -- la union por alimento en Sec 3A es por texto (`descripcion`), no
 # por ID: cualquier diferencia de tildes/mayúsculas rompe el match sin
 # avisar. Además, ~168 de las 718 filas de esa hoja tienen texto con
-# problemas de codificación (ej. "SazÃ³n" en vez de "Sazón") -- revisalo
-# cuando empieces a rellenar esos factores.
+# problemas de codificación (ej. "SazÃ³n" en vez de "Sazón") -- .
 
-# na = "NA" es necesario: al menos la hoja Sec 2 tiene 39 celdas con el
-# texto literal "NA" (no vacío real) en id_unidad_medida_presentacion, lo
-# que hace que readxl adivine esa columna entera como texto en vez de
-# numérica y rompa los left_join() de más abajo por incompatibilidad de
-# tipos. Se aplica a las tres lecturas por consistencia, aunque solo Sec 2
-# lo necesitaba.
+
 dic_conversion <- read_excel(ruta_unidades, sheet = "diccionario_conversion", na = "NA") |>
   clean_names() |>
   filter(!is.na(fc)) |>
@@ -297,12 +290,7 @@ sec2_puente <- read_excel(ruta_puente, sheet = hoja_sec2) |>
   rename(id_variedad = variedad) |>
   select(id_variedad, descripcion_engih, enhance_id, fuente, tipo_equivalencia, validado) |>
   mutate(enhance_id = as.numeric(enhance_id))
-# OJO -- en el Excel, 27 de 29 celdas de enhance_id (Sec 2) están guardadas
-# como TEXTO (ej. '70214131' con comillas) y solo 2 como número real, lo que
-# hace que readxl adivine toda la columna como character. as.numeric() lo
-# fuerza de vuelta a double para que el join con food_factors.xlsx (numérico)
-# no falle por incompatibilidad de tipos. Mismo patrón, un cellda suelta, en
-# la pestaña Sec 3A -- se corrige igual abajo por si acaso.
+
 
 sec3a_puente <- read_excel(ruta_puente, sheet = hoja_sec3a) |>
   clean_names() |>
@@ -325,10 +313,7 @@ sec2_pc <- read_excel(ruta_tabla_PC, sheet = hoja_sec2) |>
   mutate(
     enhance_id = as.numeric(enhance_id),
     # OJO: en food_factors.xlsx, hoja Sec2, EDIBLE esta guardado como TEXTO
-    # con coma decimal ("1,00"), no como numero -- confirmado revisando el
-    # tipo de celda real (openpyxl data_type='s'), no solo como lo muestra
-    # RStudio. as.numeric() directo sobre "1,00" da NA (interpreta la coma
-    # como caracter invalido). Se reemplaza la coma por punto antes de convertir.
+    
     edible = as.numeric(gsub(",", ".", as.character(edible)))
   )
 
@@ -336,11 +321,6 @@ sec3a_pc <- read_excel(ruta_tabla_PC, sheet = hoja_sec3a) |>
   clean_names() |>
   select(id_variedad, edible) |>
   mutate(
-    # id_variedad se mantiene como character -- es la convencion ya
-    # establecida en sec3a_puente (ver comentario ahi: "en el crudo
-    # id_variedad es 'text' a proposito, codigo, no cantidad"). Revertido
-    # aqui despues de confirmar que cambiarlo a numerico rompia el join
-    # con sec3a_puente mas arriba en la cadena.
     id_variedad = as.character(id_variedad),
     edible = as.numeric(gsub(",", ".", as.character(edible)))
   )
