@@ -12,8 +12,12 @@ fortificables.
 
 ## Informes
 
-Cuatro informes generados desde los datos. **Ninguna cifra está escrita a mano**:
+Cinco informes generados desde los datos. **Ninguna cifra está escrita a mano**:
 al ampliar las tablas auxiliares, los resultados se actualizan al recompilar.
+
+Las estimaciones poblacionales incorporan el diseño muestral complejo de la
+encuesta —8 estratos, 933 unidades primarias de muestreo y factor de expansión
+por hogar— con intervalos de confianza al 95% por linealización de Taylor.
 
 | Informe | Qué responde |
 |---|---|
@@ -21,6 +25,7 @@ al ampliar las tablas auxiliares, los resultados se actualizan al recompilar.
 | **R2 — Modelo de base** | Consumo diario (`Q × FC × PC / PM`) y normalización por Equivalente de Mujer Adulta |
 | **R3 — Cobertura de vehículos fortificables** | A qué proporción de hogares alcanza cada vehículo y en qué cantidad |
 | **R4 — Escenarios de fortificación** | Cómo varía la ingesta de micronutrientes según qué vehículo se fortifique |
+| **R5 — Equidad** | Cómo se distribuye la ingesta por quintil de gasto y zona de residencia |
 
 ---
 
@@ -28,25 +33,35 @@ al ampliar las tablas auxiliares, los resultados se actualizan al recompilar.
 
 **La metodología es implementable sobre esta fuente.** El 76% de las
 observaciones de la Sección 3A y el 91% de la Sección 2 completan la cadena de
-cálculo. El factor limitante no es la encuesta sino la completitud de las tablas
+cálculo. Son conteos de registros procesados, no estimaciones poblacionales. El factor limitante no es la encuesta sino la completitud de las tablas
 auxiliares de conversión y composición, que continúa ampliándose: cada
 ampliación mejora la cobertura sin modificar el método.
 
-**Los vehículos de fortificación están bien cubiertos.** Entre las observaciones
-que los mencionan, la cadena de cálculo se completa en el 97–100% de los casos.
-Los indicadores de cobertura son por tanto sólidos aun cuando la cobertura
-general sea menor.
+**Los vehículos de fortificación alcanzan a la mayoría de los hogares.**
+Arroz 88,2% (IC 95%: 87,3–89,0), aceite 87,5% (86,6–88,3) y azúcar 79,2%
+(77,9–80,4). Estimaciones ponderadas con el diseño muestral de la encuesta.
 
-**El indicador de harina de trigo mide el insumo equivocado.** Solo el 8% de los
-hogares adquiere harina como producto —ningún hogar la declara en existencias—,
-lo que sugeriría un programa de fortificación de alcance marginal. El patrón de
-consumo dominicano explica la discrepancia: la harina llega al hogar ya
-procesada, principalmente como pan. Definido el vehículo como *harina y sus
-derivados*, el alcance pasa de 8% a **85,7%**.
+**La harina de trigo constituye una excepción: 6,2% (IC 95%: 5,4–6,9).** Ningún
+hogar de la muestra la declara en existencias y solo una minoría registra su
+compra, mientras los derivados de trigo aparecen en la mayoría.
 
-Este último hallazgo no es específico de República Dominicana: **afecta a
-cualquier evaluación donde el vehículo fortificado se consuma mayoritariamente
+Una lectura posible es que la harina llegue al hogar mayoritariamente ya
+procesada. Si el patrón es ese, y dado que la fortificación se aplica en el
+molino, un indicador construido sobre harina estaría midiendo un insumo
+intermedio y no la exposición de la población al nutriente. Definido el vehículo
+como *harina y sus derivados*, el alcance asciende a 85,7% —con la salvedad de
+que la norma es obligatoria para panificación y voluntaria para pastas y
+galletas, de modo que esa cifra constituye un techo.
+
+La cuestión no es específica de República Dominicana: **concierne a cualquier
+evaluación en que el vehículo fortificado se consuma mayoritariamente
 transformado.**
+
+**La fortificación de un vehículo de consumo transversal tiene efecto
+distributivo progresivo.** La razón de ingesta de folato entre el quintil de
+mayor y el de menor gasto pasa de 1,21 sin fortificación a 1,01 incorporando el
+arroz. El mecanismo no es un mayor consumo entre los hogares de menor gasto,
+sino un consumo equivalente en toda la distribución.
 
 ---
 
@@ -110,6 +125,7 @@ quarto::quarto_render(here::here("reports", "R1_calidad_datos.qmd"))
 quarto::quarto_render(here::here("reports", "R2_modelo_base.qmd"))
 quarto::quarto_render(here::here("reports", "R3_cobertura_vehiculos.qmd"))
 quarto::quarto_render(here::here("reports", "R4_escenarios_fortificacion.qmd"))
+quarto::quarto_render(here::here("reports", "R5_equidad.qmd"))
 ```
 
 Requiere R con `dplyr`, `readr`, `tidyr`, `readxl`, `writexl`, `here`, `knitr`,
