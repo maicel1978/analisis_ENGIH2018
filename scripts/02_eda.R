@@ -1,7 +1,7 @@
 # =========================================================================
 # Script: 02_eda.R (Control de calidad y caracterización - ENGIH 2018)
 # Proyecto: ENGIH 2018 - Consumo de alimentos (WFP / MIMI)
-# Fecha original: 2026-08-16. Corregido: 2026-09-08 -- estaba desactualizado
+# Fecha original: 2026-08-16. 
 # respecto al esquema de columnas que produce 01_import.R desde que se
 # agregaron FC/PC/sociodemografia (id -> id_hogar_unico, cantidad -> Q,
 # alimento -> descripcion, unidad_medida -> unidad_a_convertir). Ademas,
