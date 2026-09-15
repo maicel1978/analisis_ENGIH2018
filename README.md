@@ -10,6 +10,22 @@ fortificables.
 
 ---
 
+## Por dónde empezar
+
+| Si busca… | Vaya a |
+|---|---|
+| **Los resultados** | Los cinco informes — ver la tabla siguiente |
+| **Cómo se hizo y qué limita el análisis** | Informe de factibilidad — método, adaptaciones, limitaciones y guía de continuidad |
+| **Verificar una decisión concreta** | [`data/auditoria/`](data/auditoria) — cada cambio con su valor anterior, el nuevo y el motivo |
+| **El marco conceptual y el alcance** | [`docs/vision-y-arquitectura.md`](docs/vision-y-arquitectura.md) — preguntas estratégicas y principios de verificación |
+| **Reproducir el análisis** | [El pipeline](#el-pipeline) — cinco scripts y los comandos exactos |
+| **El código de una cifra concreta** | [`reports/`](reports) — cada informe es el código que lo genera |
+
+Los informes se generan en `output/` al compilar. Son documentos HTML
+autocontenidos: se abren con doble clic, sin instalar nada.
+
+---
+
 ## Informes
 
 Cinco informes generados desde los datos. **Ninguna cifra está escrita a mano**:
@@ -143,13 +159,16 @@ dos documentos publiquen cifras incompatibles.
 Cada decisión metodológica que no es evidente queda registrada con su
 justificación y su evidencia:
 
-- **[`docs/hoja-de-ruta.md`](docs/hoja-de-ruta.md)** — bitácora completa: hitos,
-  decisiones, hallazgos, errores cometidos y corregidos, y backlog priorizado.
-  Es la fuente de verdad del proyecto.
+- **Informe de factibilidad** — las decisiones metodológicas con su
+  justificación: adaptaciones aplicadas, criterios de exclusión, supuestos y
+  limitaciones. Es el documento de referencia sobre cómo se hizo el análisis.
 - **[`docs/vision-y-arquitectura.md`](docs/vision-y-arquitectura.md)** — marco
   conceptual, alcance y principios de trabajo.
-- **`data/auditoria/`** — registro fila por fila de cada modificación a las
-  tablas auxiliares, con el valor anterior, el nuevo y el motivo.
+- **[`data/auditoria/`](data/auditoria)** — registro fila por fila de cada
+  modificación a las tablas auxiliares, con el valor anterior, el nuevo y el
+  motivo.
+- **`docs/hoja-de-ruta.md`** — bitácora operativa del desarrollo, de uso
+  interno.
 
 El mapeo de alimentos a tablas de composición distingue explícitamente
 equivalencias **directas** de **sustitutos por criterio**, de modo que siempre
