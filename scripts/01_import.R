@@ -350,7 +350,7 @@ sociodemografia_data <- read_excel(
     # Estrato y UPM son necesarios para estimar errores estandar correctos.
     estrato          = estrato,
     upm,
-    quintil,
+    quintil, # compruebo las medidas de posición pero ya venia calculado en la encuesta
     des_estrato,       # region y zona; de aqui se deriva urbano/rural
     grupo_region,
     factor_expansion
