@@ -279,8 +279,7 @@ resolver_unidad <- function(df) {
 
 # Paso 3: Puente a tablas de composición (enhance_id) + validación --------
 # OJO -- en crosswalk_tablas_composicion.xlsx, la pestaña de Sec 2 usa la
-# columna `variedad`, mientras que la de Sec 3A usa `id_variedad` (ya lo
-# habías anotado vos mismo al final del script anterior). Se armoniza acá
+# columna `variedad`, mientras que la de Sec 3A usa `id_variedad`. Se armoniza acá
 # con rename() para poder tratar ambas secciones de forma consistente
 # de aquí en adelante. Convendría corregir el nombre de columna en el
 # Excel de origen (Sec 2) para no depender de este rename.
