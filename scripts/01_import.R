@@ -81,7 +81,8 @@ hoja_sec3a <- "Cuest. B Sec 3A"
 
 # Periodo de muestreo por diseño (PM)
 PM    <- 7  # Alimentos en existencia el día 1 y 8 de la entrevista (inventario)
-# esto luego lo contraste contra los datos, OJO te romper el calculo si no esta bien
+# Para Sección 3A, PM se reemplaza por dias_observados_hogar
+
 
 # Paso 1: Lectura de ENGIH 2018 -------------------------------------------
 # 1.1 Sección 2: INVENTARIO INICIAL Y FINAL EN LA DESPENSA Y REFRIGERADOR
