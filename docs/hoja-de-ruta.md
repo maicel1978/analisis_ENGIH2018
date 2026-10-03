@@ -1,7 +1,7 @@
 # Hoja de ruta — Proyecto ENGIH 2018 (Consumo y Nutrición, WFP)
 
 **Congelada el:** 2026-09-03
-**Última actualización:** 2026-09-12
+**Última actualización:** 2026-10-03
 **Objetivo final:** artículo científico + dashboard de apoyo a decisiones, siguiendo el marco ampliado de Tang et al. (2021) sobre la base metodológica de Imhoff-Kunsch (2012).
 
 Este documento fija el alcance acordado hasta ahora. Cualquier cambio de alcance debería reflejarse acá explícitamente antes de asumirse en el trabajo diario — si algo cambia, se edita esta hoja, no se improvisa por fuera de ella.
@@ -10,42 +10,64 @@ Este documento fija el alcance acordado hasta ahora. Cualquier cambio de alcance
 
 ## PRIORIDAD ACTUAL (leer esto primero, antes que Fase 0 de abajo)
 
-**Estado al 2026-09-14.** Pipeline `01`→`05` con **diseño muestral complejo
-incorporado**. Seis documentos terminados y renderizados: informe de factibilidad
-(HTML y Word), R1 a R5, y la presentación como reporte de avance. Dos tableros
-escritos, pendientes de pulido. Repositorio reorganizado, README reescrito,
-validación externa hecha y **depuración de comentarios completada**.
+**Estado al 2026-10-03.** Alcance vigente: lista de tareas pendientes enviada
+por el supervisor tras la reunión de revisión (numeral 4 de los TdR). Cierre
+de la consultoría: 2026-10-23 (contrato hasta 2026-10-25).
 
-**Las dos brechas mayores frente al estándar internacional están cerradas:**
-diseño muestral (intervalos de confianza correctos) y validación externa.
+**Método de trabajo.** Rama `ajustes-octubre`; `main` conserva la versión
+revisada (etiqueta `informe-factibilidad-v1`). Un bloque por commit. Antes de
+cada bloque se declara el efecto esperado sobre las cifras de control
+(36.840 / 303.408 / 8.774); si la corrida no coincide, se detiene.
 
-**Hallazgo principal:** la fortificación del arroz reduce la razón de ingesta de
-folato entre quintiles extremos de **1,21 a 1,01**. El mecanismo es el consumo
-transversal del vehículo —los hogares pobres no consumen más arroz, consumen lo
-mismo—, lo que hace el argumento generalizable a cualquier alimento básico.
+**Fase A — aditiva, no cambia cifras existentes (5–7 oct)**
 
-**Lo que sigue, por orden:**
+- [ ] A1. Zinc, B12, D y E en `05`; función de composición única.
+- [ ] A2. Harina de maíz, avena y sal como vehículos.
+- [ ] A3. Provincia en `01` y `04`; coeficiente de variación por dominio.
+- [ ] A4a. `catalogo_grupos`, `alimento_agrupado` y `grupo_mddw` en el crosswalk.
+- [ ] A5. Tabla de parámetros normativos por vehículo.
 
-1. **PC-A: correr el pipeline y verificar las cifras de control.** Es lo único
-   con fecha límite — hay que hacerlo **antes de devolver PC-B**. Cifras:
-   36.840 sin `enhance_id` · 303.408 filas con gramos por EMA · 8.774 hogares.
-2. **Estudiar el guion conceptual** para la reunión del miércoles. A partir de
-   aquí el valor está en el dominio del material, no en más código.
-3. **Cerrar la limpieza del repositorio:** archivos de `media/` con doble
-   extensión y eliminación de los diez scripts de uso único (`84` a `93`).
-4. **Pulir los dos tableros** y redactar el borrador de artículo. No son
-   necesarios para la reunión.
+**Fase B — cambia cifras (7–9 oct)**
 
-**Estado de las máquinas.** PC-B (prestada) se devuelve; tiene todo y está al
-día. **PC-A quedó operativa:** repositorio clonado limpio en
-`C:\proyectos\analisis_ENGIH2018`, **fuera de OneDrive**, lo que elimina el
-cuelgue conocido en `.git/objects`. La copia antigua dentro de OneDrive y la
-descarga en ZIP de `Downloads` están obsoletas: **borrar ambas**. En PC-A falta
-correr el pipeline una vez, porque `data/clean/` no se versiona.
+- [ ] B1. Factores de conversión: plátano, guineo y resto de la cola.
+- [ ] A4b. Herencia de composición por grupo.
+- [ ] B2. Disponibilidad neta en almacenables, como cuarta variante.
+- [ ] B3. Atípicos a nivel de hogar (después de B2).
+- [ ] B4. Ajustes del equivalente de mujer adulta.
 
-**Las tres decisiones del equipo técnico** —línea base de fortificación,
-tratamiento de Secciones 2 y 3A, fuentes de composición faltantes— siguen
-abiertas y documentadas con su evidencia.
+**Fase C — análisis (12–16 oct)**
+
+- [ ] C1. Escenarios con niveles de norma.
+- [ ] C2. Riesgo de ingesta inadecuada por nutriente.
+- [ ] C3. Desagregación por provincia, quintil y zona; mapas.
+- [ ] C4. Análisis por grupos de alimentos.
+
+**Fase D — cierre (19–23 oct)**
+
+- [ ] D1. Informe de factibilidad: recompilar, comparar contra la versión
+      etiquetada, incorporar comentarios de revisión.
+- [ ] D2. Fusión a `main`, README y productos finales.
+
+**Decisiones adoptadas el 2026-10-03** (reversibles por parámetro):
+
+- Agrupación en dos niveles; herencia de composición desde la variedad con
+  más registros del grupo, marcada como heredada.
+- Clasificación MDD-W (FAO 2021) usada para análisis por grupos; el indicador
+  no se reporta por no ser aplicable a adquisiciones del hogar.
+- Línea base 2018: harina de trigo, harina de maíz y sal fortificadas; arroz
+  y aceite sin fortificar; azúcar como escenario de sensibilidad.
+- Escenario de arroz con los niveles de la propuesta nacional de reglamento.
+- Disponibilidad neta como estimación principal solo si reduce la cola de
+  más de 6.000 kcal sin producir una energía mediana implausible.
+- Yodo: cobertura de sal y aporte según norma; no se estima riesgo.
+- Provincia: se suprime la celda con coeficiente de variación mayor de 30%.
+- Valores de referencia: EAR de OMS/FAO; enfoque probabilístico en hierro.
+
+**Supuestos pendientes de documento:** vigencia en 2018 y niveles del
+reglamento de harina de maíz; aplicación efectiva de la norma de azúcar.
+
+**Corrección:** la norma de azúcar es la NORDOM 602 (10–25 mg/kg de
+vitamina A), no "NORDOM 606, 5–25 mg/kg" como figura más abajo.
 
 **Criterios de trabajo vigentes:**
 
@@ -57,6 +79,7 @@ abiertas y documentadas con su evidencia.
   `any(grepl("texto nuevo", readLines(ruta)))`.
 - *Una afirmación que dejó de ser cierta es peor que un comentario mal
   redactado.* Al cambiar algo, revisar qué documentación lo daba por imposible.
+
 
 ## Fase 0 — Cerrar la base de datos (prerrequisito, en curso)
 
