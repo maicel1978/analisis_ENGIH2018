@@ -69,6 +69,10 @@ reglamento de harina de maíz; aplicación efectiva de la norma de azúcar.
 **Corrección:** la norma de azúcar es la NORDOM 602 (10–25 mg/kg de
 vitamina A), no "NORDOM 606, 5–25 mg/kg" como figura más abajo.
 
+**Sustituye a:** la "DECISIÓN ABIERTA (2026-09-10)" sobre línea base (Fase 0)
+y la lista de "Decisiones a llevar a la reunión" (Fase 5). Ambas quedan como
+registro histórico; rigen las decisiones del 2026-10-03.
+
 **Criterios de trabajo vigentes:**
 
 - *Avanzar con los datos como están, declarando la cobertura de cada cifra.*

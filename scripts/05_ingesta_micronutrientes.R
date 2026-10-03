@@ -1,7 +1,13 @@
 # 05_ingesta_micronutrientes.R
 #
 # Ingesta aparente de micronutrientes por EMA/dia, a nivel de hogar.
-# Alcance acotado a 4 nutrientes: Energia, Hierro, Acido folico, Vitamina A.
+# Nutrientes: los de MAPA_NUTRIENTES (energia, hierro, folato, vitamina A,
+# zinc, B12, D y E).
+#
+# SUPUESTO sobre unidades de INCAP para ZN (mg), VITB12 (mcg), VITD (mcg) y
+# VITE (mg): el archivo no trae hoja de unidades. Se asumen las de los
+# identificadores INFOODS, coherentes con los maximos observados (94 / 90 /
+# 170 / 43). Pendiente de confirmar contra la documentacion de la tabla.
 #
 # Equivalencia de columnas (verificada 2026-09-09):
 #   Nutriente     | INCAP      | FNDDS                     | Unidad
@@ -40,7 +46,20 @@ library(readxl)
 library(here)
 conflicts_prefer(dplyr::filter)
 
-NUTRIENTES <- c("energia_kcal", "hierro_mg", "folato_mcg_dfe", "vitamina_a_mcg_rae")
+# Nutrientes y su columna en cada tabla de composicion. Para agregar uno,
+# se agrega una fila.
+MAPA_NUTRIENTES <- tribble(
+  ~nutriente,            ~incap,        ~patron_fndds,
+  "energia_kcal",        "ENERC_KCAL",  "^Energy \\(kcal\\)$",
+  "hierro_mg",           "FE",          "^Iron ?\\(mg\\)$",
+  "folato_mcg_dfe",      "FOLDFE",      "^Folate, DFE",
+  "vitamina_a_mcg_rae",  "VITA_RAE",    "^Vitamin A, RAE",
+  "zinc_mg",             "ZN",          "^Zinc ?\\(mg\\)$",
+  "vitamina_b12_mcg",    "VITB12",      "^Vitamin B-12 ?\\(mcg\\)$",
+  "vitamina_d_mcg",      "VITD",        "^Vitamin D",
+  "vitamina_e_mg",       "VITE",        "^Vitamin E \\(alpha"
+)
+NUTRIENTES <- MAPA_NUTRIENTES$nutriente
 
 # Paso 1: consumo por EMA (04_equivalente_adulto.R) -----------------------
 gramos_por_ema <- read_delim(
@@ -69,18 +88,14 @@ if (nrow(conflictos_fuente) > 0) {
 }
 
 # Paso 3: tablas de composicion, con nombres estandarizados ---------------
+cols_incap <- setNames(MAPA_NUTRIENTES$incap, MAPA_NUTRIENTES$nutriente)
+
 nutrientes_incap <- read_excel(
   here("data", "raw", "food_composition_INCAP.xlsx"),
   sheet = "nutrient_values"
 ) |>
-  transmute(
-    enhance_id = as.numeric(ENHANCE_ID),
-    fuente = "INCAP",
-    energia_kcal = ENERC_KCAL,
-    hierro_mg = FE,
-    folato_mcg_dfe = FOLDFE,
-    vitamina_a_mcg_rae = VITA_RAE
-  )
+  select(enhance_id = ENHANCE_ID, all_of(cols_incap)) |>
+  mutate(enhance_id = as.numeric(enhance_id), fuente = "INCAP", .after = enhance_id)
 
 # Los encabezados de FNDDS contienen saltos de linea internos ("Iron" + salto +
 # "(mg)"). Se resuelven por patron sobre el nombre normalizado, con stop() si el
@@ -104,17 +119,20 @@ col_fndds <- function(patron, etiqueta) {
   names(fndds_raw)[i]
 }
 
-nutrientes_fndds <- fndds_raw |>
-  transmute(
-    enhance_id         = as.numeric(.data[[col_fndds("^Food code$", "id")]]),
-    fuente             = "FNDDS",
-    energia_kcal       = as.numeric(.data[[col_fndds("^Energy \\(kcal\\)$", "energia")]]),
-    hierro_mg          = as.numeric(.data[[col_fndds("^Iron ?\\(mg\\)$", "hierro")]]),
-    # De las cuatro columnas de folato de FNDDS solo DFE corresponde a FOLDFE
-    # de INCAP: los equivalentes dieteticos ponderan el acido folico sintetico
-    # por su mayor biodisponibilidad (factor 1,7).
-    folato_mcg_dfe     = as.numeric(.data[[col_fndds("^Folate, DFE", "folato DFE")]]),
-    vitamina_a_mcg_rae = as.numeric(.data[[col_fndds("^Vitamin A, RAE", "vitamina A")]])
+cols_fndds <- setNames(
+  mapply(col_fndds, MAPA_NUTRIENTES$patron_fndds, MAPA_NUTRIENTES$nutriente),
+  MAPA_NUTRIENTES$nutriente
+)
+
+# De las cuatro columnas de folato de FNDDS solo DFE corresponde a FOLDFE de
+# INCAP. De las dos de vitamina E se usa alfa-tocoferol total, no la anadida.
+nutrientes_fndds <- cols_fndds |>
+  lapply(\(col) as.numeric(fndds_raw[[col]])) |>
+  as_tibble() |>
+  mutate(
+    enhance_id = as.numeric(fndds_raw[[col_fndds("^Food code$", "id")]]),
+    fuente     = "FNDDS",
+    .before    = 1
   )
 
 colisiones <- intersect(nutrientes_incap$enhance_id, nutrientes_fndds$enhance_id)
