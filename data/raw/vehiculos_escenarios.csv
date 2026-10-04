@@ -1,0 +1,9 @@
+vehiculo;patron;excluir;fraccion_harina;estado
+Harina de trigo;^harina de trigo|^harina integral;;1.0;definicion
+Pan;^pan |^panes$;pan de maiz|pan dulce|pan de fruta|pan de yuca|pan de licor;0.7;provisional
+Pastas;spaghetti|^fideos|^fiedos|^coditos|^macarrones|^espirales|^lasagna|^linguinis|^tallarines|^mostachones|^pastas;con queso;1.0;provisional
+Galletas saladas;^galletas (saladas|de soda|integrales|de ajo|con ajonjoli);;0.85;provisional
+Galletas dulces;^galletas (dulces|maria|de harina|de huevo|de avena|rellenas);;0.6;provisional
+Repostería;^bizcocho|^pan dulce|^donas?|^masitas;;0.4;provisional
+Arroz;^arroz;arroz integral;1.0;definicion
+Azúcar;^azucar (morena|blanca)|^azucares$;;1.0;definicion

@@ -61,13 +61,35 @@ cada bloque se declara el efecto esperado sobre las cifras de control
       ajustables: el cuestionario no los registra. Cota de la lactancia: hasta
       505 kcal (0,22 EMA) en, como máximo, ese 5,6% de hogares. El valor de
       niñas queda por contrastar mes a mes con la tabla de la fuente.
-- [ ] B5. Trigo en equivalentes de harina: pan, pastas y galletas convertidos
-      a gramos de harina con factores de contenido de fuente citable.
+- [x] B5. Trigo en equivalentes de harina (2026-10-04), dentro de
+      `scripts/07_escenarios_fortificacion.R`. Fracciones de harina en
+      `data/raw/vehiculos_escenarios.csv`, PROVISIONALES y sin fuente citable.
+      Resultado: el trigo alcanza al 91,8% de los hogares, con una media de
+      46,9 g de harina por EMA y día; el arroz, 85,5% y 218 g.
 
 **Fase C — análisis (12–16 oct)**
 
-- [ ] C1. Escenarios: sin fortificación, niveles recomendados por la OMS y
-      norma nacional. Sin aceite. Yodo desde la sal como escenario poblacional.
+- [x] C1. Escenarios con método aditivo (2026-10-04), en `07`: se parte del
+      alimento sin fortificar y se suma el nivel de cada escenario (mg/kg),
+      definido en `data/raw/escenarios_fortificacion.csv`. Medianas ponderadas
+      de folato (µg DFE) e hierro (mg) por EMA y día: sin fortificación 158 y
+      7,65; norma nacional, harina y pan 229 y 8,92; norma con todos los
+      derivados 291 y 10,02; OMS para harina (tramo menor de 75 g) 500 y 10,22;
+      norma más arroz según la propuesta nacional 853 y 14,48. Razón de folato
+      entre quintiles 5 y 1: 1,20 sin fortificación y con trigo; 1,03 con arroz.
+      Ácido fólico añadido sobre el límite superior: 8,0% de los hogares con
+      arroz; menos de 1,6% en los demás. Pendiente: niveles OMS de arroz, B12 y
+      vitamina A por confirmar, y riesgo de ingesta inadecuada por escenario.
+
+      CORRECCIÓN: los escenarios de R4 y R5 no eran válidos como línea base.
+      La tabla de composición trae pan, pastas y galletas elaborados con harina
+      enriquecida, de modo que el escenario "sin fortificar" ya incluía la
+      fortificación del trigo. La afirmación de que fortificar la harina casi no
+      mueve la ingesta era un artefacto: con el método aditivo la norma vigente
+      eleva el folato mediano entre 45% y 84%. El trigo y el arroz tienen alcance
+      similar; lo que los distingue es la cantidad consumida. El resultado de
+      equidad sí se mantiene. R4, R5, la presentación y el README conservan la
+      versión anterior y no deben citarse en este punto.
 - [ ] C2. Riesgo de ingesta inadecuada y densidad por 1.000 kcal: cálculo
       hecho en `scripts/06_riesgo_inadecuacion.R` (punto de corte; probabilidad
       para hierro; proporción sobre el límite superior). Los valores de

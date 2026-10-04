@@ -1,0 +1,106 @@
+escenario;vehiculo;nutriente;nivel_mg_kg;fuente;estado
+1a. Norma nacional: harina y pan;Harina de trigo;hierro_mg;55;Norma nacional (RTD 616);concordante_en_dos_fuentes
+1a. Norma nacional: harina y pan;Pan;hierro_mg;55;Norma nacional (RTD 616);concordante_en_dos_fuentes
+1a. Norma nacional: harina y pan;Harina de trigo;folato_mcg_dfe;1.8;Norma nacional (RTD 616);concordante_en_dos_fuentes
+1a. Norma nacional: harina y pan;Pan;folato_mcg_dfe;1.8;Norma nacional (RTD 616);concordante_en_dos_fuentes
+1b. Norma nacional: harina y todos los derivados;Harina de trigo;hierro_mg;55;Norma nacional (RTD 616);concordante_en_dos_fuentes
+1b. Norma nacional: harina y todos los derivados;Pan;hierro_mg;55;Norma nacional (RTD 616);concordante_en_dos_fuentes
+1b. Norma nacional: harina y todos los derivados;Pastas;hierro_mg;55;Norma nacional (RTD 616);concordante_en_dos_fuentes
+1b. Norma nacional: harina y todos los derivados;Galletas saladas;hierro_mg;55;Norma nacional (RTD 616);concordante_en_dos_fuentes
+1b. Norma nacional: harina y todos los derivados;Galletas dulces;hierro_mg;55;Norma nacional (RTD 616);concordante_en_dos_fuentes
+1b. Norma nacional: harina y todos los derivados;Repostería;hierro_mg;55;Norma nacional (RTD 616);concordante_en_dos_fuentes
+1b. Norma nacional: harina y todos los derivados;Harina de trigo;folato_mcg_dfe;1.8;Norma nacional (RTD 616);concordante_en_dos_fuentes
+1b. Norma nacional: harina y todos los derivados;Pan;folato_mcg_dfe;1.8;Norma nacional (RTD 616);concordante_en_dos_fuentes
+1b. Norma nacional: harina y todos los derivados;Pastas;folato_mcg_dfe;1.8;Norma nacional (RTD 616);concordante_en_dos_fuentes
+1b. Norma nacional: harina y todos los derivados;Galletas saladas;folato_mcg_dfe;1.8;Norma nacional (RTD 616);concordante_en_dos_fuentes
+1b. Norma nacional: harina y todos los derivados;Galletas dulces;folato_mcg_dfe;1.8;Norma nacional (RTD 616);concordante_en_dos_fuentes
+1b. Norma nacional: harina y todos los derivados;Repostería;folato_mcg_dfe;1.8;Norma nacional (RTD 616);concordante_en_dos_fuentes
+1c. Norma nacional y azúcar;Harina de trigo;hierro_mg;55;Norma nacional (RTD 616);concordante_en_dos_fuentes
+1c. Norma nacional y azúcar;Pan;hierro_mg;55;Norma nacional (RTD 616);concordante_en_dos_fuentes
+1c. Norma nacional y azúcar;Pastas;hierro_mg;55;Norma nacional (RTD 616);concordante_en_dos_fuentes
+1c. Norma nacional y azúcar;Galletas saladas;hierro_mg;55;Norma nacional (RTD 616);concordante_en_dos_fuentes
+1c. Norma nacional y azúcar;Galletas dulces;hierro_mg;55;Norma nacional (RTD 616);concordante_en_dos_fuentes
+1c. Norma nacional y azúcar;Repostería;hierro_mg;55;Norma nacional (RTD 616);concordante_en_dos_fuentes
+1c. Norma nacional y azúcar;Harina de trigo;folato_mcg_dfe;1.8;Norma nacional (RTD 616);concordante_en_dos_fuentes
+1c. Norma nacional y azúcar;Pan;folato_mcg_dfe;1.8;Norma nacional (RTD 616);concordante_en_dos_fuentes
+1c. Norma nacional y azúcar;Pastas;folato_mcg_dfe;1.8;Norma nacional (RTD 616);concordante_en_dos_fuentes
+1c. Norma nacional y azúcar;Galletas saladas;folato_mcg_dfe;1.8;Norma nacional (RTD 616);concordante_en_dos_fuentes
+1c. Norma nacional y azúcar;Galletas dulces;folato_mcg_dfe;1.8;Norma nacional (RTD 616);concordante_en_dos_fuentes
+1c. Norma nacional y azúcar;Repostería;folato_mcg_dfe;1.8;Norma nacional (RTD 616);concordante_en_dos_fuentes
+3. Norma nacional y arroz (propuesta nacional);Harina de trigo;hierro_mg;55;Norma nacional (RTD 616);concordante_en_dos_fuentes
+3. Norma nacional y arroz (propuesta nacional);Pan;hierro_mg;55;Norma nacional (RTD 616);concordante_en_dos_fuentes
+3. Norma nacional y arroz (propuesta nacional);Pastas;hierro_mg;55;Norma nacional (RTD 616);concordante_en_dos_fuentes
+3. Norma nacional y arroz (propuesta nacional);Galletas saladas;hierro_mg;55;Norma nacional (RTD 616);concordante_en_dos_fuentes
+3. Norma nacional y arroz (propuesta nacional);Galletas dulces;hierro_mg;55;Norma nacional (RTD 616);concordante_en_dos_fuentes
+3. Norma nacional y arroz (propuesta nacional);Repostería;hierro_mg;55;Norma nacional (RTD 616);concordante_en_dos_fuentes
+3. Norma nacional y arroz (propuesta nacional);Harina de trigo;folato_mcg_dfe;1.8;Norma nacional (RTD 616);concordante_en_dos_fuentes
+3. Norma nacional y arroz (propuesta nacional);Pan;folato_mcg_dfe;1.8;Norma nacional (RTD 616);concordante_en_dos_fuentes
+3. Norma nacional y arroz (propuesta nacional);Pastas;folato_mcg_dfe;1.8;Norma nacional (RTD 616);concordante_en_dos_fuentes
+3. Norma nacional y arroz (propuesta nacional);Galletas saladas;folato_mcg_dfe;1.8;Norma nacional (RTD 616);concordante_en_dos_fuentes
+3. Norma nacional y arroz (propuesta nacional);Galletas dulces;folato_mcg_dfe;1.8;Norma nacional (RTD 616);concordante_en_dos_fuentes
+3. Norma nacional y arroz (propuesta nacional);Repostería;folato_mcg_dfe;1.8;Norma nacional (RTD 616);concordante_en_dos_fuentes
+1c. Norma nacional y azúcar;Azúcar;vitamina_a_mcg_rae;10;NORDOM 602, nivel mínimo;verificado
+3. Norma nacional y arroz (propuesta nacional);Arroz;hierro_mg;24;Propuesta nacional de reglamento de arroz;tomado_de_presentacion
+3. Norma nacional y arroz (propuesta nacional);Arroz;zinc_mg;25;Propuesta nacional de reglamento de arroz;tomado_de_presentacion
+3. Norma nacional y arroz (propuesta nacional);Arroz;folato_mcg_dfe;1.8;Propuesta nacional de reglamento de arroz;tomado_de_presentacion
+3. Norma nacional y arroz (propuesta nacional);Arroz;vitamina_b12_mcg;0.01;Propuesta nacional de reglamento de arroz;tomado_de_presentacion
+2a. OMS: harina y derivados, consumo menor de 75 g;Harina de trigo;hierro_mg;60;OMS 2009, harina de baja extracción;verificado
+2a. OMS: harina y derivados, consumo menor de 75 g;Pan;hierro_mg;60;OMS 2009, harina de baja extracción;verificado
+2a. OMS: harina y derivados, consumo menor de 75 g;Pastas;hierro_mg;60;OMS 2009, harina de baja extracción;verificado
+2a. OMS: harina y derivados, consumo menor de 75 g;Galletas saladas;hierro_mg;60;OMS 2009, harina de baja extracción;verificado
+2a. OMS: harina y derivados, consumo menor de 75 g;Galletas dulces;hierro_mg;60;OMS 2009, harina de baja extracción;verificado
+2a. OMS: harina y derivados, consumo menor de 75 g;Repostería;hierro_mg;60;OMS 2009, harina de baja extracción;verificado
+2a. OMS: harina y derivados, consumo menor de 75 g;Harina de trigo;folato_mcg_dfe;5.0;OMS 2009, harina de baja extracción;verificado
+2a. OMS: harina y derivados, consumo menor de 75 g;Pan;folato_mcg_dfe;5.0;OMS 2009, harina de baja extracción;verificado
+2a. OMS: harina y derivados, consumo menor de 75 g;Pastas;folato_mcg_dfe;5.0;OMS 2009, harina de baja extracción;verificado
+2a. OMS: harina y derivados, consumo menor de 75 g;Galletas saladas;folato_mcg_dfe;5.0;OMS 2009, harina de baja extracción;verificado
+2a. OMS: harina y derivados, consumo menor de 75 g;Galletas dulces;folato_mcg_dfe;5.0;OMS 2009, harina de baja extracción;verificado
+2a. OMS: harina y derivados, consumo menor de 75 g;Repostería;folato_mcg_dfe;5.0;OMS 2009, harina de baja extracción;verificado
+2a. OMS: harina y derivados, consumo menor de 75 g;Harina de trigo;zinc_mg;95;OMS 2009, harina de baja extracción;verificado
+2a. OMS: harina y derivados, consumo menor de 75 g;Pan;zinc_mg;95;OMS 2009, harina de baja extracción;verificado
+2a. OMS: harina y derivados, consumo menor de 75 g;Pastas;zinc_mg;95;OMS 2009, harina de baja extracción;verificado
+2a. OMS: harina y derivados, consumo menor de 75 g;Galletas saladas;zinc_mg;95;OMS 2009, harina de baja extracción;verificado
+2a. OMS: harina y derivados, consumo menor de 75 g;Galletas dulces;zinc_mg;95;OMS 2009, harina de baja extracción;verificado
+2a. OMS: harina y derivados, consumo menor de 75 g;Repostería;zinc_mg;95;OMS 2009, harina de baja extracción;verificado
+2a. OMS: harina y derivados, consumo menor de 75 g;Harina de trigo;vitamina_b12_mcg;0.04;OMS 2009, harina de baja extracción;por_confirmar
+2a. OMS: harina y derivados, consumo menor de 75 g;Pan;vitamina_b12_mcg;0.04;OMS 2009, harina de baja extracción;por_confirmar
+2a. OMS: harina y derivados, consumo menor de 75 g;Pastas;vitamina_b12_mcg;0.04;OMS 2009, harina de baja extracción;por_confirmar
+2a. OMS: harina y derivados, consumo menor de 75 g;Galletas saladas;vitamina_b12_mcg;0.04;OMS 2009, harina de baja extracción;por_confirmar
+2a. OMS: harina y derivados, consumo menor de 75 g;Galletas dulces;vitamina_b12_mcg;0.04;OMS 2009, harina de baja extracción;por_confirmar
+2a. OMS: harina y derivados, consumo menor de 75 g;Repostería;vitamina_b12_mcg;0.04;OMS 2009, harina de baja extracción;por_confirmar
+2a. OMS: harina y derivados, consumo menor de 75 g;Harina de trigo;vitamina_a_mcg_rae;5.9;OMS 2009, harina de baja extracción;por_confirmar
+2a. OMS: harina y derivados, consumo menor de 75 g;Pan;vitamina_a_mcg_rae;5.9;OMS 2009, harina de baja extracción;por_confirmar
+2a. OMS: harina y derivados, consumo menor de 75 g;Pastas;vitamina_a_mcg_rae;5.9;OMS 2009, harina de baja extracción;por_confirmar
+2a. OMS: harina y derivados, consumo menor de 75 g;Galletas saladas;vitamina_a_mcg_rae;5.9;OMS 2009, harina de baja extracción;por_confirmar
+2a. OMS: harina y derivados, consumo menor de 75 g;Galletas dulces;vitamina_a_mcg_rae;5.9;OMS 2009, harina de baja extracción;por_confirmar
+2a. OMS: harina y derivados, consumo menor de 75 g;Repostería;vitamina_a_mcg_rae;5.9;OMS 2009, harina de baja extracción;por_confirmar
+2b. OMS: harina y derivados, consumo de 75 a 149 g;Harina de trigo;hierro_mg;60;OMS 2009, harina de baja extracción;verificado
+2b. OMS: harina y derivados, consumo de 75 a 149 g;Pan;hierro_mg;60;OMS 2009, harina de baja extracción;verificado
+2b. OMS: harina y derivados, consumo de 75 a 149 g;Pastas;hierro_mg;60;OMS 2009, harina de baja extracción;verificado
+2b. OMS: harina y derivados, consumo de 75 a 149 g;Galletas saladas;hierro_mg;60;OMS 2009, harina de baja extracción;verificado
+2b. OMS: harina y derivados, consumo de 75 a 149 g;Galletas dulces;hierro_mg;60;OMS 2009, harina de baja extracción;verificado
+2b. OMS: harina y derivados, consumo de 75 a 149 g;Repostería;hierro_mg;60;OMS 2009, harina de baja extracción;verificado
+2b. OMS: harina y derivados, consumo de 75 a 149 g;Harina de trigo;folato_mcg_dfe;2.6;OMS 2009, harina de baja extracción;verificado
+2b. OMS: harina y derivados, consumo de 75 a 149 g;Pan;folato_mcg_dfe;2.6;OMS 2009, harina de baja extracción;verificado
+2b. OMS: harina y derivados, consumo de 75 a 149 g;Pastas;folato_mcg_dfe;2.6;OMS 2009, harina de baja extracción;verificado
+2b. OMS: harina y derivados, consumo de 75 a 149 g;Galletas saladas;folato_mcg_dfe;2.6;OMS 2009, harina de baja extracción;verificado
+2b. OMS: harina y derivados, consumo de 75 a 149 g;Galletas dulces;folato_mcg_dfe;2.6;OMS 2009, harina de baja extracción;verificado
+2b. OMS: harina y derivados, consumo de 75 a 149 g;Repostería;folato_mcg_dfe;2.6;OMS 2009, harina de baja extracción;verificado
+2b. OMS: harina y derivados, consumo de 75 a 149 g;Harina de trigo;zinc_mg;55;OMS 2009, harina de baja extracción;verificado
+2b. OMS: harina y derivados, consumo de 75 a 149 g;Pan;zinc_mg;55;OMS 2009, harina de baja extracción;verificado
+2b. OMS: harina y derivados, consumo de 75 a 149 g;Pastas;zinc_mg;55;OMS 2009, harina de baja extracción;verificado
+2b. OMS: harina y derivados, consumo de 75 a 149 g;Galletas saladas;zinc_mg;55;OMS 2009, harina de baja extracción;verificado
+2b. OMS: harina y derivados, consumo de 75 a 149 g;Galletas dulces;zinc_mg;55;OMS 2009, harina de baja extracción;verificado
+2b. OMS: harina y derivados, consumo de 75 a 149 g;Repostería;zinc_mg;55;OMS 2009, harina de baja extracción;verificado
+2b. OMS: harina y derivados, consumo de 75 a 149 g;Harina de trigo;vitamina_b12_mcg;0.02;OMS 2009, harina de baja extracción;por_confirmar
+2b. OMS: harina y derivados, consumo de 75 a 149 g;Pan;vitamina_b12_mcg;0.02;OMS 2009, harina de baja extracción;por_confirmar
+2b. OMS: harina y derivados, consumo de 75 a 149 g;Pastas;vitamina_b12_mcg;0.02;OMS 2009, harina de baja extracción;por_confirmar
+2b. OMS: harina y derivados, consumo de 75 a 149 g;Galletas saladas;vitamina_b12_mcg;0.02;OMS 2009, harina de baja extracción;por_confirmar
+2b. OMS: harina y derivados, consumo de 75 a 149 g;Galletas dulces;vitamina_b12_mcg;0.02;OMS 2009, harina de baja extracción;por_confirmar
+2b. OMS: harina y derivados, consumo de 75 a 149 g;Repostería;vitamina_b12_mcg;0.02;OMS 2009, harina de baja extracción;por_confirmar
+2b. OMS: harina y derivados, consumo de 75 a 149 g;Harina de trigo;vitamina_a_mcg_rae;3.0;OMS 2009, harina de baja extracción;por_confirmar
+2b. OMS: harina y derivados, consumo de 75 a 149 g;Pan;vitamina_a_mcg_rae;3.0;OMS 2009, harina de baja extracción;por_confirmar
+2b. OMS: harina y derivados, consumo de 75 a 149 g;Pastas;vitamina_a_mcg_rae;3.0;OMS 2009, harina de baja extracción;por_confirmar
+2b. OMS: harina y derivados, consumo de 75 a 149 g;Galletas saladas;vitamina_a_mcg_rae;3.0;OMS 2009, harina de baja extracción;por_confirmar
+2b. OMS: harina y derivados, consumo de 75 a 149 g;Galletas dulces;vitamina_a_mcg_rae;3.0;OMS 2009, harina de baja extracción;por_confirmar
+2b. OMS: harina y derivados, consumo de 75 a 149 g;Repostería;vitamina_a_mcg_rae;3.0;OMS 2009, harina de baja extracción;por_confirmar
