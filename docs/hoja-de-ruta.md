@@ -34,7 +34,17 @@ cada bloque se declara el efecto esperado sobre las cifras de control
 
 - [ ] B1. Factores de conversión: plátano, guineo y resto de la cola.
 - [ ] A4b. Herencia de composición por grupo.
-- [ ] B2. Disponibilidad neta en almacenables, como cuarta variante.
+- [x] B2. Regla de agotamiento adoptada como estimación principal (2026-10-04).
+      La disponibilidad neta prevista no aplica: la pregunta 9 de la Sección 2
+      es inventario inicial menos final en el 98,3% de las filas y el
+      inventario final no incluye las compras de la semana, de modo que
+      `inicial + adquisiciones - final` es la suma que ya se calculaba.
+      Regla: si al día 8 queda existencia inicial de un alimento almacenable,
+      lo adquirido esa semana se marca como almacenado y no se cuenta.
+      Efecto (sin ponderar): energía mediana 2.153 a 2.118 kcal; media 2.755 a
+      2.667; hogares sobre 6.000 kcal 572 a 509; bajo 500 kcal 296 a 297.
+      Gramos excluidos: aceite 13,4%; pastas 9,7%; azúcar 9,0%; arroz 6,5%.
+      La suma simple se conserva como variante de sensibilidad.
 - [ ] B3. Atípicos a nivel de hogar (después de B2).
 - [ ] B4. Ajustes del equivalente de mujer adulta.
 - [ ] B5. Trigo en equivalentes de harina: pan, pastas y galletas convertidos

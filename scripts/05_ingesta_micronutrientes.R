@@ -167,6 +167,10 @@ consumo_nutrientes <- gramos_por_ema |>
 #
 # El tratamiento aplicable es una decision del equipo tecnico. Se producen las
 # tres variantes para poder compararlas.
+if (!"almacenado" %in% names(consumo_nutrientes)) {
+  stop("Falta la columna `almacenado`. Volver a correr 04_equivalente_adulto.R.",
+       call. = FALSE)
+}
 if (!"seccion" %in% names(consumo_nutrientes)) {
   stop("Falta la columna `seccion`. Volver a correr 04_equivalente_adulto.R ",
        "(la conserva desde 2026-09-12).", call. = FALSE)
@@ -182,7 +186,10 @@ agregar_por_hogar <- function(df, etiqueta) {
 ingesta_hogar <- bind_rows(
   agregar_por_hogar(consumo_nutrientes |> filter(seccion == "Sec 2"),  "Sec 2"),
   agregar_por_hogar(consumo_nutrientes |> filter(seccion == "Sec 3A"), "Sec 3A"),
-  agregar_por_hogar(consumo_nutrientes,                                "Sec 2 + Sec 3A")
+  # Estimacion principal: suma de secciones con la regla de agotamiento.
+  agregar_por_hogar(consumo_nutrientes |> filter(!almacenado),         "Sec 2 + Sec 3A"),
+  # Sensibilidad: suma simple, sin la regla.
+  agregar_por_hogar(consumo_nutrientes,                                "Sec 2 + Sec 3A, sin regla de agotamiento")
 )
 
 # Comparacion de las tres variantes. La MEDIANA es la cifra citable: la media

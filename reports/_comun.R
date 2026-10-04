@@ -114,14 +114,18 @@ cargar_crosswalk <- function(hoja) {
 }
 
 # Consumo por EMA, salida de 04_equivalente_adulto.R.
-cargar_gramos_por_ema <- function() {
+# Por defecto excluye las adquisiciones marcadas como almacenadas por la regla
+# de agotamiento; `incluir_almacenado = TRUE` devuelve la suma simple.
+cargar_gramos_por_ema <- function(incluir_almacenado = FALSE) {
   f <- file.path(RUTA_CLEAN, "data_gramos_por_ema.csv")
   exigir_archivo(f, "04_equivalente_adulto.R")
   d <- leer_limpio(f)
-  if (!"seccion" %in% names(d)) {
-    stop("`data_gramos_por_ema.csv` no tiene la columna `seccion`. ",
-         "Volver a correr scripts/04_equivalente_adulto.R.", call. = FALSE)
+  faltan <- setdiff(c("seccion", "almacenado"), names(d))
+  if (length(faltan) > 0) {
+    stop("`data_gramos_por_ema.csv` no tiene: ", paste(faltan, collapse = ", "),
+         ". Volver a correr scripts/04_equivalente_adulto.R.", call. = FALSE)
   }
+  if (!incluir_almacenado) d <- d |> filter(!almacenado)
   d
 }
 
