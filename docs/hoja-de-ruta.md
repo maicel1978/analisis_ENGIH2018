@@ -54,7 +54,13 @@ cada bloque se declara el efecto esperado sobre las cifras de control
       16,5% del quintil 5, por el extremo superior (2,7% frente a 12,1%); el
       inferior es parejo (3 a 4%). Excluir sesgaría la comparación por quintil.
       El riesgo de ingesta inadecuada se reportará con y sin el filtro.
-- [ ] B4. Ajustes del equivalente de mujer adulta.
+- [x] B4. Equivalente de mujer adulta (2026-10-04). Menores de un año: 649 kcal
+      (niños) y 600 (niñas), promedio anual de FAO/WHO/UNU 2004, en lugar del
+      valor provisional de 600. Afecta a 505 menores en 501 hogares (5,6%);
+      el cambio es de 0,02 EMA por niño varón. Embarazo y lactancia no son
+      ajustables: el cuestionario no los registra. Cota de la lactancia: hasta
+      505 kcal (0,22 EMA) en, como máximo, ese 5,6% de hogares. El valor de
+      niñas queda por contrastar mes a mes con la tabla de la fuente.
 - [ ] B5. Trigo en equivalentes de harina: pan, pastas y galletas convertidos
       a gramos de harina con factores de contenido de fuente citable.
 

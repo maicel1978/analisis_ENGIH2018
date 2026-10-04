@@ -47,11 +47,11 @@
 #      hombres, 55kg mujeres -- las mismas hipotesis del documento de
 #      metodologico), no el peso real de cada persona, porque la ENGIH no
 #      registra peso individual.
-#   3. Infantes menores de 1 ano: la Tabla 4.2/4.3 de FAO/WHO/UNU 2004
-#      empieza en 1-2 anos. Para edad=0 se usa un valor provisional
-#      (ver mas abajo) que HAY QUE REVISAR con la seccion 3 del mismo
-#      informe (requerimientos de lactantes) antes de dar el resultado
-#      por bueno para ese grupo de edad.
+#   3. Menores de 1 ano: las Tablas 4.2 y 4.3 empiezan en 1-2 anos. Para
+#      edad 0 se usa el promedio de los doce valores mensuales de la
+#      seccion 3 del mismo informe, por sexo. La encuesta registra la edad
+#      en anos cumplidos, de modo que no se distingue el mes. No se descuenta
+#      la lactancia materna, que el cuestionario no registra.
 #
 # Todas estas limitaciones se documentan tambien en HOJA_DE_RUTA_PROYECTO.md.
 
@@ -139,10 +139,10 @@ REFERENCIA_EMA_KCAL <- tabla_adultos |>
   filter(sexo == "Femenino", edad_desde == 18) |>
   pull(kcal_dia)
 
-# Placeholder para menores de 1 año -- PENDIENTE DE REVISAR (ver
-# limitacion 3 arriba). Valor aproximado de literatura general para
-# lactantes, NO verificado contra la seccion 3 de FAO/WHO/UNU 2004.
-KCAL_MENOR_1_ANO_PROVISIONAL <- 600
+# Menores de 1 ano: promedio de los doce valores mensuales de FAO/WHO/UNU
+# 2004, seccion 3 (kcal/dia). Ninos, de 518 en el primer mes a 775 en el
+# duodecimo; ninas, de 464 a 712.
+KCAL_MENOR_1_ANO <- c(Masculino = 649, Femenino = 600)
 
 # Paso 3: Asignar requerimiento energético a cada persona ----------------
 sociodemografia_data <- sociodemografia_data |>
@@ -156,7 +156,7 @@ sociodemografia_data <- sociodemografia_data |>
 
 asignar_kcal <- function(edad, sexo_texto) {
   if (is.na(edad) || is.na(sexo_texto)) return(NA_real_)
-  if (edad < 1) return(KCAL_MENOR_1_ANO_PROVISIONAL)
+  if (edad < 1) return(KCAL_MENOR_1_ANO[[sexo_texto]])
   fila <- tabla_requerimiento |>
     filter(sexo == sexo_texto, edad >= edad_desde, edad < edad_hasta)
   if (nrow(fila) == 0) return(NA_real_)
@@ -333,9 +333,8 @@ message(
 write_delim(gramos_por_ema, here("data", "clean", "data_gramos_por_ema.csv"), delim = ";")
 
 # Próximos pasos (NO hechos en este script) ------------------------------
-# 1. Revisar KCAL_MENOR_1_ANO_PROVISIONAL contra FAO/WHO/UNU 2004
-#    seccion 3 (requerimientos de lactantes) -- ahora mismo es un
-#    placeholder, no un valor verificado.
+# 1. [HECHO 2026-10-04] Requerimiento de menores de 1 ano tomado de
+#    FAO/WHO/UNU 2004, seccion 3.
 # 2. [HECHO 2026-09-08, ver Paso 6 arriba] Union con consumo diario y
 #    calculo de gramos por EMA.
 # 3. Decidir qué hacer con los hogares que tengan algún miembro sin EMA

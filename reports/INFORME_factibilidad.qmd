@@ -817,8 +817,8 @@ encuentra sobrestimado, según se detalla en la sección siguiente.
 
 **Del cálculo del EMA.** No se ajusta por embarazo ni lactancia; se asume nivel
 de actividad física moderado y peso corporal fijo por sexo. El requerimiento
-para menores de un año emplea un valor provisional pendiente de contrastar con
-la referencia FAO/OMS/UNU.
+para menores de un año es el promedio anual por sexo de la referencia
+FAO/OMS/UNU, sin descuento por lactancia materna.
 
 # Decisiones que requieren definición del equipo técnico
 
