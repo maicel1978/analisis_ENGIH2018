@@ -21,7 +21,7 @@ cada bloque se declara el efecto esperado sobre las cifras de control
 
 **Fase A — aditiva, no cambia cifras existentes (5–7 oct)**
 
-- [ ] A1. Zinc, B12, D y E en `05`; función de composición única.
+- [x] A1. Zinc, B12, D y E en `05`; función de composición única. Cobertura en gramos: zinc 96,0%; B12 94,1%; D 89,1%; E 83,0%.
 - [ ] A2. Harina de maíz, avena y sal como vehículos.
 - [ ] A3. Provincia en `01` y `04`; coeficiente de variación por dominio.
 - [ ] A4a. `catalogo_grupos`, `alimento_agrupado` y `grupo_mddw` en el crosswalk.
@@ -254,7 +254,7 @@ registro histórico; rigen las decisiones del 2026-10-03.
 
   **Nota de ubicación para sesiones futuras: `_comun.R` está en `reports/`, NO en `scripts/`.** Los `.qmd` buscan en ambas rutas por compatibilidad, pero la copia válida es la de `reports/`. Tener dos copias produciría resultados distintos según dónde se ejecute.
 
-- [ ] **Refactor pendiente: `cargar_composicion()` está duplicada.** Vive en `reports/_comun.R` y la misma lógica está dentro de `scripts/05_ingesta_micronutrientes.R`. Lo correcto es que el `05` escriba la tabla de composición a `data/clean/` y que ambos la lean de ahí. No urge, pero es deuda técnica real: si se corrige un mapeo de columnas en un sitio y no en el otro, los reportes y el pipeline divergen en silencio.
+- [x] **Refactor pendiente: `cargar_composicion()` está duplicada.** *Resuelto el 2026-10-03 (bloque A1b).* Vive en `reports/_comun.R` y la misma lógica está dentro de `scripts/05_ingesta_micronutrientes.R`. Lo correcto es que el `05` escriba la tabla de composición a `data/clean/` y que ambos la lean de ahí. No urge, pero es deuda técnica real: si se corrige un mapeo de columnas en un sitio y no en el otro, los reportes y el pipeline divergen en silencio.
 
 - [x] **HITO (2026-09-13): entregables reorganizados y estructura del repositorio normalizada.**
 

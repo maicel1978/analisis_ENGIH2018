@@ -135,43 +135,14 @@ pesos_hogar <- function() {
     summarise(peso = first(peso), .groups = "drop")
 }
 
-# Composicion unificada INCAP + FNDDS.
-# Duplica la logica de 05_ingesta_micronutrientes.R -- pendiente de unificar.
+# Composicion unificada INCAP + FNDDS, generada por 05_ingesta_micronutrientes.R.
+# Tipos declarados: una columna con muchos vacios al inicio no debe leerse
+# como logica.
 cargar_composicion <- function() {
-  incap <- read_excel(file.path(RUTA_RAW, "food_composition_INCAP.xlsx"),
-                      sheet = "nutrient_values") |>
-    transmute(
-      enhance_id         = as.numeric(ENHANCE_ID),
-      energia_kcal       = as.numeric(ENERC_KCAL),
-      hierro_mg          = as.numeric(FE),
-      folato_mcg_dfe     = as.numeric(FOLDFE),
-      vitamina_a_mcg_rae = as.numeric(VITA_RAE)
-    )
-  
-  # Los encabezados de FNDDS contienen saltos de linea internos.
-  fn <- read_excel(file.path(RUTA_RAW, "food_composition_FNDDS.xlsx"),
-                   sheet = "nutrient_values", skip = 1, .name_repair = "minimal")
-  col_fn <- function(patron, etiqueta) {
-    nn <- gsub("[[:space:]]+", " ", trimws(names(fn)))
-    i <- grep(patron, nn, ignore.case = TRUE, perl = TRUE)
-    if (length(i) != 1) {
-      stop("El patron de '", etiqueta, "' identifica ", length(i),
-           " columnas en FNDDS (deberia ser 1)", call. = FALSE)
-    }
-    names(fn)[i]
-  }
-  fndds <- fn |>
-    transmute(
-      enhance_id         = as.numeric(.data[[col_fn("^Food code$", "id")]]),
-      energia_kcal       = as.numeric(.data[[col_fn("^Energy \\(kcal\\)$", "energia")]]),
-      hierro_mg          = as.numeric(.data[[col_fn("^Iron ?\\(mg\\)$", "hierro")]]),
-      folato_mcg_dfe     = as.numeric(.data[[col_fn("^Folate, DFE", "folato")]]),
-      vitamina_a_mcg_rae = as.numeric(.data[[col_fn("^Vitamin A, RAE", "vitamina A")]])
-    )
-  
-  bind_rows(incap, fndds) |>
-    filter(!is.na(enhance_id)) |>
-    distinct(enhance_id, .keep_all = TRUE)
+  f <- file.path(RUTA_CLEAN, "composicion_unificada.csv")
+  exigir_archivo(f, "05_ingesta_micronutrientes.R")
+  read_delim(f, delim = ";", col_types = cols(.default = col_double()),
+             locale = locale(decimal_mark = "."), na = c("", "NA"))
 }
 
 # --- Diseno muestral ----------------------------------------------------------

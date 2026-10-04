@@ -143,6 +143,13 @@ if (length(colisiones) > 0) {
 
 composicion <- bind_rows(nutrientes_incap, nutrientes_fndds)
 
+# Tabla unica de composicion: los reportes la leen de aqui (reports/_comun.R).
+composicion |>
+  select(-fuente) |>
+  filter(!is.na(enhance_id)) |>
+  distinct(enhance_id, .keep_all = TRUE) |>
+  write_delim(here("data", "clean", "composicion_unificada.csv"), delim = ";")
+
 # Paso 4: unir consumo + composicion --------------------------------------
 # left_join a proposito: las filas sin match se conservan para poder medir
 # la cobertura real. Se une por enhance_id (verificado unico entre fuentes);
