@@ -1,0 +1,8 @@
+nutriente;ear;ul;unidad;metodo;fuente;estado;nota
+hierro_mg;8.1;45;mg;probabilidad;IOM, mujeres de 19 a 30 años;provisional;El punto de corte no aplica: se usa la distribucion del requerimiento (hierro_requerimiento.csv).
+zinc_mg;6.8;40;mg;punto_de_corte;IOM, mujeres de 19 a 30 años;provisional;
+folato_mcg_dfe;320;1000;ug DFE;punto_de_corte;IOM, mujeres de 19 a 30 años;provisional;El limite superior aplica solo al acido folico sintetico: la proporcion sobre el limite es una cota maxima.
+vitamina_a_mcg_rae;500;3000;ug RAE;punto_de_corte;IOM, mujeres de 19 a 30 años;provisional;El limite superior aplica solo al retinol preformado: la proporcion sobre el limite es una cota maxima.
+vitamina_b12_mcg;2.0;;ug;punto_de_corte;IOM, mujeres de 19 a 30 años;provisional;Sin limite superior establecido.
+vitamina_d_mcg;10;100;ug;punto_de_corte;IOM, mujeres de 19 a 30 años;provisional;No considera la sintesis cutanea: la inadecuacion dietetica no equivale a deficiencia.
+vitamina_e_mg;12;;mg;punto_de_corte;IOM, mujeres de 19 a 30 años;provisional;El limite superior aplica solo a suplementos.

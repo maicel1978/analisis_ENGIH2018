@@ -28,7 +28,7 @@ cada bloque se declara el efecto esperado sobre las cifras de control
       hogares y de 4 a 160 UPM por provincia. La precisión se evalúa
       en C3.
 - [ ] A4a. `catalogo_grupos`, `alimento_agrupado` y `grupo_mddw` en el crosswalk.
-- [ ] A5. Tabla de parámetros normativos por vehículo.
+- [x] A5. Tabla de parámetros normativos por vehículo (`data/raw/parametros_normativos.csv`).
 
 **Fase B — cambia cifras (7–9 oct)**
 
@@ -68,8 +68,19 @@ cada bloque se declara el efecto esperado sobre las cifras de control
 
 - [ ] C1. Escenarios: sin fortificación, niveles recomendados por la OMS y
       norma nacional. Sin aceite. Yodo desde la sal como escenario poblacional.
-- [ ] C2. Riesgo de ingesta inadecuada por nutriente; densidad por 1.000 kcal.
-- [ ] C3. Desagregación por provincia, quintil y zona; mapas.
+- [ ] C2. Riesgo de ingesta inadecuada y densidad por 1.000 kcal: cálculo
+      hecho en `scripts/06_riesgo_inadecuacion.R` (punto de corte; probabilidad
+      para hierro; proporción sobre el límite superior). Los valores de
+      referencia de `data/raw/valores_referencia.csv` y
+      `hierro_requerimiento.csv` son PROVISIONALES (IOM): se sustituyen por los
+      de la metodología MIMI. Resultados no citables hasta entonces ni hasta
+      cerrar C1: el folato muestra 23% bajo el requerimiento y 38% sobre el
+      límite superior a la vez, artefacto del mapeo del arroz. La
+      biodisponibilidad del hierro (10% o 18%) cambia el resultado de 54% a 27%.
+- [ ] C3. Desagregación: hecha en `06` para región, zona, quintil y provincia.
+      Región, zona y quintil sin celdas de precisión baja (semiamplitud máxima
+      3,6 puntos). Provincia: 47 de 256 celdas con precisión baja. Faltan los
+      mapas y la desagregación del consumo de vehículos.
 - [ ] C4. Análisis por grupos de alimentos.
 
 **Fase D — redacción y cierre (15–23 oct)**
@@ -120,7 +131,10 @@ de contenido de harina en pan, pastas y galletas.
   compra, no consumo. El aporte de yodo se modela como escenario poblacional:
   consumo promedio de sal de fuente externa por el rango de la norma
   (20–50 mg/kg). No se estima distribución por hogar ni riesgo.
-- Provincia: se suprime la celda con coeficiente de variación mayor de 30%.
+- Precisión (revisado el 2026-10-04): en proporciones, la celda se marca si
+  tiene menos de 50 hogares o la semiamplitud del intervalo supera 10 puntos;
+  el coeficiente de variación penaliza prevalencias bajas bien estimadas y se
+  reserva para medias (umbral 30%). La provincia no es dominio de estimación.
 - Valores de referencia: EAR de OMS/FAO; enfoque probabilístico en hierro.
 
 **Supuestos pendientes de documento:** vigencia en 2018 y niveles del
