@@ -37,19 +37,45 @@ cada bloque se declara el efecto esperado sobre las cifras de control
 - [ ] B2. Disponibilidad neta en almacenables, como cuarta variante.
 - [ ] B3. Atípicos a nivel de hogar (después de B2).
 - [ ] B4. Ajustes del equivalente de mujer adulta.
+- [ ] B5. Trigo en equivalentes de harina: pan, pastas y galletas convertidos
+      a gramos de harina con factores de contenido de fuente citable.
 
 **Fase C — análisis (12–16 oct)**
 
-- [ ] C1. Escenarios con niveles de norma.
-- [ ] C2. Riesgo de ingesta inadecuada por nutriente.
+- [ ] C1. Escenarios: sin fortificación, niveles recomendados por la OMS y
+      norma nacional. Sin aceite. Yodo desde la sal como escenario poblacional.
+- [ ] C2. Riesgo de ingesta inadecuada por nutriente; densidad por 1.000 kcal.
 - [ ] C3. Desagregación por provincia, quintil y zona; mapas.
 - [ ] C4. Análisis por grupos de alimentos.
 
-**Fase D — cierre (19–23 oct)**
+**Fase D — redacción y cierre (15–23 oct)**
 
-- [ ] D1. Informe de factibilidad: recompilar, comparar contra la versión
-      etiquetada, incorporar comentarios de revisión.
+- [ ] D1. Informe final: reestructurar por preguntas, recompilar, comparar
+      contra la versión etiquetada y responder los comentarios de revisión.
 - [ ] D2. Fusión a `main`, README y productos finales.
+
+**Estructura del informe final (acordada el 2026-10-04).** Un solo documento
+principal: el informe de factibilidad evoluciona a informe final con formato
+de artículo. R1 a R5 quedan como cuadernos de cálculo y no se pulen.
+
+1. Introducción: problema, preguntas e hipótesis, objetivos.
+2. Métodos: breves; fuentes y cadena de cálculo; el detalle va a anexo.
+3. Resultados: un apartado por pregunta, con una tabla o figura principal.
+4. Discusión: hallazgo por pregunta, contraste con la literatura,
+   limitaciones, implicaciones.
+5. Conclusiones.
+Anexos: calidad de datos y adaptaciones; decisiones adoptadas; respuesta a
+los comentarios de revisión (sección original, respuesta, ubicación nueva);
+reproducibilidad.
+
+Preguntas: la de factibilidad (¿permite la encuesta el análisis, con qué
+cobertura?) más las seis preguntas estratégicas de
+`docs/vision-y-arquitectura.md`. Hipótesis solo donde se formuló antes de
+ver el dato (efecto distributivo de un vehículo de consumo transversal).
+
+**Datos externos por conseguir:** consumo promedio de sal en el país;
+yodación de la sal de los cubos de caldo (etiqueta y fabricante); factores
+de contenido de harina en pan, pastas y galletas.
 
 **Decisiones adoptadas el 2026-10-03** (reversibles por parámetro):
 
@@ -59,10 +85,17 @@ cada bloque se declara el efecto esperado sobre las cifras de control
   no se reporta por no ser aplicable a adquisiciones del hogar.
 - Línea base 2018: harina de trigo, harina de maíz y sal fortificadas; arroz
   y aceite sin fortificar; azúcar como escenario de sensibilidad.
-- Escenario de arroz con los niveles de la propuesta nacional de reglamento.
+- Escenarios (revisado el 2026-10-04, por comentario de revisión): sin
+  fortificación, niveles OMS y norma nacional. La propuesta nacional de
+  reglamento de arroz se añade como fila adicional. El aceite no se modela.
 - Disponibilidad neta como estimación principal solo si reduce la cola de
   más de 6.000 kcal sin producir una energía mediana implausible.
-- Sal y yodo (revisado el 2026-10-04): la sal no figura en la Sección 2 y solo el 13,3% de los hogares la registra en el diario de siete días (mediana de 26,5 g por EMA y día entre quienes la registran). La cifra mide frecuencia de compra semanal, no cobertura ni consumo; se reporta con esa nota y no se estima aporte ni riesgo de yodo.
+- Sal y yodo (revisado el 2026-10-04): la sal no figura en la Sección 2 y
+  solo el 13,3% de los hogares la registra en el diario (mediana de 26,5 g
+  por EMA y día entre quienes la registran): la encuesta mide frecuencia de
+  compra, no consumo. El aporte de yodo se modela como escenario poblacional:
+  consumo promedio de sal de fuente externa por el rango de la norma
+  (20–50 mg/kg). No se estima distribución por hogar ni riesgo.
 - Provincia: se suprime la celda con coeficiente de variación mayor de 30%.
 - Valores de referencia: EAR de OMS/FAO; enfoque probabilístico en hierro.
 
