@@ -141,7 +141,7 @@ amplitud <- cob |> mutate(a = hi - lo) |> summarise(max = max(a)) |> pull(max)
 
 knitr::asis_output(paste0(
   "La amplitud máxima de los intervalos es de ", fmt(amplitud),
-  " puntos porcentuales, lo que indica estimaciones precisas para los cuatro ",
+  " puntos porcentuales, lo que indica estimaciones precisas para todos los ",
   "vehículos. Las diferencias de cobertura entre ellos no son atribuibles a ",
   "error de muestreo."
 ))
@@ -288,7 +288,7 @@ tres <- gpe |> filter(!is.na(vehiculo)) |> distinct(id_hogar_unico, vehiculo) |>
   count(id_hogar_unico) |> filter(n >= 3) |> nrow()
 
 knitr::asis_output(paste0(
-  "La mayoría de los hogares consume **tres de los cuatro vehículos** (",
+  "La mayoría de los hogares consume **tres o más vehículos** (",
   fmt(100 * tres / hogares_total), "% consume tres o más). Con la definición ",
   "estricta, el vehículo ausente es casi siempre la harina de trigo. Arroz, ",
   "aceite y azúcar alcanzan por tanto de forma conjunta a la mayor parte de la ",
@@ -315,7 +315,7 @@ todos <- gpe |>
   nrow()
 
 knitr::asis_output(paste0(
-  "**Los cuatro vehículos a la vez:** ", format(todos, big.mark = "."),
+  "**Todos los vehículos a la vez:** ", format(todos, big.mark = "."),
   " hogares (", fmt(100 * todos / hogares_total), "%)."))
 ```
 

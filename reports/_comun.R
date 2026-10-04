@@ -23,7 +23,10 @@ VEHICULOS <- tribble(
   "Arroz",              "arroz",
   "Harina de trigo",    "harina de trigo|harina integral",
   "Aceite",             "aceite",
-  "Azúcar",             "azucar|az\u00facar"
+  "Azúcar",             "azucar|az\u00facar",
+  "Harina de maíz",     "^harinas? de maiz",
+  "Avena",              "^avena",
+  "Sal",                "^sal (molida|en grano|marina)"
 )
 
 # Definicion ampliada del vehiculo trigo: harina y derivados de consumo directo.

@@ -22,7 +22,7 @@ cada bloque se declara el efecto esperado sobre las cifras de control
 **Fase A — aditiva, no cambia cifras existentes (5–7 oct)**
 
 - [x] A1. Zinc, B12, D y E en `05`; función de composición única. Cobertura en gramos: zinc 96,0%; B12 94,1%; D 89,1%; E 83,0%.
-- [ ] A2. Harina de maíz, avena y sal como vehículos.
+- [x] A2. Harina de maíz, avena y sal como vehículos.
 - [ ] A3. Provincia en `01` y `04`; coeficiente de variación por dominio.
 - [ ] A4a. `catalogo_grupos`, `alimento_agrupado` y `grupo_mddw` en el crosswalk.
 - [ ] A5. Tabla de parámetros normativos por vehículo.
@@ -59,7 +59,7 @@ cada bloque se declara el efecto esperado sobre las cifras de control
 - Escenario de arroz con los niveles de la propuesta nacional de reglamento.
 - Disponibilidad neta como estimación principal solo si reduce la cola de
   más de 6.000 kcal sin producir una energía mediana implausible.
-- Yodo: cobertura de sal y aporte según norma; no se estima riesgo.
+- Sal y yodo (revisado el 2026-10-04): la sal no figura en la Sección 2 y solo el 13,3% de los hogares la registra en el diario de siete días (mediana de 26,5 g por EMA y día entre quienes la registran). La cifra mide frecuencia de compra semanal, no cobertura ni consumo; se reporta con esa nota y no se estima aporte ni riesgo de yodo.
 - Provincia: se suprime la celda con coeficiente de variación mayor de 30%.
 - Valores de referencia: EAR de OMS/FAO; enfoque probabilístico en hierro.
 

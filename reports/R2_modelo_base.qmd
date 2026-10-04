@@ -286,7 +286,7 @@ arroz, aceite, azúcar y leche —todos almacenables— encabezan el listado y
 aparecen en ambas secciones.
 
 **Esto sobrestima el consumo de los alimentos almacenables**, entre ellos tres
-de los cuatro vehículos de fortificación.
+de los vehículos de fortificación (arroz, aceite y azúcar).
 
 El refinamiento metodológico apropiado es la **disponibilidad neta**
 (existencias iniciales + adquisiciones − existencias finales). Los datos

@@ -857,7 +857,7 @@ Sin embargo, existe solapamiento en alimentos almacenables: un hogar puede
 declarar existencias de arroz y adquirir arroz durante el mismo período. El
 análisis de los hogares con ingesta implausible confirma el mecanismo —arroz,
 aceite, azúcar y leche encabezan el listado y aparecen en ambas secciones—, lo
-que afecta a **tres de los cuatro vehículos de fortificación**.
+que afecta a **tres vehículos de fortificación: arroz, aceite y azúcar**.
 
 **Opción propuesta:** adoptar la combinación de ambas secciones como estimación
 principal, declarando el solapamiento como limitación, e implementar el cálculo

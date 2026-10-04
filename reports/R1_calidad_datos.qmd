@@ -117,7 +117,7 @@ importa porque orienta el trabajo pendiente: no tiene sentido ampliar el
 crosswalk si la pérdida principal está en los factores de conversión, ni al
 revés.
 
-## Los cuatro vehículos de fortificación
+## Vehículos de fortificación
 
 Esta es la verificación que decide si los indicadores de cobertura del reporte
 R3 son defendibles. La pregunta no es cuánto cubre el pipeline en general, sino
