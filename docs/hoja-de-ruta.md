@@ -45,7 +45,15 @@ cada bloque se declara el efecto esperado sobre las cifras de control
       2.667; hogares sobre 6.000 kcal 572 a 509; bajo 500 kcal 296 a 297.
       Gramos excluidos: aceite 13,4%; pastas 9,7%; azúcar 9,0%; arroz 6,5%.
       La suma simple se conserva como variante de sensibilidad.
-- [ ] B3. Atípicos a nivel de hogar (después de B2).
+- [x] B3. Plausibilidad de la energía por hogar (2026-10-04): columna
+      `energia_plausible` (500 a 6.000 kcal por EMA y día). Se marca y no se
+      excluye. Quedan fuera del rango 806 hogares (9,2%): 297 por debajo y 509
+      por encima. Los criterios basados en la propia distribución dan límites
+      implausibles (3 MAD en logaritmo: 351 a 12.792 kcal). La exclusión no es
+      neutra entre grupos: fuera del rango queda el 6,0% del quintil 1 y el
+      16,5% del quintil 5, por el extremo superior (2,7% frente a 12,1%); el
+      inferior es parejo (3 a 4%). Excluir sesgaría la comparación por quintil.
+      El riesgo de ingesta inadecuada se reportará con y sin el filtro.
 - [ ] B4. Ajustes del equivalente de mujer adulta.
 - [ ] B5. Trigo en equivalentes de harina: pan, pastas y galletas convertidos
       a gramos de harina con factores de contenido de fuente citable.

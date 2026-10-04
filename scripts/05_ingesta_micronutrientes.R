@@ -159,14 +159,14 @@ consumo_nutrientes <- gramos_por_ema |>
   left_join(composicion |> select(-fuente), by = "enhance_id") |>
   mutate(across(all_of(NUTRIENTES), ~ Gramos_por_EMA_dia * .x / 100))
 
-# Paso 5: ingesta aparente por hogar, en tres variantes --------------------
+# Paso 5: ingesta aparente por hogar, en cuatro variantes ------------------
 # Sec 2 (existencias) y Sec 3A (adquisiciones) miden cosas distintas. Al
 # sumarlas se duplican los alimentos almacenables: de los 572 hogares con
 # energia > 6.000 kcal/EMA/dia, 223 se explican por ese solapamiento, que
 # afecta a arroz, aceite, azucar y leche.
 #
-# El tratamiento aplicable es una decision del equipo tecnico. Se producen las
-# tres variantes para poder compararlas.
+# La estimacion principal es la suma con la regla de agotamiento (04). Las
+# demas variantes se conservan para comparacion y sensibilidad.
 if (!"almacenado" %in% names(consumo_nutrientes)) {
   stop("Falta la columna `almacenado`. Volver a correr 04_equivalente_adulto.R.",
        call. = FALSE)
@@ -192,6 +192,16 @@ ingesta_hogar <- bind_rows(
   agregar_por_hogar(consumo_nutrientes,                                "Sec 2 + Sec 3A, sin regla de agotamiento")
 )
 
+# Plausibilidad de la energia por hogar. Se marca y no se excluye: los hogares
+# sobre el limite superior se concentran en los quintiles altos (2,7% en el
+# quintil 1 y 12,1% en el 5), de modo que excluirlos sesgaria las comparaciones
+# entre grupos. El filtro se usa solo como analisis de sensibilidad.
+LIMITES_ENERGIA <- c(inferior = 500, superior = 6000)  # kcal por EMA y dia
+
+ingesta_hogar <- ingesta_hogar |>
+  mutate(energia_plausible = energia_kcal >= LIMITES_ENERGIA[["inferior"]] &
+           energia_kcal <= LIMITES_ENERGIA[["superior"]])
+
 # Comparacion de las tres variantes. La MEDIANA es la cifra citable: la media
 # esta inflada por la cola de hogares con energia implausible.
 comparacion_variantes <- ingesta_hogar |>
@@ -210,8 +220,12 @@ comparacion_variantes <- ingesta_hogar |>
 write_delim(comparacion_variantes,
             here("data", "clean", "comparacion_variantes_seccion.csv"), delim = ";")
 
-message("\nComparacion de variantes (el tratamiento aplicable es decision del equipo tecnico):")
+message("\nComparacion de variantes (principal: Sec 2 + Sec 3A, con regla de agotamiento):")
 print(comparacion_variantes)
+
+message("\nHogares segun plausibilidad de la energia (", LIMITES_ENERGIA[["inferior"]],
+        " a ", LIMITES_ENERGIA[["superior"]], " kcal por EMA y dia):")
+print(ingesta_hogar |> count(variante, energia_plausible))
 
 # Paso 6: cobertura -- ponderada por gramos, por nutriente ----------------
 # Este numero acompana al resultado siempre: sin el, la ingesta se lee como

@@ -13,9 +13,9 @@
 #        que cualquier agregado sea representativo a nivel nacional
 #
 # Lo que esta etapa no hace
-#   - Disponibilidad neta Sec 2 + Sec 3A para alimentos almacenables
-#     (inventario_inicial + adquisiciones - inventario_final). Requiere decidir
-#     antes el tratamiento de las dos secciones.
+#   - Tratamiento del solapamiento entre Sec 2 y Sec 3A en alimentos
+#     almacenables. Se resuelve en 04_equivalente_adulto.R con la regla de
+#     agotamiento.
 #   - Corrección de outliers. Aquí solo se marcan (`es_outlier`); el método de
 #     corrección es una decisión metodológica pendiente de documentar.
 #   - Control de outliers a nivel de hogar. La detección opera por alimento, de
