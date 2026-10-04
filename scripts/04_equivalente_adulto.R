@@ -193,6 +193,8 @@ ema_hogar <- sociodemografia_data |>
     quintil          = first(quintil),
     des_estrato      = first(des_estrato),
     grupo_region     = first(grupo_region),
+    id_provincia     = first(id_provincia),
+    des_provincia    = first(des_provincia),
     zona             = if_else(grepl("Rural", first(des_estrato)), "Rural", "Urbano"),
     .groups = "drop"
   )
@@ -201,6 +203,7 @@ message(
   "Diseno muestral -- estratos: ", n_distinct(ema_hogar$estrato),
   " | UPM: ", n_distinct(ema_hogar$upm),
   " | quintiles: ", n_distinct(ema_hogar$quintil),
+  " | provincias: ", n_distinct(ema_hogar$id_provincia),
   " | hogares sin factor de expansion: ", sum(is.na(ema_hogar$factor_expansion))
 )
 message(

@@ -23,7 +23,10 @@ cada bloque se declara el efecto esperado sobre las cifras de control
 
 - [x] A1. Zinc, B12, D y E en `05`; función de composición única. Cobertura en gramos: zinc 96,0%; B12 94,1%; D 89,1%; E 83,0%.
 - [x] A2. Harina de maíz, avena y sal como vehículos.
-- [ ] A3. Provincia en `01` y `04`; coeficiente de variación por dominio.
+- [x] A3. Provincia arrastrada en `01`, `04` y el diseño muestral (32
+      provincias). No es dominio de estimación de la encuesta: de 35 a 1.341
+      hogares y de 4 a 160 UPM por provincia. La precisión se evalúa
+      en C3.
 - [ ] A4a. `catalogo_grupos`, `alimento_agrupado` y `grupo_mddw` en el crosswalk.
 - [ ] A5. Tabla de parámetros normativos por vehículo.
 

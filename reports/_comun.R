@@ -176,7 +176,7 @@ diseno_muestral <- function(datos) {
 
   dis <- cargar_ema_hogar() |>
     select(id_hogar_unico, estrato, upm, factor_expansion,
-           quintil, zona, grupo_region)
+           quintil, zona, grupo_region, id_provincia, des_provincia)
 
   d <- datos |>
     inner_join(dis, by = "id_hogar_unico", suffix = c("", "_dis"))

@@ -354,6 +354,10 @@ sociodemografia_data <- read_excel(
     quintil, # compruebo las medidas de posición pero ya venia calculado en la encuesta
     des_estrato,       # region y zona; de aqui se deriva urbano/rural
     grupo_region,
+    # La provincia no es dominio de estimacion de la encuesta (lo son region
+    # y zona); se conserva para analisis exploratorio con control de precision.
+    id_provincia,
+    des_provincia,
     factor_expansion
   )
 
