@@ -90,15 +90,29 @@ cada bloque se declara el efecto esperado sobre las cifras de control
       similar; lo que los distingue es la cantidad consumida. El resultado de
       equidad sí se mantiene. R4, R5, la presentación y el README conservan la
       versión anterior y no deben citarse en este punto.
-- [ ] C2. Riesgo de ingesta inadecuada y densidad por 1.000 kcal: cálculo
-      hecho en `scripts/06_riesgo_inadecuacion.R` (punto de corte; probabilidad
-      para hierro; proporción sobre el límite superior). Los valores de
-      referencia de `data/raw/valores_referencia.csv` y
-      `hierro_requerimiento.csv` son PROVISIONALES (IOM): se sustituyen por los
-      de la metodología MIMI. Resultados no citables hasta entonces ni hasta
-      cerrar C1: el folato muestra 23% bajo el requerimiento y 38% sobre el
-      límite superior a la vez, artefacto del mapeo del arroz. La
-      biodisponibilidad del hierro (10% o 18%) cambia el resultado de 54% a 27%.
+- [ ] C2. Riesgo de ingesta inadecuada por escenario (2026-10-04), en
+      `scripts/06_riesgo_inadecuacion.R`, que lee los escenarios de `07`. Línea
+      base de 2018: `ESCENARIO_BASE`, norma aplicada a harina y pan (1a).
+      Valores de referencia PROVISIONALES (IOM): no citables hasta sustituirlos
+      por los de la metodología MIMI. Hogares bajo el requerimiento, ponderado:
+
+      | Escenario | Folato | Hierro 10% | Hierro 18% | Zinc | B12 | Vit. A |
+      |---|---|---|---|---|---|---|
+      | Sin fortificación | 78,3 | 80,1 | 53,8 | 45,3 | 46,3 | 84,5 |
+      | Norma, harina y pan | 66,8 | 75,4 | 46,0 | 45,3 | 46,3 | 84,5 |
+      | Norma, todos los derivados | 55,2 | 70,8 | 40,1 | 45,3 | 46,3 | 84,5 |
+      | Norma y azúcar | 55,2 | 70,8 | 40,1 | 45,3 | 46,3 | 42,9 |
+      | OMS harina, menos de 75 g | 28,2 | 69,9 | 39,1 | 21,8 | 20,3 | 57,0 |
+      | Norma y arroz (propuesta) | 14,2 | 51,4 | 23,7 | 21,4 | 18,3 | 84,5 |
+
+      Ácido fólico añadido sobre el límite superior: 8,0% con arroz; 1,5% con
+      OMS; menos de 0,2% con la norma. Vitaminas D y E (95,8% y 83,6%) no
+      cambian entre escenarios y están infladas por la cobertura de la tabla de
+      composición. El filtro de energía plausible mueve las cifras menos de 3,5
+      puntos. La biodisponibilidad del hierro pesa más que cualquier escenario.
+      Supuestos que condicionan el resultado: fracciones de harina
+      provisionales, sin pérdidas por cocción, y hierro y folato de los
+      derivados fijados desde la harina sin enriquecer.
 - [ ] C3. Desagregación: hecha en `06` para región, zona, quintil y provincia.
       Región, zona y quintil sin celdas de precisión baja (semiamplitud máxima
       3,6 puntos). Provincia: 47 de 256 celdas con precisión baja. Faltan los
