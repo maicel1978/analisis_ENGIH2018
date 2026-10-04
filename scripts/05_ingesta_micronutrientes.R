@@ -94,7 +94,7 @@ nutrientes_incap <- read_excel(
   here("data", "raw", "food_composition_INCAP.xlsx"),
   sheet = "nutrient_values"
 ) |>
-  select(enhance_id = ENHANCE_ID, all_of(cols_incap)) |>
+  select(enhance_id = ENHANCE_ID, grupo_incap = FG1_name, all_of(cols_incap)) |>
   mutate(enhance_id = as.numeric(enhance_id), fuente = "INCAP", .after = enhance_id)
 
 # Los encabezados de FNDDS contienen saltos de linea internos ("Iron" + salto +
@@ -142,6 +142,32 @@ if (length(colisiones) > 0) {
 }
 
 composicion <- bind_rows(nutrientes_incap, nutrientes_fndds)
+
+# Relleno de vacios de composicion -------------------------------------------
+# Un nutriente sin valor suma cero a la ingesta. Se completan dos casos:
+# valores puntuales con fuente declarada (composicion_relleno.csv), que solo
+# llenan vacios, y B12 y vitamina D en alimentos vegetales sin procesar, donde
+# el vacio de la tabla es un cero real.
+GRUPOS_VEGETALES <- c("Fruits", "Vegetables", "Roots, tubers, and plantains",
+                      "Pulses, seeds and nuts")
+
+relleno <- read_delim(here("data", "raw", "composicion_relleno.csv"), delim = ";",
+                      show_col_types = FALSE, locale = locale(decimal_mark = "."))
+stopifnot(all(relleno$nutriente %in% NUTRIENTES),
+          all(relleno$enhance_id %in% composicion$enhance_id))
+
+vacios_antes <- sum(is.na(composicion[NUTRIENTES]))
+for (k in seq_len(nrow(relleno))) {
+  fila <- which(composicion$enhance_id == relleno$enhance_id[k])
+  nut  <- relleno$nutriente[k]
+  if (is.na(composicion[[nut]][fila])) composicion[[nut]][fila] <- relleno$valor[k]
+}
+composicion <- composicion |>
+  mutate(across(c(vitamina_b12_mcg, vitamina_d_mcg),
+                ~ if_else(is.na(.x) & grupo_incap %in% GRUPOS_VEGETALES, 0, .x))) |>
+  select(-grupo_incap)
+message("Relleno de composicion: ", vacios_antes - sum(is.na(composicion[NUTRIENTES])),
+        " valores completados")
 
 # Tabla unica de composicion: los reportes la leen de aqui (reports/_comun.R).
 composicion |>

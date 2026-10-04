@@ -1,0 +1,10 @@
+enhance_id;alimento;nutriente;valor;fuente;regla
+70212131;Plátano verde, crudo;folato_mcg_dfe;22;INCAP 70212130, plátano maduro, crudo;Misma especie en otro estado de madurez
+70212131;Plátano verde, crudo;vitamina_e_mg;0.14;INCAP 70212130, plátano maduro, crudo;Misma especie en otro estado de madurez
+70212011;Banano o guineo, verde;folato_mcg_dfe;20;INCAP 70212010, banano o guineo, maduro;Misma especie en otro estado de madurez
+70212011;Banano o guineo, verde;zinc_mg;0.15;INCAP 70212010, banano o guineo, maduro;Misma especie en otro estado de madurez
+70212011;Banano o guineo, verde;vitamina_e_mg;0.10;INCAP 70212010, banano o guineo, maduro;Misma especie en otro estado de madurez
+70212103;Naranja agria, fruta;folato_mcg_dfe;30;FNDDS 61119010, Orange, raw;Fruta del mismo género
+70212103;Naranja agria, fruta;zinc_mg;0.07;FNDDS 61119010, Orange, raw;Fruta del mismo género
+70212103;Naranja agria, fruta;vitamina_e_mg;0.18;FNDDS 61119010, Orange, raw;Fruta del mismo género
+70213004;Arroz blanco, sin enriquecer;vitamina_a_mcg_rae;0;Sin fuente de vitamina A;Cereal refinado

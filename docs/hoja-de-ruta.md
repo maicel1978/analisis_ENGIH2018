@@ -17,7 +17,45 @@ de la consultoría: 2026-10-23 (contrato hasta 2026-10-25).
 **Método de trabajo.** Rama `ajustes-octubre`; `main` conserva la versión
 revisada (etiqueta `informe-factibilidad-v1`). Un bloque por commit. Antes de
 cada bloque se declara el efecto esperado sobre las cifras de control
-(36.840 / 303.408 / 8.774); si la corrida no coincide, se detiene.
+(36.840 / 328.173 / 8.778); si la corrida no coincide, se detiene.
+
+**Cifras vigentes al cierre del 2026-10-04.** Sustituyen a las que figuran en
+las entradas B2, B3, C1 y C2 de este bloque, que son anteriores a B1 y al
+relleno de composición. Valores de referencia PROVISIONALES: no citables.
+
+- Entran al cálculo 328.173 registros de 8.778 hogares: 97,1% de la Sección 2
+  y 82,4% de la Sección 3A (antes 90,7% y 76,0%).
+- Energía mediana 2.300 kcal por EMA y día, sin ponderar (media 2.862); 847
+  hogares fuera del rango de 500 a 6.000 kcal.
+- Cobertura de composición, en gramos: hierro 96,9%; zinc y B12 96,6%; folato
+  93,4%; vitamina A 92,8%; vitamina D 91,0%; vitamina E 85,3%.
+- Vehículos: arroz 85,5% de los hogares y 218 g por EMA y día; trigo en
+  equivalentes de harina 91,8% y 46,9 g; azúcar 76,9% y 55,7 g.
+
+| Escenario | Folato mediano | Hierro mediano | Folato Q5/Q1 | Fol. bajo req. | Hierro 10% | Zinc | B12 | Vit. A |
+|---|---|---|---|---|---|---|---|---|
+| Sin fortificación | 196 | 8,68 | 1,23 | 73,1 | 76,1 | 42,9 | 46,3 | 74,7 |
+| Norma, harina y pan (línea base) | 267 | 9,96 | 1,24 | 60,2 | 71,1 | 42,9 | 46,3 | 74,7 |
+| Norma, todos los derivados | 328 | 11,02 | 1,21 | 48,3 | 66,4 | 42,9 | 46,3 | 74,7 |
+| Norma y azúcar | 328 | 11,02 | 1,21 | 48,3 | 66,4 | 42,9 | 46,3 | 35,1 |
+| OMS harina, menos de 75 g | 535 | 11,24 | 1,25 | 24,9 | 65,5 | 20,5 | 20,3 | 44,5 |
+| Norma y arroz (propuesta) | 884 | 15,49 | 1,03 | 12,6 | 47,5 | 20,6 | 18,3 | 74,7 |
+
+Columnas 5 a 9: hogares bajo el requerimiento (%). Ácido fólico añadido sobre el
+límite superior: 8,0% con arroz; 1,5% con OMS; menos de 0,2% con la norma.
+Provincia: 56 de 256 celdas con precisión baja; región, zona y quintil, ninguna.
+
+**Verificación en punto de venta (2026-10-04).** Un establecimiento, un día.
+El azúcar no declara vitamina A (norma no aplicada). El arroz Bisonó se vende
+fortificado con los siete nutrientes y niveles de la propuesta nacional. La
+harina de trigo declara hierro, tiamina, riboflavina, niacina y ácido fólico,
+sin vitamina A. La sal declara yodo 20-50 ppm y flúor 200-250 ppm. El cubo de
+caldo declara "sal" sin indicar si es yodada.
+
+**Pendiente al cierre:** revisión de la agrupación de alimentos (A4a, C4);
+mapas; valores de referencia definitivos; fuente de las fracciones de harina;
+niveles OMS de arroz; consumo promedio de sal; fotos de tomate y colmado;
+reescritura del informe y del README antes de fusionar a `main`.
 
 **Fase A — aditiva, no cambia cifras existentes (5–7 oct)**
 
@@ -32,7 +70,18 @@ cada bloque se declara el efecto esperado sobre las cifras de control
 
 **Fase B — cambia cifras (7–9 oct)**
 
-- [ ] B1. Factores de conversión: plátano, guineo y resto de la cola.
+- [x] B1. Factores por unidad de siete alimentos, medidos en punto de venta
+      (2026-10-04): plátano verde 209 g, plátano maduro 200, guineo verde 178,
+      guineo maduro 140, aguacate 464, tomate 127 y naranja agria 109. La
+      balanza marca libras: el factor de ají cubanela de septiembre (288 g)
+      trataba la lectura como kilogramos y se corrigió a 131 g. Pendiente:
+      comprobar la unidad de la balanza con un peso conocido; ají gustoso y
+      apio sin cargar (la encuesta registra otra unidad). Registro y fotos:
+      `data/auditoria/verificacion_punto_venta_2026-10-04.csv`.
+- [x] Relleno de vacíos de composición (2026-10-04), en `05`: valores puntuales
+      con fuente (`data/raw/composicion_relleno.csv`) y B12 y vitamina D en
+      cero para alimentos vegetales sin procesar. 278 valores completados.
+      Quedan unos 75 códigos de INCAP con algún nutriente vacío, sin tratar.
 - [ ] A4b. Herencia de composición por grupo.
 - [x] B2. Regla de agotamiento adoptada como estimación principal (2026-10-04).
       La disponibilidad neta prevista no aplica: la pregunta 9 de la Sección 2

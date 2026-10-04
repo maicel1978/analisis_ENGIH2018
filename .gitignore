@@ -49,3 +49,7 @@ output/
 
 # Reporte HTML de dlookr (regenerable con 02_eda.R)
 data/diagnosticos/*.html
+
+# Salidas de scripts/diagnostico_*.R (regenerables)
+data/diagnosticos/solapamiento_*.csv
+data/diagnosticos/hogares_extremos_*.csv
