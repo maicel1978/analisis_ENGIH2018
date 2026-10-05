@@ -52,9 +52,9 @@ harina de trigo declara hierro, tiamina, riboflavina, niacina y ácido fólico,
 sin vitamina A. La sal declara yodo 20-50 ppm y flúor 200-250 ppm. El cubo de
 caldo declara "sal" sin indicar si es yodada.
 
-**Pendiente al cierre:** revisión de la agrupación de alimentos (A4a, C4);
+**Pendiente al cierre:** aporte de cada grupo de alimentos a los micronutrientes;
 mapas; valores de referencia definitivos; fuente de las fracciones de harina;
-niveles OMS de arroz; consumo promedio de sal; fotos de tomate y colmado;
+niveles OMS de arroz; consumo promedio de sal;
 reescritura del informe y del README antes de fusionar a `main`.
 
 **Fase A — aditiva, no cambia cifras existentes (5–7 oct)**
@@ -65,7 +65,11 @@ reescritura del informe y del README antes de fusionar a `main`.
       provincias). No es dominio de estimación de la encuesta: de 35 a 1.341
       hogares y de 4 a 160 UPM por provincia. La precisión se evalúa
       en C3.
-- [ ] A4a. `catalogo_grupos`, `alimento_agrupado` y `grupo_mddw` en el crosswalk.
+- [x] A4a. Agrupación de alimentos (2026-10-04): `data/raw/agrupacion_alimentos.csv`,
+      799 variedades en 133 alimentos agrupados y grupos MDD-W (FAO 2021). Va en
+      archivo aparte y no en el crosswalk, para no reescribir un Excel con tipos
+      mezclados. Revisadas 75 filas (76% de los registros); el resto es propuesta
+      sin revisión fila a fila.
 - [x] A5. Tabla de parámetros normativos por vehículo (`data/raw/parametros_normativos.csv`).
 
 **Fase B — cambia cifras (7–9 oct)**
@@ -74,8 +78,10 @@ reescritura del informe y del README antes de fusionar a `main`.
       (2026-10-04): plátano verde 209 g, plátano maduro 200, guineo verde 178,
       guineo maduro 140, aguacate 464, tomate 127 y naranja agria 109. La
       balanza marca libras: el factor de ají cubanela de septiembre (288 g)
-      trataba la lectura como kilogramos y se corrigió a 131 g. Pendiente:
-      comprobar la unidad de la balanza con un peso conocido; ají gustoso y
+      trataba la lectura como kilogramos y se corrigió a 131 g. Comprobado con
+      los precios de la encuesta (precio por unidad entre precio por libra): ají
+      cubanela 106 g y tomate 76 g, frente a 131 y 127 en libras y 289 y 280 en
+      kilogramos. El tomate de supermercado puede pesar más que el de 2018. Ají gustoso y
       apio sin cargar (la encuesta registra otra unidad). Registro y fotos:
       `data/auditoria/verificacion_punto_venta_2026-10-04.csv`.
 - [x] Relleno de vacíos de composición (2026-10-04), en `05`: valores puntuales
@@ -111,14 +117,14 @@ reescritura del informe y del README antes de fusionar a `main`.
       505 kcal (0,22 EMA) en, como máximo, ese 5,6% de hogares. El valor de
       niñas queda por contrastar mes a mes con la tabla de la fuente.
 - [x] B5. Trigo en equivalentes de harina (2026-10-04), dentro de
-      `scripts/07_escenarios_fortificacion.R`. Fracciones de harina en
+      `scripts/06_escenarios_fortificacion.R`. Fracciones de harina en
       `data/raw/vehiculos_escenarios.csv`, PROVISIONALES y sin fuente citable.
       Resultado: el trigo alcanza al 91,8% de los hogares, con una media de
       46,9 g de harina por EMA y día; el arroz, 85,5% y 218 g.
 
 **Fase C — análisis (12–16 oct)**
 
-- [x] C1. Escenarios con método aditivo (2026-10-04), en `07`: se parte del
+- [x] C1. Escenarios con método aditivo (2026-10-04), en `06`: se parte del
       alimento sin fortificar y se suma el nivel de cada escenario (mg/kg),
       definido en `data/raw/escenarios_fortificacion.csv`. Medianas ponderadas
       de folato (µg DFE) e hierro (mg) por EMA y día: sin fortificación 158 y
@@ -140,7 +146,7 @@ reescritura del informe y del README antes de fusionar a `main`.
       equidad sí se mantiene. R4, R5, la presentación y el README conservan la
       versión anterior y no deben citarse en este punto.
 - [ ] C2. Riesgo de ingesta inadecuada por escenario (2026-10-04), en
-      `scripts/06_riesgo_inadecuacion.R`, que lee los escenarios de `07`. Línea
+      `scripts/07_riesgo_inadecuacion.R`, que lee los escenarios de `06`. Línea
       base de 2018: `ESCENARIO_BASE`, norma aplicada a harina y pan (1a).
       Valores de referencia PROVISIONALES (IOM): no citables hasta sustituirlos
       por los de la metodología MIMI. Hogares bajo el requerimiento, ponderado:
@@ -162,11 +168,16 @@ reescritura del informe y del README antes de fusionar a `main`.
       Supuestos que condicionan el resultado: fracciones de harina
       provisionales, sin pérdidas por cocción, y hierro y folato de los
       derivados fijados desde la harina sin enriquecer.
-- [ ] C3. Desagregación: hecha en `06` para región, zona, quintil y provincia.
+- [ ] C3. Desagregación: hecha en `07` para región, zona, quintil y provincia.
       Región, zona y quintil sin celdas de precisión baja (semiamplitud máxima
       3,6 puntos). Provincia: 47 de 256 celdas con precisión baja. Faltan los
       mapas y la desagregación del consumo de vehículos.
-- [ ] C4. Análisis por grupos de alimentos.
+- [x] C4. Análisis por grupos de alimentos (2026-10-04), en
+      `scripts/08_grupos_alimentos.R`. Aporte a la energía: cereales, raíces y
+      plátanos 46,7%; aceites y grasas 19,5%; carnes 10,2%; dulces 8,2%. El arroz
+      solo aporta 28,1% y el aceite 18,5%; frutas y verduras, menos de 1,3% en
+      conjunto. Media de 5,5 grupos MDD-W adquiridos por hogar en la semana; no
+      es el indicador MDD-W. Sin grupo: 1.911 de 325.958 registros (0,6%).
 
 **Fase D — redacción y cierre (15–23 oct)**
 
@@ -452,7 +463,7 @@ registro histórico; rigen las decisiones del 2026-10-03.
 
 - [ ] **Decisión tomada sobre Shiny: NO.** Un tablero "en construcción pero bonito" es una promesa, no un producto, y un servidor puede fallar en vivo. Se opta por **dashboard estático de Quarto** con gráficos interactivos (plotly) y tablas dinámicas (DT): HTML autocontenido, sin servidor, no puede caerse, y vive en el repositorio.
 
-- [ ] **Borrador de artículo científico — PENDIENTE, no iniciado.** Alcance acordado: introducción con definición del problema científico mediante preguntas e hipótesis, metodología completa (no depende de los resultados), y solo los resultados disponibles. **Es deliberadamente un borrador a medio escribir**, sin nada que no se sostenga. Tono científico, distinto del administrativo del informe de factibilidad y del expositivo de la presentación. Referencia de estilo: `referencias/notas-marco-analitico-tang.docx`.
+- [ ] **Borrador de artículo científico — PENDIENTE, no iniciado.** Alcance acordado: introducción con definición del problema científico mediante preguntas e hipótesis, metodología completa (no depende de los resultados), y solo los resultados disponibles. **Es deliberadamente un borrador a medio escribir**, sin nada que no se sostenga. Tono científico, distinto del administrativo del informe de factibilidad y del expositivo de la presentación.
 
 - [ ] **Menor:** los *warnings* de `big.mark`/`decimal.mark` al compilar el informe (se usa "." para ambos). No afecta resultados; limpiar en la próxima pasada.
 

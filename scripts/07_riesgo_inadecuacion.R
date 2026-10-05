@@ -1,10 +1,10 @@
-# 06_riesgo_inadecuacion.R
+# 07_riesgo_inadecuacion.R
 #
 # Riesgo de ingesta inadecuada por nutriente y escenario de fortificacion,
 # sobre la estimacion principal (Sec 2 + Sec 3A con regla de agotamiento).
 #
 # Hierro, folato, zinc, B12 y vitamina A se toman de los escenarios de
-# 07_escenarios_fortificacion.R, que parten del alimento sin fortificar. Las
+# 06_escenarios_fortificacion.R, que parten del alimento sin fortificar. Las
 # vitaminas D y E no cambian entre escenarios y se toman de 05.
 #
 #   - Punto de corte: proporcion de hogares con ingesta por EMA bajo el EAR.
@@ -32,7 +32,7 @@
 # aparente, a nivel de hogar y por equivalente de mujer adulta; el reparto
 # dentro del hogar se supone proporcional al requerimiento energetico.
 #
-# Requiere haber corrido 04, 05 y 07.
+# Requiere haber corrido 04, 05 y 06.
 
 library(dplyr)
 library(tidyr)

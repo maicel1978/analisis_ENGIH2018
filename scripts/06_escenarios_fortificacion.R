@@ -1,4 +1,4 @@
-# 07_escenarios_fortificacion.R
+# 06_escenarios_fortificacion.R
 #
 # Escenarios de fortificacion sobre la estimacion principal.
 #
