@@ -1,0 +1,11 @@
+orden;entregable;tdr;avance_pct;estado;falta;horas_est
+1;Análisis preliminar de las Secciones 2 y 3A;4.1 a 4.3;100;Entregado y revisado;Incorporar la respuesta a los comentarios de revisión;6
+2;Código R del análisis preliminar;7;100;Entregado;;0
+3;Cobertura y consumo de alimentos fortificables;8.1;95;Calculado;Mapas provinciales;8
+4;Análisis demográfico y socioeconómico con EMA;8.2;100;Terminado;;0
+5;Ingesta de micronutrientes y riesgo de ingesta inadecuada;8.3;85;Calculado con valores provisionales;Valores de referencia definitivos y supuesto de biodisponibilidad del hierro;10
+6;Análisis por grupos de alimentos;8.4;70;Primera versión;Aporte de cada grupo a los micronutrientes;10
+7;Mapas y visualizaciones;8.5;40;En curso;Límites provinciales oficiales y mapas de riesgo por dominio;12
+8;Informe analítico final;7 y 8;60;Borrador completo de resultados y discusión;Redacción final, verificación de cifras y referencias;20
+9;Manual técnico de 20 a 30 páginas;18;25;Esqueleto y metodología redactada en el informe;Supuestos, procedimientos y referencias en documento propio;20
+10;Módulos de capacitación;9 a 17;15;Diseño instruccional;Guiones, diapositivas, ejercicios y banco de preguntas;40
