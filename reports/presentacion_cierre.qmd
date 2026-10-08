@@ -158,49 +158,30 @@ consumo_veh <- function(grupo_, columna) {
 }
 ```
 
-## Alcance y pregunta
+## La pregunta
 
-::: {.columns}
-::: {.column width="48%"}
-::: {style="background:#f1f5f8; border-left:4px solid #4a7c9b; padding:0.55em 0.9em; font-size:0.84em;"}
-**Componente A · Análisis de la ENGIH 2018**
-
-Numerales 4 y 8 de los términos de referencia. Viabilidad del análisis,
-cobertura y consumo de alimentos fortificables, contribución a la ingesta de
-micronutrientes.
-:::
-:::
-::: {.column width="48%"}
-::: {style="background:#f6f7f8; border-left:4px solid #c9d3da; padding:0.55em 0.9em; font-size:0.84em;"}
-**Componente B · Módulos de capacitación**
-
-Numerales 9 a 17. Estrategia educativa para la transferencia del método a
-otros equipos y otros conjuntos de datos.
-:::
-:::
-:::
-
-::: {style="font-size:0.8em; color:#5a6b76; margin-top:0.3em;"}
-Durante la consultoría el énfasis se concentró en el componente de análisis.
-Esta presentación trata sobre él.
+::: {style="font-size:0.84em; color:#5a6b76;"}
+La consultoría tuvo dos componentes: el análisis de la encuesta y los módulos
+de capacitación. El peso se puso en el análisis, y de eso trata esta
+presentación.
 :::
 
 <br>
 
-::: {style="font-size:0.95em;"}
-**Pregunta principal**
-
-> ¿Permite la ENGIH 2018 estimar la cobertura y el consumo de alimentos
-> fortificables y su contribución a la ingesta de micronutrientes de la
-> población dominicana?
-
-**Y si lo permite**
-
-> ¿Llegan los vehículos de fortificación a la población? ¿Qué parte del margen
-> disponible utiliza la norma vigente? ¿A quién alcanza el beneficio?
+::: {style="font-size:1.18em; line-height:1.45;"}
+¿Permite la ENGIH 2018 estimar la **cobertura** y el **consumo** de alimentos
+fortificables, y su **contribución a la ingesta de micronutrientes** de la
+población dominicana?
 :::
 
-::: {style="font-size:0.78em; color:#5a6b76; margin-top:0.4em;"}
+<br>
+
+::: {style="font-size:0.95em; color:#2c5364;"}
+Y si lo permite: ¿llegan los vehículos a la población? ¿qué parte del margen
+disponible utiliza la norma vigente? ¿a quién alcanza el beneficio?
+:::
+
+::: {style="font-size:0.75em; color:#7d8f9c; margin-top:1.1em;"}
 Toda cifra de esta presentación se regenera ejecutando el procedimiento sobre
 los microdatos de la encuesta. Las láminas de anexo, al final, responden a las
 preguntas de detalle.
