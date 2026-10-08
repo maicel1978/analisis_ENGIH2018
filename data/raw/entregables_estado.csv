@@ -1,11 +1,11 @@
-orden;entregable;tdr;avance_pct;estado;falta;horas_est
-1;Análisis preliminar de las Secciones 2 y 3A;4.1 a 4.3;100;Entregado y revisado;Incorporar la respuesta a los comentarios de revisión;6
-2;Código R del análisis preliminar;7;100;Entregado;;0
-3;Cobertura y consumo de alimentos fortificables;8.1;95;Calculado;Mapas provinciales;8
-4;Análisis demográfico y socioeconómico con EMA;8.2;100;Terminado;;0
-5;Ingesta de micronutrientes y riesgo de ingesta inadecuada;8.3;85;Calculado con valores provisionales;Valores de referencia definitivos y supuesto de biodisponibilidad del hierro;10
-6;Análisis por grupos de alimentos;8.4;70;Primera versión;Aporte de cada grupo a los micronutrientes;10
-7;Mapas y visualizaciones;8.5;40;En curso;Límites provinciales oficiales y mapas de riesgo por dominio;12
-8;Informe analítico final;7 y 8;60;Borrador completo de resultados y discusión;Redacción final, verificación de cifras y referencias;20
-9;Manual técnico de 20 a 30 páginas;18;25;Esqueleto y metodología redactada en el informe;Supuestos, procedimientos y referencias en documento propio;20
-10;Módulos de capacitación;9 a 17;15;Diseño instruccional;Guiones, diapositivas, ejercicios y banco de preguntas;40
+orden;entregable;tdr;situacion;fecha_compromiso;falta;avance_pct
+1;Análisis preliminar de las Secciones 2 y 3A;4.1 a 4.3;Entregado;;Incorporar la respuesta a los comentarios de revisión;100
+2;Código R del análisis preliminar;7;Entregado;;;100
+3;Análisis demográfico y socioeconómico con Equivalente de Mujer Adulta;8.2;Entregado;;;100
+4;Cobertura y consumo de alimentos fortificables;8.1;En revisión;2026-10-14;Mapas provinciales;95
+5;Ingesta de micronutrientes y riesgo de ingesta inadecuada;8.3;En revisión;2026-10-16;Valores de referencia definitivos y supuesto de biodisponibilidad del hierro;85
+6;Análisis por grupos de alimentos;8.4;En revisión;2026-10-16;Aporte de cada grupo a los micronutrientes;70
+7;Mapas y visualizaciones;8.5;Programado;2026-10-17;Límites provinciales oficiales y mapas de riesgo por dominio;40
+8;Informe analítico final;7 y 8;En revisión;2026-10-21;Redacción final, verificación de cifras y referencias;60
+9;Manual técnico de metodología y procedimientos;18;Programado;2026-10-22;Supuestos, procedimientos y referencias en documento propio;25
+10;Módulos de capacitación;9 a 17;Programado;2026-10-23;Guiones, diapositivas, ejercicios y banco de preguntas;15

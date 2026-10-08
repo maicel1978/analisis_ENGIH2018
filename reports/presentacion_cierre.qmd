@@ -1,6 +1,6 @@
 ---
-title: "ENGIH 2018 — consumo aparente y fortificación"
-subtitle: "Avance del análisis, estado de los productos y cierre de la consultoría"
+title: "Consumo aparente y fortificación de alimentos"
+subtitle: "Encuesta Nacional de Gastos e Ingresos de los Hogares 2018 — avance del análisis y cierre de la consultoría"
 author: "Maicel E. Monzón, PhD — ORCID 0000-0003-2117-9145"
 date: last-modified
 date-format: "D [de] MMMM [de] YYYY"
@@ -31,8 +31,8 @@ execute:
 ```{r}
 #| label: setup
 
-# Esta presentación no calcula nada: lee las salidas del pipeline. Si falta un
-# archivo, se detiene indicando qué script lo genera.
+# Esta presentación no calcula resultados: lee las salidas del pipeline. Si
+# falta un archivo, se detiene indicando qué script lo genera.
 ruta_comun <- c(here::here("reports", "_comun.R"),
                 here::here("scripts", "_comun.R"))
 source(ruta_comun[file.exists(ruta_comun)][1])
@@ -62,10 +62,17 @@ veh <- leer_clean("escenarios_consumo_vehiculos.csv", "06_escenarios_fortificaci
 rie <- leer_clean("riesgo_inadecuacion.csv",          "07_riesgo_inadecuacion.R")
 gru <- leer_clean("grupos_alimentos.csv",             "08_grupos_alimentos.R")
 
+consumo <- cargar_consumo()
+ema     <- cargar_ema_hogar()
+gpe     <- cargar_gramos_por_ema()
+
 entregables <- leer_limpio(file.path(RUTA_RAW, "entregables_estado.csv")) |>
   arrange(orden)
 auditoria <- leer_limpio(here::here("data", "auditoria",
                                     "verificacion_punto_venta_2026-10-04.csv"))
+
+HOG_MUESTRA <- nrow(ema)
+HOG_CALCULO <- n_distinct(gpe$id_hogar_unico)
 
 # Escenarios citados en el texto. Si alguno cambia de nombre, la presentación
 # se detiene en lugar de mostrar una cifra equivocada.
@@ -79,8 +86,6 @@ if (length(faltan) > 0) {
        paste(faltan, collapse = "; "), call. = FALSE)
 }
 
-# Rótulos cortos para las figuras. La correspondencia se comprueba: si aparece
-# un escenario nuevo sin rótulo, se detiene.
 ROTULOS <- tibble::tribble(
   ~escenario, ~corto,
   E_SIN,   "Sin\nfortificar",
@@ -101,7 +106,6 @@ ORDEN_CORTO <- corto(c(E_SIN, sort(setdiff(unique(esc$escenario), E_SIN))))
 
 # --- Extractores: una sola fila o error ---------------------------------------
 
-# Riesgo de ingesta inadecuada a nivel nacional, con todos los hogares.
 riesgo_nac <- function(escenario_, nutriente_, metodo_ = "Punto de corte") {
   v <- rie |>
     filter(dominio == "Nacional", hogares == "Todos", escenario == escenario_,
@@ -114,17 +118,6 @@ riesgo_nac <- function(escenario_, nutriente_, metodo_ = "Punto de corte") {
   v
 }
 
-# Ingesta mediana por EMA y día.
-mediana_esc <- function(escenario_, nutriente_) {
-  v <- esc |> filter(escenario == escenario_, nutriente == nutriente_) |> pull(mediana)
-  if (length(v) != 1) {
-    stop("Mediana no identificada para ", escenario_, " / ", nutriente_, ".",
-         call. = FALSE)
-  }
-  v
-}
-
-# Razón entre el quintil de mayor y el de menor gasto.
 razon_esc <- function(escenario_) {
   v <- esc |> filter(escenario == escenario_) |> distinct(razon_q5_q1) |> pull()
   if (length(v) != 1) stop("Razón Q5/Q1 no identificada para ", escenario_, ".",
@@ -137,78 +130,133 @@ consumo_veh <- function(grupo_, columna) {
   if (length(v) != 1) stop("Vehículo no identificado: ", grupo_, ".", call. = FALSE)
   v
 }
-
-HOGARES <- max(rie$n, na.rm = TRUE)
-HORAS   <- sum(entregables$horas_est, na.rm = TRUE)
 ```
 
-## Lo que se preguntó y lo que se encontró
+## Objetivo del análisis y hallazgos principales
 
-::: {style="font-size:0.95em;"}
-**¿Permite la ENGIH 2018 estimar el aporte de los alimentos fortificados a la
-ingesta de micronutrientes?** Sí, con adaptaciones documentadas.
-`r format(HOGARES, big.mark = ".")` hogares entran al cálculo.
+::: {style="font-size:0.93em;"}
+**Pregunta.** ¿Permite la ENGIH 2018 estimar la cobertura y el consumo de
+alimentos fortificables y su contribución a la ingesta de micronutrientes?
+**Respuesta: sí, con adaptaciones documentadas.** El análisis se completó sobre
+`r format(HOG_CALCULO, big.mark = ".")` de los
+`r format(HOG_MUESTRA, big.mark = ".")` hogares de la muestra.
 :::
 
 <br>
 
 ::: {.columns}
-::: {.column width="33%"}
-**El alcance ya existe**
+::: {.column width="32%"}
+::: {style="font-size:0.88em;"}
+**1 · Alcance poblacional**
 
-Los vehículos llegan a casi todos los hogares: arroz
+Los vehículos llegan a la mayoría de los hogares: arroz
 **`r fmt(consumo_veh("Arroz", pct_hogares), 0)`%**, trigo
-**`r fmt(consumo_veh("Trigo, en equivalentes de harina", pct_hogares), 0)`%**.
+**`r fmt(consumo_veh("Trigo, en equivalentes de harina", pct_hogares), 0)`%**,
+azúcar **`r fmt(consumo_veh("Azúcar", pct_hogares), 0)`%**. La vía de entrega
+existe y es estable.
 :::
-::: {.column width="33%"}
-**La norma vigente no agota el margen**
-
-Bajo el requerimiento de folato: **`r fmt(riesgo_nac(E_BASE, "folato_mcg_dfe"))`%**
-con la norma de harina; **`r fmt(riesgo_nac(E_ARROZ, "folato_mcg_dfe"))`%**
-añadiendo el arroz.
 :::
-::: {.column width="33%"}
-**El vehículo decide quién se beneficia**
+::: {.column width="32%"}
+::: {style="font-size:0.88em;"}
+**2 · Margen no utilizado**
 
-Razón de ingesta de folato entre quintiles extremos:
-**`r fmt(razon_esc(E_BASE), 2)`** con harina, **`r fmt(razon_esc(E_ARROZ), 2)`**
-con arroz.
+Hogares bajo el requerimiento de folato:
+**`r fmt(riesgo_nac(E_SIN, "folato_mcg_dfe"))`%** sin fortificación,
+**`r fmt(riesgo_nac(E_BASE, "folato_mcg_dfe"))`%** con la norma vigente,
+**`r fmt(riesgo_nac(E_ARROZ, "folato_mcg_dfe"))`%** si se amplía al arroz.
+:::
+:::
+::: {.column width="32%"}
+::: {style="font-size:0.88em;"}
+**3 · Distribución del beneficio**
+
+Razón de ingesta de folato entre el quintil de mayor y el de menor gasto:
+**`r fmt(razon_esc(E_BASE), 2)`** con la norma vigente, **`r fmt(razon_esc(E_ARROZ), 2)`**
+al incorporar el arroz. La elección del vehículo condiciona la equidad del
+resultado.
+:::
 :::
 :::
 
 ::: {.notapie}
-**NOTA:** Estimaciones ponderadas con el diseño muestral complejo de la encuesta (8 estratos, 933 unidades primarias de muestreo, factor de expansión por hogar). Los valores de referencia son provisionales. EMA: Equivalente de Mujer Adulta.
+**NOTA:** Estimaciones ponderadas con el diseño muestral complejo de la encuesta (8 estratos, 933 unidades primarias de muestreo, factor de expansión por hogar). Los valores de referencia son provisionales y no citables. Las cifras corresponden a riesgo de ingesta inadecuada estimado a nivel de hogar, no a prevalencia de deficiencia.
 :::
 
-## Estado de los productos
+## Flujo de inclusión de la muestra
+
+```{r}
+#| label: tbl-inclusion
+#| tbl-cap: "Flujo de inclusión de registros de adquisición de alimentos, por sección de la encuesta. ENGIH 2018"
+
+MOTIVOS <- c("Registros de la sección",
+             "Sin cantidad declarada",
+             "Sin factor de conversión a gramos",
+             "Sin correspondencia en la tabla de composición",
+             "Sin porción comestible",
+             "Registro atípico",
+             "Entran al cálculo")
+
+cascada <- function(df, nombre) {
+  d <- marcar_elegible(df)
+  total <- nrow(d)
+  motivo <- with(d, case_when(
+    !tiene_Q       ~ MOTIVOS[2],
+    !tiene_fc      ~ MOTIVOS[3],
+    !tiene_enhance ~ MOTIVOS[4],
+    !tiene_pc      ~ MOTIVOS[5],
+    es_outlier     ~ MOTIVOS[6],
+    TRUE           ~ MOTIVOS[7]))
+  tibble::tibble(motivo) |>
+    count(motivo) |>
+    bind_rows(tibble::tibble(motivo = MOTIVOS[1], n = total)) |>
+    transmute(motivo, !!nombre := paste0(format(n, big.mark = ".", trim = TRUE),
+                                         "  (", fmt(100 * n / total), "%)"))
+}
+
+tibble::tibble(motivo = MOTIVOS) |>
+  left_join(cascada(consumo$sec2,  "Sección 2"), by = "motivo") |>
+  left_join(cascada(consumo$sec3a, "Sección 3A"), by = "motivo") |>
+  mutate(across(-motivo, ~ coalesce(.x, "—"))) |>
+  rename(` ` = motivo) |>
+  tabla(notas = paste("Las causas de exclusión son excluyentes entre sí y se",
+                      "aplican en el orden en que aparecen. Ningún hogar fue",
+                      "excluido del análisis: la exclusión opera a nivel de",
+                      "registro de adquisición."))
+```
+
+::: {style="font-size:0.78em; color:#5a6b76; margin-top:-0.2em;"}
+La cobertura de la Sección 3A pasó de 76,0% a `r fmt(100 * sum(marcar_elegible(consumo$sec3a)$entra_calculo) / nrow(consumo$sec3a))`% tras el trabajo de campo de conversión de unidades y el relleno documentado de la tabla de composición.
+:::
+
+## Estado de los productos y fechas de entrega
 
 ```{r}
 #| label: tbl-entregables
-#| tbl-cap: "Grado de avance de los productos comprometidos en los términos de referencia. Consultoría ENGIH 2018"
+#| tbl-cap: "Situación de los productos comprometidos en los términos de referencia y fecha de entrega. Consultoría ENGIH 2018"
 
 entregables |>
   transmute(
     Producto = entregable,
     `TdR`    = tdr,
-    Avance   = paste0(strrep("█", round(avance_pct / 10)),
-                      strrep("·", 10 - round(avance_pct / 10)),
-                      "  ", avance_pct, "%"),
-    Situación = estado
+    Situación = situacion,
+    Entrega  = if_else(is.na(fecha_compromiso), "—",
+                       format(as.Date(fecha_compromiso), "%d de octubre"))
   ) |>
   tabla(fuente = paste("Fuente: términos de referencia de la consultoría y",
                        "registro de avance del repositorio del proyecto."),
-        notas = "TdR: numeral de los términos de referencia.")
+        notas = paste("TdR: numeral de los términos de referencia.",
+                      "Cierre de la consultoría: 23 de octubre de 2026."))
 ```
 
-# 1 · Avances del análisis {background-color="#2c5364"}
+# Avances del análisis {background-color="#2c5364"}
 
-## Qué consume el país
+## Cobertura y consumo de los vehículos de fortificación
 
 ```{r}
 #| label: fig-vehiculos
 #| fig-cap: "Hogares que adquieren cada vehículo de fortificación y consumo mediano entre quienes lo adquieren, por Equivalente de Mujer Adulta y día. República Dominicana, 2018"
 #| fig-width: 10.5
-#| fig-height: 3.8
+#| fig-height: 3.6
 
 veh |>
   mutate(grupo = reorder(grupo, pct_hogares)) |>
@@ -225,16 +273,16 @@ veh |>
 ```
 
 ::: {.notapie}
-**NOTA:** La cifra a la derecha de cada punto es el consumo mediano entre los hogares que adquieren el vehículo, en gramos por EMA y día. El trigo se expresa en equivalentes de harina: pan, pastas, galletas y repostería convertidos a gramos de harina con factores de contenido provisionales. Estimaciones ponderadas con el diseño muestral complejo de la encuesta (8 estratos, 933 unidades primarias de muestreo, factor de expansión por hogar). EMA: Equivalente de Mujer Adulta.
+**NOTA:** La cifra a la derecha de cada punto es el consumo mediano entre los hogares que adquieren el vehículo, en gramos por Equivalente de Mujer Adulta y día. El trigo se expresa en equivalentes de harina: pan, pastas, galletas y repostería convertidos a gramos de harina mediante factores de contenido provisionales. Estimaciones ponderadas con el diseño muestral complejo de la encuesta (8 estratos, 933 unidades primarias de muestreo, factor de expansión por hogar).
 :::
 
-## De dónde viene la energía
+## Aporte de los grupos de alimentos a la energía adquirida
 
 ```{r}
 #| label: fig-grupos
 #| fig-cap: "Aporte de cada grupo de alimentos a la energía adquirida por el hogar y hogares que lo adquieren en la semana de referencia. República Dominicana, 2018"
 #| fig-width: 10.5
-#| fig-height: 4
+#| fig-height: 3.9
 
 gru |>
   slice_max(pct_energia, n = 10) |>
@@ -251,16 +299,16 @@ gru |>
 ```
 
 ::: {.notapie}
-**NOTA:** Clasificación de grupos de alimentos de la guía de diversidad dietética mínima en mujeres (FAO, 2021), aplicada a la agrupación propia de las 799 variedades de la encuesta en 133 alimentos. Los grupos no son el indicador de diversidad dietética: la encuesta mide adquisición del hogar en una semana, no consumo individual en 24 horas. Estimaciones ponderadas con el factor de expansión de la encuesta.
+**NOTA:** Clasificación de grupos de alimentos de la guía de diversidad dietética mínima en mujeres (FAO, 2021), aplicada a una agrupación propia de las 799 variedades de la encuesta en 133 alimentos. Los grupos no constituyen el indicador de diversidad dietética: la encuesta mide adquisición del hogar en una semana, no consumo individual en 24 horas. Estimaciones ponderadas con el factor de expansión de la encuesta.
 :::
 
-## Qué cambia según qué se fortifique
+## Ingesta de hierro y folato según escenario de fortificación
 
 ```{r}
 #| label: fig-escenarios
-#| fig-cap: "Ingesta mediana de hierro y folato por Equivalente de Mujer Adulta y día, según escenario de fortificación. República Dominicana, 2018"
+#| fig-cap: "Ingesta aparente mediana de hierro y folato por Equivalente de Mujer Adulta y día, según escenario de fortificación. República Dominicana, 2018"
 #| fig-width: 11
-#| fig-height: 3.7
+#| fig-height: 3.6
 
 esc |>
   filter(nutriente %in% c("hierro_mg", "folato_mcg_dfe")) |>
@@ -281,16 +329,16 @@ esc |>
 ```
 
 ::: {.notapie}
-**NOTA:** Cada escenario parte del alimento sin fortificar y añade el nivel de la norma correspondiente, expresado en miligramos por kilogramo de vehículo. Los niveles de la propuesta nacional de reglamento de arroz se tomaron de una presentación y están pendientes de confirmación documental. EMA: Equivalente de Mujer Adulta. DFE: equivalentes dietéticos de folato. OMS: Organización Mundial de la Salud.
+**NOTA:** Cada escenario parte de la composición del alimento sin fortificar y añade el nivel de la norma correspondiente, expresado en miligramos por kilogramo de vehículo. Los niveles de la propuesta nacional de reglamento de arroz proceden de una presentación y están pendientes de confirmación documental. DFE: equivalentes dietéticos de folato. OMS: Organización Mundial de la Salud.
 :::
 
-## Riesgo de ingesta inadecuada
+## Riesgo de ingesta inadecuada por nutriente y escenario
 
 ```{r}
 #| label: fig-riesgo
-#| fig-cap: "Hogares con ingesta por Equivalente de Mujer Adulta bajo el requerimiento promedio estimado, según nutriente y escenario de fortificación. República Dominicana, 2018"
+#| fig-cap: "Hogares con ingesta aparente por Equivalente de Mujer Adulta inferior al requerimiento promedio estimado, según nutriente y escenario de fortificación. República Dominicana, 2018"
 #| fig-width: 10.5
-#| fig-height: 3.9
+#| fig-height: 3.8
 
 ETIQ_NUT <- c(folato_mcg_dfe     = "Folato",
               hierro_mg          = "Hierro",
@@ -321,16 +369,16 @@ ggplot(pend, aes(escenario, pct_inadecuado, group = nut)) +
 ```
 
 ::: {.notapie}
-**NOTA:** Método del punto de corte del requerimiento promedio estimado, salvo en hierro, donde se aplica el enfoque de probabilidad con la distribución del requerimiento y un supuesto de 10% de biodisponibilidad. **Valores de referencia provisionales: no citables.** Estas cifras no son prevalencia de deficiencia: la ingesta es aparente, a nivel de hogar, y el reparto dentro del hogar se supone proporcional al requerimiento energético. Ácido fólico añadido sobre el límite superior tolerable: `r fmt(esc |> filter(escenario == E_ARROZ) |> distinct(pct_folico_sobre_ul) |> pull())`% en el escenario con arroz. EMA: Equivalente de Mujer Adulta.
+**NOTA:** Método del punto de corte del requerimiento promedio estimado, salvo en hierro, donde se aplica el enfoque de probabilidad con la distribución del requerimiento y un supuesto de 10% de biodisponibilidad. **Valores de referencia provisionales: no citables.** Estas proporciones no son prevalencia de deficiencia: la ingesta es aparente, estimada a nivel de hogar, y el reparto intrafamiliar se supone proporcional al requerimiento energético. Ácido fólico añadido por encima del límite superior tolerable en el escenario con arroz: `r fmt(esc |> filter(escenario == E_ARROZ) |> distinct(pct_folico_sobre_ul) |> pull())`% de los hogares.
 :::
 
-## El vehículo decide quién se beneficia
+## Gradiente socioeconómico de la ingesta de folato
 
 ```{r}
 #| label: fig-equidad
-#| fig-cap: "Ingesta mediana de folato por Equivalente de Mujer Adulta y día en los quintiles extremos de gasto del hogar, según escenario de fortificación. República Dominicana, 2018"
+#| fig-cap: "Ingesta aparente mediana de folato por Equivalente de Mujer Adulta y día en los quintiles extremos de gasto del hogar, según escenario de fortificación. República Dominicana, 2018"
 #| fig-width: 10.5
-#| fig-height: 3.8
+#| fig-height: 3.7
 
 eq <- esc |>
   distinct(escenario, folato_q1, folato_q5, razon_q5_q1) |>
@@ -344,72 +392,74 @@ ggplot(eq, aes(y = etq)) +
   geom_text(aes(x = folato_q5, label = paste0("  razón ", fmt(razon_q5_q1, 2))),
             hjust = 0, size = 3.7, colour = "#44555f") +
   scale_x_continuous(expand = expansion(mult = c(0.04, 0.26))) +
-  labs(x = "Folato (µg DFE por EMA y día)", y = NULL) +
+  labs(x = "Folato (µg DFE por Equivalente de Mujer Adulta y día)", y = NULL) +
   tema(14) +
   theme(axis.text.y = element_text(lineheight = 0.95))
 ```
 
 ::: {.notapie}
-**NOTA:** Punto azul: quintil de menor gasto. Punto anaranjado: quintil de mayor gasto. La razón es el cociente entre ambas medianas; un valor cercano a 1 indica que el vehículo alcanza por igual a los dos extremos de la distribución del gasto. El quintil es el de la propia encuesta. Estimaciones ponderadas con el diseño muestral complejo de la encuesta (8 estratos, 933 unidades primarias de muestreo, factor de expansión por hogar). EMA: Equivalente de Mujer Adulta. DFE: equivalentes dietéticos de folato.
+**NOTA:** Punto azul: quintil de menor gasto. Punto anaranjado: quintil de mayor gasto. La razón es el cociente entre ambas medianas; un valor próximo a 1 indica que el vehículo alcanza por igual a los dos extremos de la distribución del gasto. El quintil es el definido por la propia encuesta. Estimaciones ponderadas con el diseño muestral complejo de la encuesta. DFE: equivalentes dietéticos de folato.
 :::
 
-## Lo que dice la etiqueta
+## Verificación del etiquetado en punto de venta
 
 ::: {.columns}
-::: {.column width="27%"}
+::: {.column width="26%"}
 ![](../media/fotos_investigacion_mercado/azucar_lider02_v.jpg)
 :::
-::: {.column width="27%"}
+::: {.column width="26%"}
 ![](../media/fotos_investigacion_mercado/arroz_bisono02_v.jpg)
 :::
-::: {.column width="46%"}
-::: {style="font-size:0.92em;"}
-Verificación en punto de venta, **`r sum(auditoria$tipo == "etiqueta")` etiquetas**
-de un establecimiento en un día.
+::: {.column width="48%"}
+::: {style="font-size:0.9em;"}
+**`r sum(auditoria$tipo == "etiqueta")` etiquetas** registradas con fotografía,
+para contrastar la norma escrita con el producto disponible.
 
 <br>
 
 **El azúcar no declara vitamina A.** Ingrediente único: azúcar. El escenario de
-azúcar es, por ahora, una norma sin aplicación verificada.
+azúcar modela una norma cuya aplicación no se verificó en el producto.
 
 <br>
 
-**El arroz se vende ya fortificado** con siete nutrientes, por encima de
-cualquier norma vigente. El escenario de arroz no es hipotético: describe un
-producto que está en el estante.
+**El arroz se comercializa fortificado** con siete nutrientes, por encima de
+toda norma vigente. El escenario de arroz no es hipotético: describe un
+producto ya disponible en el mercado.
 :::
 :::
 :::
 
 ::: {.notapie}
-**NOTA:** Un establecimiento, un día; no es una muestra representativa del mercado. Registro completo en `data/auditoria/verificacion_punto_venta_2026-10-04.csv`.
+**NOTA:** Un establecimiento, un día; no constituye una muestra representativa del mercado. El registro completo, con fotografía de cada etiqueta, está en `data/auditoria/verificacion_punto_venta_2026-10-04.csv`.
 :::
 
-# 2 · Problemas encontrados y cómo se resolvieron {background-color="#2c5364"}
+# Adaptaciones metodológicas {background-color="#2c5364"}
 
-## Medir lo que la encuesta no publica
+## Determinación de factores de conversión en campo
 
 ::: {.columns}
 ::: {.column width="40%"}
-![](../media/fotos_investigacion_mercado/platano_verde02_v.jpg)
+![](../media/fotos_investigacion_mercado/platano_verde02.jpg)
 :::
 ::: {.column width="60%"}
-::: {style="font-size:0.9em;"}
-**El problema.** La encuesta registra plátano, guineo y aguacate en unidades,
-no en gramos. Sin peso por unidad, 16.400 observaciones quedaban fuera.
+::: {style="font-size:0.88em;"}
+**Limitación.** La encuesta registra plátano, guineo y aguacate en unidades. Sin
+peso por unidad, esos registros no pueden convertirse a gramos ni entrar al
+cálculo de ingesta.
 
 <br>
 
-**La solución.** Pesaje directo en punto de venta de
-**`r sum(auditoria$tipo == "pesaje")` alimentos**, con fotografía de cada
-lectura.
+**Procedimiento.** Pesaje directo en punto de venta de
+**`r sum(auditoria$tipo == "pesaje")` alimentos**, cinco unidades por alimento,
+con fotografía de cada lectura.
 
 <br>
 
-**La comprobación que cambió un resultado.** La balanza marcaba libras, no
-kilogramos. Un factor cargado en septiembre estaba sobreestimado 2,2 veces.
-Se verificó por una vía independiente —los precios implícitos de la propia
-encuesta, precio por unidad entre precio por libra— y se corrigió.
+**Control de calidad.** La balanza opera en libras. Un factor incorporado en
+septiembre había interpretado la lectura como kilogramos. La discrepancia se
+detectó al contrastar los pesos con una fuente independiente —los precios
+implícitos de la propia encuesta, precio por unidad entre precio por libra— y
+se corrigió.
 :::
 :::
 :::
@@ -418,118 +468,132 @@ encuesta, precio por unidad entre precio por libra— y se corrigió.
 **NOTA:** Registro y fotografías en `data/auditoria/verificacion_punto_venta_2026-10-04.csv`. Un establecimiento, un día.
 :::
 
-## Cuatro decisiones metodológicas
+## Decisiones metodológicas adoptadas
 
-::: {style="font-size:0.82em;"}
-**1 · Doble conteo entre las dos secciones.** La Sección 2 registra existencias
-y la 3A, adquisiciones diarias. Se comprobó que la pregunta de consumo de la
-Sección 2 equivale a inventario inicial menos final en el **98,3%** de las
-filas. Se adoptó una regla de agotamiento: si al día 8 queda existencia inicial
-de un alimento almacenable, lo adquirido esa semana se trata como almacenado y
-no se cuenta.
+::: {style="font-size:0.8em;"}
+**1 · Solapamiento entre las Secciones 2 y 3A.** La Sección 2 registra
+existencias y la 3A adquisiciones diarias; sumarlas puede duplicar el mismo
+alimento. Se verificó que la pregunta de consumo de la Sección 2 equivale a
+inventario inicial menos final en el **98,3%** de los registros. Se adoptó una
+regla de agotamiento: si al día 8 persiste existencia inicial de un alimento
+almacenable, lo adquirido en la semana se clasifica como almacenado y no se
+contabiliza como consumido.
 
-**2 · La línea base no estaba sin fortificar.** Las entradas de pan, pastas y
-galletas de la tabla de composición se elaboran con harina ya enriquecida. El
-escenario «sin fortificar» de la versión de septiembre no lo era, y la
-conclusión de que fortificar la harina apenas movía la ingesta era un artefacto.
-Se sustituyó por un método aditivo: se parte del alimento sin fortificar y se
-añade el nivel de la norma en miligramos por kilogramo.
+**2 · Las tablas de composición no ofrecen una línea base sin fortificar.** Las
+entradas de pan, pastas y galletas corresponden a productos elaborados con
+harina ya enriquecida. Un escenario construido sustituyendo códigos de
+composición compara, en realidad, dos productos fortificados, y subestima el
+efecto atribuible a la norma. Se sustituyó por un método aditivo: la
+composición parte del alimento sin fortificar y se añade el nivel normativo en
+miligramos por kilogramo de vehículo. La advertencia es extensible a cualquier
+análisis que emplee estas tablas.
 
-**3 · Hogares con energía implausible.** 847 hogares quedan fuera del rango de
-500 a 6.000 kcal por EMA y día. Excluirlos no es neutral: afecta al 6,0% del
-quintil de menor gasto y al 16,5% del de mayor gasto. Se marcan, no se excluyen,
-y todo resultado se reporta con y sin ellos.
+**3 · Hogares con energía implausible.** 847 hogares quedan fuera del intervalo
+de 500 a 6.000 kcal por Equivalente de Mujer Adulta y día. Su exclusión no es
+neutral respecto al nivel socioeconómico: afecta al 6,0% del quintil de menor
+gasto y al 16,5% del de mayor gasto. Se marcan y se conservan; todo resultado
+se reporta con y sin ellos.
 
 **4 · Vacíos en la tabla de composición.** 278 valores completados con fuente
-documentada, y vitamina B12 y vitamina D en cero para alimentos vegetales sin
-procesar. Cobertura en gramos: hierro 96,9%, folato 93,4%.
+documentada, y vitamina B12 y vitamina D asignadas en cero a alimentos
+vegetales sin procesar. Cobertura resultante, ponderada por gramos consumidos:
+hierro 96,9%, folato 93,4%.
 :::
 
-## Lo que queda abierto
+## Supuestos pendientes de definición
 
 ::: {style="font-size:0.88em;"}
-Ninguna de estas cuatro decisiones es reversible sin recalcular. Las tres que
-siguen sí condicionan las cifras que se publiquen:
+Las cuatro decisiones anteriores están cerradas y documentadas. Las tres
+siguientes condicionan las cifras y requieren definición externa:
 
-- **Valores de referencia.** Los actuales son del Instituto de Medicina para
-  mujeres de 19 a 30 años, provisionales. Cambiarlos es sustituir un archivo;
-  cambia todas las cifras de riesgo.
-- **Biodisponibilidad del hierro.** Con 10% el riesgo es
+- **Valores de referencia.** Los empleados proceden del Instituto de Medicina
+  para mujeres de 19 a 30 años y son provisionales. Están aislados en un único
+  archivo de parámetros: su sustitución no exige modificar el análisis, pero
+  altera todas las estimaciones de riesgo.
+- **Biodisponibilidad del hierro.** Con 10% el riesgo estimado es
   `r fmt(riesgo_nac(E_BASE, "hierro_mg", "Probabilidad, biodisponibilidad 10%"))`%;
   con 18%,
   `r fmt(riesgo_nac(E_BASE, "hierro_mg", "Probabilidad, biodisponibilidad 18%"))`%.
-  Es el supuesto más influyente del análisis.
-- **Fracciones de harina** en pan, pastas y galletas: en uso, sin fuente citable.
+  Es el supuesto de mayor influencia sobre los resultados.
+- **Fracciones de harina** en pan, pastas y galletas: en uso, sin fuente
+  citable identificada hasta la fecha.
 :::
 
 ::: {.notapie}
-**NOTA:** Las decisiones adoptadas y su justificación están registradas en `docs/hoja-de-ruta.md`, con fecha y efecto sobre las cifras.
+**NOTA:** Cada decisión adoptada está registrada en `docs/hoja-de-ruta.md` con su fecha, su justificación y su efecto sobre las cifras de control del análisis.
 :::
 
-## Para qué sirve esto después
+## Reproducibilidad y límites de transferencia
 
-::: {style="font-size:0.88em;"}
-**Lo que es reutilizable.** El procedimiento está dividido en ocho etapas
-numeradas, cada una con su salida en disco. Los parámetros no están en el
-código: norma de fortificación, valores de referencia, agrupación de alimentos
-y vehículos viven en archivos editables. Cambiar de referencia o de escenario
-es sustituir un archivo, no reescribir un programa.
+::: {style="font-size:0.86em;"}
+**Arquitectura.** El procedimiento está organizado en ocho etapas numeradas,
+cada una con su salida en disco y su verificación. Los parámetros no residen en
+el código: niveles de fortificación, valores de referencia, agrupación de
+alimentos y definición de vehículos se encuentran en archivos editables.
+Modificar una referencia o un escenario consiste en sustituir un archivo.
 
-**Lo que conecta con el trabajo de la organización.** La salida es la que pide
-un análisis de riesgo de ingesta inadecuada: consumo aparente por Equivalente
-de Mujer Adulta, riesgo por nutriente y por dominio de estimación, y escenarios
-de fortificación comparables entre sí.
+**Correspondencia con el análisis de riesgo de ingesta inadecuada.** Las
+salidas son las que requiere este tipo de análisis: consumo aparente por
+Equivalente de Mujer Adulta, riesgo por nutriente y por dominio de estimación,
+y escenarios de fortificación comparables entre sí, con intervalos de confianza
+derivados del diseño muestral.
 
-**Lo que no es transferible.** La tabla puente entre la encuesta y la tabla de
+**Límites de transferencia.** La tabla puente entre la encuesta y las tablas de
 composición, la agrupación de alimentos y los factores de conversión son
-específicos de la ENGIH. Otra encuesta exige rehacerlos: cambian la estructura,
-las variables y el sistema de clasificación. El código lo advierte donde
-corresponde.
+específicos de la ENGIH. Su aplicación a otra encuesta exige rehacerlos: las
+encuestas difieren en estructura, variables y sistema de clasificación. El
+código lo advierte explícitamente en cada punto donde esa dependencia existe.
 :::
 
-# 3 · Cierre {background-color="#2c5364"}
+# Cierre {background-color="#2c5364"}
 
-## Qué falta y en cuánto tiempo
+## Trabajo pendiente y fechas de entrega
 
 ```{r}
 #| label: tbl-pendiente
-#| tbl-cap: "Trabajo pendiente por producto y tiempo estimado de dedicación. Consultoría ENGIH 2018"
+#| tbl-cap: "Trabajo pendiente por producto y fecha comprometida de entrega. Consultoría ENGIH 2018"
 
 entregables |>
-  filter(horas_est > 0) |>
+  filter(!is.na(fecha_compromiso)) |>
+  arrange(fecha_compromiso) |>
   transmute(Producto = entregable,
-            `Qué falta` = falta,
-            `Horas` = horas_est) |>
+            `Trabajo pendiente` = falta,
+            Entrega = format(as.Date(fecha_compromiso), "%d de octubre")) |>
   tabla(fuente = "Fuente: registro de avance del repositorio del proyecto.",
-        notas = paste0("Estimación de dedicación propia, no de calendario. ",
-                       "Total: ", HORAS, " horas."))
+        notas = paste("El calendario se completa dentro del período de",
+                      "contrato. Cierre de la consultoría:",
+                      "23 de octubre de 2026."))
 ```
 
-## Lo que se pide decidir
+## Puntos que requieren decisión
 
-::: {style="font-size:0.9em;"}
+::: {style="font-size:0.88em;"}
 1. **Valores de referencia definitivos.** ¿Se mantienen los del Instituto de
-   Medicina o se adoptan los armonizados del proyecto de referencia? Condiciona
-   toda la sección de riesgo.
-2. **Biodisponibilidad del hierro.** Fijar el supuesto, o publicar las dos
-   estimaciones como rango.
-3. **Alcance del escenario de arroz.** La propuesta nacional de reglamento se
-   tomó de una presentación. ¿Se consigue el documento, o se reporta solo como
-   análisis de sensibilidad?
-4. **Prioridad entre productos.** Con el tiempo disponible, el análisis y el
-   informe final pueden quedar completos; los módulos de capacitación, en
-   cumplimiento mínimo. Se pide confirmar ese orden.
+   Medicina o se adoptan los armonizados empleados en los análisis de
+   referencia de la organización? Condiciona toda la sección de riesgo.
+2. **Supuesto de biodisponibilidad del hierro.** Fijar un valor, o reportar
+   ambas estimaciones como intervalo.
+3. **Tratamiento del escenario de arroz.** Los niveles proceden de una
+   presentación. ¿Se obtiene el documento normativo, o se reporta únicamente
+   como análisis de sensibilidad?
+4. **Orden de prioridad entre productos.** Confirmar que el análisis y el
+   informe final tienen precedencia sobre los módulos de capacitación en caso
+   de conflicto de tiempo.
 :::
 
 ::: {.notapie}
-**NOTA:** Las tres primeras decisiones afectan a cifras ya calculadas y pueden aplicarse sustituyendo archivos de parámetros, sin reescribir el análisis.
+**NOTA:** Las tres primeras decisiones afectan a cifras ya calculadas y pueden aplicarse sustituyendo archivos de parámetros, sin reescribir el análisis ni repetir el procesamiento de los microdatos.
 :::
 
-## Fuentes
+## Referencias
 
-::: {style="font-size:0.78em;"}
+::: {style="font-size:0.74em;"}
 Banco Central de la República Dominicana. *Encuesta Nacional de Gastos e
 Ingresos de los Hogares 2018.*
+
+Tang K, Adams KP, Ferguson EL, et al. Systematic review of metrics used to
+characterise dietary nutrient supply from household consumption and expenditure
+surveys. *Public Health Nutrition.* 2022;25(5):1–13.
 
 Instituto de Nutrición de Centro América y Panamá. *Tabla de composición de
 alimentos de Centroamérica.*
@@ -537,14 +601,15 @@ alimentos de Centroamérica.*
 United States Department of Agriculture. *Food and Nutrient Database for
 Dietary Studies.*
 
-Institute of Medicine. *Dietary Reference Intakes: the essential guide to
-nutrient requirements.* Washington: National Academies Press.
+Institute of Medicine. *Dietary Reference Intakes: applications in dietary
+assessment.* Washington: National Academies Press; 2000.
 
 Organización Mundial de la Salud. *Recommendations on wheat and maize flour
-fortification.* Ginebra, 2009.
+fortification.* Ginebra; 2009.
 
 Organización de las Naciones Unidas para la Alimentación y la Agricultura.
-*Minimum dietary diversity for women: an updated guide.* Roma, 2021.
+*Minimum dietary diversity for women: an updated guide for measurement.* Roma;
+2021.
 
 Reglamento Técnico Dominicano RTD 616, enriquecimiento de la harina de trigo.
 Norma Dominicana NORDOM 602, azúcar fortificada con vitamina A.
