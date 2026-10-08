@@ -66,6 +66,23 @@ consumo <- cargar_consumo()
 ema     <- cargar_ema_hogar()
 gpe     <- cargar_gramos_por_ema()
 
+# Cobertura de registros dentro y fuera de los vehiculos de fortificacion:
+# muestra si las exclusiones amenazan el resultado principal o solo el
+# panorama alimentario general.
+cobertura_grupo <- consumo$sec3a |>
+  marcar_elegible() |>
+  marcar_vehiculo(ampliado = TRUE) |>
+  mutate(grupo = if_else(is.na(vehiculo), "resto", "vehiculos")) |>
+  group_by(grupo) |>
+  summarise(registros = n(), pct = 100 * mean(entra_calculo), .groups = "drop")
+
+pct_grupo <- function(g) {
+  v <- cobertura_grupo$pct[cobertura_grupo$grupo == g]
+  if (length(v) != 1) stop("Cobertura no identificada para el grupo: ", g, ".",
+                           call. = FALSE)
+  v
+}
+
 entregables <- leer_limpio(file.path(RUTA_RAW, "entregables_estado.csv")) |>
   arrange(orden)
 auditoria <- leer_limpio(here::here("data", "auditoria",
@@ -549,8 +566,19 @@ tibble::tibble(motivo = MOTIVOS) |>
                       "registro de adquisición. Base:", HOG_FRASE, "."))
 ```
 
-::: {style="font-size:0.78em; color:#5a6b76; margin-top:-0.2em;"}
-La cobertura de la Sección 3A pasó de 76,0% a `r fmt(100 * sum(marcar_elegible(consumo$sec3a)$entra_calculo) / nrow(consumo$sec3a))`% tras el trabajo de campo de conversión de unidades y el relleno documentado de la tabla de composición.
+::: {style="font-size:0.8em; margin-top:-0.1em;"}
+**Las exclusiones no afectan por igual a todos los alimentos.** En los registros
+correspondientes a vehículos de fortificación entra al cálculo el
+**`r fmt(pct_grupo("vehiculos"))`%**
+(`r mil(cobertura_grupo$registros[cobertura_grupo$grupo == "vehiculos"])` registros);
+en el resto de los alimentos, el `r fmt(pct_grupo("resto"))`%. Las exclusiones
+reducen el detalle del panorama alimentario general; no comprometen la
+estimación de cobertura y consumo de los vehículos, que es el objeto del
+análisis.
+:::
+
+::: {style="font-size:0.78em; color:#5a6b76;"}
+La cobertura global de la Sección 3A pasó de 76,0% a `r fmt(100 * sum(marcar_elegible(consumo$sec3a)$entra_calculo) / nrow(consumo$sec3a))`% tras el trabajo de campo de conversión de unidades y el relleno documentado de la tabla de composición.
 :::
 
 ## Determinación de factores de conversión en campo
