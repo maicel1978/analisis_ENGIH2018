@@ -158,28 +158,49 @@ consumo_veh <- function(grupo_, columna) {
 }
 ```
 
-## Contenido
+## Alcance y pregunta
 
-::: {style="font-size:0.95em;"}
-**Mandato.** Evaluar si la ENGIH 2018 permite estimar la cobertura y el consumo
-de alimentos fortificables y su contribución a la ingesta de micronutrientes, y
-ejecutar ese análisis en código reutilizable.
+::: {.columns}
+::: {.column width="48%"}
+::: {style="background:#f1f5f8; border-left:4px solid #4a7c9b; padding:0.55em 0.9em; font-size:0.84em;"}
+**Componente A · Análisis de la ENGIH 2018**
+
+Numerales 4 y 8 de los términos de referencia. Viabilidad del análisis,
+cobertura y consumo de alimentos fortificables, contribución a la ingesta de
+micronutrientes.
+:::
+:::
+::: {.column width="48%"}
+::: {style="background:#f6f7f8; border-left:4px solid #c9d3da; padding:0.55em 0.9em; font-size:0.84em;"}
+**Componente B · Módulos de capacitación**
+
+Numerales 9 a 17. Estrategia educativa para la transferencia del método a
+otros equipos y otros conjuntos de datos.
+:::
+:::
+:::
+
+::: {style="font-size:0.8em; color:#5a6b76; margin-top:0.3em;"}
+Durante la consultoría el énfasis se concentró en el componente de análisis.
+Esta presentación trata sobre él.
 :::
 
 <br>
 
 ::: {style="font-size:0.95em;"}
-1. **Estado de los productos.** Qué está entregado, qué está en revisión y en
-   qué fecha entra lo que falta.
-2. **Hallazgos.** Tres resultados con consecuencia para la decisión de
-   fortificación.
-3. **Método y cierre.** Las decisiones que sostienen las cifras, lo que queda
-   abierto y lo que se pide decidir.
+**Pregunta principal**
+
+> ¿Permite la ENGIH 2018 estimar la cobertura y el consumo de alimentos
+> fortificables y su contribución a la ingesta de micronutrientes de la
+> población dominicana?
+
+**Y si lo permite**
+
+> ¿Llegan los vehículos de fortificación a la población? ¿Qué parte del margen
+> disponible utiliza la norma vigente? ¿A quién alcanza el beneficio?
 :::
 
-<br>
-
-::: {style="font-size:0.88em; color:#5a6b76;"}
+::: {style="font-size:0.78em; color:#5a6b76; margin-top:0.4em;"}
 Toda cifra de esta presentación se regenera ejecutando el procedimiento sobre
 los microdatos de la encuesta. Las láminas de anexo, al final, responden a las
 preguntas de detalle.
