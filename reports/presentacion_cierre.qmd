@@ -159,12 +159,15 @@ consumo_veh <- function(grupo_, columna) {
 ```
 
 
-## Pregunta y hallazgos
+## Introducción
 
 ::: {style="font-size:0.84em; color:#5a6b76;"}
 La consultoría tuvo dos componentes: el análisis de la encuesta y los módulos
-de capacitación. El peso se puso en el análisis, y de eso trata esta
-presentación.
+de capacitación. El énfasis se puso en el análisis, y de eso trata esta
+presentación. La **ENGIH 2018** es la encuesta de gastos e ingresos de los
+hogares del Banco Central: muestra nacional de `r mil(HOG_MUESTRA)` hogares en
+8 estratos y 933 unidades primarias de muestreo, con registro diario de
+adquisiciones durante una semana.
 :::
 
 <br>
@@ -178,31 +181,10 @@ población dominicana?
 <br>
 
 ::: {style="font-size:1.05em; color:#2c5364;"}
-**Sí**, con adaptaciones documentadas. El análisis se completó sobre
+**Sí**, con adaptaciones y hallazgos documentados. El análisis se completó sobre
 `r HOG_FRASE`.
 :::
 
-## Tres hallazgos
-
-::: {style="font-size:1em; line-height:1.6;"}
-**1 · Alcance.** Los vehículos de fortificación llegan a la mayoría de los
-hogares: la vía de entrega existe.
-
-<br>
-
-**2 · Margen.** La norma vigente utiliza una parte menor del margen disponible.
-
-<br>
-
-**3 · Distribución.** La elección del vehículo decide a quién alcanza el
-beneficio.
-:::
-
-::: {style="font-size:0.76em; color:#7d8f9c; margin-top:1.4em;"}
-Toda cifra de esta presentación se regenera ejecutando el procedimiento sobre
-los microdatos de la encuesta. Las láminas de anexo, al final, responden a las
-preguntas de detalle.
-:::
 
 ## Estado de los productos y fechas de entrega
 
@@ -222,7 +204,78 @@ entregables |>
         notas = "Cierre de la consultoría: 23 de octubre de 2026.")
 ```
 
+## Síntesis de hallazgos obtenidos durante el estudio
+
+::: {style="font-size:1em; line-height:1.6;"}
+**1 · Alcance.** Los vehículos de fortificación llegan a la mayoría de los
+hogares: la vía de entrega existe.
+
+<br>
+
+**2 · Margen.** La norma vigente utiliza una parte menor del margen disponible.
+
+<br>
+
+**3 · Distribución.** La elección del vehículo decide a quién alcanza el
+beneficio.
+:::
+
+::: {style="font-size:0.76em; color:#7d8f9c; margin-top:1.4em;"}
+Se abordará el estado de los productos y los principales hallazgos con una visión general. Se incluye una ampliación al final para consulta o discusión, si fuese necesario.
+:::
+
+
 # Hallazgos {background-color="#2c5364"}
+
+## Escenarios de fortificación modelados
+
+```{r}
+#| label: tbl-escenarios-def
+#| tbl-cap: "Escenarios de fortificación modelados: vehículos incluidos y nutrientes añadidos en cada uno. Consultoría ENGIH 2018"
+
+VEH_TRIGO <- c("Harina de trigo", "Pan", "Pastas", "Galletas saladas",
+               "Galletas dulces", "Repostería")
+NUT_CORTO <- c(hierro_mg = "hierro", folato_mcg_dfe = "folato",
+               zinc_mg = "zinc", vitamina_a_mcg_rae = "vitamina A",
+               vitamina_b12_mcg = "vitamina B12")
+
+resumir_veh <- function(v) {
+  v     <- unique(v)
+  trigo <- intersect(v, VEH_TRIGO)
+  otros <- setdiff(v, VEH_TRIGO)
+  etq <- if (length(trigo) >= 3) "harina de trigo y derivados"
+         else if (length(trigo) > 0) tolower(paste(trigo, collapse = " y "))
+         else character(0)
+  paste(c(etq, tolower(otros)), collapse = ", ")
+}
+
+definicion <- leer_limpio(file.path(RUTA_RAW, "escenarios_fortificacion.csv"))
+sin_etiqueta <- setdiff(unique(definicion$nutriente), names(NUT_CORTO))
+if (length(sin_etiqueta) > 0) {
+  stop("Nutrientes sin etiqueta corta: ", paste(sin_etiqueta, collapse = ", "),
+       call. = FALSE)
+}
+
+resumen_esc <- definicion |>
+  group_by(escenario) |>
+  summarise(`Vehículos fortificados` = resumir_veh(vehiculo),
+            `Nutrientes añadidos` = paste(unique(NUT_CORTO[nutriente]), collapse = ", "),
+            .groups = "drop") |>
+  arrange(escenario)
+
+linea_base <- tibble::tibble(escenario = E_SIN,
+                             `Vehículos fortificados` = "ninguno",
+                             `Nutrientes añadidos` = "—")
+
+bind_rows(linea_base, resumen_esc) |>
+  rename(Escenario = escenario) |>
+  tabla(fuente = "Fuente: parámetros normativos del repositorio del proyecto.",
+        notas = paste("Cada escenario parte de la composición del alimento sin",
+                      "fortificar y añade el nivel normativo en miligramos por",
+                      "kilogramo de vehículo. Los resultados que siguen",
+                      "presentan tres de estos escenarios; el informe recoge",
+                      "los siete."))
+```
 
 ## Hallazgo 1 · Alcance poblacional de los vehículos
 
@@ -535,11 +588,12 @@ condicionan las cifras y requieren definición externa:
 
 <br>
 
-**1 · Valores de referencia.** Los empleados proceden del Instituto de Medicina
-para mujeres de 19 a 30 años y son provisionales. ¿Se mantienen, o se adoptan
-los armonizados de los análisis de referencia de la organización? Están
-aislados en un único archivo: sustituirlos no exige modificar el análisis, pero
-altera todas las estimaciones de riesgo.
+**1 · Valores de referencia.** Los empleados son **Requerimientos Promedio
+Estimados (RPE)** del Instituto de Medicina para mujeres de 19 a 30 años, y son
+provisionales. ¿Se mantienen, o se adoptan los **Requerimientos Promedio
+Armonizados (RPA)** que emplea el proyecto MIMI? Están aislados en un único
+archivo: sustituirlos no exige modificar el análisis, pero altera todas las
+estimaciones de riesgo.
 
 <br>
 
