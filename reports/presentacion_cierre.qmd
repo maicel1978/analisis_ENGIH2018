@@ -244,9 +244,9 @@ veh |>
 
 ::: {style="font-size:0.95em; margin-bottom:-0.3em;"}
 **La fortificación vigente reduce el riesgo de ingesta inadecuada de folato de
-`r fmt(riesgo_nac(E_SIN, "folato_mcg_dfe"))`% a `r fmt(riesgo_nac(E_BASE, "folato_mcg_dfe"))`%; ampliarla al arroz lo llevaría a
-`r fmt(riesgo_nac(E_ARROZ, "folato_mcg_dfe"))`%.** El margen disponible es mayor
-que el utilizado.
+`r fmt(riesgo_nac(E_SIN, "folato_mcg_dfe"))`% a `r fmt(riesgo_nac(E_BASE, "folato_mcg_dfe"))`%; si todo el arroz llevara los niveles de la
+propuesta nacional, bajaría a `r fmt(riesgo_nac(E_ARROZ, "folato_mcg_dfe"))`%.**
+El margen disponible es mayor que el utilizado.
 :::
 
 ```{r}
@@ -284,7 +284,7 @@ ggplot(pend, aes(escenario, pct_inadecuado, group = nut)) +
 ```
 
 ::: {.notapie}
-**NOTA:** Método del punto de corte del requerimiento promedio estimado, salvo en hierro, donde se aplica el enfoque de probabilidad con la distribución del requerimiento y un supuesto de 10% de biodisponibilidad. **Valores de referencia provisionales: no citables.** Estas proporciones no son prevalencia de deficiencia: la ingesta es aparente, estimada a nivel de hogar, y el reparto intrafamiliar se supone proporcional al requerimiento energético. Ácido fólico añadido por encima del límite superior tolerable en el escenario con arroz: `r fmt(esc |> filter(escenario == E_ARROZ) |> distinct(pct_folico_sobre_ul) |> pull())`% de los hogares.
+**NOTA:** Método del punto de corte del requerimiento promedio estimado, salvo en hierro, donde se aplica el enfoque de probabilidad con la distribución del requerimiento y un supuesto de 10% de biodisponibilidad. **Valores de referencia provisionales: no citables.** Estas proporciones no son prevalencia de deficiencia: la ingesta es aparente, estimada a nivel de hogar, y el reparto intrafamiliar se supone proporcional al requerimiento energético. El escenario con arroz supone que la totalidad del arroz consumido lleva los niveles de la propuesta nacional; la línea base lo supone sin fortificar. Ácido fólico añadido por encima del límite superior tolerable en ese escenario: `r fmt(esc |> filter(escenario == E_ARROZ) |> distinct(pct_folico_sobre_ul) |> pull())`% de los hogares.
 :::
 
 ## Hallazgo 3 · Distribución social del beneficio
@@ -353,7 +353,7 @@ esc |>
 ```
 
 ::: {.notapie}
-**NOTA:** Cada escenario parte de la composición del alimento sin fortificar y añade el nivel de la norma correspondiente, expresado en miligramos por kilogramo de vehículo. Los niveles de la propuesta nacional de reglamento de arroz proceden de una presentación y están pendientes de confirmación documental. DFE: equivalentes dietéticos de folato. OMS: Organización Mundial de la Salud.
+**NOTA:** Cada escenario parte de la composición del alimento sin fortificar y añade el nivel de la norma correspondiente, expresado en miligramos por kilogramo de vehículo. Los niveles de la propuesta nacional de reglamento de arroz proceden de una presentación y están pendientes de confirmación documental. **La línea base supone el arroz sin fortificar.** La propuesta no está en vigor, de modo que la fortificación del arroz es voluntaria; la encuesta no distingue arroz fortificado de no fortificado y su cobertura de mercado en 2018 no consta en ninguna fuente disponible. El escenario estima, por tanto, una cota superior del incremento atribuible a una norma de arroz. DFE: equivalentes dietéticos de folato. OMS: Organización Mundial de la Salud.
 :::
 
 ## Decisiones metodológicas adoptadas
@@ -481,9 +481,13 @@ siguientes condicionan las cifras y requieren definición externa:
    `r fmt(riesgo_nac(E_BASE, "hierro_mg", "Probabilidad, biodisponibilidad 18%"))`%.
    Fijar un valor, o reportar ambas estimaciones como intervalo.
 3. **Tratamiento del escenario de arroz.** Los niveles proceden de una
-   presentación. ¿Se obtiene el documento normativo, o se reporta únicamente
-   como análisis de sensibilidad? Pendiente también una fuente citable para las
-   fracciones de harina en pan, pastas y galletas.
+   presentación: ¿se obtiene el documento normativo, o se reporta únicamente
+   como análisis de sensibilidad? Y una segunda cuestión: la fortificación del
+   arroz es hoy voluntaria y la encuesta no la distingue, de modo que la
+   cobertura de mercado en 2018 es desconocida. Si existe una estimación de esa
+   cobertura, el escenario puede ponderarse; sin ella, el incremento estimado es
+   una cota superior. Pendiente también una fuente citable para las fracciones
+   de harina en pan, pastas y galletas.
 4. **Orden de prioridad entre productos.** Confirmar que el análisis y el
    informe final tienen precedencia sobre los módulos de capacitación en caso
    de conflicto de tiempo.
