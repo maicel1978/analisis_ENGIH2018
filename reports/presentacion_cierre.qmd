@@ -204,6 +204,12 @@ entregables |>
         notas = "Cierre de la consultoría: 23 de octubre de 2026.")
 ```
 
+::: {style="font-size:0.82em; margin-top:0.35em;"}
+La plataforma de capacitación está publicada y es accesible:
+[**fortificacion.netlify.app**](https://fortificacion.netlify.app/) — 24 módulos,
+17 ejercicios con autoevaluación y el taller completo.
+:::
+
 ## Síntesis de hallazgos obtenidos durante el estudio
 
 ::: {style="font-size:1em; line-height:1.6;"}
