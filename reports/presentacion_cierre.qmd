@@ -221,7 +221,7 @@ beneficio.
 :::
 
 ::: {style="font-size:0.76em; color:#7d8f9c; margin-top:1.4em;"}
-Se abordará el estado de los productos y los principales hallazgos con una visión general. Se incluye una ampliación al final para consulta o discusión, si fuese necesario.
+Lo que sigue amplía estos tres hallazgos y el método que los sostiene. Al final hay un anexo para consulta, si algún punto interesa en detalle.
 :::
 
 
@@ -423,7 +423,7 @@ equivalentes dietéticos de folato. EMA: Equivalente de Mujer Adulta.
 
 # Cómo se construyó el análisis {background-color="#2c5364"}
 
-## Escenarios normativos modelados
+## Ingesta de hierro y folato en los siete escenarios
 
 ```{r}
 #| label: fig-escenarios
