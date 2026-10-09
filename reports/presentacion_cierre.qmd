@@ -357,7 +357,7 @@ ggplot(pend, aes(escenario, pct_inadecuado, group = nut)) +
             hjust = 0, size = 3.9, colour = "#44555f") +
   scale_y_continuous(limits = c(0, 100), labels = function(x) paste0(x, "%")) +
   scale_x_discrete(expand = expansion(mult = c(0.08, 0.52))) +
-  labs(x = NULL, y = "Hogares bajo el requerimiento (%)") +
+  labs(x = "Escenario de fortificación", y = "Hogares bajo el requerimiento (%)") +
   tema(14) +
   theme(axis.text.x = element_text(lineheight = 0.95))
 ```
@@ -443,7 +443,8 @@ esc |>
   facet_wrap(~nutriente, scales = "free_y",
              labeller = as_labeller(c(hierro_mg = "Hierro (mg)",
                                       folato_mcg_dfe = "Folato (µg DFE)"))) +
-  labs(x = NULL, y = NULL) +
+  labs(x = "Escenario de fortificación",
+       y = "Ingesta aparente mediana\npor EMA y día") +
   tema(13) +
   theme(strip.text  = element_text(face = "bold", colour = "#1a3a4a"),
         axis.text.x = element_text(size = rel(0.82), lineheight = 0.95))
