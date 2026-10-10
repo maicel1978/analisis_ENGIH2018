@@ -211,5 +211,65 @@ g_riesgo <- ggplot(mapa_riesgo) +
 ggsave(here("media", "mapas", "mapa_riesgo_folato.png"), g_riesgo,
        width = 8.5, height = 6, dpi = 200, bg = "white")
 
+# --- 5. Coropletico de densidad, invariante al nivel de registro ------------
+# Decision E1: para comparacion geografica se prefiere la densidad de
+# nutrientes a la ingesta absoluta, porque un factor de sobrerregistro comun a
+# todos los alimentos del hogar se cancela en el cociente y no en el nivel
+# (hallazgo del 2026-10-10 en docs/hoja-de-ruta.md).
+#
+# El umbral no es un supuesto nuevo. El denominador del EMA son 2.291 kcal, el
+# requerimiento de la mujer adulta de referencia (FAO/WHO/UNU 2004), y los RPE
+# son de esa misma mujer (IOM, 19 a 30 anos). La densidad que ella necesita
+# queda determinada por los dos parametros que el proyecto ya usa:
+#
+#   densidad_critica = RPE / 2291 * 1000
+#
+# Se mapea la razon entre la densidad mediana observada y esa densidad
+# critica, centrada en 1. Es adimensional y comparable entre nutrientes.
+#
+# Precision: aqui se usa solo el minimo de hogares. La semiamplitud del
+# intervalo que define precision_baja es la de la proporcion de riesgo, no la
+# de una mediana de densidad, y aplicarla a esta ultima seria mezclar dos
+# cantidades distintas.
+KCAL_EMA <- 2291
+src04 <- readLines(here("scripts", "04_equivalente_adulto.R"), warn = FALSE)
+if (!any(grepl(as.character(KCAL_EMA), src04, fixed = TRUE))) {
+  stop("04_equivalente_adulto.R no menciona ", KCAL_EMA, " kcal. La base ",
+       "energetica del EMA cambio: revisar la densidad critica.", call. = FALSE)
+}
+HOGARES_MIN <- 50
+
+ear_folato <- leer("data", "raw", "valores_referencia.csv") |>
+  filter(nutriente == "folato_mcg_dfe") |> pull(ear)
+stopifnot(length(ear_folato) == 1)
+dens_critica <- 1000 * ear_folato / KCAL_EMA
+
+mapa_dens <- provincias |>
+  left_join(riesgo |> select(id_provincia, densidad_mediana, n), by = "id_provincia") |>
+  mutate(razon = if_else(coalesce(n, 0L) >= HOGARES_MIN,
+                         densidad_mediana / dens_critica, NA_real_))
+
+g_dens <- ggplot(mapa_dens) +
+  geom_sf(aes(fill = razon), colour = "white", linewidth = 0.18) +
+  scale_fill_gradient2(
+    low = "#F21A00", mid = "#EBCC2A", high = "#3B9AB2", midpoint = 1,
+    labels = function(x) ifelse(is.na(x), "", sprintf("%.1fx", x)),
+    na.value = "grey85",
+    name = paste0("Densidad mediana de folato\nsobre la densidad critica\n(",
+                  round(dens_critica, 1), " ug DFE/1.000 kcal)")) +
+  labs(caption = paste0(
+    "Escenario de linea base. La densidad critica es el RPE de folato (", ear_folato,
+    " ug DFE) sobre el requerimiento energetico de la\nmujer adulta de referencia (",
+    KCAL_EMA, " kcal), que es el denominador del EMA. Gris: menos de ", HOGARES_MIN,
+    " hogares. La mediana no es\nuna prevalencia de adecuacion. La provincia no es ",
+    "dominio de estimacion. Valores de referencia provisionales.")) +
+  theme_void(base_size = 11) +
+  theme(plot.caption = element_text(hjust = 0, colour = "#5a6b76", size = 8))
+
+ggsave(here("media", "mapas", "mapa_densidad_folato.png"), g_dens,
+       width = 8.5, height = 6, dpi = 200, bg = "white")
+
 message("\nMapas en media/mapas/. Provincias con precision suficiente: ",
-        sum(!is.na(mapa_riesgo$valor)), " de 32.")
+        sum(!is.na(mapa_riesgo$valor)), " de 32 en el mapa de riesgo, ",
+        sum(!is.na(mapa_dens$razon)), " de 32 en el de densidad.")
+message("Densidad critica de folato: ", round(dens_critica, 1), " ug DFE por 1.000 kcal.")

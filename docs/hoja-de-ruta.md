@@ -143,6 +143,45 @@ un requerimiento de referencia en torno a 2.000-2.200. El extremo inferior
 3. Las estimaciones nacionales no quedan afectadas: el filtro de energía
    plausible mueve las cifras menos de 3,5 puntos.
 
+**Implementación de la decisión 2 (2026-10-10).** La densidad necesita un
+umbral para ser interpretable y no solo relativa. El umbral no exige valores de
+referencia nuevos: sale de los dos parámetros que el proyecto ya usa. El
+denominador del EMA son 2.291 kcal, el requerimiento energético de la mujer
+adulta de 18 a 30 años (FAO/WHO/UNU 2004, ver el encabezado de
+`04_equivalente_adulto.R`), y los RPE de `valores_referencia.csv` son de esa
+misma mujer (IOM, 19 a 30 años). De modo que
+
+    densidad_crítica = RPE / 2291 × 1000        (folato: 139,7 µg DFE/1.000 kcal)
+
+y los dos criterios quedan ligados por una identidad exacta:
+
+    densidad / densidad_crítica = (ingesta / RPE) × (2291 / energía por EMA)
+
+Coinciden cuando la energía registrada por EMA es 2.291 kcal, y divergen por el
+factor exacto en que la supera. El punto de corte sobre la ingesta absoluta es
+más indulgente donde se registra más energía: eso es el patrón geográfico, en
+una línea de álgebra. En Samaná, con 3.913 kcal, el factor es 1,71.
+
+Piezas: `scripts/diagnostico_densidad_critica.R` calcula los dos criterios en
+los cinco dominios con una guarda que exige reproducir `riesgo_inadecuacion.csv`
+en el criterio de ingesta, y `09_mapas.R` añade el mapa provincial de la razón
+entre la densidad mediana y la crítica, centrado en 1.
+
+**Supuesto del criterio de densidad.** Requiere que el sobrerregistro sea
+multiplicativo, es decir, que afecte por igual a todos los alimentos del hogar.
+En estos datos el supuesto está respaldado y no solo asumido: las dos secciones
+se inflan por factores parecidos (1,64x y 1,55x) y la composición de la dieta
+es la del resto del país (79,4% del folato desde cereales y raíces frente a
+81,7%). Si el sobrerregistro fuera selectivo por grupo de alimentos, la
+densidad quedaría igual de sesgada que el nivel.
+
+**Pendiente de la corrida.** Queda por verificar si el confundidor alcanza a
+región y zona, que sí son dominios de estimación, y si la mediana nacional de
+energía por EMA se aparta poco de 2.291 kcal. Si se aparta poco, las dos
+lecturas coinciden a nivel nacional y la cifra principal del informe queda
+validada por una vía independiente. **Nada de esto se cita hasta que la salida
+esté pegada.**
+
 **Hipótesis abierta, no verificada.** Las cinco provincias de mayor energía son
 rurales y agrícolas; las de menor, más urbanas. La producción propia y las
 existencias de despensa mayores en zonas rurales son una fuente conocida de
