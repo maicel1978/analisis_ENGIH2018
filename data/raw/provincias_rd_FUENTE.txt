@@ -1,0 +1,10 @@
+provincias_rd.geojson
+
+Limites provinciales de la Republica Dominicana, 32 provincias.
+Fuente: paquete sfDR (github.com/adatar-do/sfDR), que los toma del
+geoportal del IDERD (geoportal.iderd.gob.do) y de la Division Territorial
+2021 de la Oficina Nacional de Estadistica. Licencia MIT.
+Extraido el 2026-10-10 con sfDR 0.2.2
+
+El campo id_provincia es PROV_ID convertido a entero, que empata de forma
+exacta con id_provincia de la ENGIH 2018.

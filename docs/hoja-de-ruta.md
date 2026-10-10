@@ -10,52 +10,187 @@ Este documento fija el alcance acordado hasta ahora. Cualquier cambio de alcance
 
 ## PRIORIDAD ACTUAL (leer esto primero, antes que Fase 0 de abajo)
 
-**Estado al 2026-10-03.** Alcance vigente: lista de tareas pendientes enviada
-por el supervisor tras la reunión de revisión (numeral 4 de los TdR). Cierre
-de la consultoría: 2026-10-23 (contrato hasta 2026-10-25).
+**Estado al 2026-10-10.** Presentacion de avance realizada el 9 de octubre.
+Alcance vigente: cerrar los entregables de los terminos de referencia antes
+del 2026-10-23 (contrato hasta el 25). Quedan **diez dias habiles**.
 
-**Método de trabajo.** Rama `ajustes-octubre`; `main` conserva la versión
+**Metodo de trabajo.** Rama `ajustes-octubre`; `main` conserva la version
 revisada (etiqueta `informe-factibilidad-v1`). Un bloque por commit. Antes de
 cada bloque se declara el efecto esperado sobre las cifras de control
 (36.840 / 328.173 / 8.778); si la corrida no coincide, se detiene.
 
-**Cifras vigentes al cierre del 2026-10-04.** Sustituyen a las que figuran en
-las entradas B2, B3, C1 y C2 de este bloque, que son anteriores a B1 y al
-relleno de composición. Valores de referencia PROVISIONALES: no citables.
+**Regla de prioridad para el cierre.** Cada pieza debe servir a mas de un
+entregable. La que sirve a uno solo va al final de la cola.
 
-- Entran al cálculo 328.173 registros de 8.778 hogares: 97,1% de la Sección 2
-  y 82,4% de la Sección 3A (antes 90,7% y 76,0%).
-- Energía mediana 2.300 kcal por EMA y día, sin ponderar (media 2.862); 847
-  hogares fuera del rango de 500 a 6.000 kcal.
-- Cobertura de composición, en gramos: hierro 96,9%; zinc y B12 96,6%; folato
-  93,4%; vitamina A 92,8%; vitamina D 91,0%; vitamina E 85,3%.
-- Vehículos: arroz 85,5% de los hogares y 218 g por EMA y día; trigo en
-  equivalentes de harina 91,8% y 46,9 g; azúcar 76,9% y 55,7 g.
+### Fase E — cierre (10–23 oct)
 
-| Escenario | Folato mediano | Hierro mediano | Folato Q5/Q1 | Fol. bajo req. | Hierro 10% | Zinc | B12 | Vit. A |
-|---|---|---|---|---|---|---|---|---|
-| Sin fortificación | 196 | 8,68 | 1,23 | 73,1 | 76,1 | 42,9 | 46,3 | 74,7 |
-| Norma, harina y pan (línea base) | 267 | 9,96 | 1,24 | 60,2 | 71,1 | 42,9 | 46,3 | 74,7 |
-| Norma, todos los derivados | 328 | 11,02 | 1,21 | 48,3 | 66,4 | 42,9 | 46,3 | 74,7 |
-| Norma y azúcar | 328 | 11,02 | 1,21 | 48,3 | 66,4 | 42,9 | 46,3 | 35,1 |
-| OMS harina, menos de 75 g | 535 | 11,24 | 1,25 | 24,9 | 65,5 | 20,5 | 20,3 | 44,5 |
-| Norma y arroz (propuesta) | 884 | 15,49 | 1,03 | 12,6 | 47,5 | 20,6 | 18,3 | 74,7 |
+**E0. Desbloqueo (13 oct).** Preguntas planteadas en la presentacion que
+condicionan cifras ya calculadas. **Si el 15 de octubre no hay respuesta, se
+cierra con los supuestos actuales y se declaran en el informe. No se espera.**
 
-Columnas 5 a 9: hogares bajo el requerimiento (%). Ácido fólico añadido sobre el
-límite superior: 8,0% con arroz; 1,5% con OMS; menos de 0,2% con la norma.
-Provincia: 56 de 256 celdas con precisión baja; región, zona y quintil, ninguna.
+- [ ] Valores de referencia: Requerimiento Promedio Estimado del IOM frente a
+      Requerimiento Promedio Armonizado. Sustitucion de un unico archivo;
+      altera todas las estimaciones de riesgo.
+- [ ] Biodisponibilidad del hierro: fijar 10%, 18%, o reportar ambas como rango.
+- [ ] Documento normativo del arroz: obtenerlo o mantener el escenario como
+      analisis de sensibilidad.
+- [ ] Fuente citable para las fracciones de harina en pan, pastas y galletas.
+- [ ] Alcance, fecha y duracion de la sesion extendida de discusion de
+      resultados.
 
-**Verificación en punto de venta (2026-10-04).** Un establecimiento, un día.
-El azúcar no declara vitamina A (norma no aplicada). El arroz Bisonó se vende
-fortificado con los siete nutrientes y niveles de la propuesta nacional. La
-harina de trigo declara hierro, tiamina, riboflavina, niacina y ácido fólico,
-sin vitamina A. La sal declara yodo 20-50 ppm y flúor 200-250 ppm. El cubo de
-caldo declara "sal" sin indicar si es yodada.
+**E1. Mapas y visualizaciones, TdR 8.5 (14–16 oct).** Pieza de mayor
+apalancamiento: alimenta el informe final, la sesion extendida y la difusion
+posterior.
 
-**Pendiente al cierre:** aporte de cada grupo de alimentos a los micronutrientes;
-mapas; valores de referencia definitivos; fuente de las fracciones de harina;
-niveles OMS de arroz; consumo promedio de sal;
-reescritura del informe y del README antes de fusionar a `main`.
+- [ ] Limites provinciales oficiales incorporados al repositorio con su fuente.
+- [ ] Mapa bivariado de cobertura y consumo por vehiculo. Dos ejes: proporcion
+      de hogares que lo adquiere y cantidad por EMA y dia. Identifica donde un
+      vehiculo tiene alcance poblacional suficiente.
+- [ ] Mapa coropletico de riesgo de ingesta inadecuada por dominio.
+- [ ] **Decision tecnica: region como dominio principal; la provincia se
+      publica con marca explicita de precision baja** (menos de 50 hogares o
+      semiamplitud mayor de 10 puntos). Un coropletico sin esa marca presenta
+      como comparables 56 de 256 celdas que no lo son.
+
+**E2. Aporte de los grupos de alimentos a los micronutrientes, TdR 8.4
+(16 oct).** Completa el analisis por grupos, hoy limitado a la energia.
+
+- [ ] Contribucion de cada grupo a cada micronutriente, en la forma de salida
+      de los analisis de referencia del proyecto.
+
+**E3. Informe analitico final, TdR 7 y 8 (17–21 oct).** Consume E1 y E2.
+
+- [ ] Reestructurar por preguntas, incorporar mapas y grupos, recompilar y
+      comparar contra la version etiquetada.
+- [ ] Responder los comentarios de revision, con seccion de origen, respuesta y
+      ubicacion nueva.
+- [ ] Incorporar la introduccion de contexto de pais y politicas de
+      fortificacion solicitada en la revision, que se omitio en la
+      presentacion por tiempo.
+
+**E4. Manual tecnico, TdR 18 (21–22 oct).** Se extrae del informe final y de
+las decisiones ya documentadas en este archivo; no se redacta de cero.
+
+**E5. Modulos de capacitacion, TdR 9 a 17 (22–23 oct).** Consume E3.
+
+- [ ] Sustituir los datos simulados del tema 5 por resultados reales de la
+      ENGIH. **Exigido por la Nota Metodologica 5 del contrato; no es
+      opcional.**
+- [ ] Unidades de R aplicado, version minima sobre la ENGIH.
+- [ ] Retirar o regrabar los videos 15 y 16, que explican el metodo de nivel de
+      fortificacion anterior a su correccion.
+
+**E6. Sesion extendida de discusion.** Fecha por confirmar en E0. No es un
+mazo nuevo: es el actual, mas sus laminas de anexo, mas los mapas de E1, mas
+la escalera de escenarios.
+
+**E7. Cierre del repositorio (23 oct).**
+
+- [ ] Fusion de `ajustes-octubre` a `main`, README reescrito y etiqueta de
+      cierre. El README de `main` conserva todavia la conclusion sobre el trigo
+      anterior a la correccion de la linea base.
+
+### El patrón geográfico del riesgo está gobernado por la energía registrada (2026-10-10)
+
+Hallazgo surgido al revisar el mapa provincial. Tres provincias presentaban un
+riesgo de inadecuación de folato muy por debajo del resto: Samaná 12,8%, San
+José de Ocoa 22,9% y María Trinidad Sánchez 37,8%, frente a 60,2% nacional.
+
+**Son las tres provincias de mayor energía registrada** (puestos 1, 2 y 4 de 32),
+y su densidad de folato es ordinaria (puestos 13, 4 y 14). Su composición
+dietética es prácticamente idéntica a la del resto del país: cereales y raíces
+aportan el 79,4% del folato frente al 81,7% nacional.
+
+Correlación entre la energía provincial y el riesgo, 32 provincias:
+
+| Nutriente | r con la energía |
+|---|---|
+| Zinc | -0,89 |
+| Vitamina B12 | -0,80 |
+| Folato | -0,73 |
+| Vitamina D | -0,73 |
+| Vitamina E | -0,66 |
+| Vitamina A | -0,65 |
+
+El riesgo de folato correlaciona -0,82 con la ingesta absoluta y **-0,49 con la
+densidad**. El tamaño del hogar no interviene: r = 0,04 con el riesgo y -0,23
+con la energía.
+
+**Mecanismos de procesamiento descartados.** Ninguno de los tres explica el
+patrón:
+
+- *Sección 2 contra 3A.* Las dos secciones están infladas por el mismo factor en
+  las tres provincias: 1,64x en la Sección 2 y 1,55x en la 3A. El peso relativo
+  de la Sección 2 no sigue patrón (44%, 63% y 29%, contra 33% nacional).
+- *Regla de agotamiento.* No excluye energía en el hogar mediano de ninguna
+  provincia.
+- *Días observados.* Mediana de 7 en 31 de las 32 provincias.
+
+**Conclusión.** La diferencia está en la adquisición declarada, no en el
+procesamiento. En el extremo superior las medianas provinciales de energía por
+EMA y día no son interpretables como consumo: Samaná registra 3.913 kcal contra
+un requerimiento de referencia en torno a 2.000-2.200. El extremo inferior
+(1.970 kcal) sí es plausible; la asimetría indica que el problema está arriba.
+
+**Decisiones derivadas.**
+
+1. El mapa provincial se acompaña de la salvedad de que refleja adquisición
+   registrada antes que adecuación.
+2. Para comparación geográfica se prefiere la densidad de nutrientes a la
+   ingesta absoluta. El fundamento es aritmético: un factor de inflación comun
+   a todos los alimentos se cancela en el cociente y no en el nivel. De ahí que
+   la densidad correlacione -0,49 y la ingesta absoluta -0,82.
+3. Las estimaciones nacionales no quedan afectadas: el filtro de energía
+   plausible mueve las cifras menos de 3,5 puntos.
+
+**Hipótesis abierta, no verificada.** Las cinco provincias de mayor energía son
+rurales y agrícolas; las de menor, más urbanas. La producción propia y las
+existencias de despensa mayores en zonas rurales son una fuente conocida de
+sobrerregistro en encuestas de gasto. Comprobable si la ENGIH registra la
+procedencia de la adquisición (compra, producción propia, regalo). Va al
+informe como limitación, no como resultado.
+
+**Descartado por falta de evidencia.** Se evaluó añadir un mínimo de
+conglomerados al filtro de precisión, bajo la hipótesis de que los dominios
+pequeños producían estimaciones inestables. La descomposición de la dispersión
+no la respalda: el ruido de muestreo explica el 4% de la dispersión en los
+dominios con menos de 10 grados de libertad, y el factor de encogimiento de las
+ocho provincias más pequeñas va de 0,82 a 0,97. Las estimaciones directas ya
+están donde las pondría un modelo de áreas pequeñas. **Se conserva el filtro
+vigente y se añaden los grados de libertad como columna informativa.**
+
+
+### Escalera de escenarios (identificada el 2026-10-09)
+
+Resultado util para politica que no estaba explicito. Hogares bajo el
+requerimiento de folato:
+
+| Escenario | % |
+|---|---|
+| Sin fortificacion | 73,1 |
+| Norma vigente, harina y pan | 60,2 |
+| **Norma extendida a todos los derivados de trigo** | **48,3** |
+| Norma y arroz (propuesta) | 12,6 |
+
+El tercer escalon no exige vehiculo ni norma nuevos, solo ampliar el alcance
+de la existente, y gana doce puntos. La norma vigente captura el 21% de lo
+alcanzable en folato y el 17% en hierro. El margen no utilizado tiene tres
+dimensiones: el vehiculo (218 g de arroz frente a 46,9 g de trigo en
+equivalentes de harina), la parte del vehiculo que alcanza (harina y pan, no
+todos los derivados) y los nutrientes (la norma anade hierro y acido folico;
+zinc, B12 y vitamina A quedan sin cambio).
+
+### Fuera del contrato
+
+Trabajo derivado sugerido en la reunion. **No compite con el cierre.** Alcance
+y acuerdos antes del 25 de octubre; desarrollo posterior.
+
+- [ ] Articulo cientifico: esquema y tabla de figuras antes del cierre; la
+      redaccion, despues.
+- [ ] Estimacion en areas pequenas para los dominios donde la estimacion
+      directa no alcanza precision. Brecha tecnica identificada frente a los
+      analisis de referencia del proyecto.
+
 
 **Fase A — aditiva, no cambia cifras existentes (5–7 oct)**
 
