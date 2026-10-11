@@ -100,12 +100,23 @@ Preguntas planteadas en la presentación que condicionan cifras ya calculadas.
 
 ### Cola de brotes, por valor
 
-**P1. Salvedad y método de la densidad.** *Corto. Sin dependencias.* Texto que
-fija la regla de los dos usos —densidad como descripción de calidad de la dieta
-en todas partes, como sustituto de la ingesta solo donde la variación de
-energía es artefactual— y la condición de uso por nutriente. Sirve al informe,
-al manual técnico y a la sesión extendida. Se escribe ahora porque es lo que se
-pierde si se deja para cuando toque redactar esa sección.
+**P1. Salvedad y método de la densidad.** *Hecho el 2026-10-11.* Escrito en
+`reports/_metodo_densidad.qmd`, como fragmento de inclusión de Quarto para no
+intervenir el esqueleto del informe. Se incorpora con
+`{{< include _metodo_densidad.qmd >}}`.
+
+Todas las cifras se leen de `data/clean/sensibilidad_densidad_critica.csv`,
+`acoplamiento_energia.csv` y `data/raw/valores_referencia.csv`; ninguna está
+escrita a mano. Cuando se resuelva el desbloqueo y cambien los valores de
+referencia, la sección se recompila con las cifras nuevas en vez de quedar
+desactualizada en silencio. Las tablas usan `tabla()` de `_comun.R`, de modo
+que llevan fuente y notas dentro del objeto.
+
+Contenido: construcción del umbral, la identidad entre criterios, la
+verificación nacional, la aplicación por nutriente, la regla de los dos usos
+con el gradiente socioeconómico como caso, la salvedad de los mapas
+provinciales y el supuesto multiplicativo con sus límites. Falta leerlo y
+compilarlo.
 
 **P2. Mapas incorporados al informe.** *Corto. Depende de P1.* Las tres figuras
 ya existen en `media/mapas/`. Falta la figura con su leyenda dentro del
@@ -179,6 +190,10 @@ completo en la cabeza.
       Después de P4: es presentación sobre contenido ya decidido.
 - [ ] **M4.** Revisar que ningún README ni documento de `main` cite cifras
       superadas por la corrección de la línea base.
+- [ ] **M5.** Tabla de nombres de provincia para prosa y figuras, tomada de la
+      fuente oficial. En los datos de la encuesta van en mayúsculas y sin
+      acentos; hoy `_metodo_densidad.qmd` los capitaliza con una función propia
+      y el nombre sale sin acentuar.
 
 ### El patrón geográfico del riesgo está gobernado por la energía registrada (2026-10-10)
 

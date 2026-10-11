@@ -1,0 +1,271 @@
+```{r}
+#| label: setup-densidad
+#| include: false
+
+source(here::here("reports", "_comun.R"))
+library(dplyr); library(tidyr)
+
+exigir_archivo(file.path(RUTA_CLEAN, "sensibilidad_densidad_critica.csv"),
+               "diagnostico_densidad_critica.R")
+exigir_archivo(file.path(RUTA_CLEAN, "acoplamiento_energia.csv"),
+               "diagnostico_densidad_critica.R")
+
+# Requerimiento energetico de la mujer adulta de referencia, 18 a 30 anos, no
+# embarazada ni lactando (FAO/WHO/UNU 2004). Es el denominador del EMA en
+# scripts/04_equivalente_adulto.R: si cambia alli, cambia aqui.
+KCAL_EMA <- 2291
+
+NOMBRE_NUTRIENTE <- c(
+  hierro_mg          = "Hierro",
+  zinc_mg            = "Zinc",
+  folato_mcg_dfe     = "Folato",
+  vitamina_a_mcg_rae = "Vitamina A",
+  vitamina_b12_mcg   = "Vitamina B12",
+  vitamina_d_mcg     = "Vitamina D",
+  vitamina_e_mg      = "Vitamina E"
+)
+
+ref_d <- leer_limpio(file.path(RUTA_RAW, "valores_referencia.csv")) |>
+  mutate(densidad_critica = 1000 * ear / KCAL_EMA,
+         Nutriente = NOMBRE_NUTRIENTE[nutriente])
+
+sens <- leer_limpio(file.path(RUTA_CLEAN, "sensibilidad_densidad_critica.csv")) |>
+  mutate(Nutriente = NOMBRE_NUTRIENTE[nutriente])
+
+acopl <- leer_limpio(file.path(RUTA_CLEAN, "acoplamiento_energia.csv")) |>
+  mutate(Nutriente = NOMBRE_NUTRIENTE[nutriente])
+
+nac    <- sens |> filter(dominio == "Nacional")
+e_nac  <- median(nac$energia)
+f_nac  <- e_nac / KCAL_EMA
+fol    <- nac |> filter(nutriente == "folato_mcg_dfe")
+dc_fol <- ref_d |> filter(nutriente == "folato_mcg_dfe") |> pull(densidad_critica)
+
+prov <- sens |> filter(dominio == "Provincia", nutriente == "folato_mcg_dfe")
+r_ing  <- cor(prov$energia, prov$pct_ing_comp)
+r_dens <- cor(prov$energia, prov$pct_densidad)
+prov_min <- prov |> slice_min(pct_densidad, n = 1)
+
+# Los nombres de provincia estan en mayusculas en los datos de la encuesta. Para
+# prosa se capitalizan; los acentos del nombre oficial se incorporaran cuando se
+# agregue la tabla de nombres de la fuente oficial (tarea M5).
+en_prosa <- function(x) {
+  p <- strsplit(tolower(x), " ")[[1]]
+  chicas <- c("de", "del", "la", "las", "los", "y")
+  p <- ifelse(p %in% chicas & seq_along(p) > 1, p,
+              paste0(toupper(substr(p, 1, 1)), substr(p, 2, nchar(p))))
+  paste(p, collapse = " ")
+}
+
+quint <- sens |> filter(dominio == "Quintil", nutriente == "folato_mcg_dfe") |>
+  arrange(nivel)
+q1 <- quint |> filter(nivel == "1"); q5 <- quint |> filter(nivel == "5")
+
+mas_acoplado  <- acopl |> slice_max(r_log, n = 2)
+menos_acoplado <- acopl |> slice_min(r_log, n = 1)
+```
+
+## Densidad de nutrientes como criterio complementario {#sec-densidad}
+
+Las estimaciones de riesgo de ingesta inadecuada de este informe se construyen
+comparando la ingesta aparente por EMA y día contra el Requerimiento Promedio
+Estimado, por el método del punto de corte. Ese criterio depende del nivel
+absoluto de la adquisición registrada. Como el nivel registrado varía entre
+territorios por razones que no son de consumo —se documenta en
+@sec-salvedad-mapas—, se añade un criterio complementario que no depende de
+ese nivel: la densidad de nutrientes.
+
+### Construcción del umbral
+
+El umbral no introduce valores de referencia nuevos. Queda determinado por los
+dos parámetros que el análisis ya utiliza. El denominador del Equivalente de
+Mujer Adulta son `r fmt(KCAL_EMA, 0)` kcal, que es el requerimiento energético
+de la mujer adulta de 18 a 30 años, no embarazada ni lactando (FAO/WHO/UNU, 2004), y los
+Requerimientos Promedio Estimados empleados corresponden a esa misma mujer de
+referencia. La densidad que ella necesita es, por tanto,
+
+$$d_{\text{crítica}} = \frac{\text{RPE}}{`r fmt(KCAL_EMA, 0)`} \times 1000$$
+
+```{r}
+#| label: tbl-densidad-critica
+#| tbl-cap: "Densidad crítica de nutrientes, derivada del Requerimiento Promedio Estimado y del denominador del Equivalente de Mujer Adulta"
+#| echo: false
+
+ref_d |>
+  filter(metodo == "punto_de_corte") |>
+  transmute(Nutriente,
+            `RPE` = fmt(ear, 1),
+            Unidad = unidad,
+            `Densidad crítica (por 1.000 kcal)` = fmt(densidad_critica, 2)) |>
+  tabla(notas = c(
+    paste0("Densidad crítica = RPE / ", fmt(KCAL_EMA, 0), " × 1.000, donde ",
+           fmt(KCAL_EMA, 0), " kcal es el requerimiento energético de la mujer ",
+           "adulta de referencia (FAO/WHO/UNU 2004) y el denominador del EMA."),
+    "Valores de referencia provisionales.",
+    NOTA_EMA))
+```
+
+Los dos criterios quedan ligados por una identidad exacta. Para un hogar, con
+la ingesta y la energía expresadas por EMA y día:
+
+$$\frac{d}{d_{\text{crítica}}} = \frac{\text{ingesta}}{\text{RPE}} \times \frac{`r fmt(KCAL_EMA, 0)`}{\text{energía}}$$
+
+Coinciden cuando la energía registrada por EMA es `r fmt(KCAL_EMA, 0)` kcal, y
+divergen por el factor exacto en que la supera. El punto de corte sobre la
+ingesta absoluta es más indulgente donde se registra más energía.
+
+### Verificación a nivel nacional
+
+La mediana nacional de energía registrada es `r fmt(e_nac, 0)` kcal por EMA y
+día, frente a `r fmt(KCAL_EMA, 0)` kcal del requerimiento de referencia: un
+factor de `r fmt(f_nac, 3)`. Los dos criterios están construidos
+prácticamente sobre el mismo punto, y en consecuencia coinciden.
+
+```{r}
+#| label: tbl-densidad-nacional
+#| tbl-cap: "Hogares bajo el requerimiento según cada criterio, total nacional, escenario de línea base"
+#| echo: false
+
+nac |>
+  arrange(desc(pct_ing_comp)) |>
+  transmute(Nutriente,
+            `Ingesta absoluta (%)` = fmt(pct_ing_comp, 1),
+            `Densidad (%)`         = fmt(pct_densidad, 1),
+            `Diferencia (puntos)`  = fmt(pct_densidad - pct_ing_comp, 1)) |>
+  tabla(notas = c(
+    paste0("Criterio de ingesta: proporción de hogares cuya ingesta aparente ",
+           "por EMA y día es inferior al RPE. Criterio de densidad: ",
+           "proporción cuya densidad de nutrientes es inferior a la densidad ",
+           "crítica del cuadro precedente."),
+    paste0("El hierro no aparece: se evalúa por el enfoque de probabilidad ",
+           "sobre la distribución del requerimiento, cuyo equivalente en ",
+           "densidad exigiría escalar esa distribución."),
+    NOTA_DISENO, NOTA_EMA))
+```
+
+En folato, el nutriente de interés principal para la fortificación de la harina
+de trigo, el criterio de ingesta absoluta sitúa en `r fmt(fol$pct_ing_comp, 1)`%
+la proporción de hogares bajo el requerimiento y el de densidad en
+`r fmt(fol$pct_densidad, 1)`%. **La estimación nacional no es un artefacto del
+nivel de adquisición registrada**: se sostiene bajo un criterio que es
+invariante a ese nivel.
+
+### El criterio se aplica por nutriente
+
+La densidad no es un criterio de aplicación general. Informa donde la ingesta
+del nutriente varía con independencia de la energía. Donde la sigue, la
+densidad es casi constante entre hogares y la proporción bajo el umbral se
+desplaza hacia 0 o hacia 100 según de qué lado caiga esa constante: el criterio
+deja de discriminar, tanto entre hogares como entre territorios.
+
+```{r}
+#| label: tbl-acoplamiento
+#| tbl-cap: "Acoplamiento de cada nutriente con la energía registrada"
+#| echo: false
+
+acopl |>
+  arrange(desc(r_log)) |>
+  left_join(nac |> select(nutriente, pct_ing_comp, pct_densidad), by = "nutriente") |>
+  transmute(Nutriente,
+            `r (log ingesta, log energía)` = fmt(r_log, 3),
+            `CV de la ingesta`             = fmt(cv_ingesta, 2),
+            `CV de la densidad`            = fmt(cv_densidad, 2),
+            `CV relativo`                  = fmt(razon_cv, 2),
+            `Diferencia entre criterios (puntos)` = fmt(pct_densidad - pct_ing_comp, 1)) |>
+  tabla(notas = c(
+    paste0("Correlación ponderada entre los logaritmos de la ingesta y de la ",
+           "energía por EMA y día, y coeficientes de variación ponderados. ",
+           "Descriptivos, no estimaciones de diseño."),
+    paste0("Correlación alta y CV relativo bajo indican que la ingesta sigue a ",
+           "la energía: la densidad es casi constante y el criterio no ",
+           "discrimina."),
+    NOTA_EMA))
+```
+
+Los dos nutrientes más acoplados —`r paste(mas_acoplado$Nutriente, collapse = " y ")`—
+son también los de mayor desplazamiento entre criterios, y cada uno queda
+empujado a un extremo distinto según de qué lado del umbral cae su densidad
+casi constante. El mecanismo es de composición de la dieta: los aceites
+concentran el aporte de vitamina E y su consumo escala con el consumo total de
+alimentos, mientras el folato depende de un vehículo fortificado de cobertura
+desigual y varía por su cuenta. En consecuencia, **el criterio de densidad se
+reporta en este informe para los nutrientes de acoplamiento moderado, y para
+los demás se señala la degeneración en lugar de presentar la cifra como una
+estimación alternativa.**
+
+### Los dos usos de la densidad, que no son el mismo
+
+La densidad admite dos lecturas y conviene no mezclarlas, porque su validez no
+es la misma.
+
+**Como descripción de la calidad de la dieta** es válida en cualquier
+comparación: expresa cuánto de un nutriente acompaña a cada unidad de energía
+de la canasta adquirida, y es una característica de la dieta, no del nivel de
+registro.
+
+**Como sustituto de la ingesta para estimar riesgo** es una corrección contra
+el sobrerregistro, y vale solo donde la variación de energía entre grupos es
+artefactual. Donde esa variación es real, dividir por la energía no elimina
+ruido: elimina señal.
+
+El gradiente socioeconómico lo muestra. La energía registrada crece de
+`r fmt(q1$energia, 0)` kcal por EMA y día en el primer quintil a
+`r fmt(q5$energia, 0)` en el quinto, un rango de `r fmt(q5$energia / q1$energia, 2)`
+veces, compatible con diferencias efectivas de acceso a alimentos. Bajo el
+criterio de ingesta absoluta la proporción de hogares bajo el requerimiento de
+folato pasa de `r fmt(q1$pct_ing_comp, 1)`% a `r fmt(q5$pct_ing_comp, 1)`%;
+bajo el de densidad, de `r fmt(q1$pct_densidad, 1)`% a
+`r fmt(q5$pct_densidad, 1)`%. El gradiente se invierte, y la inversión no es un
+resultado sobre bienestar: es lo que ocurre al aplicar una corrección donde no
+hay nada que corregir.
+
+**Regla de aplicación adoptada.** El gradiente socioeconómico se reporta sobre
+ingesta absoluta. La densidad entra en esa sección como descripción de la
+composición de la dieta —que las canastas de mayor gasto lleven menos folato por
+unidad de energía es un hallazgo sobre la dieta, consistente con el patrón de
+transición alimentaria— y nunca como proporción de hogares en riesgo.
+
+### Salvedad de los mapas provinciales {#sec-salvedad-mapas}
+
+La proporción de hogares bajo el requerimiento, estimada por provincia, refleja
+la adquisición registrada antes que la adecuación de la dieta. Entre las 32
+provincias, esa proporción correlaciona `r fmt(r_ing, 2)` con la energía
+registrada bajo el criterio de ingesta absoluta y `r fmt(r_dens, 2)` bajo el de
+densidad: el criterio de densidad reduce sustancialmente la dependencia del
+nivel de registro, y la dispersión entre provincias baja de
+`r fmt(diff(range(prov$pct_ing_comp)), 1)` a
+`r fmt(diff(range(prov$pct_densidad)), 1)` puntos de rango.
+
+No la elimina. La provincia de menor proporción bajo el criterio de densidad
+—`r en_prosa(prov_min$nivel)`, con `r fmt(prov_min$pct_densidad, 1)`%— sigue apartada del
+valor nacional, y ese residuo queda sin explicar. Se declara como tal y no como
+un resultado sobre el estado nutricional de esa provincia.
+
+A lo anterior se añaden dos limitaciones de diseño. **La provincia no es dominio
+de estimación de la ENGIH 2018**: su tamaño muestral por provincia va desde unas
+decenas de hogares hasta más de mil, y las estimaciones provinciales se publican
+con marca explícita de precisión. Las provincias que no alcanzan el mínimo de
+hogares o cuyo intervalo de confianza excede la semiamplitud fijada no se pintan
+con su valor en los mapas: se dejan sin color y se declara el motivo.
+
+### Supuesto y límites del criterio
+
+El criterio de densidad supone que el sobrerregistro es **multiplicativo**, es
+decir, que afecta por igual a todos los alimentos del hogar. Solo bajo ese
+supuesto el factor de inflación se cancela en el cociente.
+
+En estos datos el supuesto está respaldado y no únicamente asumido. En las
+provincias de mayor energía registrada, las dos secciones del cuestionario se
+inflan por factores semejantes, y la composición de la dieta —medida como la
+proporción del folato aportada por cereales y raíces— es equivalente a la del
+resto del país. Si el sobrerregistro fuera selectivo por grupo de alimentos, la
+densidad quedaría tan sesgada como el nivel, y el criterio no ofrecería ninguna
+garantía adicional.
+
+Dos límites más. El hierro queda fuera de esta comparación, por evaluarse
+mediante el enfoque de probabilidad sobre la distribución del requerimiento. Y
+los valores de referencia empleados son provisionales: la densidad crítica es
+proporcional al Requerimiento Promedio Estimado, de modo que una sustitución de
+los valores de referencia reescala todas las cifras de esta sección en la misma
+proporción, sin alterar las conclusiones sobre acoplamiento ni sobre la
+comparación entre criterios.
