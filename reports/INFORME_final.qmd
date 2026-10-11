@@ -79,11 +79,89 @@ principal <- riesgo |>
 
 ## Problema
 
-*Por redactar.*
+Decidir sobre fortificación de alimentos exige responder tres preguntas
+cuantitativas: qué proporción de la población consume el vehículo candidato, en
+qué cantidad lo consume, y cuánto se reduciría el déficit de un nutriente si se
+fortificara. Las tres requieren datos de consumo a nivel de hogar.
 
-<!-- Las encuestas de gasto de hogares no producen de forma directa cobertura de
-vehículos, ingesta aparente ni riesgo de ingesta inadecuada. Partir de
-docs/vision-y-arquitectura.md, sección 2. -->
+La República Dominicana no dispone de una encuesta nacional de consumo
+individual de alimentos. Lo que sí tiene es la Encuesta Nacional de Gastos e
+Ingresos de los Hogares 2018, diseñada para medir gasto, no nutrición. Una
+encuesta de gasto no produce de forma directa ninguna de las tres cantidades
+anteriores: registra adquisiciones en unidades de compra y montos, no gramos
+consumidos ni nutrientes ingeridos.
+
+El paso de una cosa a la otra no es automático. Exige convertir unidades de
+presentación a gramos, descontar la porción no comestible, repartir la
+adquisición en el período de observación, enlazar cada alimento con una tabla
+de composición, normalizar entre hogares de distinta composición demográfica y
+contrastar el resultado con requerimientos de referencia. Cada uno de esos
+pasos introduce supuestos, y el valor de un análisis de este tipo depende menos
+de la sofisticación del método que de que esos supuestos estén declarados y
+sean auditables.
+
+Este informe documenta ese recorrido sobre la ENGIH 2018 y responde, con los
+datos reales de la encuesta, las preguntas que la decisión de política
+requiere.
+
+## Contexto: la fortificación de alimentos en la República Dominicana
+
+El país tiene programas de fortificación obligatoria de distinta antigüedad y
+distinto grado de aplicación efectiva. La @tbl-normas resume los instrumentos
+vigentes y en propuesta para los nutrientes que este análisis modela.
+
+```{r}
+#| label: tbl-normas
+#| tbl-cap: "Instrumentos de fortificación de alimentos vigentes y en propuesta, para los nutrientes modelados. República Dominicana"
+normas <- read_delim(here("data", "raw", "parametros_normativos.csv"),
+                     delim = ";", show_col_types = FALSE,
+                     locale = locale(decimal_mark = "."))
+
+NUT_MODELADOS <- c("hierro", "acido_folico", "vitamina_a", "zinc", "vitamina_b12")
+ETIQUETA_NUT <- c(hierro = "Hierro", acido_folico = "Ácido fólico",
+                  vitamina_a = "Vitamina A", zinc = "Zinc",
+                  vitamina_b12 = "Vitamina B12", yodo = "Yodo")
+
+normas |>
+  filter(nutriente %in% NUT_MODELADOS, estado != "descartada") |>
+  transmute(`Vehículo` = vehiculo,
+            Nutriente = ETIQUETA_NUT[nutriente],
+            Nivel = paste(num(nivel_min, 2),
+                          if_else(unidad == "por_confirmar",
+                                  "(unidad por confirmar)", unidad)),
+            Instrumento = instrumento,
+            `Obligatorio` = recode(obligatorio, si = "Sí", no = "No",
+                                   propuesta = "Propuesta",
+                                   por_confirmar = "Por confirmar"),
+            `Vigente en 2018` = recode(vigente_2018, si = "Sí", no = "No",
+                                       por_confirmar = "Por confirmar")) |>
+  kable(align = "llrlll")
+```
+
+Tres rasgos de ese cuadro condicionan la lectura de todo lo que sigue.
+
+**La harina de trigo es el único vehículo con fortificación obligatoria,
+vigente en 2018 y verificada, entre los que aportan los nutrientes de interés
+de este análisis.** Su norma añade hierro y ácido fólico, además de vitaminas
+del complejo B. La sal yodada es anterior y está consolidada, pero el yodo
+queda fuera del alcance de este trabajo.
+
+**El azúcar tiene norma y no tiene aplicación verificable.** La fortificación
+con vitamina A fue oficializada como obligatoria en 2004, pero el azúcar no
+figura en la lista de alimentos fortificados del ministerio y **el producto en
+venta no declara vitamina A en su etiqueta**, según verificación en punto de
+venta realizada para este trabajo. Por eso el escenario que incorpora azúcar se
+modela como hipótesis de política y no como situación vigente.
+
+**El arroz no se fortificaba en 2018.** Existe una propuesta de reglamento
+técnico, cuyos niveles son concordantes con la etiqueta del arroz fortificado
+que ya se encuentra en el mercado. El escenario correspondiente modela esa
+propuesta, no una norma en vigor.
+
+La distinción entre norma, aplicación y verificación no es un matiz
+administrativo: determina qué escenario describe la realidad de 2018 y cuáles
+describen decisiones posibles. El escenario de línea base de este informe es la
+norma de harina de trigo aplicada a la harina y al pan.
 
 ## Preguntas
 
@@ -98,26 +176,172 @@ docs/vision-y-arquitectura.md, sección 2. -->
 
 ## Hipótesis
 
-*Por redactar.*
+Se formuló una sola hipótesis antes de examinar los datos, y se enuncia aquí
+tal como se formuló:
 
-<!-- Solo la formulada antes de ver el dato: un vehículo de consumo transversal
-reduce el gradiente social de la ingesta. -->
+> Un vehículo de fortificación de consumo transversal —adquirido por una
+> proporción alta de hogares en todos los estratos y consumido en cantidades
+> comparables entre ellos— reduce el gradiente social de la ingesta del
+> nutriente que transporta, mientras que un vehículo de consumo desigual lo
+> conserva o lo acentúa.
+
+La hipótesis es contrastable con los datos de la encuesta: basta comparar la
+razón entre quintiles extremos de la ingesta del nutriente bajo cada escenario
+de fortificación. Los resultados se presentan en la sección de escenarios.
+
+Las demás regularidades que aparecen en este informe surgieron del análisis y
+se presentan como hallazgos, no como hipótesis contrastadas. La distinción se
+mantiene de forma explícita en la discusión.
 
 ## Objetivos
 
-*Por redactar.*
+**Objetivo general.** Evaluar, con datos de la ENGIH 2018, la cobertura y el
+consumo de los alimentos fortificables y fortificados en la República
+Dominicana, y estimar su contribución a la ingesta de micronutrientes y al
+riesgo de ingesta inadecuada.
+
+**Objetivos específicos.**
+
+1. Determinar si la encuesta permite estimar consumo aparente e ingesta de
+   micronutrientes con cobertura y calidad suficientes, y documentar las
+   adaptaciones metodológicas que ello exige.
+2. Estimar el riesgo de ingesta inadecuada de los micronutrientes evaluables,
+   a nivel nacional y por dominio de estimación.
+3. Describir la composición de la dieta adquirida por grupos de alimentos y el
+   aporte de cada grupo a la energía y a cada micronutriente.
+4. Estimar la cobertura y el consumo de los principales vehículos de
+   fortificación.
+5. Identificar los grupos de población con mayor riesgo y los que quedan fuera
+   del alcance de las intervenciones vigentes.
+6. Cuantificar la contribución potencial de escenarios alternativos de
+   fortificación, incluidos los niveles recomendados internacionalmente y las
+   propuestas nacionales en discusión.
 
 # Métodos
 
-*Por redactar. Breve: el detalle va al anexo.*
+Esta sección expone la cadena de cálculo y las decisiones que la gobiernan. El
+desarrollo completo, con la justificación de cada decisión y la tabla de
+supuestos, está en el manual técnico que acompaña a este informe.
 
-<!-- Apartados: fuente de datos y diseño muestral; cadena de cálculo
-(cantidad, factor de conversión, porción comestible, período); equivalente de
-mujer adulta; tratamiento de las dos secciones (regla de agotamiento);
-composición y relleno de vacíos; escenarios (método aditivo, equivalentes de
-harina); riesgo de ingesta inadecuada (punto de corte y probabilidad);
-agrupación de alimentos; verificación en punto de venta; precisión por dominio.
-Texto reutilizable: INFORME_factibilidad.qmd, secciones "Fuentes de datos" y "Método". -->
+## Fuente y diseño
+
+Se utilizan las Secciones 2 y 3A del Cuestionario B de la ENGIH 2018. La
+Sección 2 es el inventario de despensa de alimentos almacenables, con cantidad
+inicial y final; la Sección 3A registra las adquisiciones diarias durante el
+período de observación y es la fuente principal.
+
+Todas las estimaciones son ponderadas y la varianza se calcula con el diseño
+complejo de la encuesta —estratos, unidades primarias de muestreo anidadas y
+factor de expansión por hogar— mediante linealización de Taylor. Los intervalos
+de confianza emplean la distribución *t* con los grados de libertad del
+subdiseño correspondiente.
+
+## De cantidad adquirida a gramos consumidos
+
+El consumo diario de cada alimento se obtiene como
+
+$$\text{Consumo diario (g)} = \frac{Q \times FC \times PC}{PM}$$
+
+donde $Q$ es la cantidad declarada, $FC$ el factor de conversión de la unidad de
+presentación a gramos, $PC$ la porción comestible y $PM$ el período en días. Para
+la Sección 3A, $PM$ es el número de días distintos con registro **en ese hogar**,
+que no es constante entre hogares.
+
+Los factores de conversión de las presentaciones más frecuentes se verificaron
+en punto de venta, con registro fotográfico, de modo que las equivalencias no
+dependen únicamente de tablas externas.
+
+Los valores atípicos se detectan y se marcan, pero **no se corrigen
+automáticamente**: corregir en silencio valores extremos en una encuesta de
+gasto equivale a decidir qué hogares son creíbles, y esa decisión debe ser
+explícita. Un filtro de plausibilidad energética se emplea solo como análisis
+de sensibilidad, porque los hogares que lo exceden se concentran en los
+quintiles altos y excluirlos sesgaría las comparaciones entre grupos.
+
+Un alimento almacenable puede figurar en las dos secciones. Se reporta la
+**suma** como estimación principal, por ser la única plausible, y el
+solapamiento se declara con su magnitud como limitación; el tratamiento
+específico emplea una regla de agotamiento.
+
+## Normalización por Equivalente de Mujer Adulta
+
+Para comparar hogares de distinta composición demográfica, la ingesta se expresa
+por Equivalente de Mujer Adulta y día. Cada miembro se expresa como la razón
+entre su requerimiento energético y las 2.291 kcal de la mujer adulta de
+referencia de 18 a 30 años (FAO/WHO/UNU, 2004), y el hogar es la suma de esas
+razones.
+
+La normalización supone que los alimentos se reparten **en proporción al
+requerimiento energético de cada miembro**. Es un supuesto: la encuesta no
+observa el reparto dentro del hogar. Donde el reparto real se aparta de esa
+proporción, la ingesta por EMA sobrestima la de quienes reciben menos.
+
+## Composición de alimentos
+
+El contenido de nutrientes proviene de dos tablas de composición, enlazadas con
+las variedades de la encuesta mediante un crosswalk construido y validado
+alimento por alimento. Solo las correspondencias validadas entran al cálculo.
+
+Los alimentos sin correspondencia aportan **cero**, no un valor faltante. En
+consecuencia, **la ingesta estimada es un piso y no una estimación centrada**, y
+la cobertura del emparejamiento, ponderada por gramos, acompaña a los
+resultados.
+
+## Escenarios de fortificación
+
+Los escenarios se construyen **por adición**: se parte del alimento sin
+fortificar y se suma el nivel que el escenario añade, en miligramos por
+kilogramo de vehículo, que es como se expresa una norma.
+
+Los derivados del trigo exigen un tratamiento particular. La tabla de
+composición los trae ya elaborados con harina enriquecida, de modo que partir de
+ellos contaría la fortificación dos veces; su hierro y su folato se sustituyen
+por los de la harina sin enriquecer, en proporción a la harina que contienen. Lo
+que un escenario añade a un derivado es su nivel multiplicado por esa fracción.
+
+No se descuentan pérdidas por almacenamiento ni por cocción: **los aportes
+calculados son un máximo**, y el folato es particularmente sensible a este
+supuesto.
+
+## Riesgo de ingesta inadecuada
+
+La proporción de hogares con ingesta inadecuada se estima por el **método del
+punto de corte**, comparando la ingesta por EMA y día contra el Requerimiento
+Promedio Estimado. El método supone una distribución simétrica del
+requerimiento, independencia entre ingesta y requerimiento, y que la
+distribución utilizada es la de la ingesta habitual; esta última condición es la
+que una encuesta de gasto satisface peor.
+
+El **hierro** no se evalúa por punto de corte, porque la distribución de su
+requerimiento es marcadamente asimétrica en mujeres en edad fértil. Se emplea el
+enfoque de probabilidad sobre la distribución del requerimiento, que depende del
+supuesto de biodisponibilidad de la dieta; el supuesto empleado se declara junto
+a cada cifra.
+
+El **límite superior** no se aplica al nutriente total sino a la forma a la que
+corresponde: al ácido fólico sintético añadido y al retinol preformado añadido.
+Las proporciones sobre el límite se calculan sobre la fracción añadida y se
+declaran como cota máxima.
+
+Los valores de referencia se leen de un archivo de parámetros y su estado se
+declara en la tabla correspondiente.
+
+## Dominios de estimación y precisión
+
+Se estima a nivel nacional, por región, por zona y por quintil, que son dominios
+de estimación de la encuesta, y por provincia, **que no lo es**. Las
+estimaciones provinciales se publican con marca explícita de precisión
+insuficiente cuando no alcanzan un mínimo de hogares o cuando la semiamplitud de
+su intervalo excede el umbral fijado; en los mapas, esas unidades no se pintan
+con su valor.
+
+## Agrupación de alimentos
+
+Los alimentos se clasifican en los grupos de la diversidad alimentaria mínima en
+mujeres (MDD-W, FAO 2021) más las categorías que esa guía deja fuera y que aquí
+importan. **La clasificación no es el indicador MDD-W**, que mide consumo
+individual en 24 horas; aquí se clasifican adquisiciones del hogar durante una
+semana.
 
 # Resultados
 
