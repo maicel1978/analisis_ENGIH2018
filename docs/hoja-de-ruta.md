@@ -10,85 +10,133 @@ Este documento fija el alcance acordado hasta ahora. Cualquier cambio de alcance
 
 ## PRIORIDAD ACTUAL (leer esto primero, antes que Fase 0 de abajo)
 
-**Estado al 2026-10-10.** Presentacion de avance realizada el 9 de octubre.
-Alcance vigente: cerrar los entregables de los terminos de referencia antes
-del 2026-10-23 (contrato hasta el 25). Quedan **diez dias habiles**.
+**Estado al 2026-10-11.** Presentación de avance realizada el 9 de octubre, con
+buena acogida. Alcance vigente: cerrar los entregables de los términos de
+referencia.
 
-**Metodo de trabajo.** Rama `ajustes-octubre`; `main` conserva la version
-revisada (etiqueta `informe-factibilidad-v1`). Un bloque por commit. Antes de
-cada bloque se declara el efecto esperado sobre las cifras de control
+**Cómo se organiza este trabajo.** Por paquetes, no por calendario. La cola
+está ordenada por valor y cada paquete declara su tamaño y de qué depende, de
+modo que se pueda tomar el que quepa en el brote disponible. Las fechas
+aparecen solo donde hay un compromiso con otra persona. Un paquete no empezado
+no es un retraso: es un paquete no empezado.
+
+**Tamaños.** *Corto*, una sentada. *Medio*, una sesión larga. *Largo*, varios
+brotes; se parte al empezarlo.
+
+**Método.** Rama `ajustes-octubre`; `main` conserva la versión revisada
+(etiqueta `informe-factibilidad-v1`). Un bloque por commit. Antes de cada
+bloque se declara el efecto esperado sobre las cifras de control
 (36.840 / 328.173 / 8.778); si la corrida no coincide, se detiene.
 
-**Regla de prioridad para el cierre.** Cada pieza debe servir a mas de un
-entregable. La que sirve a uno solo va al final de la cola.
+**Regla de prioridad.** Cada pieza debe servir a más de un entregable. La que
+sirve a uno solo va al final de la cola.
 
-### Fase E — cierre (10–23 oct)
+### Compromisos con fecha
 
-**E0. Desbloqueo (13 oct).** Preguntas planteadas en la presentacion que
-condicionan cifras ya calculadas. **Si el 15 de octubre no hay respuesta, se
-cierra con los supuestos actuales y se declaran en el informe. No se espera.**
+Son los únicos puntos del calendario. Todo lo demás es cola.
+
+- **2026-10-23.** Entrega de los entregables de los TdR. Contrato hasta el 25.
+- **2026-10-15.** Corte del desbloqueo. Las preguntas de abajo dependen de
+  terceros; si ese día no hay respuesta, se cierra con los supuestos actuales y
+  se declaran en el informe. **No se espera.**
+- **Sesión extendida de discusión de resultados.** Propuesta por la
+  contraparte; fecha por confirmar. No es un mazo nuevo: es el actual, más las
+  láminas de anexo, más los mapas, más la escalera de escenarios.
+
+### Desbloqueo — depende de terceros, no de brote
+
+Preguntas planteadas en la presentación que condicionan cifras ya calculadas.
 
 - [ ] Valores de referencia: Requerimiento Promedio Estimado del IOM frente a
-      Requerimiento Promedio Armonizado. Sustitucion de un unico archivo;
+      Requerimiento Promedio Armonizado. Sustitución de un único archivo;
       altera todas las estimaciones de riesgo.
 - [ ] Biodisponibilidad del hierro: fijar 10%, 18%, o reportar ambas como rango.
 - [ ] Documento normativo del arroz: obtenerlo o mantener el escenario como
-      analisis de sensibilidad.
+      análisis de sensibilidad.
 - [ ] Fuente citable para las fracciones de harina en pan, pastas y galletas.
-- [ ] Alcance, fecha y duracion de la sesion extendida de discusion de
-      resultados.
+- [ ] Alcance, fecha y duración de la sesión extendida.
 
-**E1. Mapas y visualizaciones, TdR 8.5 (14–16 oct).** Pieza de mayor
-apalancamiento: alimenta el informe final, la sesion extendida y la difusion
-posterior.
+### Cola de brotes, por valor
 
-- [ ] Limites provinciales oficiales incorporados al repositorio con su fuente.
-- [ ] Mapa bivariado de cobertura y consumo por vehiculo. Dos ejes: proporcion
-      de hogares que lo adquiere y cantidad por EMA y dia. Identifica donde un
-      vehiculo tiene alcance poblacional suficiente.
-- [ ] Mapa coropletico de riesgo de ingesta inadecuada por dominio.
-- [ ] **Decision tecnica: region como dominio principal; la provincia se
-      publica con marca explicita de precision baja** (menos de 50 hogares o
-      semiamplitud mayor de 10 puntos). Un coropletico sin esa marca presenta
-      como comparables 56 de 256 celdas que no lo son.
+**P1. Salvedad y método de la densidad.** *Corto. Sin dependencias.* Texto que
+fija la regla de los dos usos —densidad como descripción de calidad de la dieta
+en todas partes, como sustituto de la ingesta solo donde la variación de
+energía es artefactual— y la condición de uso por nutriente. Sirve al informe,
+al manual técnico y a la sesión extendida. Se escribe ahora porque es lo que se
+pierde si se deja para cuando toque redactar esa sección.
 
-**E2. Aporte de los grupos de alimentos a los micronutrientes, TdR 8.4
-(16 oct).** Completa el analisis por grupos, hoy limitado a la energia.
+**P2. Mapas incorporados al informe.** *Corto. Depende de P1.* Las tres figuras
+ya existen en `media/mapas/`. Falta la figura con su leyenda dentro del
+documento y la decisión de qué mapa va al cuerpo y cuál al anexo. Completa
+TdR 8.5.
 
-- [ ] Contribucion de cada grupo a cada micronutriente, en la forma de salida
-      de los analisis de referencia del proyecto.
+**P3. Residuo de Samaná.** *Medio. Sin dependencias.* La densidad bajó la
+anomalía de 47 a 37 puntos y no la cerró. Hipótesis abierta: producción propia
+y existencias de despensa en provincias rurales. Comprobable si la ENGIH
+registra la procedencia de la adquisición. Es el paquete con más posibilidad de
+hallazgo propio y hoy está abierto.
 
-**E3. Informe analitico final, TdR 7 y 8 (17–21 oct).** Consume E1 y E2.
+**P4. Informe analítico final, TdR 7 y 8.** *Largo. Depende de P1 y P2.* El
+grueso del cierre.
 
 - [ ] Reestructurar por preguntas, incorporar mapas y grupos, recompilar y
-      comparar contra la version etiquetada.
-- [ ] Responder los comentarios de revision, con seccion de origen, respuesta y
-      ubicacion nueva.
-- [ ] Incorporar la introduccion de contexto de pais y politicas de
-      fortificacion solicitada en la revision, que se omitio en la
-      presentacion por tiempo.
+      comparar contra la versión etiquetada.
+- [ ] Responder los comentarios de revisión, con sección de origen, respuesta y
+      ubicación nueva.
+- [ ] Introducción de contexto de país y políticas de fortificación, solicitada
+      en la revisión y omitida en la presentación por tiempo.
 
-**E4. Manual tecnico, TdR 18 (21–22 oct).** Se extrae del informe final y de
-las decisiones ya documentadas en este archivo; no se redacta de cero.
+**P5. Manual técnico, TdR 18.** *Medio. Depende de P4.* Se extrae del informe y
+de las decisiones ya documentadas en este archivo; no se redacta de cero.
 
-**E5. Modulos de capacitacion, TdR 9 a 17 (22–23 oct).** Consume E3.
+**P6. Módulos de capacitación, TdR 9 a 17.** *Medio. Depende de P4 y de la
+comprobación mecánica M1.*
 
 - [ ] Sustituir los datos simulados del tema 5 por resultados reales de la
-      ENGIH. **Exigido por la Nota Metodologica 5 del contrato; no es
+      ENGIH. **Exigido por la Nota Metodológica 5 del contrato; no es
       opcional.**
-- [ ] Unidades de R aplicado, version minima sobre la ENGIH.
-- [ ] Retirar o regrabar los videos 15 y 16, que explican el metodo de nivel de
-      fortificacion anterior a su correccion.
+- [ ] Unidades de R aplicado, versión mínima sobre la ENGIH.
+- [ ] Retirar o regrabar los videos 15 y 16, que explican el método de nivel de
+      fortificación anterior a su corrección.
 
-**E6. Sesion extendida de discusion.** Fecha por confirmar en E0. No es un
-mazo nuevo: es el actual, mas sus laminas de anexo, mas los mapas de E1, mas
-la escalera de escenarios.
+**P7. Cierre del repositorio.** *Corto. Depende de P4.* Fusión de
+`ajustes-octubre` a `main`, README reescrito y etiqueta de cierre. **El README
+de `main` conserva todavía la conclusión sobre el trigo anterior a la
+corrección de la línea base**: es un error visible en la rama pública.
 
-**E7. Cierre del repositorio (23 oct).**
+**P8. Una página para el oficial de nutrición del país.** *Corto. Depende de
+P4.* Lo que cambia su trabajo del lunes, sin metodología. Fuera de los TdR;
+sirve al objetivo de recontratación. Ver `claude/valor-operativo.md`.
 
-- [ ] Fusion de `ajustes-octubre` a `main`, README reescrito y etiqueta de
-      cierre. El README de `main` conserva todavia la conclusion sobre el trigo
-      anterior a la correccion de la linea base.
+### Trabajo propio — sin fecha y sin depender del cierre
+
+No está gobernado por la entrega. Entra cuando haya brote, incluso antes del 23
+de octubre, y no compite con los paquetes de arriba salvo por el tiempo.
+
+- **Tutorial extendido.** 23 capítulos; escrito el de adecuación. Lo salido de
+  la corrida del 11 de octubre es material propio para varios: la densidad
+  crítica derivada de la construcción del EMA, la identidad entre los dos
+  criterios, el dominio de validez por nutriente y la inversión del gradiente
+  socioeconómico.
+- **Paquete de R.** Diseño en `diseno-paquete-r.md`. Primer paso es la
+  pregunta de propiedad intelectual, no el código.
+- **Artículo.** Propuesto por la contraparte en la presentación. Ver la Fase 4
+  más abajo.
+
+### Banco mecánico — para oficina o cansancio
+
+Tareas de bajo consumo de juicio, que se pueden hacer sin tener el hilo
+completo en la cabeza.
+
+- [ ] **M1.** Comprobar si los módulos 18 a 24 leen las cifras de archivo o las
+      tienen escritas a mano. Decide el alcance real de P6 y hoy es la
+      contradicción sin resolver entre la hoja de ruta y la tabla presentada.
+- [ ] **M2.** Actualizar `claude/valor-operativo.md` con la estructura de
+      fuentes por nutriente y con los resultados de densidad.
+- [ ] **M3.** Aplicar `docs/normas-figuras-y-tablas.md` a los tres mapas.
+      Después de P4: es presentación sobre contenido ya decidido.
+- [ ] **M4.** Revisar que ningún README ni documento de `main` cite cifras
+      superadas por la corrección de la línea base.
 
 ### El patrón geográfico del riesgo está gobernado por la energía registrada (2026-10-10)
 
