@@ -79,8 +79,14 @@ no es un retraso: es un paquete no empezado.
 **Tamaños.** *Corto*, una sentada. *Medio*, una sesión larga. *Largo*, varios
 brotes; se parte al empezarlo.
 
-**Método.** Rama `ajustes-octubre`; `main` conserva la versión revisada
-(etiqueta `informe-factibilidad-v1`). Un bloque por commit. Antes de cada
+**Primera fusión a `main`: 2026-10-11, en `42bc01c`.** Con el informe final
+compilando sin error en HTML y Word, se aplicó por primera vez la regla de que
+`main` es el último estado verificado. Entraron 86 archivos y 6.565 líneas que
+llevaban desde el 18 de septiembre esperando. Lo que quedaba para el día de la
+entrega pasa a ser rutina.
+
+**Método.** Rama `ajustes-octubre`; la etiqueta `informe-factibilidad-v1`
+conserva la versión entregada y revisada. Un bloque por commit. Antes de cada
 bloque se declara el efecto esperado sobre las cifras de control
 (36.840 / 328.173 / 8.778); si la corrida no coincide, se detiene.
 
@@ -358,6 +364,14 @@ completo en la cabeza.
           findstr /c:"<!--" reports\INFORME_final.qmd
 
       Debe no devolver nada. Lo mismo para el manual técnico.
+- [ ] **M7.** Redimensionar las cuatro fotos de `caldo_dona_gallina0*.jpg`.
+      Pesan entre 5,3 y 6 MB cada una, frente a los 130 a 200 KB del resto de
+      las fotos de campo: salieron del teléfono sin redimensionar. Son 22 de
+      los 31,7 MB de `media/`. Redimensionarlas a la escala de las demás
+      recupera unos 22 MB en los clones nuevos; la historia conserva las
+      originales. Comprobado el 2026-10-11 que las versiones `_v.jpg` **sí se
+      usan** en la presentación de cierre, de modo que no son candidatas a
+      limpieza.
 - [ ] **M5.** Tabla de nombres de provincia para prosa y figuras, tomada de la
       fuente oficial. En los datos de la encuesta van en mayúsculas y sin
       acentos; hoy `_metodo_densidad.qmd` los capitaliza con una función propia
