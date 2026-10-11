@@ -370,49 +370,62 @@ Consecuencia operativa: el gradiente socioeconómico del informe se reporta
 sobre ingesta absoluta, y la densidad entra en esa sección como descripción de
 composición de la dieta, nunca como prevalencia de riesgo.
 
-**La hipótesis abierta ya es comprobable (2026-10-11).** La ENGIH **sí registra
-la procedencia de la adquisición**. El Excel original tiene en la Sección 3A la
-variable `QUIEN_PAGO1`, cuyo diccionario incluye *Producción propia del hogar*
-(código 2) y *Retiro del negocio del hogar* (3), además de los regalos por
-origen. También registra el destino de lo adquirido —`DESTINO_NEGOCIO`,
-`DESTINO_OTRO_HOGAR`, `DESTINO_IGLESIA_ONG`— y la participación del hogar en la
-adquisición, `PORCENTAJE_HOGAR`.
+**La procedencia se registra, y queda descartada como mecanismo (2026-10-11).**
+La ENGIH sí registra la procedencia: `QUIEN_PAGO1` de la Sección 3A distingue
+*Producción propia del hogar* (2) y *Retiro del negocio del hogar* (3), además
+de los regalos por origen. Magnitud nacional, sobre el archivo original: compra
+90,85% del monto, regalo de otro hogar 4,47%, retiro del negocio 1,77%,
+producción propia 1,64%, destino declarado a un negocio 1,49%. Concentrada:
+12,6% de los hogares registra algo, con percentil 90 en el 70% de su
+adquisición.
 
-**Ninguna de ellas llega al cálculo.** `01_import.R` las lee del Excel y las
-descarta en el `transmute()` del paso 6.2, que conserva once campos. En
-consecuencia `cantidad_adquirida` entra completa aunque la adquisición fuera
-para un negocio o para otro hogar. Esto es independiente de Samaná y hay que
-decidirlo por separado.
+**No explica el patrón.** Entre hogares, la correlación entre la participación
+no comprada y la energía registrada es **0,011**. Por tramo de participación,
+la energía mediana es 2.262, 2.775, 2.657 y 2.282 kcal por EMA y día: no hay
+gradiente. El destino a un negocio correlaciona **−0,18** con la energía
+provincial, en sentido contrario al de la hipótesis.
 
-Magnitud nacional, calculada sobre el archivo original:
+**La prueba decisiva.** Dentro de las tres provincias de menor riesgo, los
+hogares **sin nada** de producción propia ni retiro del negocio registran 3.370
+kcal por EMA y día (n = 250), frente a 2.238 en los hogares equivalentes del
+resto del país (n = 7.353). El exceso está íntegro en los hogares para los que
+la hipótesis predice que no debería haberlo.
 
-| Procedencia | Registros | Monto |
-|---|---|---|
-| El hogar (compra) | 93,50% | 90,85% |
-| Regalo de otro hogar nacional | 2,38% | 4,47% |
-| Retiro del negocio del hogar | 2,42% | 1,77% |
-| Producción propia del hogar | 1,19% | 1,64% |
-| Destino declarado a un negocio | 0,37% | 1,49% |
+**Falacia ecológica, documentada.** Entre provincias, la participación de
+producción propia correlaciona 0,51 con la energía registrada, y la proporción
+de hogares con algo de producción propia, 0,50. Samaná tiene 35,6% de hogares
+con producción propia frente a 9,4% en el resto. Y sin embargo el efecto no
+existe entre hogares. Es un caso de libro y vale como material docente con
+datos reales.
 
-Pequeño en el agregado y **concentrado**: el 12,6% de los hogares registra algo
-de producción propia o retiro del negocio, y entre esos la mediana es 11,8% de
-su adquisición, el percentil 90 es 70% y hay hogares al 100%. Esa concentración
-es la forma que tendría el mecanismo si fuera el responsable del patrón
-provincial, pero 3,4% del monto nacional no explica por sí solo un exceso de
-1,71 veces en Samaná. **Es un candidato, no una explicación establecida.**
+Evidencia: `scripts/diagnostico_procedencia.R`,
+`data/clean/procedencia_por_provincia.csv`. Medido en monto, no en gramos; como
+el resultado es negativo y el margen es amplio, no se justifica arrastrar
+`quien_pago1` por el pipeline para medirlo en energía.
 
-Prueba: `scripts/diagnostico_procedencia.R`, que relee solo esas columnas y
-cruza por hogar con la energía ya calculada, sin tocar el pipeline ni las
-cifras de control. Mide la participación en **monto**, que es un sustituto; si
-el resultado es afirmativo, el paso siguiente es arrastrar `quien_pago1` por el
-pipeline y medirlo en energía.
+**Asunto independiente que queda abierto.** `01_import.R` lee del Excel la
+procedencia, el destino de lo adquirido (`DESTINO_NEGOCIO`,
+`DESTINO_OTRO_HOGAR`, `DESTINO_IGLESIA_ONG`) y `PORCENTAJE_HOGAR`, y las
+descarta en el `transmute()` del paso 6.2. En consecuencia
+`cantidad_adquirida` entra completa aunque la adquisición fuera para un negocio
+o para otro hogar, y sin aplicar la participación del hogar. Nacionalmente es
+chico —0,37% de registros con destino a negocio, 3,81% con participación
+distinta de 100— pero es **un supuesto no declarado**. Va al manual técnico
+como tal; probarlo como sensibilidad es opcional.
 
-**Hipótesis abierta, no verificada.** Las cinco provincias de mayor energía son
-rurales y agrícolas; las de menor, más urbanas. La producción propia y las
-existencias de despensa mayores en zonas rurales son una fuente conocida de
-sobrerregistro en encuestas de gasto. Comprobable si la ENGIH registra la
-procedencia de la adquisición (compra, producción propia, regalo). Va al
-informe como limitación, no como resultado.
+**Cuarto mecanismo descartado. Hipótesis siguiente: los factores de
+conversión.** Quedan descartados la composición de la dieta, el reparto entre
+secciones, la regla de agotamiento, los días observados, el tamaño del hogar,
+la inestabilidad de conglomerados pequeños y ahora la procedencia. Lo que no se
+ha examinado es el paso de cantidad declarada a gramos. Si las unidades no
+estándar —compras a granel, unidades locales— son más frecuentes en las
+provincias rurales y su factor de conversión universal sobrestima, el exceso
+aparecería exactamente donde aparece, sería multiplicativo y se cancelaría en
+la densidad, que es todo lo observado. El repositorio ya tiene
+`data/diagnosticos/ranking_unidades_no_estandar.csv` y el trabajo de campo de
+verificación de factores en punto de venta. **Comprobable:** participación de
+unidades no estándar por provincia, y si el exceso se concentra en productos de
+factor dudoso. Pendiente de brote.
 
 **Descartado por falta de evidencia.** Se evaluó añadir un mínimo de
 conglomerados al filtro de precisión, bajo la hipótesis de que los dominios
