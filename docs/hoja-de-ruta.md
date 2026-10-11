@@ -235,6 +235,52 @@ corrección de la línea base**: es un error visible en la rama pública.
 P4.* Lo que cambia su trabajo del lunes, sin metodología. Fuera de los TdR.
 Nota de alcance y destinatario fuera de este repositorio.
 
+**P9. Reducción de dimensionalidad de los entregables y limpieza de la
+documentación.** *Medio. Depende de P4 — y la dependencia es real, no de
+preferencia: hasta que el informe final esté escrito no se sabe qué de los
+informes modulares quedó absorbido.*
+
+Hoy se renderizan **doce documentos** desde `reports/`:
+
+| Documento | Líneas | Formato |
+|---|---|---|
+| `INFORME_factibilidad` | 1.170 | html, docx |
+| `INFORME_final` | 640 | html, docx |
+| `MANUAL_tecnico` | 582 | html, docx |
+| `R1_calidad_datos` | 352 | html |
+| `R2_modelo_base` | 350 | html |
+| `R3_cobertura_vehiculos` | 396 | html |
+| `R4_escenarios_fortificacion` | 353 | html |
+| `R5_equidad` | 568 | html |
+| `dashboard_decision_fortificacion` | 349 | dashboard |
+| `dashboard_estado_datos` | 242 | dashboard |
+| `presentacion_cierre` | 819 | revealjs |
+| `presentacion_revision` | 578 | revealjs |
+
+**Criterio propuesto.** Un documento se entrega si responde una pregunta que
+ningún otro responde **y** tiene un destinatario nombrado. Lo que no pasa las
+dos pruebas es material de trabajo: se conserva en el repositorio, no se
+entrega.
+
+**Conjunto de entrega, como hipótesis a confirmar al escribir P4:**
+
+1. `INFORME_factibilidad` — entregado y revisado; se congela como está.
+2. `INFORME_final` — el entregable principal.
+3. `MANUAL_tecnico` — TdR 18.
+4. `dashboard_decision_fortificacion` — la pieza que sirve a quien decide.
+5. `presentacion_cierre` — entregada el 9 de octubre.
+
+**A decidir en ese momento:** los cinco informes modulares, que suman 2.019
+líneas y que P4 está absorbiendo por construcción, pasan a anexos del informe
+final o salen del conjunto de entrega y quedan como material de trabajo. El
+tablero de estado de datos y la presentación de revisión son artefactos de
+proceso, no de entrega.
+
+**Alcance adicional, al final.** Revisión de toda la documentación de los dos
+repositorios —README, hoja de ruta, documentos de `docs/`— para que lo que
+quede sea coherente y no haya documentos que se contradigan entre sí. Incluye
+M4, que ya está en el banco mecánico.
+
 ### Trabajo propio — sin fecha y sin depender del cierre
 
 No está gobernado por la entrega. Entra cuando haya brote, incluso antes del 23
