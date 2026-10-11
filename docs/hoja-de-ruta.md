@@ -10,6 +10,48 @@ Este documento fija el alcance acordado hasta ahora. Cualquier cambio de alcance
 
 ## PRIORIDAD ACTUAL (leer esto primero, antes que Fase 0 de abajo)
 
+### DECISIÓN ABIERTA Y PRIORITARIA — el repositorio es público (2026-10-11)
+
+Detectado al verificar el estado de las ramas. El repositorio está en
+visibilidad pública y tiene rastreados, desde el commit `ad78a3b` del 6 de
+septiembre y en las dos ramas:
+
+| Archivo | Tamaño |
+|---|---|
+| `data/raw/Registros_Cuestionario_B.xlsx` | 56,4 MB |
+| `data/raw/Sociodemograficas_e_ingresos.xlsx` | 42,6 MB |
+| `data/raw/data_raw_sec3a.csv` | 25,4 MB |
+| `data/raw/data_raw_sec2.csv` | 2,6 MB |
+
+Son microdatos a nivel de hogar, incluida la base sociodemográfica y de
+ingresos, contra la regla propia de no subir microdatos. Además, `referencias/`
+redistribuye documentos metodológicos internos del proyecto y un artículo de
+revista con derechos de autor.
+
+**Lo que falta establecer, y no lo puede establecer el asistente:** bajo qué
+condiciones se recibieron esos archivos. Si son de descarga abierta, el asunto
+es de términos de uso; si se entregaron bajo un acuerdo de uso de datos, es
+otra cosa.
+
+**Paso reversible e inmediato.** Poner el repositorio en privado. Detiene la
+exposición, no toca la historia, no rompe nada:
+
+    gh repo edit maicel1978/analisis_ENGIH2018 --visibility private --accept-visibility-change-consequences
+
+**Paso no reversible, que se decide con la cabeza fría.** `git rm` no quita los
+archivos de la historia: siguen descargables desde cualquier commit anterior.
+Limpiarlos exige `git filter-repo` y `push --force`, lo que cambia el hash de
+todos los commits y vuelve incompatible cualquier clon, más un pedido a soporte
+de GitHub para recoger los objetos sueltos. Se hace una vez y bien.
+
+**Dato que ayuda a dimensionarlo:** Insights → Traffic en GitHub muestra clones
+y visitas de los últimos 14 días. Con 0 forks y 0 watchers, si el tráfico es
+nulo o mínimo hay margen para hacer la limpieza sin prisa.
+
+Hecho ya: los nombres de personas de este archivo se sustituyeron por el rol, y
+se quitó una nota de posicionamiento interno que no correspondía a un
+repositorio abierto.
+
 **Estado al 2026-10-11.** Presentación de avance realizada el 9 de octubre, con
 buena acogida. Alcance vigente: cerrar los entregables de los términos de
 referencia.
@@ -105,8 +147,8 @@ de `main` conserva todavía la conclusión sobre el trigo anterior a la
 corrección de la línea base**: es un error visible en la rama pública.
 
 **P8. Una página para el oficial de nutrición del país.** *Corto. Depende de
-P4.* Lo que cambia su trabajo del lunes, sin metodología. Fuera de los TdR;
-sirve al objetivo de recontratación. Ver `claude/valor-operativo.md`.
+P4.* Lo que cambia su trabajo del lunes, sin metodología. Fuera de los TdR.
+Nota de alcance y destinatario fuera de este repositorio.
 
 ### Trabajo propio — sin fecha y sin depender del cierre
 
@@ -620,7 +662,7 @@ registro histórico; rigen las decisiones del 2026-10-03.
 
   **Respuesta citable ante la pregunta "¿cuál es el período de medición?":** *el diseño declara 7 días, los datos muestran registro incompleto en el 39% de los hogares, y verifiqué contra los datos cuál interpretación se sostiene — la ingesta mediana es invariante al número de días observados, lo que confirma que el denominador es correcto.*
 
-- [x] **HITO (2026-09-12): Sección 2 y Sección 3A NO son intercambiables ni sumables sin criterio. Cuantificado.** Daniel indicó explícitamente trabajar con **Sec 2** y Santiago con **Sec 3A**. Verificado que **ninguna de las dos indicaciones era errónea: las dos hacen falta.**
+- [x] **HITO (2026-09-12): Sección 2 y Sección 3A NO son intercambiables ni sumables sin criterio. Cuantificado.** La supervisión técnica indicó explícitamente trabajar con **Sec 2** y Santiago con **Sec 3A**. Verificado que **ninguna de las dos indicaciones era errónea: las dos hacen falta.**
 
   | Variante | Hogares | Energía mediana | Energía media | Hierro | Folato | Vit. A | >6000 kcal |
   |---|---|---|---|---|---|---|---|
@@ -634,7 +676,7 @@ registro histórico; rigen las decisiones del 2026-10-03.
 
   **Descomposición de la cola (78 + 271 = 349, pero la suma da 572):** **223 hogares (39% de la cola) nacen del solapamiento**; los otros 349 ya estaban en los datos crudos, sobre todo en Sec 3A — son **compras al por mayor** (un saco de arroz en un día), fenómeno real de las encuestas de adquisición, no un error del pipeline.
 
-  **Decisión documentada:** reportar **la suma** como estimación principal (única plausible); **declarar el solapamiento con su magnitud** como limitación conocida que sobrestima arroz, aceite, azúcar y leche; **proponer la disponibilidad neta** (`cantidad_inicial + adquisiciones − cantidad_final`) como refinamiento para almacenables — los datos existen, `cantidad_inicial` y `cantidad_final` están en Sec 2. **Llevar a Daniel y Santiago como decisión suya, con esta tabla como evidencia.** No elegir una sección por cuenta propia: contradiría a uno de los dos supervisores.
+  **Decisión documentada:** reportar **la suma** como estimación principal (única plausible); **declarar el solapamiento con su magnitud** como limitación conocida que sobrestima arroz, aceite, azúcar y leche; **proponer la disponibilidad neta** (`cantidad_inicial + adquisiciones − cantidad_final`) como refinamiento para almacenables — los datos existen, `cantidad_inicial` y `cantidad_final` están en Sec 2. **Llevar a la supervisión técnica como decisión suya, con esta tabla como evidencia.** No elegir una sección por cuenta propia: contradiría a uno de los dos supervisores.
 
   Salida reproducible: `data/clean/comparacion_variantes_seccion.csv`. El `04` conserva ahora la columna `seccion` (antes se perdía en el `bind_rows`), y el `05` produce las tres variantes con `stop()` si esa columna falta.
 
@@ -875,7 +917,7 @@ registro histórico; rigen las decisiones del 2026-10-03.
 
 - [ ] **Pendiente menor:** varios archivos de `media/` tienen doble extensión (`aji_cubanela02.jpg.jpg`, `platano_verde00.jpg02.jpeg`). Funcionan, pero desentonan. Corregir junto con las rutas que los referencian en la presentación, no por separado.
 
-- [ ] **DECISIÓN ABIERTA (2026-09-10) — línea base de fortificación. Corresponde al equipo (Daniel/Carlos/Santiago), NO se automatiza.** El crosswalk actual no representa ningún escenario real de política pública dominicana:
+- [ ] **DECISIÓN ABIERTA (2026-09-10) — línea base de fortificación. Corresponde a la supervisión técnica, NO se automatiza.** El crosswalk actual no representa ningún escenario real de política pública dominicana:
   - **Arroz:** RD **no** tiene norma de fortificación de arroz, pero el crosswalk manda ARROZ (var. 7), Arroz selecto (66) y Súper-selecto (65) a `70213002` "Arroz blanco enriquecido" (Fe 4.36, folato 386/100g). Solo Arroz corriente (67) va a `70213004` sin enriquecer. **Sobrestima** Fe y folato del alimento #1 de la dieta.
   - **Harina de trigo:** fortificación **obligatoria desde 2009** (Fe, ácido fólico, complejo B), pero el crosswalk manda Harina de trigo (58) a `70213038` "s/enriquecer" (Fe 1.17, folato 26). **Subestima.**
   - **Azúcar:** fortificada con vitamina A (NORDOM 606, 5–25 mg/kg), pero AZUCARES (29) va a `70215001` sin fortificar (vit A = 0) y Azúcar blanca refinada (458) a `70215036`. **Subestima** vitamina A.
@@ -919,11 +961,11 @@ Sec 3A superó la proyección (155,770 vs. ~113,700 esperados) — probablemente
 - [x] **Resuelto:** `crosswalk_tablas_composicion.xlsx`, pestaña `Cuest. B Sec 3A`, columna `validado` — las 6 filas con número en vez de booleano ya se corrigieron a mano. De esas 6, dos (id 2936 "Impuesto a vivienda de lujos", id 2392 "Pulseras de metales preciosos") resultaron ser errores de captura reales del crudo ENGIH (1 hogar cada uno, no alimentos) — **eliminadas de la tabla el 2026-09-06**. Se revisaron otras 24 filas con palabras similares (alcohol, tabaco): son categorías legítimas de la sección, sin `ENHANCE_ID` a propósito por no aportar a la fortificación — no se tocan.
 - [x] Sec 3A completo — resuelto 2026-09-05. Misma metodología que Sec 2, aplicada a 2,008 combinaciones reales (antes la tabla solo tenía 721, cubriendo el 36%). De 1,372 genuinamente alimento-específicas: 546 con FC asignado (97.9% de las observaciones pendientes), 68 combos (0.66%, incluye variantes menores de "Sopita Concentrada") quedan para revisión manual, 758 sin evidencia (1.5%, cola de muy baja frecuencia). La hoja `Cuest. B Sec 3A` de `data_raw_unidades_ACTUALIZADO.xlsx` fue reconstruida completa (2,008 filas, mismo formato que Sec 2: `id_variedad`, `descripcion`, `unidad_no_estandar`, `FC`, `frec_sec3` corregida, `validacion`, `nota`). Detalle: `data/eda/FC_propuesto_sec3a.csv`.
   - [ ] 68 combos en `REVISAR_MANUAL_alta_dispersion` (ver `data/eda/FC_propuesto_sec3a.csv`) — mayormente n pequeño (3-25 hogares) o rango amplio sin patrón claro de mercado, baja prioridad por impacto (762 observaciones de 342,046 filas totales).
-  - [x] **"Sopita Concentrada" — cerrado con dato real (2026-09-08), pendiente solo de aprobación final de Daniel/Carlos.** Con trabajo de campo real (fotos propias en el mercado, `media/fotos_investigacion_mercado/`) y una etiqueta de Knorr Caldo de Pollo verificada en H-E-B: **1 cubito = 10g → 2,320mg sodio, 30kcal (23,200mg sodio/100g, 62x más que el caldo diluido que se iba a usar por error).** Confirma con datos reales el diagnóstico teórico de la mañana. Limitación honesta: la etiqueta solo trae sodio/macros, no el perfil completo de micronutrientes — no hay `ENHANCE_ID` completo todavía, pero para sodio/energía (lo más relevante de este producto) ya hay dato citable. Detalle completo en `crosswalk_tablas_composicion.xlsx`, columna `notas` de esa fila.
+  - [x] **"Sopita Concentrada" — cerrado con dato real (2026-09-08), pendiente solo de aprobación final de la supervisión técnica.** Con trabajo de campo real (fotos propias en el mercado, `media/fotos_investigacion_mercado/`) y una etiqueta de Knorr Caldo de Pollo verificada en H-E-B: **1 cubito = 10g → 2,320mg sodio, 30kcal (23,200mg sodio/100g, 62x más que el caldo diluido que se iba a usar por error).** Confirma con datos reales el diagnóstico teórico de la mañana. Limitación honesta: la etiqueta solo trae sodio/macros, no el perfil completo de micronutrientes — no hay `ENHANCE_ID` completo todavía, pero para sodio/energía (lo más relevante de este producto) ya hay dato citable. Detalle completo en `crosswalk_tablas_composicion.xlsx`, columna `notas` de esa fila.
   - [ ] El join de producción en `01_import.R` sigue siendo por `descripcion` (texto), no por `id_variedad` — se verificó que hoy no hay colisiones, pero sigue siendo fràgil a futuro (un cambio de tilde/mayúscula en cualquiera de los dos archivos rompe el match sin avisar). Considerar migrar el join a `id_variedad` cuando haya tiempo.
 
 
-- [ ] Completar validación del crosswalk Sec 3A — **420/769 hechas (55%), actualizado 2026-09-08.** Quedan 349. Nuevos sin match: Conconete, Jamón bolo, Pan camarón, Cojinúa (es un pez, no cebollín), Bija en polvo, Pico y pala de pollo, Sardinas en agua y sal, Sazón líquido, Compota, Malagueta, Queso de hoja, Extracto de malta, Dorado, Rulo, Masitas, Paletas+mentas, Sopa china -- lista completa para preguntarle a Daniel. Sin match real ni en INCAP ni en FNDDS tras búsqueda (21 en total): Sazón líquido (mayor frecuencia pendiente, 1756), Compota, Malagueta, Queso de hoja, Extracto de malta, Dorado, Rulo, Masitas, Paletas+mentas (categoría combinada), Sopa china instantánea, más 12 menores — **preguntarle a Daniel si conoce fuente para estos** en vez de seguir buscando a ciegas. Nota: algunos matches de "media"/"baja" confianza automática resultaron correctos al verificar (ej. Huevos criollos, Pimienta en polvo, Chuleta de cerdo) — la etiqueta de confianza automática no predice bien la calidad, hay que seguir revisando una por una.
+- [ ] Completar validación del crosswalk Sec 3A — **420/769 hechas (55%), actualizado 2026-09-08.** Quedan 349. Nuevos sin match: Conconete, Jamón bolo, Pan camarón, Cojinúa (es un pez, no cebollín), Bija en polvo, Pico y pala de pollo, Sardinas en agua y sal, Sazón líquido, Compota, Malagueta, Queso de hoja, Extracto de malta, Dorado, Rulo, Masitas, Paletas+mentas, Sopa china -- lista completa para consultar a la supervisión técnica. Sin match real ni en INCAP ni en FNDDS tras búsqueda (21 en total): Sazón líquido (mayor frecuencia pendiente, 1756), Compota, Malagueta, Queso de hoja, Extracto de malta, Dorado, Rulo, Masitas, Paletas+mentas (categoría combinada), Sopa china instantánea, más 12 menores — **consultar a la supervisión técnica si conoce fuente para estos** en vez de seguir buscando a ciegas. Nota: algunos matches de "media"/"baja" confianza automática resultaron correctos al verificar (ej. Huevos criollos, Pimienta en polvo, Chuleta de cerdo) — la etiqueta de confianza automática no predice bien la calidad, hay que seguir revisando una por una.
 - [ ] Resolver los ~68 `id_variedad` de Sec 3A ausentes del diccionario oficial (¿versión distinta, o residual real?)
 - [ ] Decidir si cubrir los 16 códigos `VARIEDAD` de Sec 2 fuera del crosswalk de 30 (afecta 0.13% de filas — prioridad baja)
 - [x] Completar factores FC "Alimento-específico" de **Sec 2** — resuelto 2026-09-05. De 196 combinaciones: 43 ya resueltas por unidad universal, 34 fuera del crosswalk de 30 alimentos (bajo impacto, ver abajo), 119 genuinamente alimento-específicas. De esas 119: 79 con FC asignado con evidencia del propio crudo (`contenido_empaque_presentacion`, mediana por combinación), cubriendo 95.9% de las observaciones; 40 sin evidencia suficiente (1% de las observaciones, baja prioridad). Metodología completa en `data/eda/FC_propuesto_sec2.csv`. Archivo actualizado: `data/raw/data_raw_unidades_ACTUALIZADO.xlsx` (reemplaza a `data_raw_unidades.xlsx` una vez validado).
@@ -946,7 +988,7 @@ Sec 3A superó la proyección (155,770 vs. ~113,700 esperados) — probablemente
 - [ ] **Bug de "Docena" (código 52) — abierto desde el 10-09 y puede aparecer en R1.** El diccionario universal le asigna FC = 12 (un conteo, no gramos) y la tabla universal tiene prioridad sobre la específica, así que una docena de huevos devuelve 12 en vez de ~600 g. Afecta ~217 filas de Sec 3A y 1 de Sec 2 (0.06%), con subestimación sistemática de ~40x en esos ítems. No invalida los agregados por su tamaño, pero **puede verse en R1 como valores anómalamente bajos en alimentos comprados por docena**. Mejor declararlo que improvisar si lo notan en la presentación.
 - [ ] **VERIFICAR antes del 16: el módulo demográfico de la ENGIH.** Fase 2 anota que el consumo aparente por AFE con mujeres 15-49, embarazadas y lactantes **requiere un módulo demográfico aún sin descargar**. Eso cambia cómo se declara la limitación de embarazo/lactancia en R1 y R2: no es lo mismo "la encuesta no captura el dato" que "está en un módulo que no se incorporó en esta etapa". La segunda es honesta y deja la puerta abierta; la primera sería incorrecta si el módulo existe.
 - [ ] **Aplicar el diseño muestral complejo con `srvyr`** (`ESTRATO` 8 niveles, `UPM` 933, `FACTOR_EXPANSION`). Las tres variables están disponibles y el paquete está en el entorno. Mientras no se aplique, **todos los intervalos de confianza están subestimados**, incluido el que ya imprime `03_transform.R`. Los TdR lo piden explícitamente (numeral 3.3).
-- [ ] **Unificar nomenclatura EMA / AFE / AWE.** Mismo constructo con tres nombres: los TdR dicen AFE, la presentación de Daniel dice EMA, el módulo 24 del repo `fortificacion` dice AWE. **Adoptar EMA** (término del material en español, y el que usa quien revisa). Ojo: **AME (Adult Male Equivalent) sí es un concepto distinto** y no debe fusionarse. Mencionarlo de entrada en la presentación, antes de que lo marquen en revisión.
+- [ ] **Unificar nomenclatura EMA / AFE / AWE.** Mismo constructo con tres nombres: los TdR dicen AFE, la presentación de la supervisión técnica dice EMA, el módulo 24 del repo `fortificacion` dice AWE. **Adoptar EMA** (término del material en español, y el que usa quien revisa). Ojo: **AME (Adult Male Equivalent) sí es un concepto distinto** y no debe fusionarse. Mencionarlo de entrada en la presentación, antes de que lo marquen en revisión.
 - [ ] **Afinar la detección de atípicos.** La corrida del 12-09 marca 45 filas en Sec 3A de más de 300,000 — tasa muy baja. El umbral es deliberadamente conservador (marca sin eliminar), lo cual es defendible, pero hay que poder explicar el criterio si preguntan.
 - [ ] **Limpieza del repositorio (después del 16-09, no antes).** El enlace se comparte con los supervisores. Quitar archivos redundantes con commits, no con borrado manual, para que todo quede en el historial. Identificados: `food_factors_BACKUP_2026-09-10.xlsx` (redundante, git ya es el respaldo), `lote_PC_109.csv` (lote ya incorporado), `.RDataTmp*` (agregar al `.gitignore`: la regla actual no lo atrapa por falta de comodín), y los scripts de uso único `96`, `97`, `98`, `99` una vez commiteados sus resultados.
 
@@ -959,7 +1001,7 @@ Sec 3A superó la proyección (155,770 vs. ~113,700 esperados) — probablemente
 - [x] `01_import.R` — Q, FC (3 niveles), `enhance_id`, PC ensamblados. Corriendo limpio contra datos reales desde 2026-09-08.
 - [x] `02_eda.R` — corregido y confirmado corriendo limpio (2026-09-08): overlap de hogares, estandarización de unidades, missingness, atípicos por alimento, cobertura del diario. Ver HITO arriba.
 - [x] `03_transform.R` — corregido y confirmado corriendo limpio (2026-09-08): `Q × FC × PC / PM`, outliers marcados, ejemplo de cobertura ponderada real. Ver HITO arriba. Queda pendiente afinar: disponibilidad neta para alimentos almacenables, y el aviso de diseño muestral (IC subestimado).
-- [x] **`04_equivalente_adulto.R` — completo y conectado con consumo diario (2026-09-08).** EMA por persona (fuente: FAO/WHO/UNU 2004, Tablas 4.2/4.3/5.2, no el documento de Daniel que solo las cita) y por hogar (8,892/8,892 con EMA, mediana 3.04 sin ponderar / **3,09 ponderada**), unido con `03_transform.R` → `Gramos_por_EMA_dia` (**303,407 registros** en la corrida del 12-09; las cifras de 254,905 y 296,969 son de corridas anteriores y quedaron desactualizadas al ampliarse la cobertura). **Limitaciones documentadas en el propio script:** sin ajuste embarazo/lactancia (dato no existe en la ENGIH), peso fijo por sexo (65/55kg, no individual), menores de 1 año con valor provisional (600 kcal, sin verificar contra FAO sección 3).
+- [x] **`04_equivalente_adulto.R` — completo y conectado con consumo diario (2026-09-08).** EMA por persona (fuente: FAO/WHO/UNU 2004, Tablas 4.2/4.3/5.2, no el documento de la supervisión técnica que solo lo cita) y por hogar (8,892/8,892 con EMA, mediana 3.04 sin ponderar / **3,09 ponderada**), unido con `03_transform.R` → `Gramos_por_EMA_dia` (**303,407 registros** en la corrida del 12-09; las cifras de 254,905 y 296,969 son de corridas anteriores y quedaron desactualizadas al ampliarse la cobertura). **Limitaciones documentadas en el propio script:** sin ajuste embarazo/lactancia (dato no existe en la ENGIH), peso fijo por sexo (65/55kg, no individual), menores de 1 año con valor provisional (600 kcal, sin verificar contra FAO sección 3).
 - [ ] `05_ingesta_micronutrientes.R` — join con INCAP/FNDDS completos (~65 nutrientes) sobre `data_gramos_por_ema.csv` (ya listo); consumo aparente de energía, macro y micronutrientes por EMA. **Único script del pipeline básico sin empezar** — pendiente por la complejidad de armonizar esquemas INCAP/FNDDS, no por falta de piezas previas (esas ya están).
 - [ ] `06_report.qmd` — reporte reproducible base.
 
@@ -987,7 +1029,7 @@ Sec 3A superó la proyección (155,770 vs. ~113,700 esperados) — probablemente
 - [ ] Definir audiencia y decisiones que debe soportar (¿uso interno WFP? ¿Ministerio de Salud/SESPAS?)
 - [ ] Seleccionar indicadores clave (cobertura, prevalencia de inadecuación, densidad, equidad)
 - [ ] Prototipo (herramienta a decidir: Shiny, Quarto dashboard, u otra)
-- [ ] Iterar con retroalimentación de Carlos Rodas y Daniel Hernández
+- [ ] Iterar con retroalimentación de la supervisión técnica
 - [ ] **Revisión editorial/creativa antes de presentar (no antes — solo cuando haya contenido real que pulir):** pasada de Claude como editor crítico sobre `06_report.qmd` y los materiales de presentación — tono, concisión, que no "suene a transcripción de IA" (frases repetitivas, exceso de explicación). Los documentos internos (`HOJA_DE_RUTA`, `VISION`) NO se tocan para esto — su densidad técnica es correcta para lo que son, un log de trabajo, no un entregable.
 
 ## Fase 4 — Artículo
@@ -1010,7 +1052,7 @@ Sec 3A superó la proyección (155,770 vs. ~113,700 esperados) — probablemente
 **Estructura en tres actos:**
 
 1. **¿Sirven estos datos?** Cobertura, factores de conversión, porción comestible, atípicos, adaptaciones metodológicas. Responde los numerales 4.1–4.3 y 7 de los TdR. Establece la regla que rige toda la presentación: ninguna cifra se cita sin su cobertura. Aquí van los problemas resueltos (fan-out de 17,698 filas, guardas de integridad, trabajo de campo en el mercado, cereza→acerola) como evidencia de dato auditado, no como anécdotas.
-2. **El modelo de base.** `Q × FC × PC / PM` primero, EMA después — el mismo orden de las dos presentaciones de Daniel, y en su orden cronológico (dic-2025, ago-2026). Es mostrarle su metodología implementada sobre datos dominicanos reales.
+2. **El modelo de base.** `Q × FC × PC / PM` primero, EMA después — el mismo orden de las dos presentaciones de la supervisión técnica, y en su orden cronológico (dic-2025, ago-2026). Es mostrarle su metodología implementada sobre datos dominicanos reales.
 3. **Hacia lo que le sirve al PMA.** La especificación de Santiago en su orden: cobertura de vehículos, contribución del alimento fortificado, desplazamiento respecto al EAR, escenarios. Cierra con replicabilidad: el paquete va a Perú, RD y Cuba, y los TdR (numerales 9, 10, 12) piden código modular y adaptable.
 
 **Frontera explícita** al final del Acto 2: *hasta aquí entregable cerrado; de aquí en adelante línea de trabajo abierta con decisiones pendientes que corresponden a los supervisores.* Decirlo en voz alta protege los dos primeros actos de lo que falte en el tercero, y convierte el final abierto en una solicitud de decisión en vez de un vacío.
@@ -1033,7 +1075,7 @@ Sec 3A superó la proyección (155,770 vs. ~113,700 esperados) — probablemente
 
 **Infraestructura compartida:** `scripts/_comun.R` centraliza rutas, carga, definición de vehículos de fortificación y la regla de elegibilidad (`marcar_elegible()`). Al mejorar los datos o cambiar una definición se toca ahí y todos los reportes quedan consistentes — es lo que impide que R1 diga 89.2% y R3 diga otra cosa. **Ningún reporte lleva cifras escritas a mano.**
 
-**Resuelto (2026-09-11):** la aparente discrepancia entre H-AR (presentación de Daniel) y EAR con enfoque probabilístico (TdR numeral 1.6). La especificación de Santiago transcrita en Fase 2 ya fija **EAR con punto de corte**, alineado con los TdR. No es pregunta abierta.
+**Resuelto (2026-09-11):** la aparente discrepancia entre H-AR (presentación de la supervisión técnica) y EAR con enfoque probabilístico (TdR numeral 1.6). La especificación de Santiago transcrita en Fase 2 ya fija **EAR con punto de corte**, alineado con los TdR. No es pregunta abierta.
 
 **Decisiones a llevar a la reunión, no a resolver por cuenta propia:**
 1. Línea base de fortificación (ver "Decisión abierta" en Fase 0).
