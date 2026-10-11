@@ -99,7 +99,44 @@ nac_base   <- principal |> filter(dominio == "Nacional", escenario == ESCENARIO_
 
 # Resumen {.unnumbered}
 
-*Por redactar al final.*
+**Contexto.** La República Dominicana no dispone de una encuesta nacional de
+consumo individual de alimentos. Este informe utiliza la Encuesta Nacional de
+Gastos e Ingresos de los Hogares 2018 —diseñada para medir gasto, no
+nutrición— para estimar la cobertura y el consumo de los alimentos
+fortificables, su contribución a la ingesta de micronutrientes y el efecto de
+escenarios alternativos de fortificación.
+
+**Una respuesta por pregunta.**
+
+1. *¿Sirve la encuesta?* Sí, con la condición de que cada estimación de ingesta
+   se lea junto a su cobertura de composición y se declare como límite
+   inferior. Las adaptaciones metodológicas que ello exige están documentadas.
+
+2. *¿Qué micronutrientes presentan mayor riesgo?* El riesgo es muy desigual
+   entre nutrientes. Su jerarquía depende de dos supuestos declarados: los
+   valores de referencia, provisionales, y la biodisponibilidad del hierro.
+
+3. *¿Qué alimentos aportan la mayor proporción de la dieta?* El aporte está
+   concentrado y es distinto para cada nutriente: los cereales y las raíces
+   dominan unos y son irrelevantes para otros, que provienen de alimentos de
+   origen animal.
+
+4. *¿Qué cobertura tienen los vehículos?* Los principales alcanzan a casi todo
+   el país, sin zonas desatendidas. Difieren en la cantidad que transportan:
+   cobertura y consumo son condiciones distintas.
+
+5. *¿Qué grupos quedan fuera del alcance?* El riesgo sigue un gradiente por
+   gasto del hogar. El patrón geográfico, en cambio, está gobernado por el
+   nivel de adquisición registrada y no por diferencias en la dieta.
+
+6. *¿Qué aportarían otros escenarios?* La norma vigente reduce el riesgo de
+   folato sin resolverlo. Los niveles recomendados internacionalmente rinden
+   más sobre el mismo vehículo; incorporar un vehículo adicional rinde más aún,
+   con el exceso de ácido fólico como contrapartida.
+
+7. *¿Reduce el gradiente social un vehículo transversal?* Sí. Y la consecuencia
+   es que **elevar la ingesta media y cerrar la brecha social son objetivos
+   distintos que no se consiguen con la misma decisión.**
 
 
 # Introducción
@@ -772,12 +809,154 @@ explícita de su mayor rendimiento.
 
 # Discusión
 
-*Por redactar: hallazgo principal de cada pregunta, contraste con la literatura, limitaciones, implicaciones.*
+## Lo que el análisis establece
+
+La ENGIH 2018 permite estimar consumo aparente e ingesta de micronutrientes con
+calidad suficiente para orientar decisiones de fortificación, siempre que cada
+estimación se lea junto a su cobertura de composición y se declare como un
+límite inferior. Esa condición no es una salvedad de cortesía: es lo que separa
+una cifra utilizable de una cifra engañosa.
+
+Sobre esa base, el análisis establece tres cosas que no eran evidentes antes de
+hacerlo.
+
+**La elección del vehículo determina qué nutrientes es posible corregir, no
+solo a cuánta gente se llega.** El aporte de cada grupo de alimentos a cada
+micronutriente está fuertemente concentrado: los cereales y las raíces
+dominan unos nutrientes y son irrelevantes para otros, que provienen casi
+enteramente de alimentos de origen animal. Un escenario que fortifica un cereal
+no puede mover un nutriente que el cereal no aporta, por alto que sea el nivel
+de adición. La restricción es estructural y precede a cualquier discusión sobre
+dosis.
+
+**Elevar la ingesta media y cerrar la brecha social son objetivos distintos.**
+Subir el nivel normativo sobre un vehículo de consumo desigual mejora el
+promedio y conserva el gradiente; cambiar a un vehículo de consumo transversal
+cierra el gradiente. Las dos decisiones son defendibles y no son
+intercambiables. Este resultado contrasta la conjetura formulada antes de
+examinar los datos y la respalda.
+
+**La norma vigente deja margen y el margen tiene dos vías distintas.** La
+fortificación actual de la harina de trigo reduce el riesgo de inadecuación de
+folato sin resolverlo. Ese margen puede cerrarse elevando el nivel sobre el
+mismo vehículo —los niveles recomendados internacionalmente rinden más sobre
+los mismos alimentos y el mismo alcance— o incorporando un vehículo adicional.
+La primera vía es normativa y no exige infraestructura nueva; la segunda tiene
+mayor rendimiento y una contrapartida explícita en el límite superior.
+
+## Lo que el análisis no puede establecer
+
+La encuesta mide **adquisición**, no ingesta. Entre una y otra median el
+desperdicio, el almacenamiento, el reparto desigual dentro del hogar y el
+consumo fuera de él. Ninguna técnica elimina esa distancia, y por eso toda
+cifra de este informe se denomina *aparente*.
+
+La normalización por Equivalente de Mujer Adulta supone que los alimentos se
+reparten en proporción al requerimiento energético de cada miembro. La encuesta
+no observa ese reparto. Donde el reparto real se aparta de esa proporción —y la
+literatura documenta que a menudo lo hace en perjuicio de mujeres y niñas— la
+ingesta por EMA sobrestima la de quienes reciben menos.
+
+El nivel de adquisición registrada **varía entre territorios por razones que no
+son de consumo**. Este informe lo documenta y adopta un criterio complementario
+que es invariante a ese nivel, con su dominio de validez declarado por
+nutriente. El criterio reduce sustancialmente la dependencia del nivel de
+registro en la comparación geográfica, pero no la elimina, y el residuo queda
+sin explicar.
+
+Los valores de referencia son provisionales y las estimaciones de riesgo
+escalan con ellos. El supuesto de biodisponibilidad del hierro cambia su cifra
+de forma sustantiva. Y la cadena de cálculo no incorpora la procedencia ni el
+destino declarado de la adquisición, aunque la encuesta los registre: es un
+supuesto implícito que aquí queda explícito.
+
+## Lo que se examinó y no se sostuvo
+
+Documentar las hipótesis que no prosperaron delimita el alcance de la
+verificación y evita que se vuelvan a ensayar.
+
+El patrón geográfico del riesgo no se explica por la composición de la dieta,
+ni por el reparto entre las dos secciones del cuestionario, ni por la regla de
+agotamiento, ni por los días observados, ni por el tamaño del hogar, ni por la
+inestabilidad de los dominios con pocos conglomerados, ni por la procedencia de
+la adquisición. Este último caso merece mención propia porque ilustra un riesgo
+de inferencia: **entre provincias**, la participación de la producción propia
+correlaciona de forma apreciable con la energía registrada; **entre hogares**,
+no correlaciona en absoluto, y los hogares sin nada de producción propia en las
+provincias afectadas presentan el mismo exceso. Es una falacia ecológica con
+datos reales, y de no haberse examinado a nivel de hogar habría producido una
+conclusión equivocada y plausible.
+
+## Relación con el enfoque de referencia
+
+El procedimiento sigue la línea de los análisis de modelación de la
+contribución de la fortificación a los requerimientos de micronutrientes a
+partir de encuestas de consumo y gasto de los hogares (Tang et al., 2022), con
+las adaptaciones que la estructura de la ENGIH 2018 exige y que el manual
+técnico documenta una a una. Las principales son el tratamiento del
+solapamiento entre el inventario de despensa y las adquisiciones diarias, el
+período de observación variable por hogar, y la verificación en punto de venta
+de los factores de conversión y de la aplicación efectiva de las normas.
+
+Esa última verificación produjo un hallazgo que ningún análisis de gabinete
+habría encontrado: **el azúcar en venta no declara vitamina A en su etiqueta**,
+pese a existir norma obligatoria desde 2004. La distinción entre norma vigente,
+aplicación efectiva y verificación en el mercado resultó determinante para
+decidir qué escenario describe la realidad de 2018 y cuáles describen
+decisiones posibles.
+
+## Implicaciones
+
+Para la decisión de política, el análisis ordena las opciones por rendimiento y
+por contrapartida, y no sustituye la decisión. Elevar el nivel normativo sobre
+el vehículo vigente es la opción de menor costo institucional. Incorporar un
+vehículo de consumo transversal es la de mayor rendimiento y la única que
+cierra la brecha social, con el exceso de ácido fólico como contrapartida
+declarada. Fortificar un vehículo cuyo nutriente proviene de grupos de
+alimentos distintos es la única vía para los nutrientes que ningún escenario de
+cereales mueve.
+
+Para el trabajo técnico subsiguiente, tres asuntos quedan planteados: confirmar
+los valores de referencia y el supuesto de biodisponibilidad, que reescalan
+todas las cifras de riesgo; obtener el texto de los instrumentos normativos que
+aquí se usaron a partir de fuentes secundarias concordantes; y examinar los
+factores de conversión de unidades no estándar como posible origen del patrón
+geográfico que este informe documenta sin explicar.
 
 
 # Conclusiones
 
-*Por redactar.*
+1. **La encuesta sirve.** La ENGIH 2018 permite estimar consumo aparente e
+   ingesta de micronutrientes con cobertura y calidad suficientes para orientar
+   decisiones de fortificación, con la condición de que cada estimación se lea
+   junto a su cobertura de composición y se declare como límite inferior.
+
+2. **El riesgo de inadecuación es desigual entre nutrientes** y su jerarquía
+   depende de supuestos declarados: los valores de referencia, provisionales, y
+   la biodisponibilidad del hierro.
+
+3. **El aporte de nutrientes está concentrado por grupo de alimentos**, de modo
+   que la elección del vehículo determina qué nutrientes es posible corregir.
+
+4. **Los principales vehículos alcanzan a casi todo el país**, sin zonas
+   desatendidas, pero difieren en la cantidad que transportan: cobertura y
+   consumo son condiciones distintas y solo una parte de los vehículos cumple
+   las dos.
+
+5. **El gradiente social existe y depende del vehículo.** Un vehículo de
+   consumo transversal lo cierra; uno de consumo desigual lo conserva aunque se
+   eleve el nivel. La conjetura formulada antes de examinar los datos queda
+   respaldada.
+
+6. **La norma vigente deja margen, y el margen tiene dos vías.** Elevar el
+   nivel sobre el vehículo actual, de menor costo institucional; o incorporar
+   un vehículo adicional, de mayor rendimiento y con el exceso de ácido fólico
+   como contrapartida.
+
+7. **El patrón geográfico del riesgo está gobernado por el nivel de
+   adquisición registrada y no por la dieta.** Siete mecanismos alternativos
+   fueron examinados y descartados. El criterio de densidad reduce esa
+   dependencia pero no la agota, y el residuo queda abierto.
 
 # Anexos {.unnumbered}
 

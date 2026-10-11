@@ -191,8 +191,14 @@ quintil bajo los dos criterios; y los dos coropléticos. El fragmento de
 densidad entra en Métodos y la figura de mapas se trasladó a Resultados, que es
 donde corresponde a un objeto de resultados.
 
-**Pendientes:** Factibilidad, Escenarios, la Discusión, las Conclusiones, el
-Resumen y los Anexos. El esqueleto lleva, en comentarios
+**El borrador está completo al 2026-10-11**, con ocho figuras. Escritos los
+seis apartados de Resultados, la Discusión, las Conclusiones y el Resumen.
+
+**Pendientes:** los Anexos —calidad de datos y adaptaciones metodológicas,
+decisiones adoptadas, respuesta a los comentarios de revisión,
+reproducibilidad— y, sobre todo, **la corrida**. Ninguna de las ocho figuras ha
+sido compilada: el código de gráficos no se ha probado y la corrida es la
+prueba. Hasta entonces el borrador es texto sin verificar. El esqueleto lleva, en comentarios
 ocultos, lo que corresponde a cada uno.
 
 **P5. Manual técnico, TdR 18.** *Esqueleto escrito el 2026-10-11, en
