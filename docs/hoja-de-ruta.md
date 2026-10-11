@@ -118,9 +118,24 @@ con el gradiente socioeconómico como caso, la salvedad de los mapas
 provinciales y el supuesto multiplicativo con sus límites. Falta leerlo y
 compilarlo.
 
-**P2. Mapas incorporados al informe.** *Corto. Depende de P1.* Las tres figuras
-ya existen en `media/mapas/`. Falta la figura con su leyenda dentro del
-documento y la decisión de qué mapa va al cuerpo y cuál al anexo. Completa
+**P2. Mapas incorporados al informe.** *Hecho el 2026-10-11.* Cada mapa quedó
+donde hace su trabajo, no agrupados en una sección de figuras.
+
+- El bivariado de cobertura y consumo, en `reports/_mapas_cobertura.qmd`, con
+  su lectura: los dos vehículos comparten la clase de cobertura alta y no la de
+  consumo, de modo que la cobertura por sí sola no los ordena.
+- Los dos coropléticos de folato, en la salvedad de `_metodo_densidad.qmd`,
+  como figura de dos paneles, que es donde el texto compara precisamente esos
+  dos criterios.
+
+Las cifras de la prosa se leen de `vehiculos_por_provincia.csv`; los nombres de
+provincia salen del propio archivo de hogares. Las leyendas declaran fuente de
+los datos, fuente de la geometría y que la provincia no es dominio de
+estimación. Ambos fragmentos verifican con `exigir_archivo()` que las PNG
+existan, porque una imagen ausente se renderiza rota y en silencio.
+
+Falta: **`media/mapas/mapa_densidad_folato.png` todavía no está en el
+repositorio**; lo generó la corrida local y hay que versionarlo. Completa
 TdR 8.5.
 
 **P3. Residuo de Samaná.** *Medio. Sin dependencias.* La densidad bajó la
@@ -187,7 +202,10 @@ completo en la cabeza.
 - [ ] **M2.** Actualizar `claude/valor-operativo.md` con la estructura de
       fuentes por nutriente y con los resultados de densidad.
 - [ ] **M3.** Aplicar `docs/normas-figuras-y-tablas.md` a los tres mapas.
-      Después de P4: es presentación sobre contenido ya decidido.
+      Después de P4: es presentación sobre contenido ya decidido. Incluye
+      producir una variante sin la leyenda incrustada, para el documento: con
+      ella dentro de la imagen, los dos coropléticos no se pueden poner lado a
+      lado sin volverse ilegibles, y hoy van apilados por eso.
 - [ ] **M4.** Revisar que ningún README ni documento de `main` cite cifras
       superadas por la corrección de la línea base.
 - [ ] **M5.** Tabla de nombres de provincia para prosa y figuras, tomada de la
