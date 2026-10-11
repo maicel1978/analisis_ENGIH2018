@@ -90,6 +90,8 @@ tema_informe <- theme_minimal(base_size = 11) +
         axis.title = element_text(colour = GRIS),
         legend.position = "bottom")
 
+exigir("cobertura_composicion_nutrientes.csv", "05_ingesta_micronutrientes.R")
+cobertura  <- leer("cobertura_composicion_nutrientes.csv")
 grupos_nut <- leer("grupos_micronutrientes.csv")
 sens       <- leer("sensibilidad_densidad_critica.csv")
 nac_base   <- principal |> filter(dominio == "Nacional", escenario == ESCENARIO_BASE)
@@ -420,7 +422,49 @@ principal |>
   kable(align = "lrrr")
 ```
 
-*Por redactar.*
+La ENGIH 2018 permite estimar consumo aparente e ingesta de micronutrientes, y
+la respuesta a la primera pregunta de este informe es afirmativa con una
+condición: que el resultado se lea junto a su cobertura.
+
+La cadena de cálculo enlaza cada alimento de la encuesta con una tabla de
+composición. Los alimentos que no encuentran correspondencia **aportan cero, no
+un valor faltante**, de modo que la ingesta estimada subestima por construcción.
+La magnitud de esa subestimación es distinta para cada nutriente y la
+@fig-cobertura la cuantifica.
+
+```{r}
+#| label: fig-cobertura
+#| fig-cap: "Proporción de los gramos consumidos que cuenta con dato de composición, por nutriente. Los gramos sin dato aportan cero a la ingesta, de modo que el complemento de esta barra es la subestimación por construcción."
+#| fig-width: 7
+#| fig-height: 3.4
+ETIQ_COB <- c(NUTRIENTE, energia_kcal = "Energía")
+cobertura |>
+  mutate(Nutriente = coalesce(unname(ETIQ_COB[nutriente]), nutriente)) |>
+  ggplot(aes(x = pct_gramos_cubiertos,
+             y = reorder(Nutriente, pct_gramos_cubiertos))) +
+  geom_col(fill = AZUL, width = 0.65) +
+  geom_text(aes(label = num(pct_gramos_cubiertos)), hjust = -0.25, size = 3.1,
+            colour = GRIS) +
+  scale_x_continuous(limits = c(0, 112), breaks = seq(0, 100, 25),
+                     labels = function(x) paste0(x, "%")) +
+  labs(x = "Gramos consumidos con dato de composición (%)", y = NULL) +
+  tema_informe
+```
+
+La lectura práctica es que **los nutrientes de cobertura alta admiten una
+interpretación directa y los de cobertura menor deben leerse como un piso**. Es
+también la razón por la que las vitaminas D y E, que son las de cobertura más
+baja, aparecen con las proporciones de inadecuación más altas: parte de esa
+cifra es déficit real y parte es ausencia de dato.
+
+Esta cifra acompaña a todo resultado de ingesta de este informe. Sin ella, una
+estimación de ingesta se lee como si fuera completa cuando en realidad es un
+límite inferior.
+
+El análisis preliminar de factibilidad, entregado por separado, documenta la
+cobertura por sección del cuestionario, las pérdidas de registros por motivo y
+la validación externa de las cantidades. Este informe no la repite: parte de
+ella.
 
 
 ## Composición de la dieta por grupos de alimentos
@@ -602,6 +646,47 @@ sección de métodos.
 ## Escenarios de fortificación
 
 ```{r}
+#| label: fig-escenarios
+#| fig-cap: "Hogares bajo el requerimiento, por escenario de fortificación y nutriente. Los escenarios están ordenados de menor a mayor alcance; el punto de partida es la dieta sin fortificar."
+#| fig-width: 7.5
+#| fig-height: 4.4
+principal |>
+  filter(dominio == "Nacional",
+         nutriente %in% c("Folato", "Hierro", "Zinc", "Vitamina B12", "Vitamina A")) |>
+  mutate(corto = sub("^([0-9a-c]+)\\. .*", "\\1", escenario)) |>
+  ggplot(aes(x = corto, y = pct_inadecuado, colour = nutriente,
+             group = nutriente)) +
+  geom_line(linewidth = 0.8) +
+  geom_point(size = 2.4) +
+  scale_y_continuous(limits = c(0, 100), breaks = seq(0, 100, 25),
+                     labels = function(x) paste0(x, "%")) +
+  labs(x = "Escenario", colour = NULL,
+       y = "Hogares bajo el requerimiento (% del total)") +
+  tema_informe +
+  theme(panel.grid.major.y = element_line(colour = "grey92"))
+```
+
+```{r}
+#| label: fig-equidad-escenarios
+#| fig-cap: "Razón entre la ingesta de folato del quintil de mayor gasto y la del quintil de menor gasto, por escenario. Un valor de 1 indica ingesta equivalente entre los extremos de la distribución del gasto."
+#| fig-width: 7
+#| fig-height: 3.4
+escenarios |>
+  filter(nutriente == "folato_mcg_dfe") |>
+  mutate(corto = sub("^([0-9a-c]+)\\. .*", "\\1", escenario)) |>
+  ggplot(aes(x = reorder(corto, razon_q5_q1), y = razon_q5_q1)) +
+  geom_hline(yintercept = 1, linetype = "dashed", colour = GRIS) +
+  geom_segment(aes(xend = reorder(corto, razon_q5_q1), y = 1,
+                   yend = razon_q5_q1), colour = GRIS, linewidth = 0.5) +
+  geom_point(size = 3.4, colour = AZUL) +
+  geom_text(aes(label = num(razon_q5_q1, 2)), hjust = -0.5, size = 3.1,
+            colour = GRIS) +
+  coord_flip() +
+  labs(x = "Escenario", y = "Razón entre quintiles extremos (Q5 / Q1)") +
+  tema_informe
+```
+
+```{r}
 #| label: tbl-escenarios
 #| tbl-cap: "Ingesta de folato y hogares por debajo del requerimiento, según escenario de fortificación. República Dominicana, 2018"
 folato <- escenarios |>
@@ -623,7 +708,66 @@ principal |>
   kable(align = "lrrrrrrrr")
 ```
 
-*Por redactar.*
+La @fig-escenarios ordena los escenarios por alcance y muestra qué le ocurre a
+cada nutriente. Tres lecturas, en orden de consecuencia para la decisión.
+
+**La norma vigente reduce el riesgo de folato y no lo resuelve.** La
+fortificación de la harina de trigo y el pan desplaza la proporción de hogares
+bajo el requerimiento, pero la deja todavía en el entorno de la mitad. Extender
+la norma a todos los derivados del trigo —pastas, galletas, repostería, hoy de
+fortificación voluntaria— añade un desplazamiento menor: el límite no está en
+qué productos se alcanzan sino en cuánta harina transporta cada uno.
+
+**Los niveles recomendados internacionalmente rinden más sobre los mismos
+alimentos.** Los escenarios construidos con los niveles de la Organización
+Mundial de la Salud operan sobre el mismo vehículo y el mismo alcance
+poblacional, y producen un desplazamiento mayor. La diferencia no es de
+cobertura: es de dosis. Eso sitúa la revisión del nivel normativo como una
+decisión con rendimiento propio, independiente de incorporar vehículos nuevos.
+
+**Los nutrientes que ningún escenario de harina mueve, no se mueven.** El zinc,
+la vitamina B12 y la vitamina A permanecen prácticamente invariables a lo largo
+de todos los escenarios de la norma nacional, por la razón que muestra la
+@fig-grupos-nutrientes: la norma añade hierro y ácido fólico, y esos nutrientes
+provienen de grupos de alimentos que el vehículo no toca. Solo la propuesta que
+incorpora arroz, cuyos niveles incluyen zinc y vitamina B12, los desplaza.
+
+### Equidad: la pregunta 7
+
+La @fig-equidad-escenarios contrasta la conjetura formulada antes de examinar
+los datos. La razón entre la ingesta de folato del quintil de mayor gasto y la
+del quintil de menor gasto mide cuánto se aparta de la equidad el reparto del
+nutriente.
+
+El resultado respalda la conjetura y además la precisa. El arroz, que es el
+vehículo de consumo más transversal —cobertura alta en todas las provincias y
+cantidades comparables entre ellas, según la @fig-bivariado— lleva la razón
+prácticamente a la unidad: la ingesta de folato deja de depender del gasto del
+hogar. Los escenarios que operan sobre la harina de trigo, cuyo consumo es
+desigual entre estratos, conservan el gradiente aunque eleven el nivel medio.
+
+El hallazgo tiene una consecuencia de política que no es evidente de antemano:
+**elevar la ingesta media y cerrar la brecha social no son el mismo objetivo, y
+no se consiguen con la misma decisión.** Subir el nivel normativo sobre un
+vehículo desigual mejora el promedio y mantiene la desigualdad; cambiar a un
+vehículo transversal cierra la brecha. Qué se prioriza es una decisión política,
+pero conviene tomarla sabiendo que son dos decisiones y no una.
+
+### El límite superior
+
+La propuesta que incorpora arroz deja a una fracción de hogares por encima del
+límite superior de ingesta tolerable de ácido fólico. Esa cifra debe leerse con
+dos precisiones.
+
+La primera es que **el límite aplica al ácido fólico sintético añadido**, no al
+folato total de la dieta, y el cálculo de este informe se hace sobre la fracción
+añadida, de modo que es una **cota máxima**. La segunda es que la cifra se
+refiere a hogares y no a personas: la ingesta está expresada por Equivalente de
+Mujer Adulta, y el reparto real dentro del hogar no se observa.
+
+Aun con esas precisiones, es el único escenario donde la cuestión del exceso se
+plantea, y acompaña a la decisión sobre el arroz como una contrapartida
+explícita de su mayor rendimiento.
 
 
 # Discusión
