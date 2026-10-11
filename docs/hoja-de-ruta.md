@@ -333,8 +333,13 @@ completo en la cabeza.
       de respaldo del 24. Horas, no días. Queda resuelta la contradicción entre
       la hoja de ruta, que proponía retirarlos de la navegación, y la tabla
       presentada, que comprometía la sustitución.
-- [ ] **M2.** Actualizar `claude/valor-operativo.md` con la estructura de
-      fuentes por nutriente y con los resultados de densidad.
+- [x] **M2. Hecho el 2026-10-11.** `claude/valor-operativo.md` pasa de ocho a
+      doce entradas. Las cuatro nuevas: qué nutrientes puede y no puede
+      arreglar un vehículo de cereal; que elevar la media y cerrar la brecha
+      son dos decisiones y no una; la protección contra la inversión del
+      gradiente bajo densidad; y la advertencia de no afirmar estado
+      nutricional provincial. Las dos últimas son seguros contra afirmaciones
+      caras de retirar, no herramientas.
 - [ ] **M3.** Aplicar `docs/normas-figuras-y-tablas.md` a los tres mapas.
       Después de P4: es presentación sobre contenido ya decidido. Incluye
       producir una variante sin la leyenda incrustada, para el documento: con
