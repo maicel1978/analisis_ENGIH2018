@@ -257,10 +257,20 @@ Hoy se renderizan **doce documentos** desde `reports/`:
 | `presentacion_cierre` | 819 | revealjs |
 | `presentacion_revision` | 578 | revealjs |
 
-**Criterio propuesto.** Un documento se entrega si responde una pregunta que
-ningún otro responde **y** tiene un destinatario nombrado. Lo que no pasa las
-dos pruebas es material de trabajo: se conserva en el repositorio, no se
-entrega.
+**Criterio, decidido el 2026-10-11.** Un documento se entrega si responde una
+pregunta que ningún otro responde **y** tiene un destinatario nombrado. Lo que
+no pasa las dos pruebas no se entrega. Y lo que además no aporta, se va.
+
+«Se va» tiene dos sentidos y se distinguen:
+
+- **Se borra del árbol de trabajo** lo que no aporta y además estorba: un
+  documento que contradice a otro, o una versión superada que alguien puede
+  abrir por error creyendo que es la vigente. La historia de git lo conserva,
+  de modo que no se pierde nada recuperable.
+- **Se conserva, declarado como material de trabajo**, lo que no se entrega
+  pero sirve para reutilizar el repositorio en otro país o en otra encuesta.
+  Ese es el activo que justifica conservar el repositorio después del cierre;
+  borrarlo por prolijidad sería tirarlo.
 
 **Conjunto de entrega, como hipótesis a confirmar al escribir P4:**
 
