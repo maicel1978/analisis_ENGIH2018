@@ -61,6 +61,40 @@ principal <- riesgo |>
   mutate(nutriente = factor(NUTRIENTE[nutriente], levels = NUTRIENTE))
 ```
 
+```{r}
+#| label: preparacion-figuras
+#| include: false
+library(ggplot2)
+
+exigir <- function(archivo, script) {
+  if (!file.exists(here("data", "clean", archivo)))
+    stop("Falta data/clean/", archivo, ". Generalo corriendo scripts/", script,
+         call. = FALSE)
+  invisible(TRUE)
+}
+exigir("grupos_micronutrientes.csv", "08_grupos_alimentos.R")
+exigir("sensibilidad_densidad_critica.csv", "diagnostico_densidad_critica.R")
+for (m in c("mapa_riesgo_folato.png", "mapa_densidad_folato.png",
+            "mapa_bivariado_vehiculos.png")) {
+  if (!file.exists(here("media", "mapas", m)))
+    stop("Falta media/mapas/", m, ". Generalo corriendo scripts/09_mapas.R",
+         call. = FALSE)
+}
+
+# Paleta del proyecto, la misma de los mapas.
+AZUL <- "#3B9AB2"; GRIS <- "#5a6b76"
+
+tema_informe <- theme_minimal(base_size = 11) +
+  theme(panel.grid.minor = element_blank(),
+        panel.grid.major.y = element_blank(),
+        axis.title = element_text(colour = GRIS),
+        legend.position = "bottom")
+
+grupos_nut <- leer("grupos_micronutrientes.csv")
+sens       <- leer("sensibilidad_densidad_critica.csv")
+nac_base   <- principal |> filter(dominio == "Nacional", escenario == ESCENARIO_BASE)
+```
+
 # Resumen {.unnumbered}
 
 *Por redactar al final.*
@@ -306,6 +340,8 @@ declaran como cota máxima.
 Los valores de referencia se leen de un archivo de parámetros y su estado se
 declara en la tabla correspondiente.
 
+{{< include _metodo_densidad.qmd >}}
+
 ## Dominios de estimación y precisión
 
 Se estima a nivel nacional, por región, por zona y por quintil, que son dominios
@@ -327,10 +363,49 @@ semana.
 
 ## Factibilidad y cobertura de los datos
 
-*Por redactar.*
+La inadecuación no se reparte por igual entre nutrientes. La @fig-riesgo los
+ordena de mayor a menor, y el rango cubre casi toda la escala: hay nutrientes
+cuya ingesta aparente queda por debajo del requerimiento en la inmensa mayoría
+de los hogares y otros donde el déficit alcanza a menos de la mitad.
+
+Tres advertencias condicionan la lectura, y ninguna es menor.
+
+**Los valores de referencia son provisionales.** La proporción bajo el
+requerimiento escala con el requerimiento empleado, de modo que una sustitución
+del conjunto de referencia reescala todas las cifras de esta sección.
+
+**El hierro se presenta con un supuesto de biodisponibilidad del 10%.** Con un
+supuesto del 18%, propio de dietas con mayor presencia de carne y de
+potenciadores de la absorción, el requerimiento se reduce en proporción y la
+cifra baja aproximadamente a la mitad. La elección no es un detalle técnico:
+cambia la posición del hierro dentro de este cuadro.
+
+**Las vitaminas D y E dependen de la cobertura de la tabla de composición más
+que el resto**, de modo que su cifra es la más próxima a un piso. En la
+vitamina D se añade que la inadecuación dietética no equivale a deficiencia,
+porque la síntesis cutánea no se contabiliza.
 
 
 ## Riesgo de ingesta inadecuada
+
+```{r}
+#| label: fig-riesgo
+#| fig-cap: "Hogares con ingesta aparente por debajo del requerimiento, por nutriente. Escenario de línea base. El segmento indica el intervalo de confianza al 95%."
+#| fig-width: 7
+#| fig-height: 3.6
+nac_base |>
+  ggplot(aes(x = pct_inadecuado, y = reorder(nutriente, pct_inadecuado))) +
+  geom_segment(aes(x = pct_inadecuado_low, xend = pct_inadecuado_upp,
+                   yend = reorder(nutriente, pct_inadecuado)),
+               colour = GRIS, linewidth = 0.6) +
+  geom_point(size = 3.2, colour = AZUL) +
+  geom_text(aes(label = num(pct_inadecuado)), hjust = -0.5, size = 3.1,
+            colour = GRIS) +
+  scale_x_continuous(limits = c(0, 112), breaks = seq(0, 100, 25),
+                     labels = function(x) paste0(x, "%")) +
+  labs(x = "Hogares bajo el requerimiento (% del total de hogares)", y = NULL) +
+  tema_informe
+```
 
 ```{r}
 #| label: tbl-riesgo
@@ -351,6 +426,41 @@ principal |>
 ## Composición de la dieta por grupos de alimentos
 
 ```{r}
+#| label: fig-grupos-nutrientes
+#| fig-cap: "Aporte de cada grupo de alimentos a cada micronutriente, como porcentaje del total aportado por la dieta adquirida. Escenario sin fortificación."
+#| fig-width: 7.5
+#| fig-height: 5.2
+ETIQ_NUT_FIG <- c(folato_mcg_dfe = "Folato", hierro_mg = "Hierro",
+                  zinc_mg = "Zinc", vitamina_a_mcg_rae = "Vitamina A",
+                  vitamina_b12_mcg = "Vitamina B12",
+                  vitamina_d_mcg = "Vitamina D", vitamina_e_mg = "Vitamina E")
+
+largo_gn <- grupos_nut |>
+  pivot_longer(all_of(names(ETIQ_NUT_FIG)), names_to = "nutriente",
+               values_to = "pct") |>
+  mutate(Grupo = sub("^[0-9]{2} ", "", grupo_mddw),
+         Nutriente = factor(ETIQ_NUT_FIG[nutriente], levels = ETIQ_NUT_FIG))
+
+orden <- largo_gn |> filter(nutriente == "folato_mcg_dfe") |>
+  arrange(pct) |> pull(Grupo)
+
+largo_gn |>
+  mutate(Grupo = factor(Grupo, levels = orden)) |>
+  ggplot(aes(x = Nutriente, y = Grupo, fill = pct)) +
+  geom_tile(colour = "white", linewidth = 0.6) +
+  geom_text(aes(label = if_else(pct >= 5, num(pct, 0), "")), size = 3,
+            colour = "white", fontface = "bold") +
+  scale_fill_gradientn(colours = c("#EDF3F5", AZUL, "#1a3a4a"),
+                       limits = c(0, 100), name = "Aporte al nutriente (%)",
+                       labels = function(x) paste0(x, "%")) +
+  labs(x = NULL, y = NULL) +
+  theme_minimal(base_size = 10) +
+  theme(panel.grid = element_blank(),
+        axis.text.x = element_text(angle = 30, hjust = 1),
+        legend.position = "bottom", legend.key.width = unit(2, "cm"))
+```
+
+```{r}
 #| label: tbl-grupos
 #| tbl-cap: "Hogares que adquieren cada grupo de alimentos y aporte del grupo a la energía. República Dominicana, 2018"
 grupos |>
@@ -360,7 +470,28 @@ grupos |>
   kable(align = "lrr")
 ```
 
-*Por redactar.*
+La @fig-grupos-nutrientes es la figura con más consecuencias para la decisión
+de política de todo el informe, porque explica **por qué un escenario de
+fortificación mueve unos nutrientes y no otros**.
+
+Los grupos de cereales, raíces y plátanos concentran el aporte de los
+nutrientes que la fortificación de harinas y granos puede alcanzar, y son
+prácticamente irrelevantes para los que provienen de alimentos de origen
+animal. Un escenario que añade hierro y ácido fólico a un cereal opera sobre la
+columna donde ese grupo concentra el aporte; un nutriente cuyo aporte proviene
+casi enteramente de carnes y lácteos no puede moverse, por mucho que se
+fortifique el cereal.
+
+Dicho de otro modo: **la elección del vehículo no determina solo a cuánta gente
+se llega, sino qué nutrientes es posible corregir.** Esa restricción es
+estructural y ningún nivel de fortificación la salva.
+
+Dos notas sobre la clasificación. Es la agrupación de la diversidad alimentaria
+mínima en mujeres (FAO, 2021) más las categorías que esa guía deja fuera, y
+**no es el indicador MDD-W**: aquí se clasifican adquisiciones del hogar
+durante una semana, no consumo individual en 24 horas. El reparto está
+calculado sobre el escenario sin fortificación, de modo que describe la dieta y
+no el efecto de la norma vigente.
 
 
 ## Cobertura y consumo de los vehículos de fortificación
@@ -377,7 +508,12 @@ vehiculos |>
   kable(align = "lrrr")
 ```
 
-*Por redactar.*
+Un vehículo sirve en la medida en que reúne dos condiciones a la vez:
+alcanzar a una proporción alta de hogares y consumirse en cantidad suficiente
+para transportar el fortificante. La tabla anterior las separa; el apartado
+siguiente las examina juntas y por territorio.
+
+{{< include _mapas_cobertura.qmd >}}
 
 
 ## Desigualdad por quintil, zona y región
@@ -396,7 +532,71 @@ principal |>
   kable(align = "llrrrrr")
 ```
 
-*Por redactar.*
+```{r}
+#| label: fig-quintiles
+#| fig-cap: "Hogares bajo el requerimiento de folato por quintil de gasto, según se mida sobre la ingesta absoluta o sobre la densidad de nutrientes. Escenario de línea base."
+#| fig-width: 7
+#| fig-height: 3.8
+sens |>
+  filter(dominio == "Quintil", nutriente == "folato_mcg_dfe") |>
+  select(nivel, Ingesta = pct_ing_comp, Densidad = pct_densidad) |>
+  pivot_longer(c(Ingesta, Densidad), names_to = "Criterio", values_to = "pct") |>
+  ggplot(aes(x = nivel, y = pct, colour = Criterio, group = Criterio)) +
+  geom_line(linewidth = 0.9) +
+  geom_point(size = 2.8) +
+  scale_colour_manual(values = c(Ingesta = AZUL, Densidad = "#F21A00")) +
+  scale_y_continuous(labels = function(x) paste0(x, "%")) +
+  labs(x = "Quintil de gasto del hogar (1 = menor gasto)",
+       y = "Hogares bajo el requerimiento de folato (%)", colour = NULL) +
+  tema_informe
+```
+
+El gradiente socioeconómico del folato existe y es del signo esperado cuando se
+mide sobre la ingesta absoluta: el déficit es mayor en los hogares de menor
+gasto. Medido sobre la densidad de nutrientes, **el gradiente se invierte**.
+
+La inversión no es un resultado sobre bienestar y conviene decir por qué. El
+criterio de densidad corrige el nivel de adquisición registrada, y esa
+corrección solo procede donde la variación de ese nivel es artefactual. Entre
+quintiles la variación es plausiblemente real, porque responde a diferencias
+efectivas de acceso a alimentos: dividir por la energía allí no elimina ruido,
+elimina señal. **El gradiente socioeconómico de este informe se reporta sobre
+ingesta absoluta.**
+
+Lo que la densidad sí describe entre quintiles, y es un hallazgo por derecho
+propio, es la **composición** de la dieta: las canastas de mayor gasto llevan
+menos folato por unidad de energía, que es el patrón clásico de transición
+alimentaria. Describe la calidad de la dieta, no la prevalencia de riesgo.
+
+### Distribución territorial
+
+::: {#fig-mapas-criterios layout-ncol=1}
+
+![Criterio de ingesta absoluta](../media/mapas/mapa_riesgo_folato.png){#fig-mapa-riesgo fig-alt="Mapa coroplético de la República Dominicana por provincia, con la proporción de hogares bajo el requerimiento de folato en escala continua y las provincias de precisión insuficiente sin color."}
+
+![Criterio de densidad](../media/mapas/mapa_densidad_folato.png){#fig-mapa-densidad fig-alt="Mapa coroplético de la República Dominicana por provincia, con la razón entre la densidad mediana de folato y la densidad crítica en escala divergente centrada en uno."}
+
+Riesgo de ingesta inadecuada de folato por provincia, bajo cada uno de los dos
+criterios, escenario de línea base. El mapa de la izquierda expresa la
+proporción de hogares cuya ingesta aparente es inferior al Requerimiento
+Promedio Estimado; el de la derecha, la razón entre la densidad mediana
+observada y la densidad crítica, centrada en 1. Las provincias sin color no
+alcanzan el criterio de precisión declarado en cada figura. Fuente: Encuesta
+Nacional de Gastos e Ingresos de los Hogares 2018, Banco Central de la
+República Dominicana; límites provinciales del geoportal del IDERD y la
+División Territorial 2021 de la Oficina Nacional de Estadística. La provincia
+no es dominio de estimación de la encuesta. Valores de referencia
+provisionales.
+
+:::
+
+La provincia **no es dominio de estimación** de la encuesta, y las unidades que
+no alcanzan el criterio de precisión se dejan sin color en lugar de pintarse
+con un valor que no es comparable. El mapa de la izquierda, construido sobre la
+ingesta absoluta, refleja la adquisición registrada antes que la adecuación de
+la dieta; el de la derecha, construido sobre la densidad, es invariante al
+nivel de registro. El criterio y su condición de validez se desarrollan en la
+sección de métodos.
 
 
 ## Escenarios de fortificación

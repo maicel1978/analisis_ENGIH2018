@@ -239,26 +239,7 @@ nivel de registro, y la dispersión entre provincias baja de
 `r fmt(diff(range(prov$pct_ing_comp)), 1)` a
 `r fmt(diff(range(prov$pct_densidad)), 1)` puntos de rango.
 
-::: {#fig-mapas-criterios layout-ncol=1}
-
-![Criterio de ingesta absoluta](../media/mapas/mapa_riesgo_folato.png){#fig-mapa-riesgo fig-alt="Mapa coroplético de la República Dominicana por provincia, con la proporción de hogares bajo el requerimiento de folato en escala continua y las provincias de precisión insuficiente sin color."}
-
-![Criterio de densidad](../media/mapas/mapa_densidad_folato.png){#fig-mapa-densidad fig-alt="Mapa coroplético de la República Dominicana por provincia, con la razón entre la densidad mediana de folato y la densidad crítica en escala divergente centrada en uno."}
-
-Riesgo de ingesta inadecuada de folato por provincia, bajo cada uno de los dos
-criterios, escenario de línea base. El mapa de la izquierda expresa la
-proporción de hogares cuya ingesta aparente es inferior al Requerimiento
-Promedio Estimado; el de la derecha, la razón entre la densidad mediana
-observada y la densidad crítica, centrada en 1. Las provincias sin color no
-alcanzan el criterio de precisión declarado en cada figura. Fuente: Encuesta
-Nacional de Gastos e Ingresos de los Hogares 2018, Banco Central de la
-República Dominicana; límites provinciales del geoportal del IDERD y la
-División Territorial 2021 de la Oficina Nacional de Estadística. La provincia
-no es dominio de estimación de la encuesta. Valores de referencia
-provisionales.
-
-:::
-
+La @fig-mapas-criterios compara las dos lecturas.
 El contraste entre las dos figuras es la magnitud del problema: el mismo
 nutriente, el mismo escenario y los mismos hogares producen ordenamientos
 territoriales distintos según se mida el nivel absoluto o la composición.

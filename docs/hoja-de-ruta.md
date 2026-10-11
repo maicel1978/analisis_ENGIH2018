@@ -175,11 +175,24 @@ grueso del cierre.
       declara vitamina A; el arroz no se fortificaba en 2018, de modo que su
       escenario modela una propuesta.
 
+**Pendiente de la revisión con calma de la introducción.** La tabla de
+instrumentos normativos queda numerada como Tabla 1 dentro de la Introducción,
+y la numeración suele arrancar en Métodos o en Resultados. Además es un
+parámetro de los escenarios, de modo que su sitio natural es el apartado de
+escenarios en Métodos. No se mueve hasta revisar la introducción completa.
+
 **Estado de P4 al 2026-10-11.** Escritos Problema, Contexto, Hipótesis,
 Objetivos y Métodos. La hipótesis queda enunciada como se formuló antes de ver
 el dato y se distingue de forma explícita de los hallazgos surgidos del
-análisis. **Pendientes:** los seis apartados de Resultados, la Discusión, las
-Conclusiones, el Resumen y los Anexos. El esqueleto lleva, en comentarios
+análisis. Escritos también cuatro de los seis apartados de Resultados, con figuras:
+riesgo por nutriente con intervalo; aporte de cada grupo de alimentos a cada
+micronutriente; el mapa bivariado de cobertura y consumo; el gradiente por
+quintil bajo los dos criterios; y los dos coropléticos. El fragmento de
+densidad entra en Métodos y la figura de mapas se trasladó a Resultados, que es
+donde corresponde a un objeto de resultados.
+
+**Pendientes:** Factibilidad, Escenarios, la Discusión, las Conclusiones, el
+Resumen y los Anexos. El esqueleto lleva, en comentarios
 ocultos, lo que corresponde a cada uno.
 
 **P5. Manual técnico, TdR 18.** *Esqueleto escrito el 2026-10-11, en
