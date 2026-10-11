@@ -165,8 +165,22 @@ grueso del cierre.
       comparar contra la versión etiquetada.
 - [ ] Responder los comentarios de revisión, con sección de origen, respuesta y
       ubicación nueva.
-- [ ] Introducción de contexto de país y políticas de fortificación, solicitada
-      en la revisión y omitida en la presentación por tiempo.
+- [x] Introducción de contexto de país y políticas de fortificación, escrita el
+      2026-10-11 como apartado propio, con tabla leída de
+      `parametros_normativos.csv` en vez de transcrita. Responde a la revisión.
+      Tres rasgos condicionan la lectura del informe entero: la harina de trigo
+      es el único vehículo obligatorio, vigente en 2018 y verificado entre los
+      que aportan los nutrientes de interés; el azúcar tiene norma desde 2004
+      sin aplicación verificable y la etiqueta observada en punto de venta no
+      declara vitamina A; el arroz no se fortificaba en 2018, de modo que su
+      escenario modela una propuesta.
+
+**Estado de P4 al 2026-10-11.** Escritos Problema, Contexto, Hipótesis,
+Objetivos y Métodos. La hipótesis queda enunciada como se formuló antes de ver
+el dato y se distingue de forma explícita de los hallazgos surgidos del
+análisis. **Pendientes:** los seis apartados de Resultados, la Discusión, las
+Conclusiones, el Resumen y los Anexos. El esqueleto lleva, en comentarios
+ocultos, lo que corresponde a cada uno.
 
 **P5. Manual técnico, TdR 18.** *Esqueleto escrito el 2026-10-11, en
 `reports/MANUAL_tecnico.qmd`. Falta compilar, medir extensión y completar.*
