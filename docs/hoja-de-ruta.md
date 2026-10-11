@@ -267,6 +267,17 @@ completo en la cabeza.
       lado sin volverse ilegibles, y hoy van apilados por eso.
 - [ ] **M4.** Revisar que ningún README ni documento de `main` cite cifras
       superadas por la corrección de la línea base.
+- [ ] **M6. Comprobación antes de entregar cualquier documento renderizado.**
+      Los comentarios `<!-- ... -->` **sobreviven al renderizado en HTML** y
+      quedan visibles en el código fuente del archivo entregable. El 11 de
+      octubre se encontraron en `INFORME_final.html` diez notas internas, entre
+      ellas «BORRADOR DE ESTRUCTURA» y referencias a documentos internos del
+      proyecto. Las notas se movieron a `reports/_notas_informe.md`, que Quarto
+      no publica. Antes de entregar, comprobar que no quedan:
+
+          findstr /c:"<!--" reports\INFORME_final.qmd
+
+      Debe no devolver nada. Lo mismo para el manual técnico.
 - [ ] **M5.** Tabla de nombres de provincia para prosa y figuras, tomada de la
       fuente oficial. En los datos de la encuesta van en mayúsculas y sin
       acentos; hoy `_metodo_densidad.qmd` los capitaliza con una función propia
