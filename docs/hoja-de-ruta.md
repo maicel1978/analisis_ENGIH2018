@@ -175,34 +175,77 @@ es la del resto del país (79,4% del folato desde cereales y raíces frente a
 81,7%). Si el sobrerregistro fuera selectivo por grupo de alimentos, la
 densidad quedaría igual de sesgada que el nivel.
 
-**Dominio de validez del criterio de densidad (planteado el 2026-10-11, sin
-confirmar).** El criterio de densidad no se aplica a todos los nutrientes por
-igual. Informa donde la ingesta del nutriente varía con independencia de la
-energía; donde la sigue, la densidad es casi constante entre hogares y la
-prevalencia colapsa hacia 0 o hacia 100 según de qué lado del umbral caiga esa
-constante, de modo que deja de discriminar entre hogares y entre territorios.
+**Resultados de la corrida del 2026-10-11.** Guarda superada en las 264 celdas
+comparables, con un costo de exclusión de 0,002 puntos por el único hogar sin
+energía registrada.
 
-Indicio en las primeras filas de la corrida del 11 de octubre, que no son la
-corrida completa: en la región Este los dos criterios coinciden en folato
-(66,3% y 66,3%), el zinc baja ocho puntos y la vitamina E **sube** once en San
-Pedro de Macorís, donde el factor energético es 0,87 y debería hacer el
-criterio de densidad más indulgente. El mecanismo propuesto es el
-acoplamiento: los aceites aportan el 68,2% de la vitamina E y su consumo escala
-con el consumo total, mientras el folato depende de un vehículo fortificado de
-cobertura desigual y varía por su cuenta.
+*1. La cifra nacional queda validada por una vía independiente del nivel de
+registro.* La mediana nacional de energía registrada es 2.302 kcal por EMA y
+día contra 2.291 del requerimiento de la mujer de referencia: factor 1,005. Los
+dos criterios están construidos sobre el mismo punto y coinciden: folato 60,2%
+bajo ingesta absoluta y 62,5% bajo densidad. El hallazgo de la energía deja de
+ser una amenaza contra el resultado principal y pasa a respaldarlo.
 
-Prueba: `r_log`, correlación ponderada entre los logaritmos de la ingesta y de
-la energía, y `razon_cv`, variabilidad relativa que queda al pasar de la
-ingesta a la densidad, en `data/clean/acoplamiento_energia.csv`. **Si se
-confirma, el criterio de densidad se aplica por nutriente y no en bloque, y eso
-va al manual técnico como condición de uso, no como nota al pie.**
+*2. La densidad desconfunde la geografía sin agotarla.* La correlación del
+riesgo provincial de folato con la energía registrada cae de -0,73 a -0,31, y
+la dispersión de 72,0 a 57,3 puntos de rango (DE de 16,2 a 14,2). Pero **Samaná
+sigue siendo la provincia más baja**, 25,8% contra 62,5% nacional: la anomalía
+pasa de 47 a 37 puntos y no desaparece. Queda residuo por explicar y no se
+declara resuelta.
 
-**Pendiente de la corrida.** Queda por verificar si el confundidor alcanza a
-región y zona, que sí son dominios de estimación, y si la mediana nacional de
-energía por EMA se aparta poco de 2.291 kcal. Si se aparta poco, las dos
-lecturas coinciden a nivel nacional y la cifra principal del informe queda
-validada por una vía independiente. **Nada de esto se cita hasta que la salida
-esté pegada.**
+*3. El criterio de densidad tiene dominio de validez, y es por nutriente.*
+Confirmado en el orden previsto. Acoplamiento con la energía, correlación de
+los logaritmos y variabilidad relativa que sobrevive al pasar a densidad:
+
+| Nutriente | r_log | razon_cv | dif nacional |
+|---|---|---|---|
+| Zinc | 0,864 | 0,397 | -7,9 |
+| Vitamina E | 0,839 | 0,389 | +13,4 |
+| Folato | 0,743 | 0,544 | +2,2 |
+| Vitamina B12 | 0,624 | 0,697 | -0,1 |
+| Vitamina A | 0,619 | 0,676 | +6,5 |
+| Vitamina D | 0,535 | 0,733 | +2,0 |
+
+Los dos nutrientes más acoplados son los dos de mayor desplazamiento, y cada
+uno empujado a un extremo distinto —zinc a 34,9% y vitamina E a 96,1%— según de
+qué lado del umbral cae su densidad casi constante. Degenerado en ambos casos.
+El mecanismo es el previsto: los aceites aportan el 68,2% de la vitamina E y su
+consumo escala con el total, mientras el folato depende de un vehículo
+fortificado de cobertura desigual y varía por su cuenta. **El criterio se
+aplica por nutriente y no en bloque, y la condición de uso va al manual técnico
+como tal, no como nota al pie.**
+
+### Los dos usos de la densidad no son el mismo, y la diferencia es la trampa (2026-10-11)
+
+La corrida por quintiles invierte el gradiente socioeconómico del folato:
+
+| Quintil | Factor energético | Ingesta | Densidad |
+|---|---|---|---|
+| 1 | 0,87 | 67,3 | 58,8 |
+| 5 | 1,20 | 52,7 | 64,9 |
+
+Bajo ingesta absoluta el quintil 1 está peor; bajo densidad está mejor. Leído
+sin más, eso es un titular y es falso.
+
+**La densidad es una corrección contra el sobrerregistro, y vale donde la
+variación de energía es artefactual.** En los quintiles la variación es
+plausiblemente real: de 1.992 a 2.742 kcal es un rango de 1,38 veces,
+compatible con diferencias efectivas de acceso a alimentos. Dividir por la
+energía ahí no quita ruido, quita señal. Samaná con 3.913 kcal es el otro caso:
+eso no es consumo.
+
+De ahí dos usos que no se mezclan:
+
+1. **Descripción de la calidad de la dieta.** Válida en todas partes. Que las
+   dietas de los hogares de mayor gasto lleven menos folato por 1.000 kcal es
+   cierto y es el patrón clásico de transición alimentaria. Es un hallazgo.
+2. **Sustituto de la ingesta para estimar riesgo.** Válida solo donde la
+   variación de energía es artefactual, es decir, en la comparación geográfica
+   por el extremo superior. **No en los quintiles.**
+
+Consecuencia operativa: el gradiente socioeconómico del informe se reporta
+sobre ingesta absoluta, y la densidad entra en esa sección como descripción de
+composición de la dieta, nunca como prevalencia de riesgo.
 
 **Hipótesis abierta, no verificada.** Las cinco provincias de mayor energía son
 rurales y agrícolas; las de menor, más urbanas. La producción propia y las
