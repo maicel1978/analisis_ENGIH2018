@@ -28,6 +28,20 @@ ingresos, contra la regla propia de no subir microdatos. Además, `referencias/`
 redistribuye documentos metodológicos internos del proyecto y un artículo de
 revista con derechos de autor.
 
+**El repositorio `fortificacion` tiene el mismo problema, y agravado.** Su
+`static/data/` contiene `Registros_Cuestionario_B.xlsx` (53,7 MB) rastreado, y
+ese repositorio es público y está **desplegado** en fortificacion.netlify.app.
+Quarto copia al directorio de salida los directorios que no empiezan por `_` ni
+por `.`, de modo que `static/` se publica con el sitio: el archivo sería
+descargable desde la web, sin cuenta de GitHub y sin clonar. No se pudo
+verificar desde la sesión del asistente porque el proxy bloquea ese dominio.
+
+**Verificación de un clic:** abrir
+`https://fortificacion.netlify.app/static/data/Registros_Cuestionario_B.xlsx`.
+Si descarga, el archivo está público en la web. La dirección del sitio se
+compartió en la presentación del 9 de octubre, de modo que la exposición no es
+hipotética.
+
 **Lo que falta establecer, y no lo puede establecer el asistente:** bajo qué
 condiciones se recibieron esos archivos. Si son de descarga abierta, el asunto
 es de términos de uso; si se entregaron bajo un acuerdo de uso de datos, es
@@ -157,12 +171,13 @@ grueso del cierre.
 **P5. Manual técnico, TdR 18.** *Medio. Depende de P4.* Se extrae del informe y
 de las decisiones ya documentadas en este archivo; no se redacta de cero.
 
-**P6. Módulos de capacitación, TdR 9 a 17.** *Medio. Depende de P4 y de la
-comprobación mecánica M1.*
+**P6. Módulos de capacitación, TdR 9 a 17.** *Corto a medio tras M1. Depende
+de P4 para las cifras.* M1 mostró que el tema 5 no está lleno de datos
+simulados: son dos piezas puntuales.
 
-- [ ] Sustituir los datos simulados del tema 5 por resultados reales de la
-      ENGIH. **Exigido por la Nota Metodológica 5 del contrato; no es
-      opcional.**
+- [ ] Sustituir la tabla de dos filas del módulo 19 por resultados reales, y
+      neutralizar la rama de respaldo simulada del módulo 24. **Exigido por la
+      Nota Metodológica 5 del contrato; no es opcional.**
 - [ ] Unidades de R aplicado, versión mínima sobre la ENGIH.
 - [ ] Retirar o regrabar los videos 15 y 16, que explican el método de nivel de
       fortificación anterior a su corrección.
@@ -196,9 +211,22 @@ de octubre, y no compite con los paquetes de arriba salvo por el tiempo.
 Tareas de bajo consumo de juicio, que se pueden hacer sin tener el hilo
 completo en la cabeza.
 
-- [ ] **M1.** Comprobar si los módulos 18 a 24 leen las cifras de archivo o las
-      tienen escritas a mano. Decide el alcance real de P6 y hoy es la
-      contradicción sin resolver entre la hoja de ruta y la tabla presentada.
+- [x] **M1. Resuelto el 2026-10-11, y P6 es mucho más chico de lo estimado.**
+      Revisados los siete módulos del tema 5 en el repositorio `fortificacion`:
+      - Módulos 18, 20, 21, 22 y 23: **sin datos simulados**. Son lecciones
+        completas, con concepto y código de ejemplo (`nutriR`, `SPADE.RIVM`).
+        Cortos, no incompletos.
+      - Módulo 19: un `data.frame` de **dos filas** escrito a mano, rotulado
+        como simulado, para consumo fuera del hogar.
+      - Módulo 24: lee el archivo real desde `static/data/`; la simulación es
+        una **rama de respaldo** que avisa «Usando datos simulados (DEMO)» si
+        el archivo falta, y el archivo está presente, así que no se activa.
+
+      De modo que el compromiso de «sustituir los datos simulados del tema 5»
+      se reduce a la tabla de dos filas del módulo 19 y a neutralizar la rama
+      de respaldo del 24. Horas, no días. Queda resuelta la contradicción entre
+      la hoja de ruta, que proponía retirarlos de la navegación, y la tabla
+      presentada, que comprometía la sustitución.
 - [ ] **M2.** Actualizar `claude/valor-operativo.md` con la estructura de
       fuentes por nutriente y con los resultados de densidad.
 - [ ] **M3.** Aplicar `docs/normas-figuras-y-tablas.md` a los tres mapas.
