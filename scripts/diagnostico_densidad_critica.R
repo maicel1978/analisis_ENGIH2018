@@ -104,15 +104,24 @@ largo <- bind_rows(
          bajo_ear   = as.numeric(ingesta < ear),
          bajo_dens  = as.numeric(densidad < densidad_critica))
 
-# Los dos criterios se calculan sobre los mismos hogares. Sin energia
-# registrada la densidad no esta definida, y comparar criterios con
-# denominadores distintos no es comparar criterios.
+# Sin energia registrada la densidad no esta definida. Excluir esos hogares de
+# los dos criterios haria que el de ingesta dejara de reproducir 07 y la guarda
+# sonaria por una razon que no es la que vigila. Se separan las dos cosas:
+#
+#   bajo_ear       sobre todos los hogares -> reproduce 07, es lo que la guarda
+#                  verifica.
+#   bajo_dens      sobre los hogares con densidad definida.
+#   bajo_ear_comp  el criterio de ingesta restringido a ESOS hogares, que es con
+#                  el que se compara la densidad.
+#
+# La distancia entre bajo_ear y bajo_ear_comp mide lo que cuesta la exclusion.
 sin_energia <- largo |> filter(is.na(densidad)) |> distinct(id_hogar_unico) |> nrow()
 if (sin_energia > 0) {
-  message("AVISO: ", sin_energia, " hogares sin energia registrada quedan fuera ",
-          "de los dos criterios.")
-  largo <- largo |> filter(!is.na(densidad))
+  message("AVISO: ", sin_energia, " hogares sin energia registrada. Entran en el ",
+          "criterio de ingesta y no en el de densidad; la comparacion usa la ",
+          "columna restringida.")
 }
+largo <- largo |> mutate(bajo_ear_comp = if_else(is.na(densidad), NA_real_, bajo_ear))
 
 estimar <- function(dominio) {
   largo |>
@@ -120,10 +129,13 @@ estimar <- function(dominio) {
     as_survey_design(ids = upm, strata = estrato, weights = factor_expansion,
                      nest = TRUE) |>
     group_by(nivel, nutriente) |>
-    summarise(n          = unweighted(n()),
-              energia    = survey_median(energia_kcal, vartype = NULL),
-              pct_ingesta = 100 * survey_mean(bajo_ear,  vartype = NULL),
-              pct_densidad = 100 * survey_mean(bajo_dens, vartype = NULL),
+    summarise(n            = unweighted(n()),
+              energia      = survey_median(energia_kcal, vartype = NULL),
+              pct_ingesta  = 100 * survey_mean(bajo_ear, vartype = NULL),
+              pct_ing_comp = 100 * survey_mean(bajo_ear_comp, vartype = NULL,
+                                               na.rm = TRUE),
+              pct_densidad = 100 * survey_mean(bajo_dens, vartype = NULL,
+                                               na.rm = TRUE),
               .groups = "drop") |>
     mutate(dominio = dominio, .before = 1)
 }
@@ -155,10 +167,13 @@ message("Factor: ", sprintf("%.3f", e_nac / KCAL_EMA),
 print(as.data.frame(
   res |> filter(dominio == "Nacional") |>
     transmute(nutriente,
-              ingesta  = round(pct_ingesta, 1),
+              ingesta  = round(pct_ing_comp, 1),
               densidad = round(pct_densidad, 1),
-              dif      = round(pct_densidad - pct_ingesta, 1))
+              dif      = round(pct_densidad - pct_ing_comp, 1),
+              costo_exclusion = round(pct_ing_comp - pct_ingesta, 3))
 ))
+message("costo_exclusion: desplazamiento del criterio de ingesta al dejar fuera ",
+        "los hogares sin energia. Si no es despreciable, la comparacion no es limpia.")
 
 # --- 4. Dominios de estimacion: el confundidor alcanza a region y zona? -----
 message("\n== Dominios de estimacion de la encuesta (folato) ==")
@@ -168,9 +183,9 @@ print(as.data.frame(
     transmute(dominio, nivel, n,
               energia  = round(energia),
               factor_kcal = round(energia / KCAL_EMA, 2),
-              ingesta  = round(pct_ingesta, 1),
+              ingesta  = round(pct_ing_comp, 1),
               densidad = round(pct_densidad, 1),
-              dif      = round(pct_densidad - pct_ingesta, 1))
+              dif      = round(pct_densidad - pct_ing_comp, 1))
 ))
 
 # --- 5. Provincias: reordena la densidad el mapa? ---------------------------
@@ -181,21 +196,67 @@ print(as.data.frame(
   prov |> arrange(desc(energia)) |>
     transmute(nivel, n, energia = round(energia),
               factor_kcal = round(energia / KCAL_EMA, 2),
-              ingesta  = round(pct_ingesta, 1),
+              ingesta  = round(pct_ing_comp, 1),
               densidad = round(pct_densidad, 1),
-              dif      = round(pct_densidad - pct_ingesta, 1))
+              dif      = round(pct_densidad - pct_ing_comp, 1))
 ))
 
 message("\n== Dispersion provincial bajo cada criterio (32 provincias) ==")
 message(sprintf("  ingesta   min %5.1f  max %5.1f  rango %5.1f  DE %5.1f",
-                min(prov$pct_ingesta), max(prov$pct_ingesta),
-                diff(range(prov$pct_ingesta)), sd(prov$pct_ingesta)))
+                min(prov$pct_ing_comp), max(prov$pct_ing_comp),
+                diff(range(prov$pct_ing_comp)), sd(prov$pct_ing_comp)))
 message(sprintf("  densidad  min %5.1f  max %5.1f  rango %5.1f  DE %5.1f",
                 min(prov$pct_densidad), max(prov$pct_densidad),
                 diff(range(prov$pct_densidad)), sd(prov$pct_densidad)))
 message(sprintf("  correlacion con la energia registrada: ingesta %5.2f  densidad %5.2f",
-                cor(prov$energia, prov$pct_ingesta),
+                cor(prov$energia, prov$pct_ing_comp),
                 cor(prov$energia, prov$pct_densidad)))
 
+# --- 6. Dominio de validez del criterio de densidad -------------------------
+# El criterio de densidad informa donde la ingesta del nutriente varia con
+# independencia de la energia. Si la ingesta es casi proporcional a la energia,
+# la densidad es casi constante entre hogares, y la prevalencia bajo el
+# criterio de densidad colapsa hacia 0 o hacia 100 segun de que lado del umbral
+# caiga esa constante: deja de discriminar entre hogares y entre territorios.
+#
+# Dos lecturas de lo mismo: la correlacion entre los logaritmos de la ingesta y
+# de la energia, y cuanta variabilidad relativa queda al pasar de la ingesta a
+# la densidad. Son descriptivas ponderadas, no estimaciones de diseno.
+cv_pond <- function(x, w) {
+  m <- sum(w * x) / sum(w)
+  sqrt(sum(w * (x - m)^2) / sum(w)) / m
+}
+cor_pond <- function(x, y, w) {
+  mx <- sum(w * x) / sum(w); my <- sum(w * y) / sum(w)
+  sum(w * (x - mx) * (y - my)) /
+    sqrt(sum(w * (x - mx)^2) * sum(w * (y - my)^2))
+}
+
+acopl <- largo |>
+  filter(!is.na(densidad), ingesta > 0, energia_kcal > 0) |>
+  group_by(nutriente) |>
+  summarise(hogares     = n(),
+            r_log       = cor_pond(log(ingesta), log(energia_kcal), factor_expansion),
+            cv_ingesta  = cv_pond(ingesta, factor_expansion),
+            cv_densidad = cv_pond(densidad, factor_expansion),
+            .groups = "drop") |>
+  mutate(razon_cv = cv_densidad / cv_ingesta) |>
+  arrange(desc(r_log))
+
+message("\n== Acoplamiento de cada nutriente con la energia registrada ==")
+message("r_log alto y razon_cv baja: la ingesta sigue a la energia, la densidad",
+        " es casi\nconstante y el criterio de densidad no discrimina. ",
+        "r_log moderada: el criterio informa.")
+print(as.data.frame(
+  acopl |> transmute(nutriente, hogares,
+                     r_log       = round(r_log, 3),
+                     cv_ingesta  = round(cv_ingesta, 3),
+                     cv_densidad = round(cv_densidad, 3),
+                     razon_cv    = round(razon_cv, 3))
+))
+
+write_delim(acopl, here("data", "clean", "acoplamiento_energia.csv"), delim = ";")
+
 write_delim(res, here("data", "clean", "sensibilidad_densidad_critica.csv"), delim = ";")
-message("\nSalida en data/clean/sensibilidad_densidad_critica.csv")
+message("\nSalidas en data/clean/sensibilidad_densidad_critica.csv y ",
+        "acoplamiento_energia.csv")

@@ -175,6 +175,28 @@ es la del resto del país (79,4% del folato desde cereales y raíces frente a
 81,7%). Si el sobrerregistro fuera selectivo por grupo de alimentos, la
 densidad quedaría igual de sesgada que el nivel.
 
+**Dominio de validez del criterio de densidad (planteado el 2026-10-11, sin
+confirmar).** El criterio de densidad no se aplica a todos los nutrientes por
+igual. Informa donde la ingesta del nutriente varía con independencia de la
+energía; donde la sigue, la densidad es casi constante entre hogares y la
+prevalencia colapsa hacia 0 o hacia 100 según de qué lado del umbral caiga esa
+constante, de modo que deja de discriminar entre hogares y entre territorios.
+
+Indicio en las primeras filas de la corrida del 11 de octubre, que no son la
+corrida completa: en la región Este los dos criterios coinciden en folato
+(66,3% y 66,3%), el zinc baja ocho puntos y la vitamina E **sube** once en San
+Pedro de Macorís, donde el factor energético es 0,87 y debería hacer el
+criterio de densidad más indulgente. El mecanismo propuesto es el
+acoplamiento: los aceites aportan el 68,2% de la vitamina E y su consumo escala
+con el consumo total, mientras el folato depende de un vehículo fortificado de
+cobertura desigual y varía por su cuenta.
+
+Prueba: `r_log`, correlación ponderada entre los logaritmos de la ingesta y de
+la energía, y `razon_cv`, variabilidad relativa que queda al pasar de la
+ingesta a la densidad, en `data/clean/acoplamiento_energia.csv`. **Si se
+confirma, el criterio de densidad se aplica por nutriente y no en bloque, y eso
+va al manual técnico como condición de uso, no como nota al pie.**
+
 **Pendiente de la corrida.** Queda por verificar si el confundidor alcanza a
 región y zona, que sí son dominios de estimación, y si la mediana nacional de
 energía por EMA se aparta poco de 2.291 kcal. Si se aparta poco, las dos
