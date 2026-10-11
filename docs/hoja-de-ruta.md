@@ -168,8 +168,25 @@ grueso del cierre.
 - [ ] Introducción de contexto de país y políticas de fortificación, solicitada
       en la revisión y omitida en la presentación por tiempo.
 
-**P5. Manual técnico, TdR 18.** *Medio. Depende de P4.* Se extrae del informe y
-de las decisiones ya documentadas en este archivo; no se redacta de cero.
+**P5. Manual técnico, TdR 18.** *Esqueleto escrito el 2026-10-11, en
+`reports/MANUAL_tecnico.qmd`. Falta compilar, medir extensión y completar.*
+
+Diecisiete capítulos, extraídos de los encabezados de los scripts, de las
+decisiones de este archivo y del fragmento de densidad, que se **incluye desde
+el mismo archivo que usa el informe** para que no puedan divergir. Cada
+capítulo responde a qué hace la etapa, qué supone y qué deliberadamente no
+hace.
+
+Tres capítulos valen por sí mismos y no estaban previstos: la tabla de
+supuestos con el efecto de cada uno si no se cumple; las hipótesis evaluadas y
+descartadas, que documentan el alcance de la verificación y evitan que se
+vuelvan a ensayar; y las guardas, con el criterio de que una guarda que se
+relaja la primera vez que suena no sirve de nada.
+
+Pendiente: compilar y medir contra las 20 a 30 páginas que pide el TdR —el
+borrador ronda las veinte con el capítulo incluido, de modo que probablemente
+haya que ampliar—, y revisar el capítulo de limitaciones contra el informe
+final cuando esté.
 
 **P6. Módulos de capacitación, TdR 9 a 17.** *Corto a medio tras M1. Depende
 de P4 para las cifras.* M1 mostró que el tema 5 no está lleno de datos

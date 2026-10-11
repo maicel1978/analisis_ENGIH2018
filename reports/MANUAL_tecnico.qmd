@@ -1,0 +1,582 @@
+---
+title: "Manual técnico"
+subtitle: |
+  Metodología, procedimientos analíticos y supuestos del análisis de
+  cobertura, consumo y contribución de alimentos fortificables a la ingesta
+  de micronutrientes. Encuesta Nacional de Gastos e Ingresos de los Hogares
+  (ENGIH 2018), República Dominicana
+author: "Maicel E. Monzón, PhD — Consultor internacional"
+date: today
+lang: es
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    toc-title: "Índice"
+    number-sections: true
+    embed-resources: true
+    code-fold: true
+  docx:
+    toc: true
+    toc-depth: 3
+    number-sections: true
+crossref:
+  tbl-title: "Tabla"
+  fig-title: "Figura"
+  title-delim: "."
+execute:
+  echo: false
+  warning: false
+  message: false
+---
+
+```{r}
+#| label: setup-manual
+#| include: false
+source(here::here("reports", "_comun.R"))
+library(dplyr)
+```
+
+# Propósito y alcance
+
+Este manual documenta **cómo** se produjeron los resultados del análisis de la
+ENGIH 2018, no **cuáles** son. Los resultados están en el informe analítico;
+aquí se describen la cadena de cálculo, los supuestos que la sostienen y las
+decisiones metodológicas que se tomaron en cada bifurcación, con su
+justificación y su fuente.
+
+Está escrito para que un analista con formación estadística pueda reproducir el
+análisis, auditarlo y adaptarlo. Esa última palabra merece una advertencia que
+se repite en los módulos de capacitación y conviene fijar desde aquí: **el
+código desarrollado para la ENGIH 2018 no se traslada directamente a otra
+encuesta ni a otro país.** Las encuestas de gasto y consumo de los hogares
+difieren en estructura, en variables, en sistemas de clasificación de alimentos
+y en diseño muestral. Lo que se traslada es el razonamiento; el código exige
+adaptación en cada uno de esos cuatro frentes.
+
+El documento sigue el orden del cálculo. Cada capítulo responde a tres
+preguntas: qué hace esta etapa, qué supone, y qué deliberadamente no hace.
+
+# La fuente: la ENGIH 2018
+
+## Qué es y qué mide
+
+La Encuesta Nacional de Gastos e Ingresos de los Hogares 2018 del Banco Central
+de la República Dominicana es una encuesta de **gasto y adquisición**, no de
+consumo individual. Esa distinción gobierna todo lo que sigue y es la fuente de
+la mayor parte de las limitaciones de este análisis.
+
+La encuesta registra lo que el hogar **adquiere** durante un período de
+observación, no lo que cada persona **ingiere**. De la adquisición a la ingesta
+median el desperdicio, el almacenamiento, el reparto desigual dentro del hogar
+y el consumo fuera de él. Por eso la literatura denomina a la magnitud
+resultante **consumo aparente** o **ingesta aparente**, y por eso ninguna cifra
+de este análisis debe leerse como ingesta individual observada.
+
+## Las dos secciones utilizadas
+
+El análisis emplea dos secciones del Cuestionario B, conforme a los términos de
+referencia.
+
+**Sección 2 — inventario de despensa.** Registra las existencias de alimentos
+almacenables del hogar al inicio y al final del período, con una cantidad
+inicial y una cantidad final por producto. El consumo se deduce de la
+diferencia.
+
+**Sección 3A — adquisiciones diarias.** Registra cada adquisición de alimentos
+durante los días de observación, con su cantidad, su unidad de presentación y
+su valor. Es la fuente principal: concentra el grueso de los registros y es la
+que sostiene la estimación.
+
+Las dos se suman en la estimación principal. La decisión y su justificación
+están en el capítulo de solapamiento.
+
+## Diseño muestral
+
+Las estimaciones son ponderadas y la varianza se calcula con el diseño complejo
+de la encuesta: estratos, unidades primarias de muestreo anidadas en estrato y
+factor de expansión por hogar, con linealización de Taylor. En el código, el
+diseño se construye una sola vez en `reports/_comun.R` y en los scripts
+mediante `srvyr::as_survey_design()`, de modo que ninguna estimación del
+análisis se calcula como si la muestra fuera aleatoria simple.
+
+Los intervalos de confianza que acompañan a las proporciones se construyen con
+la distribución *t* y los grados de libertad del subdiseño correspondiente, que
+es lo que corresponde cuando el número de conglomerados del dominio es
+pequeño.
+
+## Lo que la encuesta registra y este análisis no utiliza
+
+La Sección 3A del archivo original contiene variables que la cadena de cálculo
+no incorpora, y conviene declararlo porque constituye un supuesto implícito.
+
+- `QUIEN_PAGO1`, la **procedencia** de la adquisición, que distingue la compra
+  del hogar, la producción propia, el retiro del negocio del hogar, el pago en
+  especie y los regalos según su origen.
+- `DESTINO_NEGOCIO`, `DESTINO_OTRO_HOGAR` y `DESTINO_IGLESIA_ONG`, el
+  **destino** de lo adquirido.
+- `PORCENTAJE_HOGAR`, la **participación del hogar** en una adquisición
+  compartida.
+
+En consecuencia, la cantidad adquirida entra completa al cálculo aunque la
+adquisición tuviera por destino un negocio o un tercero, y sin ponderar por la
+participación del hogar. Nacionalmente el efecto es pequeño —las adquisiciones
+con destino declarado a un negocio son una fracción menor del total— pero el
+supuesto existe y aquí queda declarado. La opción de incorporarlas se evaluó y
+se documenta en el capítulo de hipótesis evaluadas.
+
+# De cantidad declarada a gramos consumidos
+
+## La fórmula
+
+El consumo diario en gramos de cada alimento, por hogar, se obtiene como
+
+$$\text{Consumo diario (g)} = \frac{Q \times FC \times PC}{PM}$$
+
+donde $Q$ es la cantidad declarada en la unidad de presentación, $FC$ el factor
+de conversión de esa unidad a gramos, $PC$ la porción comestible del alimento, y
+$PM$ el período de memoria o de observación expresado en días.
+
+Para la Sección 3A, $PM$ se reemplaza por el **número de días distintos con
+registro en ese hogar**, que no es constante: la mediana es de siete días, con
+casos de uno y de ocho. Usar un denominador fijo cuando el denominador real
+varía produciría un sesgo sistemático en los hogares con menos días
+observados.
+
+## Factores de conversión
+
+El paso de unidad de presentación a gramos es el eslabón más frágil de la
+cadena, porque las unidades de la encuesta incluyen presentaciones comerciales
+y unidades locales cuya equivalencia en gramos no es universal.
+
+La conversión se resuelve en tres piezas, por orden de prioridad: un
+diccionario universal de unidades, una tabla específica por alimento cuando la
+unidad depende del producto, y la unidad declarada cuando ya viene en gramos.
+La unión con la tabla específica se hace **por el texto de la descripción**, no
+por código, porque la tabla de unidades no está codificada; es una debilidad
+conocida y está documentada en el código.
+
+Los factores de conversión de las presentaciones más frecuentes se
+**verificaron en punto de venta** mediante trabajo de campo con registro
+fotográfico, que es la razón por la que las equivalencias de este análisis no
+dependen únicamente de tablas de referencia externas.
+
+## Solapamiento entre las dos secciones
+
+Un alimento almacenable puede aparecer en las dos secciones: en el inventario
+de despensa y en las adquisiciones del período. Sumarlas sin criterio contaría
+dos veces el mismo alimento; tomar solo una de ellas descartaría consumo real.
+
+La decisión adoptada es **reportar la suma como estimación principal**, por ser
+la única plausible, y **declarar el solapamiento con su magnitud** como
+limitación. El tratamiento específico de los almacenables emplea una regla de
+agotamiento que se aplica en la etapa de normalización, no en la de
+transformación.
+
+## Valores atípicos
+
+Los valores atípicos se **detectan y se marcan, pero no se corrigen
+automáticamente**. La detección opera por alimento, comparando cada registro
+contra la distribución de ese alimento.
+
+Dos consecuencias hay que tener presentes. La primera es que un hogar puede
+acumular varios valores altos sin que ninguno sea atípico en su alimento, de
+modo que la detección por alimento no controla valores extremos a nivel de
+hogar. La segunda es que el método de corrección es una decisión metodológica
+que este análisis deliberadamente no toma de forma automática: corregir
+silenciosamente valores extremos en una encuesta de gasto equivale a decidir
+qué hogares son creíbles, y esa decisión debe ser explícita.
+
+Como control complementario se aplica un filtro de **plausibilidad energética**
+—un rango admisible de energía por EMA y día— que **no** se usa para la
+estimación principal sino como análisis de sensibilidad, porque los hogares que
+lo exceden se concentran en los quintiles de mayor gasto y excluirlos sesgaría
+las comparaciones entre grupos.
+
+# Normalización: el Equivalente de Mujer Adulta
+
+## Qué problema resuelve
+
+Dos hogares que adquieren la misma cantidad de alimentos no tienen la misma
+ingesta por persona si uno tiene dos adultos y el otro, dos adultos y cuatro
+niños. Comparar hogares de distinta composición exige un denominador que
+refleje la necesidad, no el número de cabezas.
+
+El Equivalente de Mujer Adulta cumple esa función. Cada miembro del hogar se
+expresa como una fracción del requerimiento energético de una mujer adulta de
+referencia, y el hogar es la suma de esas fracciones:
+
+$$EMA_i = \frac{\text{requerimiento energético}_i}{2291\ \text{kcal}}
+\qquad EMA_{\text{hogar}} = \sum_i EMA_i$$
+
+Las 2.291 kcal son el requerimiento de una mujer de 18 a 30 años, 55 kg,
+actividad física moderada (PAL = 1,76), no embarazada y no lactando, según
+FAO/WHO/UNU (2004). Los requerimientos por edad y sexo se tomaron de las tablas
+4.2, 4.3 y 5.2 de esa fuente primaria.
+
+## Qué supone y qué no hace
+
+La normalización por EMA supone que los alimentos del hogar se reparten entre
+sus miembros **en proporción a su requerimiento energético**. Es un supuesto, no
+una observación: la encuesta no registra el reparto intradoméstico. Donde el
+reparto real se aparta de esa proporción —y la literatura documenta que a
+menudo lo hace, en perjuicio de mujeres y niñas— la ingesta por EMA sobrestima
+la de quienes reciben menos.
+
+El script no aplica los incrementos por embarazo ni por lactancia que menciona
+el documento metodológico de referencia, porque la encuesta no identifica esos
+estados de forma utilizable. El efecto es una subestimación del denominador en
+los hogares con mujeres embarazadas o lactando.
+
+# Composición de alimentos
+
+## Las tablas y el emparejamiento
+
+El contenido de nutrientes de cada alimento proviene de dos tablas de
+composición, articuladas mediante un crosswalk que asocia cada variedad de la
+encuesta con un alimento de la tabla. El crosswalk se construyó alimento por
+alimento y su validación está registrada; solo las correspondencias marcadas
+como validadas entran al cálculo.
+
+La equivalencia entre columnas de las dos tablas se verificó una a una. Dos
+detalles conviene conocer porque son fuente clásica de error: una de las tablas
+trae **cuatro columnas de folato** y solo la expresada en equivalentes
+dietéticos corresponde a la otra; y varios encabezados contienen saltos de
+línea internos, de modo que las columnas se resuelven **por patrón** y no por
+nombre literal.
+
+## Cobertura del emparejamiento
+
+No todos los alimentos de la encuesta encuentran correspondencia en las tablas
+de composición. Los que no la encuentran aportan **cero**, no un valor faltante.
+
+Esto tiene una consecuencia que debe acompañar a toda cifra de ingesta de este
+análisis: **la ingesta estimada es un piso, no una estimación centrada.** La
+cobertura del emparejamiento, ponderada por gramos y calculada por nutriente,
+se reporta junto a los resultados precisamente para que la cifra no se lea como
+si fuera completa.
+
+## Supuesto de unidades
+
+Una de las tablas de composición no incluye hoja de unidades para cuatro
+nutrientes. Se asumieron las unidades de los identificadores INFOODS, decisión
+que es coherente con los valores máximos observados en la tabla. El supuesto
+está pendiente de confirmación contra la documentación de la fuente y se
+declara como tal.
+
+# Ingesta aparente de micronutrientes
+
+La ingesta aparente de cada nutriente, por EMA y día, es la suma sobre los
+alimentos del hogar del producto entre los gramos consumidos y el contenido del
+nutriente por cada 100 gramos, dividida por el EMA del hogar.
+
+Los nutrientes evaluados son energía, hierro, folato en equivalentes
+dietéticos, vitamina A en equivalentes de actividad de retinol, zinc, vitamina
+B12, vitamina D y vitamina E.
+
+La **mediana** es la cifra citable del análisis y no la media. La media está
+inflada por la cola de hogares con energía implausible, y una medida de
+posición central que se mueve con los valores extremos no describe al hogar
+típico.
+
+# Escenarios de fortificación
+
+## Método aditivo
+
+Los escenarios se construyen **por adición**: se parte del alimento sin
+fortificar y se suma el nutriente que el escenario añade, expresado en
+miligramos por kilogramo de vehículo. Es el método que corresponde cuando lo
+que se modela es una norma, porque una norma especifica un nivel de adición, no
+una composición final.
+
+El tratamiento de los derivados del trigo merece explicación. La tabla de
+composición trae el pan, las pastas y las galletas **ya elaborados con harina
+enriquecida**, de modo que partir de ellos contaría la fortificación dos veces.
+Para evitarlo, el hierro y el folato de los derivados se sustituyen por los de
+la harina sin enriquecer, en proporción a la harina que cada derivado contiene;
+los demás nutrientes no se alteran. Y lo que un escenario añade a un derivado
+es el nivel del escenario multiplicado por su fracción de harina.
+
+Las fracciones de harina de cada derivado y los niveles de adición de cada
+escenario son **parámetros en archivos editables**, no constantes en el código.
+Cambiar un escenario es cambiar una fila de un archivo.
+
+## Qué no se descuenta
+
+No se descuentan pérdidas por almacenamiento ni por cocción. Los aportes
+calculados son, por tanto, **un máximo**. El folato es particularmente sensible
+a este supuesto por su degradación térmica.
+
+# Riesgo de ingesta inadecuada
+
+## El método del punto de corte
+
+La proporción de hogares con ingesta inadecuada se estima comparando la ingesta
+aparente por EMA y día contra el **Requerimiento Promedio Estimado**, y
+contando la proporción por debajo.
+
+El método es válido bajo condiciones que conviene enunciar, porque se cumplen
+de manera desigual: que la distribución del requerimiento sea aproximadamente
+simétrica, que la ingesta y el requerimiento sean independientes, y que la
+distribución utilizada sea la de la ingesta **habitual**, no la de un período
+corto. Esta última condición es la que una encuesta de gasto satisface peor,
+y es una limitación de fondo del enfoque, no un defecto de esta
+implementación.
+
+## El hierro
+
+El hierro **no** se evalúa por punto de corte. La distribución de su
+requerimiento es marcadamente asimétrica en mujeres en edad fértil, de modo que
+la proporción por debajo de la media del requerimiento no estima la proporción
+inadecuada. Se emplea el **enfoque de probabilidad**: para cada nivel de
+ingesta se calcula la probabilidad de que el requerimiento lo supere, usando la
+distribución del requerimiento, y se promedia sobre la población.
+
+El requerimiento de hierro depende además de la **biodisponibilidad** de la
+dieta. La distribución de referencia corresponde a una biodisponibilidad
+determinada y se reescala para otras. La elección del supuesto de
+biodisponibilidad cambia la cifra resultante de manera sustantiva y, por tanto,
+debe declararse junto al resultado y no en una nota.
+
+## El límite superior
+
+El límite superior de ingesta tolerable **no se aplica al nutriente total**
+sino a la forma a la que corresponde: en el folato, al ácido fólico sintético
+añadido, no al folato dietético; en la vitamina A, al retinol preformado
+añadido, no a los carotenoides. Calcular la proporción sobre el total
+sobrestimaría groseramente el riesgo de exceso.
+
+Por ese motivo, las proporciones sobre el límite que reporta este análisis se
+calculan sobre la fracción añadida y se declaran como **cota máxima**.
+
+## Valores de referencia
+
+Los valores de referencia se leen de archivos editables, uno por nutriente, con
+su fuente y su estado. Sustituir el conjunto de referencia es sustituir un
+archivo; no exige tocar el código.
+
+```{r}
+#| label: tbl-referencia-manual
+#| tbl-cap: "Valores de referencia empleados, su método de evaluación y su estado"
+
+leer_limpio(file.path(RUTA_RAW, "valores_referencia.csv")) |>
+  transmute(Nutriente = nutriente,
+            `RPE` = ear, `Límite superior` = ul, Unidad = unidad,
+            `Método` = if_else(metodo == "punto_de_corte",
+                               "Punto de corte", "Probabilidad"),
+            Fuente = fuente, Estado = estado) |>
+  tabla(fuente = "Fuente: data/raw/valores_referencia.csv.",
+        notas = c(
+          "El límite superior aplica a la forma añadida, no al nutriente total.",
+          "Un estado provisional indica que la fuente de referencia está pendiente de confirmación."))
+```
+
+# Densidad de nutrientes como criterio complementario
+
+El capítulo que sigue se incluye **desde el mismo archivo que alimenta el
+informe analítico**, `reports/_metodo_densidad.qmd`, de modo que las dos
+versiones no puedan divergir. Si en algún momento conviene que el manual trate
+el tema con más detalle que el informe, se sustituye la inclusión por un
+archivo propio; mientras tanto, una sola fuente.
+
+{{< include _metodo_densidad.qmd >}}
+
+# Dominios de estimación y precisión
+
+## Qué es un dominio
+
+Una encuesta se diseña para producir estimaciones de precisión conocida en un
+conjunto determinado de dominios. Fuera de ese conjunto la encuesta sigue
+produciendo números, pero sin la garantía de precisión que su diseño ofrece.
+
+En este análisis se estima a nivel nacional, por región, por zona urbana o
+rural, por quintil y por provincia. Los cuatro primeros son dominios de
+estimación de la encuesta. **La provincia no lo es**, y el tamaño muestral
+provincial lo refleja: va de unas decenas de hogares a más de mil.
+
+## La regla de precisión
+
+Las estimaciones provinciales se publican con marca explícita de precisión
+insuficiente cuando el dominio no alcanza un mínimo de hogares o cuando la
+semiamplitud de su intervalo de confianza excede un umbral declarado. En los
+mapas, las unidades que no superan la regla **no se pintan con su valor**: se
+dejan sin color y la leyenda explica por qué.
+
+El fundamento de esta decisión es que un mapa coroplético sin esa marca
+presenta como comparables unidades que no lo son, y el lector no tiene manera
+de distinguirlas.
+
+Se evaluó añadir a la regla un mínimo de conglomerados, bajo la hipótesis de
+que los dominios con pocos conglomerados producían estimaciones inestables. La
+descomposición de la dispersión no respaldó esa hipótesis y la regla no se
+modificó; el detalle está en el capítulo de hipótesis evaluadas.
+
+# Análisis por grupos de alimentos
+
+Los alimentos se clasifican en los diez grupos de la diversidad alimentaria
+mínima en mujeres (MDD-W, FAO 2021) más las categorías que esa guía deja fuera
+y que aquí importan: grasas, dulces, bebidas azucaradas y condimentos. La
+asignación de cada alimento a su grupo está en un archivo editable.
+
+**Esta clasificación no es el indicador MDD-W.** El indicador mide el consumo
+individual de mujeres en un recordatorio de 24 horas; aquí se clasifican las
+adquisiciones del hogar durante una semana. Se usa la agrupación porque está
+estandarizada y es comparable entre países, no el indicador.
+
+El análisis reporta la contribución de cada grupo a cada micronutriente, además
+de la energía. Esa desagregación es la que explica por qué un escenario de
+fortificación mueve unos nutrientes y no otros: un nutriente cuyo aporte
+proviene casi enteramente de un grupo que el escenario no toca no puede
+moverse.
+
+# Representación de resultados
+
+Las normas de figuras y tablas de este análisis están en
+`docs/normas-figuras-y-tablas.md` y se resumen en un principio: **la figura y
+su leyenda deben bastar para interpretarla sin leer el cuerpo del texto.**
+
+En la práctica eso exige que toda figura declare la cantidad con su unidad y su
+denominador, el escenario, la población, la fuente de los datos, el método de
+clasificación con sus cortes, la regla de precisión y qué significa el color
+ausente. En los mapas se añaden la proyección, la fuente de la geometría con su
+fecha y licencia, y la advertencia de dominio.
+
+# Supuestos
+
+Los supuestos que sostienen el análisis, reunidos. Ninguno es una omisión: cada
+uno responde a una limitación de la fuente o a una decisión declarada.
+
+| Supuesto | Dónde actúa | Efecto si no se cumple |
+|---|---|---|
+| La adquisición aproxima al consumo | Toda la cadena | Sobrestimación por desperdicio y almacenamiento |
+| El reparto intradoméstico sigue al requerimiento energético | Normalización por EMA | Sobrestimación en los miembros que reciben menos |
+| Los alimentos sin correspondencia en composición aportan cero | Ingesta | La ingesta estimada es un piso |
+| Las unidades asumidas de la tabla de composición son las de INFOODS | Cuatro nutrientes | Error de escala en esos nutrientes |
+| No hay pérdidas por almacenamiento ni cocción | Escenarios | Los aportes son un máximo |
+| La distribución observada aproxima a la ingesta habitual | Punto de corte | Sobrestimación de la prevalencia de inadecuación |
+| El sobrerregistro es multiplicativo | Criterio de densidad | La densidad quedaría tan sesgada como el nivel |
+| La cantidad adquirida se destina al hogar | Toda la cadena | Sobrestimación en hogares con negocio |
+
+: Supuestos del análisis y su efecto {#tbl-supuestos}
+
+# Hipótesis evaluadas y descartadas
+
+Un manual técnico que solo documente lo que se hizo deja fuera la parte más
+costosa del trabajo analítico, que es lo que se probó y no funcionó. Las
+hipótesis siguientes se evaluaron con los datos y se descartaron; dejarlas
+registradas evita que se vuelvan a ensayar y muestra el alcance de la
+verificación.
+
+**Inestabilidad de los dominios pequeños.** Se propuso añadir un mínimo de
+conglomerados a la regla de precisión. La descomposición de la dispersión
+mostró que el ruido de muestreo explica una fracción menor de la variación en
+los dominios con pocos grados de libertad, y que los factores de encogimiento
+de los dominios más pequeños están próximos a uno: las estimaciones directas ya
+están donde las situaría un modelo de áreas pequeñas. La regla no se modificó.
+
+**Tamaño del hogar como explicación del patrón geográfico.** No se sostiene: la
+correlación entre el EMA del hogar y el riesgo es prácticamente nula.
+
+**Reparto entre las dos secciones, regla de agotamiento y días observados.**
+Ninguno de los tres explica el patrón geográfico. Las dos secciones se inflan
+por factores semejantes en las provincias afectadas, la regla de agotamiento no
+excluye energía en el hogar mediano de ninguna provincia, y la mediana de días
+observados es de siete en casi todas.
+
+**Procedencia de la adquisición.** La encuesta registra la producción propia y
+el retiro del negocio del hogar. La correlación entre la participación no
+comprada y la energía registrada, **entre hogares**, es prácticamente nula, y
+no hay gradiente por tramo de participación. La prueba decisiva es que los
+hogares **sin nada** de producción propia en las provincias de mayor energía
+registran el mismo exceso que el conjunto de esas provincias. La hipótesis se
+descarta.
+
+Este último caso dejó además un hallazgo metodológico que vale la pena
+conservar: **entre provincias** la participación de producción propia
+correlaciona de forma apreciable con la energía registrada, y **entre hogares**
+no correlaciona en absoluto. Es un caso de falacia ecológica con datos reales.
+
+# Reproducibilidad
+
+## Orden de ejecución
+
+Los scripts se ejecutan en orden numérico y cada uno declara en su encabezado
+qué requiere y qué produce. Ninguno depende del estado de la sesión: todos leen
+de archivo y escriben a archivo.
+
+## Cifras de control
+
+El análisis mantiene un conjunto de cifras de control —número de registros de
+cada sección y número de hogares— que toda corrida debe reproducir. Antes de
+introducir un cambio se declara el efecto esperado sobre esas cifras; si la
+corrida no coincide con lo declarado, el trabajo se detiene en lugar de
+continuar.
+
+## Guardas
+
+Varios scripts incorporan verificaciones que detienen la ejecución cuando una
+condición necesaria no se cumple, en lugar de producir un resultado plausible y
+equivocado. Entre ellas: que la asignación de vehículos reproduzca el agregado
+nacional antes de desagregar por provincia; que el reparto por grupo de
+alimentos sume cien por ciento; que toda provincia del archivo de riesgo se
+identifique con la geometría; y que un criterio alternativo reproduzca
+exactamente al criterio establecido en las celdas comparables antes de
+interpretarse.
+
+El criterio de diseño es que **una guarda que se relaja la primera vez que suena
+no sirve para nada.** Cuando una guarda se activa, se corrige el diseño o se
+corrige la expectativa, no la tolerancia.
+
+## Emparejamientos
+
+Los emparejamientos entre tablas se hacen por identificador numérico siempre
+que exista. Unir por nombre de territorio es una fuente conocida de error
+silencioso: en este análisis, dos de las treinta y dos provincias tienen
+denominaciones distintas entre la encuesta y la fuente oficial de límites, y un
+emparejamiento por texto las habría perdido sin aviso.
+
+# Limitaciones
+
+Las limitaciones de fondo, en orden de importancia.
+
+1. **La encuesta mide adquisición, no ingesta.** Es una limitación de la
+   fuente, no del análisis, y ninguna técnica la elimina.
+2. **El nivel de adquisición registrada varía entre territorios por razones
+   que no son de consumo.** Está documentado en el informe y motiva el criterio
+   de densidad.
+3. **La ingesta estimada es un piso**, por los alimentos sin correspondencia en
+   las tablas de composición.
+4. **La provincia no es dominio de estimación**, y sus cifras se publican con
+   marca de precisión.
+5. **Los valores de referencia están pendientes de confirmación**, y las
+   estimaciones de riesgo escalan con ellos.
+6. **No se modela la variabilidad intraindividual**, que una encuesta de gasto
+   no permite estimar.
+
+# Referencias
+
+FAO. 2021. *Minimum Dietary Diversity for Women. An updated guide to
+measurement: from collection to action*. Roma.
+
+FAO/WHO/UNU. 2004. *Human energy requirements: Report of a Joint FAO/WHO/UNU
+Expert Consultation*. Roma, 17–24 de octubre de 2001.
+
+Institute of Medicine. 2000. *Dietary Reference Intakes: Applications in
+Dietary Assessment*. Washington, D. C.: The National Academies Press.
+doi:10.17226/9956.
+
+Tang, K., Adams, K. P., Ferguson, E. L., Woldt, M., Kalimbira, A. A., Likoswe,
+B., Yourkavitch, J., Chrisinger, B., Pedersen, S., Segovia De La Revilla, L.,
+Dary, O., Ander, E. L. y Joy, E. J. M. 2022. Modeling food fortification
+contributions to micronutrient requirements in Malawi using Household
+Consumption and Expenditure Surveys. *Annals of the New York Academy of
+Sciences*, 1508: 105–122. doi:10.1111/nyas.14697.
+
+Weisell, R. y Dop, M. C. 2012. The adult male equivalent concept and its
+application to Household Consumption and Expenditures Surveys (HCES). *Food and
+Nutrition Bulletin*, 33(3 Suppl).
+
+Banco Central de la República Dominicana. *Encuesta Nacional de Gastos e
+Ingresos de los Hogares 2018. Documento metodológico*.
+
+Oficina Nacional de Estadística. *División Territorial 2021*. Santo Domingo.
