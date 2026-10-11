@@ -370,6 +370,43 @@ Consecuencia operativa: el gradiente socioeconómico del informe se reporta
 sobre ingesta absoluta, y la densidad entra en esa sección como descripción de
 composición de la dieta, nunca como prevalencia de riesgo.
 
+**La hipótesis abierta ya es comprobable (2026-10-11).** La ENGIH **sí registra
+la procedencia de la adquisición**. El Excel original tiene en la Sección 3A la
+variable `QUIEN_PAGO1`, cuyo diccionario incluye *Producción propia del hogar*
+(código 2) y *Retiro del negocio del hogar* (3), además de los regalos por
+origen. También registra el destino de lo adquirido —`DESTINO_NEGOCIO`,
+`DESTINO_OTRO_HOGAR`, `DESTINO_IGLESIA_ONG`— y la participación del hogar en la
+adquisición, `PORCENTAJE_HOGAR`.
+
+**Ninguna de ellas llega al cálculo.** `01_import.R` las lee del Excel y las
+descarta en el `transmute()` del paso 6.2, que conserva once campos. En
+consecuencia `cantidad_adquirida` entra completa aunque la adquisición fuera
+para un negocio o para otro hogar. Esto es independiente de Samaná y hay que
+decidirlo por separado.
+
+Magnitud nacional, calculada sobre el archivo original:
+
+| Procedencia | Registros | Monto |
+|---|---|---|
+| El hogar (compra) | 93,50% | 90,85% |
+| Regalo de otro hogar nacional | 2,38% | 4,47% |
+| Retiro del negocio del hogar | 2,42% | 1,77% |
+| Producción propia del hogar | 1,19% | 1,64% |
+| Destino declarado a un negocio | 0,37% | 1,49% |
+
+Pequeño en el agregado y **concentrado**: el 12,6% de los hogares registra algo
+de producción propia o retiro del negocio, y entre esos la mediana es 11,8% de
+su adquisición, el percentil 90 es 70% y hay hogares al 100%. Esa concentración
+es la forma que tendría el mecanismo si fuera el responsable del patrón
+provincial, pero 3,4% del monto nacional no explica por sí solo un exceso de
+1,71 veces en Samaná. **Es un candidato, no una explicación establecida.**
+
+Prueba: `scripts/diagnostico_procedencia.R`, que relee solo esas columnas y
+cruza por hogar con la energía ya calculada, sin tocar el pipeline ni las
+cifras de control. Mide la participación en **monto**, que es un sustituto; si
+el resultado es afirmativo, el paso siguiente es arrastrar `quien_pago1` por el
+pipeline y medirlo en energía.
+
 **Hipótesis abierta, no verificada.** Las cinco provincias de mayor energía son
 rurales y agrícolas; las de menor, más urbanas. La producción propia y las
 existencias de despensa mayores en zonas rurales son una fuente conocida de
