@@ -27,13 +27,14 @@ trigo <- resumen_veh |> filter(grupo == "Trigo, en equivalentes de harina")
 
 cob_baja_arroz <- veh_prov |> filter(grupo == "Arroz") |> slice_min(pct_hogares, n = 1)
 
-en_prosa_prov <- function(x) {
-  p <- strsplit(tolower(x), " ")[[1]]
-  chicas <- c("de", "del", "la", "las", "los", "y")
-  p <- ifelse(p %in% chicas & seq_along(p) > 1, p,
-              paste0(toupper(substr(p, 1, 1)), substr(p, 2, nchar(p))))
-  paste(p, collapse = " ")
-}
+# Nombre oficial de la provincia, de data/raw/provincias_nombres.csv, derivada
+# de la misma fuente que la geometria. Los datos de la encuesta traen los
+# nombres en mayusculas y sin acentos. El empate va por identificador: dos de
+# las 32 provincias tienen denominacion distinta entre la encuesta y la fuente
+# oficial, y unir por texto las perderia.
+NOM_PROV <- leer_limpio(file.path(RUTA_RAW, "provincias_nombres.csv"))
+cob_baja_arroz <- cob_baja_arroz |>
+  left_join(NOM_PROV |> select(id_provincia, nombre_oficial), by = "id_provincia")
 ```
 
 ### Distribución territorial de la cobertura y el consumo de los vehículos
@@ -66,7 +67,7 @@ provincias, y la del trigo de `r fmt(trigo$cob_min, 1)`% a
 `r fmt(trigo$cob_max, 1)`%. No existen zonas desatendidas: cualquiera de los dos
 vehículos alcanza prácticamente a todo el país, y una norma de fortificación
 aplicada a ellos no deja regiones fuera. El único apartamiento visible es el de
-`r en_prosa_prov(cob_baja_arroz$des_provincia)`, con
+`r cob_baja_arroz$nombre_oficial`, con
 `r fmt(cob_baja_arroz$pct_hogares, 1)`% de cobertura de arroz.
 
 El contraste está en el otro eje, y es el que importa para la decisión. Los dos

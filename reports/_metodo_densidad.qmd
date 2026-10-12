@@ -49,15 +49,20 @@ r_ing  <- cor(prov$energia, prov$pct_ing_comp)
 r_dens <- cor(prov$energia, prov$pct_densidad)
 prov_min <- prov |> slice_min(pct_densidad, n = 1)
 
-# Los nombres de provincia estan en mayusculas en los datos de la encuesta. Para
-# prosa se capitalizan; los acentos del nombre oficial se incorporaran cuando se
-# agregue la tabla de nombres de la fuente oficial (tarea M5).
-en_prosa <- function(x) {
-  p <- strsplit(tolower(x), " ")[[1]]
-  chicas <- c("de", "del", "la", "las", "los", "y")
-  p <- ifelse(p %in% chicas & seq_along(p) > 1, p,
-              paste0(toupper(substr(p, 1, 1)), substr(p, 2, nchar(p))))
-  paste(p, collapse = " ")
+# Nombre oficial de la provincia, de data/raw/provincias_nombres.csv, derivada
+# de la misma fuente que la geometria. El archivo de riesgo identifica la
+# provincia por el nombre de la encuesta, en mayusculas y sin acentos; se
+# traduce a identificador con la tabla de hogares y de ahi al nombre oficial,
+# porque dos de las 32 tienen denominacion distinta entre ambas fuentes.
+NOM_PROV <- leer_limpio(file.path(RUTA_RAW, "provincias_nombres.csv"))
+LOOKUP_PROV <- leer_limpio(file.path(RUTA_CLEAN, "data_ema_hogar.csv")) |>
+  distinct(id_provincia, des_provincia) |>
+  left_join(NOM_PROV |> select(id_provincia, nombre_oficial), by = "id_provincia")
+
+en_prosa <- function(nivel) {
+  k <- match(nivel, LOOKUP_PROV$des_provincia)
+  if (is.na(k) || is.na(LOOKUP_PROV$nombre_oficial[k])) nivel
+  else LOOKUP_PROV$nombre_oficial[k]
 }
 
 quint <- sens |> filter(dominio == "Quintil", nutriente == "folato_mcg_dfe") |>

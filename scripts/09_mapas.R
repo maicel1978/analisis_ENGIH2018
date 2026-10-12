@@ -53,6 +53,30 @@ if (!file.exists(geo_f)) {
 provincias <- st_read(geo_f, quiet = TRUE)
 stopifnot(nrow(provincias) == 32)
 
+# Tabla de nombres oficiales para prosa y figuras, derivada de esta misma
+# geometria y versionada aparte para que los informes no necesiten sf. Se
+# verifica en cada corrida: si la geometria cambia, la tabla deja de cuadrar y
+# el script se detiene en vez de dejar nombres desactualizados en los informes.
+nombres_f <- here("data", "raw", "provincias_nombres.csv")
+if (file.exists(nombres_f)) {
+  nom <- leer("data", "raw", "provincias_nombres.csv")
+  cmp <- provincias |> st_drop_geometry() |>
+    select(id_provincia, PROV_NAME) |>
+    full_join(nom |> select(id_provincia, nombre_oficial), by = "id_provincia")
+  if (nrow(cmp) != 32 || any(cmp$PROV_NAME != cmp$nombre_oficial)) {
+    print(as.data.frame(cmp |> filter(is.na(PROV_NAME) | is.na(nombre_oficial) |
+                                        PROV_NAME != nombre_oficial)))
+    stop("provincias_nombres.csv no coincide con la geometria. Regenerar.",
+         call. = FALSE)
+  }
+} else {
+  provincias |> st_drop_geometry() |>
+    transmute(id_provincia, codigo = PROV_CODE, nombre_oficial = PROV_NAME) |>
+    arrange(id_provincia) |>
+    write_delim(nombres_f, delim = ";")
+  message("Tabla de nombres de provincia creada en data/raw/provincias_nombres.csv")
+}
+
 # --- 2. Consumo de vehiculos por provincia -----------------------------------
 # Misma definicion de vehiculo que 06: se lee el mismo archivo de parametros.
 vehiculos <- leer("data", "raw", "vehiculos_escenarios.csv")
