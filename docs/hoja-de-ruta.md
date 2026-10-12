@@ -231,9 +231,20 @@ final cuando esté.
 de P4 para las cifras.* M1 mostró que el tema 5 no está lleno de datos
 simulados: son dos piezas puntuales.
 
-- [ ] Sustituir la tabla de dos filas del módulo 19 por resultados reales, y
-      neutralizar la rama de respaldo simulada del módulo 24. **Exigido por la
-      Nota Metodológica 5 del contrato; no es opcional.**
+- [ ] **Sustituir las tablas auxiliares del módulo 24 por las reales.**
+      Corregido el 2026-10-12: M1 había concluido que el tema 5 solo tenía dos
+      piezas menores, y estaba incompleto. El módulo 24 **sí ejecuta** un
+      cálculo sobre datos inventados: lee las cantidades reales de la Sección
+      3A y las multiplica por una tabla de factores de conversión de tres filas
+      y una de porción comestible de dos filas, ambas de ejemplo, con un
+      período de memoria fijo de 30 días cuando el análisis real usa los días
+      observados por hogar, de mediana 7. Lo que no empata queda en cero.
+      **Esto es lo que incumple la Nota Metodológica 5 y no es opcional.**
+      La rama `modulos/declarar-origen-de-datos` (PR 2) no lo arregla: lo
+      declara donde se ve, que es el paso previo. El arreglo es el primer caso
+      concreto de la articulación entre repositorios.
+- [ ] `static/r/cantidad_alimentos.R`, en la sección de recursos de la
+      plataforma, usa un `datos_consumo_simulado`. Mismo caso.
 - [ ] Unidades de R aplicado, versión mínima sobre la ENGIH.
 - [ ] Retirar o regrabar los videos 15 y 16, que explican el método de nivel de
       fortificación anterior a su corrección.
@@ -330,9 +341,11 @@ completo en la cabeza.
         Cortos, no incompletos.
       - Módulo 19: un `data.frame` de **dos filas** escrito a mano, rotulado
         como simulado, para consumo fuera del hogar.
-      - Módulo 24: lee el archivo real desde `static/data/`; la simulación es
-        una **rama de respaldo** que avisa «Usando datos simulados (DEMO)» si
-        el archivo falta, y el archivo está presente, así que no se activa.
+      - Módulo 24: lee el archivo real desde `static/data/`; la rama de
+        respaldo no se activa porque el archivo está presente. **Pero esta
+        revisión fue incompleta**: no examinó las tablas auxiliares del propio
+        módulo, que sí son inventadas y sí se ejecutan. Ver P6, corregido el
+        2026-10-12.
 
       De modo que el compromiso de «sustituir los datos simulados del tema 5»
       se reduce a la tabla de dos filas del módulo 19 y a neutralizar la rama
