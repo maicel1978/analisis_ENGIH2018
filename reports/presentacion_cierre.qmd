@@ -213,8 +213,6 @@ grupos de alimentos quedan completos e incorporados al informe.
 La tabla anterior responde que se movio. Esta responde que hay de nuevo que no estaba la semana pasada.
 :::
 
-# Hallazgos {background-color="#2c5364"}
-
 ## Escenarios de fortificación modelados
 
 ```{r}
@@ -264,6 +262,8 @@ bind_rows(linea_base, resumen_esc) |>
                       "presentan tres de estos escenarios; el informe recoge",
                       "los siete."))
 ```
+
+# Hallazgos {background-color="#2c5364"}
 
 ## Hallazgo 1 · Alcance poblacional de los vehículos
 
@@ -321,14 +321,33 @@ Ambos vehículos presentan cobertura alta en las 32 provincias, sin zonas desate
 Hallazgo negativo que ahorra dinero: no hace falta focalizar geográficamente el vehículo. Decirle a alguien dónde no gastar es un servicio.
 :::
 
-## Hallazgo 2 · Margen no utilizado por la norma vigente
+## Hallazgo 2 · Contribución y margen de la norma vigente
 
-::: {style="font-size:0.9em; margin-bottom:-0.2em;"}
+```{r}
+#| label: calculo-norma
+#| include: false
+NUT5 <- c("folato_mcg_dfe", "hierro_mg", "zinc_mg", "vitamina_b12_mcg",
+          "vitamina_a_mcg_rae")
+S_SIN <- "Sin fortificación"
+S_NOR <- "Norma vigente: harina y pan"
+cmp <- tibble::tibble(
+  nutriente = NUT5,
+  sin  = vapply(NUT5, function(n) riesgo_nac(E_SIN,  n), numeric(1)),
+  base = vapply(NUT5, function(n) riesgo_nac(E_BASE, n), numeric(1))) |>
+  mutate(Nutriente = NOMBRE[nutriente], reduccion = sin - base)
+```
+
+::: {style="font-size:0.92em;"}
 **Riesgo de ingesta inadecuada de folato:
 `r fmt(riesgo_nac(E_SIN, "folato_mcg_dfe"))`% sin fortificación,
 `r fmt(riesgo_nac(E_BASE, "folato_mcg_dfe"))`% con la norma vigente,
 `r fmt(riesgo_nac(E_ARROZ, "folato_mcg_dfe"))`% si todo el arroz llevara los
 niveles de la propuesta nacional.**
+
+La norma reduce la inadecuación de folato en
+`r fmt(cmp$reduccion[cmp$nutriente == "folato_mcg_dfe"], 1)` puntos porcentuales
+y la de hierro en `r fmt(cmp$reduccion[cmp$nutriente == "hierro_mg"], 1)`. En los
+nutrientes que no añade, no cambia nada.
 :::
 
 ## Ingesta de folato y riesgo, por escenario
@@ -382,8 +401,6 @@ la línea base lo supone sin fortificar. Ácido fólico añadido por encima del
 límite superior tolerable en ese escenario: `r fmt(esc |> filter(escenario == E_ARROZ) |> distinct(pct_folico_sobre_ul) |> pull())`% de los hogares.
 :::
 
-## Contribución de la norma vigente a la reducción del riesgo
-
 ## Hogares bajo el requerimiento, por nutriente y escenario
 
 ```{r}
@@ -391,17 +408,6 @@ límite superior tolerable en ese escenario: `r fmt(esc |> filter(escenario == E
 #| fig-cap: "Hogares bajo el requerimiento sin fortificación y con la norma vigente de harina de trigo, según nutriente. República Dominicana, 2018"
 #| fig-width: 10
 #| fig-height: 3.6
-NUT5 <- c("folato_mcg_dfe", "hierro_mg", "zinc_mg", "vitamina_b12_mcg",
-          "vitamina_a_mcg_rae")
-S_SIN <- "Sin fortificación"
-S_NOR <- "Norma vigente: harina y pan"
-
-cmp <- tibble::tibble(
-  nutriente = NUT5,
-  sin  = vapply(NUT5, function(n) riesgo_nac(E_SIN,  n), numeric(1)),
-  base = vapply(NUT5, function(n) riesgo_nac(E_BASE, n), numeric(1))) |>
-  mutate(Nutriente = NOMBRE[nutriente], reduccion = sin - base)
-
 largo_cmp <- cmp |>
   tidyr::pivot_longer(c(sin, base), names_to = "esc", values_to = "pct") |>
   mutate(Escenario = factor(if_else(esc == "sin", S_SIN, S_NOR),
