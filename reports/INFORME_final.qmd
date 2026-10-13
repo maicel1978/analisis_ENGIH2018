@@ -662,7 +662,15 @@ criterios, escenario de línea base. El mapa de la izquierda expresa la
 proporción de hogares cuya ingesta aparente es inferior al Requerimiento
 Promedio Estimado; el de la derecha, la razón entre la densidad mediana
 observada y la densidad crítica, centrada en 1. Las provincias sin color no
-alcanzan el criterio de precisión declarado en cada figura. Fuente: Encuesta
+alcanzan el criterio de precisión: menos de 50 hogares en la muestra, o
+semiamplitud del intervalo de confianza superior a 10 puntos porcentuales. La
+densidad crítica es el Requerimiento Promedio Estimado de folato sobre el
+requerimiento energético de la mujer adulta de referencia, que es el
+denominador del Equivalente de Mujer Adulta; la mediana de una provincia no es
+una prevalencia de adecuación. Las provincias se identifican con el número de
+la División Territorial 2021 de la Oficina Nacional de Estadística, cuya
+correspondencia figura a la derecha de cada mapa. Proyección UTM zona 19N
+(EPSG:32619). Fuente: Encuesta
 Nacional de Gastos e Ingresos de los Hogares 2018, Banco Central de la
 República Dominicana; límites provinciales del geoportal del IDERD y la
 División Territorial 2021 de la Oficina Nacional de Estadística. La provincia
