@@ -1,0 +1,342 @@
+---
+title: "Hallazgos y discusión metodológica"
+subtitle: "Análisis de la ENGIH 2018 — avance de la semana del 13 de octubre"
+author: "Maicel E. Monzón, PhD — ORCID 0000-0003-2117-9145"
+date: last-modified
+date-format: "D [de] MMMM [de] YYYY"
+lang: es
+format:
+  revealjs:
+    theme: [default, custom.scss]
+    slide-number: true
+    show-slide-number: all
+    code-fold: true
+    code-tools: true
+    embed-resources: true
+    transition: none
+    width: 1330
+    height: 780
+    fig-align: center
+crossref:
+  tbl-title: "Tabla"
+  fig-title: "Figura"
+  title-delim: "."
+execute:
+  warning: false
+  message: false
+  echo: false
+---
+
+```{r}
+#| label: setup
+ruta_comun <- c(here::here("reports", "_comun.R"),
+                here::here("scripts", "_comun.R"))
+source(ruta_comun[file.exists(ruta_comun)][1])
+library(ggplot2); library(tidyr)
+
+AZUL <- "#2c5364"; AZUL_C <- "#7ba3bd"; GRIS <- "#c9d3da"; ACENTO <- "#c0623c"
+
+tema <- function(base = 16) {
+  theme_minimal(base_size = base) +
+    theme(panel.grid.minor   = element_blank(),
+          panel.grid.major.x = element_blank(),
+          panel.grid.major.y = element_line(colour = "#eef2f4"),
+          axis.title  = element_text(colour = "#5a6b76", size = rel(0.85)),
+          plot.title  = element_text(face = "bold", colour = "#1a3a4a",
+                                     size = rel(0.95)),
+          legend.position = "none")
+}
+
+leer_clean <- function(archivo, script) {
+  f <- file.path(RUTA_CLEAN, archivo)
+  exigir_archivo(f, script)
+  leer_limpio(f)
+}
+
+rie   <- leer_clean("riesgo_inadecuacion.csv",   "07_riesgo_inadecuacion.R")
+esc   <- leer_clean("escenarios_resumen.csv",    "06_escenarios_fortificacion.R")
+gnut  <- leer_clean("grupos_micronutrientes.csv","08_grupos_alimentos.R")
+sens  <- leer_clean("sensibilidad_densidad_critica.csv",
+                    "diagnostico_densidad_critica.R")
+acop  <- leer_clean("acoplamiento_energia.csv",  "diagnostico_densidad_critica.R")
+proc  <- leer_clean("procedencia_por_provincia.csv", "diagnostico_procedencia.R")
+refs  <- leer_limpio(file.path(RUTA_RAW, "valores_referencia.csv"))
+
+KCAL_EMA <- 2291
+ESCENARIO_BASE <- "1a. Norma nacional: harina y pan"
+NOMBRE <- c(folato_mcg_dfe = "Folato", hierro_mg = "Hierro", zinc_mg = "Zinc",
+            vitamina_a_mcg_rae = "Vitamina A", vitamina_b12_mcg = "Vitamina B12",
+            vitamina_d_mcg = "Vitamina D", vitamina_e_mg = "Vitamina E")
+
+fol_prov <- sens |> filter(dominio == "Provincia", nutriente == "folato_mcg_dfe")
+fol_nac  <- sens |> filter(dominio == "Nacional",  nutriente == "folato_mcg_dfe")
+e_nac    <- median(sens$energia[sens$dominio == "Nacional"])
+quint    <- sens |> filter(dominio == "Quintil", nutriente == "folato_mcg_dfe") |>
+  arrange(nivel)
+prov_alta <- fol_prov |> slice_max(energia, n = 1)
+dc_fol <- refs |> filter(nutriente == "folato_mcg_dfe") |>
+  mutate(dc = 1000 * ear / KCAL_EMA) |> pull(dc)
+```
+
+## Qué cambió esta semana {.smaller}
+
+- **Informe analítico final**: de esqueleto a borrador completo, con ocho figuras. Compila en HTML y Word.
+- **Manual técnico**: diecisiete capítulos, con la tabla de supuestos y las hipótesis descartadas.
+- **Mapas provinciales**: bivariado de cobertura y consumo, y coropléticos de riesgo y de densidad, con proyección e identificación de provincia.
+- **Análisis por grupos de alimentos** extendido a cada micronutriente. Completa el TdR 8.4.
+
+Y tres hallazgos que no estaban la semana pasada, que son el objeto de esta sesión.
+
+::: {.notes}
+Abrir por el avance, breve, y pasar enseguida a los hallazgos, que es donde está la discusión. El informe y el manual están para enseñarlos si preguntan.
+:::
+
+# 1 · La elección del vehículo determina qué nutrientes se pueden corregir
+
+## Aporte de cada grupo de alimentos a cada micronutriente
+
+```{r}
+#| label: fig-grupos
+#| fig-width: 11
+#| fig-height: 5
+largo <- gnut |>
+  pivot_longer(all_of(names(NOMBRE)), names_to = "n", values_to = "pct") |>
+  mutate(Grupo = sub("^[0-9]{2} ", "", grupo_mddw),
+         Nutriente = factor(NOMBRE[n], levels = NOMBRE))
+orden <- largo |> filter(n == "folato_mcg_dfe") |> arrange(pct) |> pull(Grupo)
+
+largo |> mutate(Grupo = factor(Grupo, levels = orden)) |>
+  ggplot(aes(Nutriente, Grupo, fill = pct)) +
+  geom_tile(colour = "white", linewidth = 0.6) +
+  geom_text(aes(label = if_else(pct >= 8, sprintf("%.0f", pct), "")),
+            colour = "white", fontface = "bold", size = 4) +
+  scale_fill_gradientn(colours = c("#eef2f4", AZUL_C, AZUL), limits = c(0, 100)) +
+  labs(x = NULL, y = NULL) +
+  theme_minimal(base_size = 15) +
+  theme(panel.grid = element_blank(), legend.position = "none",
+        axis.text.x = element_text(angle = 25, hjust = 1))
+```
+
+::: {.notes}
+El número es el porcentaje del total del nutriente que aporta ese grupo. La lectura es por columna.
+:::
+
+## La consecuencia
+
+**Un escenario que fortifica un cereal no puede mover un nutriente que el cereal no aporta**, por alto que sea el nivel de adición.
+
+La restricción es estructural y precede a cualquier discusión sobre dosis.
+
+Para un oficial de nutrición se traduce en una frase operativa: fortificar harina no resolverá los nutrientes de origen animal, y proponerlo gasta capital político sin resultado posible.
+
+::: {.notes}
+Aquí es donde la figura anterior deja de ser descriptiva y pasa a ser una restricción de diseño de política.
+:::
+
+# 2 · Elevar la media y cerrar la brecha son dos decisiones
+
+## Razón entre quintiles extremos, por escenario
+
+```{r}
+#| label: fig-equidad
+#| fig-width: 10
+#| fig-height: 4.6
+esc |> filter(nutriente == "folato_mcg_dfe") |>
+  mutate(corto = sub("^([0-9a-c]+)\\. .*", "\\1", escenario)) |>
+  ggplot(aes(reorder(corto, razon_q5_q1), razon_q5_q1)) +
+  geom_hline(yintercept = 1, linetype = "dashed", colour = GRIS, linewidth = 0.9) +
+  geom_segment(aes(xend = reorder(corto, razon_q5_q1), y = 1, yend = razon_q5_q1),
+               colour = GRIS, linewidth = 0.8) +
+  geom_point(size = 5, colour = AZUL) +
+  geom_text(aes(label = sprintf("%.2f", razon_q5_q1)), hjust = -0.6, size = 5,
+            colour = "#5a6b76") +
+  coord_flip() +
+  labs(x = "Escenario", y = "Ingesta de folato: quintil 5 sobre quintil 1") +
+  tema()
+```
+
+## El enunciado
+
+Subir el nivel normativo sobre un vehículo de **consumo desigual** mejora el promedio y **conserva** el gradiente social.
+
+Cambiar a un vehículo de **consumo transversal** cierra el gradiente.
+
+Las dos decisiones son defendibles. **No son intercambiables**, y conviene tomarlas sabiendo que son dos y no una.
+
+::: {.notes}
+Esta es la conjetura que se formuló antes de ver los datos, y quedó respaldada. Está enunciada como pregunta 7 en el informe, no como apartado de hipótesis, por formato IMRyD.
+:::
+
+# 3 · El patrón geográfico está gobernado por el nivel de registro
+
+## El punto de partida
+
+En el escenario de línea base, la inadecuación de folato va de
+`r sprintf("%.1f", min(fol_prov$pct_ing_comp))`% a
+`r sprintf("%.1f", max(fol_prov$pct_ing_comp))`% entre las 32 provincias, con
+`r sprintf("%.1f", fol_nac$pct_ing_comp)`% nacional.
+
+La provincia de mayor energía registrada declara
+`r format(round(prov_alta$energia), big.mark = ".")` kcal por EMA y día, frente
+a `r format(round(e_nac), big.mark = ".")` nacional.
+
+**Esa cifra no es interpretable como consumo.**
+
+## Siete mecanismos examinados
+
+| Mecanismo | Resultado |
+|---|---|
+| Composición de la dieta | Equivalente al resto del país |
+| Reparto entre Sección 2 y 3A | Ambas infladas por el mismo factor |
+| Regla de agotamiento | Sin efecto en el hogar mediano |
+| Días observados | Mediana de 7 en 31 de 32 provincias |
+| Tamaño del hogar | r = 0,04 con el riesgo |
+| Conglomerados pequeños | El ruido explica el 4% de la dispersión |
+| **Procedencia de la adquisición** | **Descartado; ver lámina siguiente** |
+
+::: {.notes}
+Los seis primeros se descartaron la semana pasada. El séptimo es de esta semana y es el interesante.
+:::
+
+## Una falacia ecológica con datos reales
+
+```{r}
+#| label: tbl-falacia
+# La correlacion provincial se recalcula aqui del archivo. La correlacion entre
+# hogares la imprime diagnostico_procedencia.R y no queda en archivo: si se
+# vuelve a correr ese diagnostico, hay que verificar que siga siendo este valor.
+COR_HOGARES <- "0,011"
+d <- data.frame(
+  Nivel = c("Entre provincias (n = 32)", "Entre hogares (n = 8.704)"),
+  Correlacion = c(sprintf("%.2f", cor(proc$part_propio, proc$energia)), COR_HOGARES))
+names(d) <- c("Nivel de análisis", "Correlación entre producción propia y energía registrada")
+tabla(d, fuente = "Fuente: ENGIH 2018; scripts/diagnostico_procedencia.R.",
+      notas = "La correlación entre hogares se calcula sobre la participación de la producción propia y el retiro del negocio en el monto adquirido.")
+```
+
+La prueba decisiva: en las tres provincias de menor riesgo, los hogares **sin nada** de producción propia registran el mismo exceso que el conjunto de esas provincias.
+
+**De no haberse examinado a nivel de hogar, la conclusión habría sido equivocada y perfectamente plausible.**
+
+## Lo que queda abierto
+
+Siete mecanismos descartados, y el residuo sigue sin explicar.
+
+**Hipótesis siguiente: los factores de conversión de unidades no estándar.** Si las compras a granel y las unidades locales son más frecuentes en las provincias rurales y su factor universal sobrestima, el exceso aparecería donde aparece, sería multiplicativo, y se cancelaría en la densidad. Que es todo lo observado.
+
+Comprobable con el diagnóstico de unidades no estándar que ya existe en el repositorio.
+
+# 4 · Contribución metodológica: la densidad crítica
+
+## El umbral no exige valores de referencia nuevos
+
+El denominador del Equivalente de Mujer Adulta son **`r format(KCAL_EMA, big.mark = ".")` kcal**, el requerimiento de la mujer adulta de referencia (FAO/WHO/UNU, 2004).
+
+Los Requerimientos Promedio Estimados empleados son **de esa misma mujer** (IOM, 19 a 30 años).
+
+$$d_{\text{crítica}} = \frac{\text{RPE}}{`r format(KCAL_EMA, big.mark = ".")`} \times 1000
+\qquad\text{folato: } `r sprintf("%.1f", dc_fol)`\ \mu g\ \text{DFE}/1000\ \text{kcal}$$
+
+::: {.notes}
+El punto es que no se introduce ningún parámetro nuevo: la densidad crítica queda determinada por los dos que el análisis ya usa.
+:::
+
+## Una identidad exacta, y una validación
+
+$$\frac{d}{d_{\text{crítica}}} = \frac{\text{ingesta}}{\text{RPE}} \times \frac{`r format(KCAL_EMA, big.mark = ".")`}{\text{energía}}$$
+
+Los dos criterios coinciden cuando la energía registrada por EMA es
+`r format(KCAL_EMA, big.mark = ".")` kcal.
+
+La mediana nacional es **`r format(round(e_nac), big.mark = ".")` kcal**: factor
+`r sprintf("%.3f", e_nac / KCAL_EMA)`.
+
+En folato, `r sprintf("%.1f", fol_nac$pct_ing_comp)`% bajo ingesta absoluta y
+`r sprintf("%.1f", fol_nac$pct_densidad)`% bajo densidad.
+
+**La cifra nacional queda validada por una vía que no depende del nivel de registro.**
+
+## El criterio tiene dominio de validez, y es por nutriente
+
+```{r}
+#| label: tbl-acoplamiento
+acop |>
+  arrange(desc(r_log)) |>
+  transmute(Nutriente = NOMBRE[nutriente],
+            `r (log ingesta, log energía)` = sprintf("%.3f", r_log),
+            `CV relativo` = sprintf("%.2f", razon_cv)) |>
+  tabla(fuente = "Fuente: ENGIH 2018; scripts/diagnostico_densidad_critica.R.",
+        notas = paste("Correlación alta y CV relativo bajo indican que la ingesta",
+                      "sigue a la energía: la densidad es casi constante entre",
+                      "hogares y el criterio no discrimina."))
+```
+
+Los dos nutrientes más acoplados quedan empujados a extremos opuestos. El criterio **se aplica por nutriente, no en bloque**.
+
+## La trampa, y por qué está dicha en el informe
+
+```{r}
+#| label: fig-quintiles
+#| fig-width: 9.5
+#| fig-height: 3.9
+quint |> select(nivel, Ingesta = pct_ing_comp, Densidad = pct_densidad) |>
+  pivot_longer(-nivel, names_to = "Criterio", values_to = "pct") |>
+  ggplot(aes(nivel, pct, colour = Criterio, group = Criterio)) +
+  geom_line(linewidth = 1.1) + geom_point(size = 3.4) +
+  scale_colour_manual(values = c(Ingesta = AZUL, Densidad = ACENTO)) +
+  labs(x = "Quintil de gasto del hogar", y = "Hogares bajo el requerimiento (%)") +
+  tema() + theme(legend.position = "right")
+```
+
+La densidad **corrige el sobrerregistro**, y solo procede donde la variación de energía es artefactual. Entre quintiles es real. Dividir ahí no quita ruido: quita señal.
+
+# 5 · Cuestiones abiertas para discutir
+
+## Valores de referencia: RPE frente a RPA
+
+```{r}
+#| label: tbl-refs
+refs |> transmute(Nutriente = NOMBRE[nutriente], RPE = ear, Unidad = unidad,
+                  Estado = estado) |>
+  tabla(fuente = "Fuente: data/raw/valores_referencia.csv.",
+        notas = "El estado provisional indica que la fuente está pendiente de confirmación.")
+```
+
+**Propuesta: reportar ambos como análisis de sensibilidad.** El criterio de elección no puede ser cuál produce más discriminación, porque eso lo hace dependiente del resultado. Si uno representa mejor a la población dominicana, ese es el principal y la razón se declara; el otro acompaña.
+
+## Biodisponibilidad del hierro: derivable, no elegible
+
+El supuesto de biodisponibilidad **no es un estándar de referencia: es un parámetro de la dieta.**
+
+Y la dieta está medida. La proporción del hierro que proviene de alimentos de origen animal gobierna la absorción, y esa proporción sale de la figura de aportes por grupo.
+
+**Se propone derivar el supuesto de los datos en lugar de escogerlo.** Así el parámetro deja de depender del resultado que produce.
+
+## Un supuesto que conviene declarar
+
+La Sección 3A registra, y la cadena de cálculo no utiliza:
+
+- `QUIEN_PAGO1` — procedencia: compra, producción propia, retiro del negocio, regalos por origen.
+- `DESTINO_NEGOCIO`, `DESTINO_OTRO_HOGAR` — destino de lo adquirido.
+- `PORCENTAJE_HOGAR` — participación del hogar en la adquisición.
+
+La cantidad entra completa aunque la adquisición fuera para un negocio. Nacionalmente es pequeño; el supuesto queda declarado en el manual técnico.
+
+## Para discutir hoy
+
+1. Valores de referencia: ¿ambos como sensibilidad?
+2. Biodisponibilidad del hierro: ¿derivarla de la composición de la dieta?
+3. El residuo geográfico: ¿se persigue la hipótesis de los factores de conversión?
+4. Procedencia y destino: ¿se incorporan o se declaran como supuesto?
+
+## Referencias {.smaller}
+
+FAO. 2021. *Minimum Dietary Diversity for Women*. Roma.
+
+FAO/WHO/UNU. 2004. *Human energy requirements*. Roma.
+
+Institute of Medicine. 2000. *Dietary Reference Intakes: Applications in Dietary Assessment*. Washington, D. C.: The National Academies Press. doi:10.17226/9956.
+
+Tang, K. *et al.* 2022. Modeling food fortification contributions to micronutrient requirements in Malawi using Household Consumption and Expenditure Surveys. *Annals of the New York Academy of Sciences*, 1508: 105–122. doi:10.1111/nyas.14697.
+
+Weisell, R. y Dop, M. C. 2012. The adult male equivalent concept and its application to Household Consumption and Expenditures Surveys. *Food and Nutrition Bulletin*, 33(3 Suppl).
