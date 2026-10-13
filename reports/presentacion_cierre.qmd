@@ -74,7 +74,6 @@ auditoria <- leer_limpio(here::here("data", "auditoria",
 entregables <- leer_limpio(file.path(RUTA_RAW, "entregables_estado.csv")) |>
   arrange(orden)
 
-mil <- function(x) format(x, big.mark = ".", trim = TRUE)
 
 # Escenarios citados en el texto. Si alguno cambia de nombre, la presentación
 # se detiene en lugar de mostrar una cifra equivocada.
@@ -108,7 +107,22 @@ ORDEN_CORTO <- corto(c(E_SIN, sort(setdiff(unique(esc$escenario), E_SIN))))
 
 # --- Extractores: una sola fila o error ---------------------------------------
 
-riesgo_nac <- function(escenario_, nutriente_, metodo_ = "Punto de corte") {
+# El hierro no se evalua por punto de corte sino por el enfoque de
+# probabilidad. El metodo se resuelve por nutriente en lugar de fijarse: se
+# excluye la variante de 18% de biodisponibilidad, de modo que queda una sola
+# fila por nutriente, igual que en el informe.
+metodo_de <- function(nutriente_) {
+  m <- rie |>
+    filter(nutriente == nutriente_, metodo != "Probabilidad, biodisponibilidad 18%") |>
+    distinct(metodo) |> pull()
+  if (length(m) != 1) {
+    stop("Metodo no identificado para ", nutriente_, " (", length(m), ").",
+         call. = FALSE)
+  }
+  m
+}
+
+riesgo_nac <- function(escenario_, nutriente_, metodo_ = metodo_de(nutriente_)) {
   v <- rie |>
     filter(dominio == "Nacional", hogares == "Todos", escenario == escenario_,
            nutriente == nutriente_, metodo == metodo_) |>
@@ -578,8 +592,8 @@ En el escenario de línea base, la inadecuación de folato va de
 `r sprintf("%.1f", fol_nac$pct_ing_comp)`% nacional.
 
 La provincia de mayor energía registrada declara
-`r format(round(prov_alta$energia), big.mark = ".")` kcal por EMA y día, frente
-a `r format(round(e_nac), big.mark = ".")` nacional.
+`r fmt(prov_alta$energia, 0)` kcal por EMA y día, frente
+a `r fmt(e_nac, 0)` nacional.
 
 **Esa cifra no es interpretable como consumo.**
 
@@ -678,11 +692,11 @@ propia encuesta— y se corrigió.
 
 ## El umbral no exige valores de referencia nuevos
 
-El denominador del Equivalente de Mujer Adulta son **`r format(KCAL_EMA, big.mark = ".")` kcal**, el requerimiento de la mujer adulta de referencia (FAO/WHO/UNU, 2004).
+El denominador del Equivalente de Mujer Adulta son **`r fmt(KCAL_EMA, 0)` kcal**, el requerimiento de la mujer adulta de referencia (FAO/WHO/UNU, 2004).
 
 Los Requerimientos Promedio Estimados empleados son **de esa misma mujer** (IOM, 19 a 30 años).
 
-$$d_{\text{crítica}} = \frac{\text{RPE}}{`r format(KCAL_EMA, big.mark = ".")`} \times 1000
+$$d_{\text{crítica}} = \frac{\text{RPE}}{2291} \times 1000
 \qquad\text{folato: } `r sprintf("%.1f", dc_fol)`\ \mu g\ \text{DFE}/1000\ \text{kcal}$$
 
 ::: {.notes}
@@ -691,12 +705,12 @@ El punto es que no se introduce ningún parámetro nuevo: la densidad crítica q
 
 ## Una identidad exacta, y una validación
 
-$$\frac{d}{d_{\text{crítica}}} = \frac{\text{ingesta}}{\text{RPE}} \times \frac{`r format(KCAL_EMA, big.mark = ".")`}{\text{energía}}$$
+$$\frac{d}{d_{\text{crítica}}} = \frac{\text{ingesta}}{\text{RPE}} \times \frac{2291}{\text{energía}}$$
 
 Los dos criterios coinciden cuando la energía registrada por EMA es
-`r format(KCAL_EMA, big.mark = ".")` kcal.
+`r fmt(KCAL_EMA, 0)` kcal.
 
-La mediana nacional es **`r format(round(e_nac), big.mark = ".")` kcal**: factor
+La mediana nacional es **`r fmt(e_nac, 0)` kcal**: factor
 `r sprintf("%.3f", e_nac / KCAL_EMA)`.
 
 En folato, `r sprintf("%.1f", fol_nac$pct_ing_comp)`% bajo ingesta absoluta y
