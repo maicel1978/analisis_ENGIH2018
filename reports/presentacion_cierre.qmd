@@ -133,6 +133,26 @@ riesgo_nac <- function(escenario_, nutriente_, metodo_ = metodo_de(nutriente_)) 
   v
 }
 
+# Estimacion con su intervalo de confianza. Un estimador de encuesta sin
+# intervalo no es citable: el diseno es complejo y los dominios tienen tamanos
+# muy distintos.
+riesgo_ic <- function(escenario_, nutriente_) {
+  r <- rie |>
+    filter(dominio == "Nacional", hogares == "Todos", escenario == escenario_,
+           nutriente == nutriente_, metodo == metodo_de(nutriente_))
+  if (nrow(r) != 1) stop("Riesgo no identificado con IC para ", escenario_,
+                         " / ", nutriente_, ".", call. = FALSE)
+  paste0(fmt(r$pct_inadecuado), "% (IC 95%: ", fmt(r$pct_inadecuado_low),
+         "–", fmt(r$pct_inadecuado_upp), ")")
+}
+
+n_analitico <- function() {
+  v <- rie |> filter(dominio == "Nacional", hogares == "Todos") |>
+    distinct(n) |> pull()
+  if (length(v) != 1) stop("Tamano analitico no identificado.", call. = FALSE)
+  v
+}
+
 razon_esc <- function(escenario_) {
   v <- esc |> filter(escenario == escenario_) |> distinct(razon_q5_q1) |> pull()
   if (length(v) != 1) stop("Razón Q5/Q1 no identificada para ", escenario_, ".",
@@ -285,6 +305,14 @@ exigen muestreo del producto en planta y en mercado.
 
 El caso del azúcar muestra que el segundo factor no se puede dar por supuesto:
 norma obligatoria desde 2004 y etiqueta sin declaración.
+
+::: {style="font-size:0.9em;"}
+**Muestra analítica:** `r fmt(n_analitico(), 0)` hogares.
+Estimaciones ponderadas con el diseño complejo de la encuesta e intervalos por
+linealización de Taylor. Las hipótesis sobre el patrón geográfico se formularon
+**durante** el análisis y son exploratorias; la única planteada antes de ver los
+datos es la de la distribución social del beneficio.
+:::
 
 ::: {style="font-size:0.9em;"}
 **Banda de la OMS aplicable.** El consumo mediano de trigo en equivalentes de
@@ -462,16 +490,17 @@ implicaciones.
 ## Ingesta de folato y riesgo, por escenario
 
 ::: {style="font-size:0.92em;"}
-**Riesgo de ingesta inadecuada de folato:
-`r fmt(riesgo_nac(E_SIN, "folato_mcg_dfe"))`% sin fortificación,
-`r fmt(riesgo_nac(E_BASE, "folato_mcg_dfe"))`% con la norma vigente,
-`r fmt(riesgo_nac(E_ARROZ, "folato_mcg_dfe"))`% si todo el arroz llevara los
-niveles de la propuesta nacional.**
+**Hogares bajo el requerimiento de folato:
+`r riesgo_ic(E_SIN, "folato_mcg_dfe")` sin fortificación,
+`r riesgo_ic(E_BASE, "folato_mcg_dfe")` con la norma vigente,
+`r riesgo_ic(E_ARROZ, "folato_mcg_dfe")` si todo el arroz llevara los niveles de
+la propuesta nacional.**
 
-La norma reduce la inadecuación de folato en
-`r fmt(cmp$reduccion[cmp$nutriente == "folato_mcg_dfe"], 1)` puntos porcentuales
-y la de hierro en `r fmt(cmp$reduccion[cmp$nutriente == "hierro_mg"], 1)`. En los
-nutrientes que no añade, no cambia nada.
+La diferencia entre ambos escenarios —`r fmt(cmp$reduccion[cmp$nutriente == "folato_mcg_dfe"], 1)`
+puntos porcentuales en folato y `r fmt(cmp$reduccion[cmp$nutriente == "hierro_mg"], 1)`
+en hierro— se calcula sobre los mismos hogares y **se presenta sin intervalo**:
+estimarlo exige tratar el contraste como un estadístico propio, no restar dos
+estimaciones.
 :::
 
 ```{r}
@@ -731,8 +760,8 @@ vehículo no puede entregar un nutriente que no contiene.**
 
 ::: {style="font-size:0.95em;"}
 **La proporción de hogares bajo el requerimiento, estimada por provincia, sigue
-al nivel de adquisición registrada y no a diferencias en la dieta.** Se
-examinaron siete mecanismos alternativos y ninguno explica el patrón.
+al nivel de adquisición registrada y no a diferencias en la dieta.** Se examinaron siete mecanismos alternativos y **ninguno de ellos lo
+explica**.
 
 La provincia tampoco es dominio de estimación de la encuesta. **Estos datos no
 sostienen una afirmación de estado nutricional provincial.**
@@ -772,6 +801,12 @@ Correlación de **`r fmt(r_ie, 2)`** entre las 32 provincias. La provincia
 aparece con menos riesgo cuanto más alta es su energía registrada, y la
 composición de la dieta es equivalente en todas: **el ordenamiento sigue al
 nivel de registro, no a la dieta.**
+
+::: {style="font-size:0.82em;"}
+Estadístico descriptivo de nivel ecológico sobre las 32 provincias, que son la
+población completa y no una muestra: no se le atribuye valor inferencial. La
+recta es una ayuda visual. El contraste a nivel de hogar está en el anexo.
+:::
 :::
 
 ## Riesgo de folato por provincia · criterio de ingesta absoluta
@@ -874,6 +909,8 @@ opciones |>
                   paste("Todas las cifras suponen cumplimiento pleno de la norma",
                         "en la totalidad del vehículo. La proporción del suministro",
                         "efectivamente fortificada no se mide con esta encuesta."),
+                  paste("Estimaciones puntuales. Los intervalos de confianza al",
+                        "95% de cada escenario figuran en el informe analítico."),
                   "Valores de referencia provisionales."))
 ```
 
