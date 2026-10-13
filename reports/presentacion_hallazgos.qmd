@@ -141,17 +141,38 @@ dc_fol <- refs |> filter(nutriente == "folato_mcg_dfe") |>
   mutate(dc = 1000 * ear / KCAL_EMA) |> pull(dc)
 ```
 
-## Qué cambió esta semana {.smaller}
+## Lo que la norma vigente ya evita {.smaller}
 
-- **Informe analítico final**: de esqueleto a borrador completo, con ocho figuras. Compila en HTML y Word.
-- **Manual técnico**: diecisiete capítulos, con la tabla de supuestos y las hipótesis descartadas.
-- **Mapas provinciales**: bivariado de cobertura y consumo, y coropléticos de riesgo y de densidad, con proyección e identificación de provincia.
-- **Análisis por grupos de alimentos** extendido a cada micronutriente. Completa el TdR 8.4.
+```{r}
+#| label: fig-norma-evita
+#| fig-width: 10
+#| fig-height: 3.6
+NUT5 <- c("folato_mcg_dfe", "hierro_mg", "zinc_mg", "vitamina_b12_mcg",
+          "vitamina_a_mcg_rae")
+cmp <- tibble::tibble(
+  nutriente = NUT5,
+  sin  = vapply(NUT5, function(n) riesgo_nac(E_SIN,  n), numeric(1)),
+  base = vapply(NUT5, function(n) riesgo_nac(E_BASE, n), numeric(1))) |>
+  mutate(Nutriente = NOMBRE[nutriente], evita = sin - base) |>
+  arrange(desc(evita))
 
-Y tres hallazgos que no estaban la semana pasada, que son el objeto de esta sesión.
+ggplot(cmp, aes(x = reorder(Nutriente, evita))) +
+  geom_segment(aes(xend = reorder(Nutriente, evita), y = base, yend = sin),
+               colour = GRIS, linewidth = 1.6) +
+  geom_point(aes(y = sin),  size = 4, colour = ACENTO) +
+  geom_point(aes(y = base), size = 4, colour = AZUL) +
+  geom_text(aes(y = (sin + base) / 2,
+                label = if_else(evita >= 1, paste0("-", fmt(evita, 1)), "")),
+            vjust = -0.9, size = 4.4, colour = "#5a6b76") +
+  coord_flip() +
+  labs(x = NULL, y = "Hogares bajo el requerimiento (%)") +
+  tema()
+```
+
+Rojo: sin fortificación. Azul: con la norma vigente de harina de trigo. **La diferencia es lo que el país ya gana con la política que tiene**, y es una cifra que sirve para defenderla.
 
 ::: {.notes}
-Abrir por el avance, breve, y pasar enseguida a los hallazgos, que es donde está la discusión. El informe y el manual están para enseñarlos si preguntan.
+Abrir por aquí y no por el avance de la semana. Esta lámina responde una pregunta que nadie suele tener contestada: cuánto aporta lo que ya existe. Sirve para discutir presupuesto de fiscalización.
 :::
 
 ## Escenarios de fortificación modelados
@@ -203,6 +224,25 @@ bind_rows(linea_base, resumen_esc) |>
                       "presentan tres de estos escenarios; el informe recoge",
                       "los siete."))
 ```
+
+
+## Los escenarios, por la decisión que exigen {.smaller}
+
+| Escenario | Qué acción institucional exige |
+|---|---|
+| `1a` Norma nacional: harina y pan | **Situación observada en 2018.** Ninguna |
+| `1c` Norma nacional y azúcar | **Hacer cumplir una norma vigente desde 2004.** No requiere legislar |
+| `1b` Norma nacional: todos los derivados del trigo | Ampliar el alcance de una norma vigente |
+| `2a` `2b` Niveles de la OMS | Revisar el nivel normativo sobre el mismo vehículo |
+| `3` Norma nacional y arroz | Norma nueva, con precedente voluntario ya en el mercado |
+
+: Escenarios modelados según la acción institucional que requieren. República Dominicana, 2018 {#tbl-escalera}
+
+El azúcar no es «un escenario más»: es el único que **no exige crear nada**. La norma existe desde 2004 y el producto en venta no la cumple.
+
+::: {.notes}
+Esta es la lámina que convierte la modelación en una herramienta de decisión. Si solo se recuerda una, que sea esta.
+:::
 
 # 1 · La elección del vehículo determina qué nutrientes se pueden corregir
 
@@ -625,6 +665,19 @@ La cantidad entra completa aunque la adquisición fuera para un negocio. Naciona
 2. Biodisponibilidad del hierro: ¿derivarla de la composición de la dieta?
 3. El residuo geográfico: ¿se persigue la hipótesis de los factores de conversión?
 4. Procedencia y destino: ¿se incorporan o se declaran como supuesto?
+
+## Qué cambió esta semana {.smaller}
+
+- **Informe analítico final**: de esqueleto a borrador completo, con ocho figuras. Compila en HTML y Word.
+- **Manual técnico**: diecisiete capítulos, con la tabla de supuestos y las hipótesis descartadas.
+- **Mapas provinciales**: bivariado de cobertura y consumo, y coropléticos de riesgo y de densidad, con proyección e identificación de provincia.
+- **Análisis por grupos de alimentos** extendido a cada micronutriente. Completa el TdR 8.4.
+
+Y tres hallazgos que no estaban la semana pasada, que son el objeto de esta sesión.
+
+::: {.notes}
+Abrir por el avance, breve, y pasar enseguida a los hallazgos, que es donde está la discusión. El informe y el manual están para enseñarlos si preguntan.
+:::
 
 ## Referencias {.smaller}
 
