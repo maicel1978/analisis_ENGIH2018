@@ -264,6 +264,42 @@ bind_rows(linea_base, resumen_esc) |>
                       "los siete."))
 ```
 
+## Supuesto que gobierna todos los escenarios {.smaller}
+
+```{r}
+#| label: calculo-banda
+#| include: false
+trigo_g <- veh |> filter(grepl("Trigo", grupo)) |> pull(mediana_consumidores)
+banda <- if (trigo_g < 75) "menos de 75 g por día" else
+         if (trigo_g < 150) "entre 75 y 149 g por día" else "150 g o más por día"
+```
+
+**La encuesta mide la adquisición del alimento, no el contenido de
+fortificante.** Todos los escenarios suponen que el vehículo llega al hogar con
+el nivel normativo completo.
+
+La cobertura efectiva de un programa es el producto de tres factores —hogares
+alcanzados, proporción del suministro efectivamente fortificado, y nivel
+alcanzado en el producto—, y **este análisis estima el primero**. Los otros dos
+exigen muestreo del producto en planta y en mercado.
+
+El caso del azúcar muestra que el segundo factor no se puede dar por supuesto:
+norma obligatoria desde 2004 y etiqueta sin declaración.
+
+::: {style="font-size:0.9em;"}
+**Banda de la OMS aplicable.** El consumo mediano de trigo en equivalentes de
+harina entre quienes lo adquieren es de `r fmt(trigo_g, 0)` g por EMA y día, de
+modo que la banda que corresponde es la de **`r banda`**. El otro escenario de
+la OMS se conserva como contraste.
+:::
+
+::: {.notes}
+Esta lamina se adelanta a la primera pregunta de cualquiera que conozca
+programas de fortificacion: y el cumplimiento industrial. La respuesta honesta
+es que no se mide con una encuesta de gasto y que hace falta muestreo del
+producto. Decirlo antes de que lo pregunten vale mas que responderlo despues.
+:::
+
 # Hallazgos {background-color="#2c5364"}
 
 ## Hallazgo 1 · Alcance poblacional de los vehículos
@@ -820,14 +856,25 @@ opciones |>
                       numeric(1)),
          `Folato inadecuado (%)` = fmt(fol, 1),
          `Cambio frente a hoy` = paste0(if_else(fol < base_fol, "−", "+"),
-                                        fmt(abs(fol - base_fol), 1), " pp")) |>
+                                        fmt(abs(fol - base_fol), 1), " pp"),
+         ul = vapply(escenario, function(e) {
+           v <- esc |> filter(escenario == e) |> distinct(pct_folico_sobre_ul) |> pull()
+           if (length(v) != 1) NA_real_ else v }, numeric(1)),
+         `Sobre el límite de ácido fólico (%)` = if_else(is.na(ul), "—",
+                                                         fmt(ul, 1))) |>
   select(Intervención, `Acción institucional`, `Folato inadecuado (%)`,
-         `Cambio frente a hoy`) |>
+         `Cambio frente a hoy`, `Sobre el límite de ácido fólico (%)`) |>
   tabla(fuente = "Fuente: ENGIH 2018, Banco Central de la República Dominicana.",
-        notas = paste0("Situación de referencia: norma vigente de harina de ",
-                       "trigo aplicada a harina y pan, con ", fmt(base_fol, 1),
-                       "% de hogares bajo el requerimiento de folato. ",
-                       "Valores de referencia provisionales."))
+        notas = c(paste0("Situación de referencia: norma vigente de harina de ",
+                         "trigo aplicada a harina y pan, con ", fmt(base_fol, 1),
+                         "% de hogares bajo el requerimiento de folato."),
+                  paste("El límite superior aplica al ácido fólico sintético",
+                        "añadido, no al folato total, y la proporción se calcula",
+                        "sobre la fracción añadida: es una cota máxima."),
+                  paste("Todas las cifras suponen cumplimiento pleno de la norma",
+                        "en la totalidad del vehículo. La proporción del suministro",
+                        "efectivamente fortificada no se mide con esta encuesta."),
+                  "Valores de referencia provisionales."))
 ```
 
 El análisis ordena las opciones por rendimiento y por la acción que requieren; no sustituye la decisión. De las cuatro, solo la primera opera sobre una norma ya existente.
