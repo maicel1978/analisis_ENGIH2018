@@ -267,9 +267,32 @@ bind_rows(linea_base, resumen_esc) |>
 
 ## Hallazgo 1 · Alcance poblacional de los vehículos
 
-::: {style="font-size:0.9em; margin-bottom:-0.2em;"}
-**Los tres vehículos llegan a la mayoría de los hogares.** El arroz es el de
-mayor alcance y mayor nivel de consumo.
+```{r}
+#| label: calculo-vehiculos
+#| include: false
+# La afirmacion se deriva del mismo archivo que la figura, de modo que no puede
+# contradecirla: si cambia el dato, cambian las dos.
+v_cob <- veh |> slice_max(pct_hogares, n = 1)
+v_con <- veh |> slice_max(mediana_consumidores, n = 1)
+n_mayoria <- sum(veh$pct_hogares >= 50)
+```
+
+::: {style="font-size:0.92em;"}
+**`r n_mayoria` de los `r nrow(veh)` vehículos evaluados llegan a la mayoría de
+los hogares.**
+
+El de mayor alcance es **`r tolower(v_cob$grupo)`**, con
+`r fmt(v_cob$pct_hogares)`% de hogares. El de mayor consumo entre quienes lo
+adquieren es **`r tolower(v_con$grupo)`**, con
+`r fmt(v_con$mediana_consumidores, 0)` g por EMA y día.
+:::
+
+::: {.notes}
+PREP. Punto: los vehiculos candidatos no tienen problema de alcance. Razon: la
+cobertura es alta en todos y homogenea entre provincias, de modo que el alcance
+no discrimina entre ellos. Ejemplo: la figura siguiente, y el mapa despues.
+Cierre: si el alcance no los distingue, lo que los distingue es la cantidad que
+transportan, y eso lleva al hallazgo siguiente.
 :::
 
 ## Cobertura y consumo de los vehículos de fortificación
@@ -349,6 +372,16 @@ La norma reduce la inadecuación de folato en
 y la de hierro en `r fmt(cmp$reduccion[cmp$nutriente == "hierro_mg"], 1)`. En los
 nutrientes que no añade, no cambia nada.
 :::
+
+::: {.notes}
+PREP. Punto: la norma vigente funciona y no agota el problema. Razon: actua
+sobre un solo vehiculo y solo sobre los nutrientes que anade, de modo que su
+efecto esta acotado por diseno, no por aplicacion. Ejemplo: las dos figuras
+siguientes, la escalera de escenarios y el contraste por nutriente. Cierre: el
+margen que queda admite dos vias distintas, que es lo que trata el bloque de
+implicaciones.
+:::
+
 
 ## Ingesta de folato y riesgo, por escenario
 
@@ -448,6 +481,15 @@ al incorporar el arroz.** El arroz se consume de forma transversal; los
 derivados del trigo, no.
 :::
 
+::: {.notes}
+PREP. Punto: el beneficio de la fortificacion no se reparte igual entre
+estratos. Razon: depende de si el vehiculo se consume de forma transversal; el
+arroz lo es y los derivados del trigo no. Ejemplo: la razon entre quintiles
+extremos por escenario. Cierre: elevar la media y cerrar la brecha son
+objetivos distintos y no se consiguen con la misma decision.
+:::
+
+
 ## Ingesta de folato en los quintiles extremos, por escenario
 
 ```{r}
@@ -487,17 +529,37 @@ equivalentes dietéticos de folato. EMA: Equivalente de Mujer Adulta.
 
 ## Hallazgo 4 · Concentración del aporte por grupo de alimentos
 
-::: {style="font-size:0.95em;"}
-**El aporte de cada micronutriente está concentrado en pocos grupos de
-alimentos.** Un escenario que fortifica un cereal no puede mover un nutriente
-que el cereal no aporta, cualquiera que sea el nivel de adición.
+```{r}
+#| label: calculo-grupos
+#| include: false
+# Concentracion del aporte: cuanto aporta el grupo principal de cada nutriente.
+top_grupo <- gnut |>
+  tidyr::pivot_longer(all_of(names(NOMBRE)), names_to = "n", values_to = "pct") |>
+  group_by(n) |> slice_max(pct, n = 1) |> ungroup() |>
+  mutate(Grupo = sub("^[0-9]{2} ", "", grupo_mddw), Nutriente = NOMBRE[n])
+fol_top <- top_grupo |> filter(n == "folato_mcg_dfe")
+b12_top <- top_grupo |> filter(n == "vitamina_b12_mcg")
+```
 
-La restricción es estructural y precede a cualquier discusión sobre dosis.
+::: {style="font-size:0.92em;"}
+**El aporte de cada micronutriente está concentrado en pocos grupos de
+alimentos.** En folato, `r tolower(fol_top$Grupo)` aporta el
+`r fmt(fol_top$pct)`% del total; en vitamina B12, el grupo principal es
+`r tolower(b12_top$Grupo)`, con el `r fmt(b12_top$pct)`%.
+
+Un escenario que fortifica un cereal no puede mover un nutriente que el cereal
+no aporta, cualquiera que sea el nivel de adición. La restricción es
+estructural.
 :::
 
 ::: {.notes}
-Hallazgo nuevo de esta semana. La figura siguiente lo muestra por grupo y nutriente; la lectura es por columna.
+PREP. Punto: el vehiculo determina que nutrientes es posible corregir, no solo
+a cuanta gente se llega. Razon: el aporte de cada nutriente se concentra en
+pocos grupos, y un cereal no aporta lo que viene de alimentos de origen animal.
+Ejemplo: el mapa de calor siguiente; la lectura es por columna. Cierre: la
+restriccion precede a cualquier discusion sobre el nivel de adicion.
 :::
+
 
 ## Aporte de cada grupo de alimentos a cada micronutriente
 
@@ -541,8 +603,15 @@ sostienen una afirmación de estado nutricional provincial.**
 :::
 
 ::: {.notes}
-Hallazgo nuevo de esta semana. Una frase y seguir. El desarrollo esta en el anexo.
+PREP. Punto: las comparaciones entre provincias de este analisis no sostienen
+una afirmacion de estado nutricional. Razon: la estimacion provincial sigue al
+nivel de adquisicion registrada, y la provincia no es dominio de estimacion de
+la encuesta. Ejemplo: los dos mapas siguientes, que ordenan el territorio de
+forma distinta con el mismo nutriente y el mismo escenario. Cierre: siete
+mecanismos alternativos examinados y ninguno explica el patron; el desarrollo
+esta en el anexo.
 :::
+
 
 ## Riesgo de folato por provincia · criterio de ingesta absoluta
 
