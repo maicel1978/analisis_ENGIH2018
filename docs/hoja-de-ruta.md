@@ -280,6 +280,15 @@ Hoy se renderizan **doce documentos** desde `reports/`:
 | `presentacion_cierre` | 819 | revealjs |
 | `presentacion_revision` | 578 | revealjs |
 
+**Principio del autor, declarado el 2026-10-13.** El repositorio no engorda con
+documentación ni con piezas que ya no sirven en la etapa actual. Consecuencia
+operativa: **los documentos vivos se sobrescriben, no se duplican.** La historia
+de git conserva las versiones anteriores y basta para recuperarlas. Aplicado ese
+mismo día a la presentación, que volvió a ser un solo archivo.
+
+Candidato siguiente, pendiente de su decisión: `presentacion_revision.qmd`, de
+septiembre, 578 líneas, superada por la presentación vigente.
+
 **Criterio, decidido el 2026-10-11.** Un documento se entrega si responde una
 pregunta que ningún otro responde **y** tiene un destinatario nombrado. Lo que
 no pasa las dos pruebas no se entrega. Y lo que además no aporta, se va.
