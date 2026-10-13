@@ -662,6 +662,35 @@ largo |> mutate(Grupo = factor(Grupo, levels = orden)) |>
 El número es el porcentaje del total del nutriente que aporta ese grupo. La lectura es por columna.
 :::
 
+## Riesgo por escenario y nutriente {.smaller}
+
+```{r}
+#| label: fig-esc-nutrientes
+#| fig-cap: "Hogares bajo el requerimiento en cada escenario de fortificación, según nutriente. Los escenarios se ordenan por alcance creciente. República Dominicana, 2018"
+#| fig-width: 10.5
+#| fig-height: 3.9
+rie |>
+  filter(dominio == "Nacional", hogares == "Todos",
+         metodo != "Probabilidad, biodisponibilidad 18%",
+         nutriente %in% NUT5) |>
+  mutate(Nutriente = NOMBRE[nutriente],
+         corto = sub("^([0-9a-c]+)\\. .*", "\\1", escenario)) |>
+  ggplot(aes(corto, pct_inadecuado, colour = Nutriente, group = Nutriente)) +
+  geom_line(linewidth = 0.9) +
+  geom_point(size = 2.6) +
+  scale_y_continuous(limits = c(0, 100), breaks = seq(0, 100, 25),
+                     labels = function(x) paste0(x, "%")) +
+  labs(x = "Escenario", y = "Hogares bajo el requerimiento (%)", colour = NULL) +
+  tema() + theme(legend.position = "right",
+                 panel.grid.major.y = element_line(colour = "#eef2f4"))
+```
+
+::: {style="font-size:0.86em;"}
+Los escenarios de la norma nacional añaden hierro y ácido fólico. Las series de
+zinc, vitamina B12 y vitamina A permanecen planas a lo largo de ellos: **un
+vehículo no puede entregar un nutriente que no contiene.**
+:::
+
 ## Hallazgo 5 · El patrón provincial sigue al nivel de registro
 
 ::: {style="font-size:0.95em;"}
@@ -684,24 +713,37 @@ esta en el anexo.
 :::
 
 
+## Riesgo provincial de folato y energía registrada {.smaller}
+
+```{r}
+#| label: fig-riesgo-energia
+#| fig-cap: "Relación entre la proporción de hogares bajo el requerimiento de folato y la energía registrada por Equivalente de Mujer Adulta y día, en las 32 provincias. Escenario de línea base. República Dominicana, 2018"
+#| fig-width: 9.5
+#| fig-height: 4
+r_ie <- cor(fol_prov$energia, fol_prov$pct_ing_comp)
+
+ggplot(fol_prov, aes(energia, pct_ing_comp)) +
+  geom_smooth(method = "lm", se = FALSE, colour = GRIS, linewidth = 0.8) +
+  geom_point(colour = AZUL, size = 3, alpha = 0.85) +
+  scale_y_continuous(labels = function(x) paste0(x, "%")) +
+  labs(x = "Energía registrada (kcal por EMA y día)",
+       y = "Hogares bajo el requerimiento de folato (%)") +
+  tema()
+```
+
+::: {style="font-size:0.86em;"}
+Correlación de **`r fmt(r_ie, 2)`** entre las 32 provincias. La provincia
+aparece con menos riesgo cuanto más alta es su energía registrada, y la
+composición de la dieta es equivalente en todas: **el ordenamiento sigue al
+nivel de registro, no a la dieta.**
+:::
+
 ## Riesgo de folato por provincia · criterio de ingesta absoluta
 
 ![](../media/mapas/mapa_riesgo_folato.png)
 
 ::: {style="font-size:0.82em;"}
 Gris: precisión insuficiente. La provincia **no es dominio de estimación** de la encuesta.
-:::
-
-## Riesgo de folato por provincia · criterio de densidad
-
-![](../media/mapas/mapa_densidad_folato.png)
-
-::: {style="font-size:0.82em;"}
-Razón entre la densidad mediana observada y la densidad crítica, centrada en 1. El mismo nutriente, el mismo escenario y los mismos hogares producen un ordenamiento territorial distinto del obtenido con la ingesta absoluta.
-:::
-
-::: {.notes}
-El contraste entre las dos laminas es la magnitud del problema. Si alguien va a hacer una afirmacion subnacional, tiene que ver estas dos antes.
 :::
 
 # Implicaciones {background-color="#2c5364"}
@@ -980,6 +1022,17 @@ propia encuesta— y se corrigió.
 
 # La densidad como criterio complementario
 
+## Riesgo de folato por provincia · criterio de densidad
+
+![](../media/mapas/mapa_densidad_folato.png)
+
+::: {style="font-size:0.82em;"}
+Razón entre la densidad mediana observada y la densidad crítica, centrada en 1. El mismo nutriente, el mismo escenario y los mismos hogares producen un ordenamiento territorial distinto del obtenido con la ingesta absoluta.
+:::
+
+::: {.notes}
+El contraste entre las dos laminas es la magnitud del problema. Si alguien va a hacer una afirmacion subnacional, tiene que ver estas dos antes.
+:::
 ## Derivación de la densidad crítica
 
 El denominador del Equivalente de Mujer Adulta son **`r fmt(KCAL_EMA, 0)` kcal**, el requerimiento de la mujer adulta de referencia (FAO/WHO/UNU, 2004).
