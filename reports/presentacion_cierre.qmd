@@ -160,37 +160,12 @@ prov_alta <- fol_prov |> slice_max(energia, n = 1)
 dc_fol <- refs |> filter(nutriente == "folato_mcg_dfe") |>
   mutate(dc = 1000 * ear / KCAL_EMA) |> pull(dc)
 ```
+
 ## Estado de los productos y fechas de entrega
 
 ```{r}
 #| label: tbl-entregables
 #| tbl-cap: "Situación de los productos comprometidos en los términos de referencia y fecha de entrega. Consultoría ENGIH 2018"
-
-# La columna de cambio responde la pregunta que se hace en estas reuniones:
-# que se movio desde la sesion anterior. El estado previo esta versionado en el
-# propio archivo, de modo que la comparacion no depende de la memoria.
-entregables |>
-  transmute(
-    Producto = entregable,
-    `TdR`    = tdr,
-    Situación = situacion,
-    `Cambio desde el 9 de octubre` = if_else(situacion == situacion_previa, "—",
-                                             paste(situacion_previa, "→", situacion)),
-    Entrega  = if_else(is.na(fecha_compromiso), "—",
-                       format(as.Date(fecha_compromiso), "%d de octubre"))
-  ) |>
-  tabla(fuente = "Fuente: registro de avance del repositorio del proyecto.",
-        notas = c(paste0("Productos que cambiaron de situación en el período: ",
-                         sum(entregables$situacion != entregables$situacion_previa),
-                         " de ", nrow(entregables), "."),
-                  "Cierre de la consultoría: 23 de octubre de 2026."))
-```
-
-::: {style="font-size:0.82em; margin-top:0.35em;"}
-La plataforma de capacitación está publicada y es accesible:
-[**fortificacion.netlify.app**](https://fortificacion.netlify.app/) — 24 módulos,
-17 ejercicios con autoevaluación y el taller completo.
-:::
 
 ## Avance del período {.smaller}
 
@@ -216,24 +191,42 @@ La tabla anterior responde que se movio. Esta responde que hay de nuevo que no e
 
 # Hallazgos {background-color="#2c5364"}
 
-## Contribución de la norma vigente a la reducción del riesgo {.smaller}
+## Contribución de la norma vigente a la reducción del riesgo
+
+```{r}
+#| label: calculo-norma
+#| include: false
+NUT5 <- c("folato_mcg_dfe", "hierro_mg", "zinc_mg", "vitamina_b12_mcg",
+          "vitamina_a_mcg_rae")
+S_SIN <- "Sin fortificación"
+S_NOR <- "Norma vigente: harina y pan"
+cmp <- tibble::tibble(
+  nutriente = NUT5,
+  sin  = vapply(NUT5, function(n) riesgo_nac(E_SIN,  n), numeric(1)),
+  base = vapply(NUT5, function(n) riesgo_nac(E_BASE, n), numeric(1))) |>
+  mutate(Nutriente = NOMBRE[nutriente], reduccion = sin - base)
+```
+
+::: {style="font-size:1.05em;"}
+**La fortificación de la harina de trigo reduce la proporción de hogares bajo el
+requerimiento de folato en `r fmt(cmp$reduccion[cmp$nutriente == "folato_mcg_dfe"], 1)`
+puntos porcentuales y la de hierro en
+`r fmt(cmp$reduccion[cmp$nutriente == "hierro_mg"], 1)`.**
+
+Los nutrientes que la norma no añade no se modifican.
+:::
+
+::: {.notes}
+Abrir por aquí y no por el avance de la semana. Esta lámina responde una pregunta que nadie suele tener contestada: cuánto aporta lo que ya existe. Sirve para discutir presupuesto de fiscalización.
+:::
+
+## Hogares bajo el requerimiento, por nutriente y escenario {.smaller}
 
 ```{r}
 #| label: fig-norma-evita
 #| fig-cap: "Hogares bajo el requerimiento sin fortificación y con la norma vigente de harina de trigo, según nutriente. República Dominicana, 2018"
 #| fig-width: 10
 #| fig-height: 3.6
-NUT5 <- c("folato_mcg_dfe", "hierro_mg", "zinc_mg", "vitamina_b12_mcg",
-          "vitamina_a_mcg_rae")
-S_SIN <- "Sin fortificación"
-S_NOR <- "Norma vigente: harina y pan"
-
-cmp <- tibble::tibble(
-  nutriente = NUT5,
-  sin  = vapply(NUT5, function(n) riesgo_nac(E_SIN,  n), numeric(1)),
-  base = vapply(NUT5, function(n) riesgo_nac(E_BASE, n), numeric(1))) |>
-  mutate(Nutriente = NOMBRE[nutriente], reduccion = sin - base)
-
 largo_cmp <- cmp |>
   tidyr::pivot_longer(c(sin, base), names_to = "esc", values_to = "pct") |>
   mutate(Escenario = factor(if_else(esc == "sin", S_SIN, S_NOR),
@@ -260,11 +253,6 @@ requerimiento de folato en **`r fmt(cmp$reduccion[cmp$nutriente == "folato_mcg_d
 y la de hierro en **`r fmt(cmp$reduccion[cmp$nutriente == "hierro_mg"], 1)`**.
 Los nutrientes que la norma no añade no se modifican.
 :::
-
-::: {.notes}
-Abrir por aquí y no por el avance de la semana. Esta lámina responde una pregunta que nadie suele tener contestada: cuánto aporta lo que ya existe. Sirve para discutir presupuesto de fiscalización.
-:::
-
 ## Escenarios de fortificación modelados
 
 ```{r}
@@ -366,6 +354,21 @@ toda norma vigente. Ese escenario no es hipotético.
 **NOTA:** Un establecimiento, un día; no constituye una muestra representativa del mercado. El detalle del pesaje está en el anexo.
 :::
 
+## Implicación para la selección del vehículo
+
+::: {style="font-size:1.05em;"}
+**El aporte de cada micronutriente está concentrado en pocos grupos de
+alimentos, y un escenario que fortifica un cereal no puede mover un nutriente
+que el cereal no aporta.**
+
+La restricción es estructural: precede a cualquier discusión sobre el nivel de
+adición.
+:::
+
+::: {.notes}
+La figura siguiente lo muestra por grupo y nutriente. La lectura es por columna.
+:::
+
 ## Aporte de cada grupo de alimentos a cada micronutriente
 
 ```{r}
@@ -396,16 +399,19 @@ largo |> mutate(Grupo = factor(Grupo, levels = orden)) |>
 El número es el porcentaje del total del nutriente que aporta ese grupo. La lectura es por columna.
 :::
 
-## Implicación para la selección del vehículo
+## Alcance territorial de los vehículos
 
-**Un escenario que fortifica un cereal no puede mover un nutriente que el cereal no aporta**, por alto que sea el nivel de adición.
+::: {style="font-size:1.05em;"}
+**Los dos vehículos presentan cobertura alta en las 32 provincias: no hay zonas
+desatendidas.**
 
-La restricción es estructural y precede a cualquier discusión sobre dosis.
-
-En términos operativos: un escenario sobre harina de trigo no modifica los nutrientes que provienen de alimentos de origen animal, cualquiera que sea el nivel de adición.
+Difieren en la cantidad que transportan. Una norma aplicada a cualquiera de
+ellos alcanza a todo el país; la cantidad de nutriente que entrega no es la
+misma.
+:::
 
 ::: {.notes}
-Aquí es donde la figura anterior deja de ser descriptiva y pasa a ser una restricción de diseño de política.
+Hallazgo negativo que ahorra dinero: no hace falta focalizar geograficamente el vehiculo.
 :::
 
 ## Distribución territorial de la cobertura y el consumo
@@ -418,6 +424,18 @@ Ambos vehículos presentan cobertura alta en las 32 provincias, sin zonas desate
 
 ::: {.notes}
 Hallazgo negativo que ahorra dinero: no hace falta focalizar geográficamente el vehículo. Decirle a alguien dónde no gastar es un servicio.
+:::
+
+## Implicación para el diseño de la intervención
+
+La @fig-equidad lo muestra en una sola imagen: subir el nivel normativo sobre un vehículo de **consumo desigual** mejora el promedio y **conserva** el gradiente social.
+
+Cambiar a un vehículo de **consumo transversal** cierra el gradiente.
+
+Ambas opciones son defendibles y **no son intercambiables**. El análisis las distingue y las cuantifica; la elección entre una y otra es de política.
+
+::: {.notes}
+Esta es la conjetura que se formuló antes de ver los datos, y quedó respaldada. Está enunciada como pregunta 7 en el informe, no como apartado de hipótesis, por formato IMRyD.
 :::
 
 ## Hallazgo 3 · Distribución social del beneficio
@@ -462,18 +480,6 @@ quintiles extremos. El quintil es el definido por la propia encuesta.
 Estimaciones ponderadas con el diseño muestral complejo: 8 estratos, 933
 unidades primarias de muestreo y factor de expansión por hogar. DFE:
 equivalentes dietéticos de folato. EMA: Equivalente de Mujer Adulta.
-:::
-
-## Implicación para el diseño de la intervención
-
-La @fig-equidad lo muestra en una sola imagen: subir el nivel normativo sobre un vehículo de **consumo desigual** mejora el promedio y **conserva** el gradiente social.
-
-Cambiar a un vehículo de **consumo transversal** cierra el gradiente.
-
-Ambas opciones son defendibles y **no son intercambiables**. El análisis las distingue y las cuantifica; la elección entre una y otra es de política.
-
-::: {.notes}
-Esta es la conjetura que se formuló antes de ver los datos, y quedó respaldada. Está enunciada como pregunta 7 en el informe, no como apartado de hipótesis, por formato IMRyD.
 :::
 
 ## Salvedad sobre las comparaciones entre provincias
@@ -536,6 +542,35 @@ Carta de opciones con su costo institucional y su rendimiento al lado. No se pre
 3. El residuo geográfico: ¿se persigue la hipótesis de los factores de conversión?
 4. Procedencia y destino: ¿se incorporan o se declaran como supuesto?
 
+
+
+# Anexo {background-color="#4a7c9b"}
+
+# La columna de cambio responde la pregunta que se hace en estas reuniones:
+# que se movio desde la sesion anterior. El estado previo esta versionado en el
+# propio archivo, de modo que la comparacion no depende de la memoria.
+entregables |>
+  transmute(
+    Producto = entregable,
+    `TdR`    = tdr,
+    Situación = situacion,
+    `Cambio desde el 9 de octubre` = if_else(situacion == situacion_previa, "—",
+                                             paste(situacion_previa, "→", situacion)),
+    Entrega  = if_else(is.na(fecha_compromiso), "—",
+                       format(as.Date(fecha_compromiso), "%d de octubre"))
+  ) |>
+  tabla(fuente = "Fuente: registro de avance del repositorio del proyecto.",
+        notas = c(paste0("Productos que cambiaron de situación en el período: ",
+                         sum(entregables$situacion != entregables$situacion_previa),
+                         " de ", nrow(entregables), "."),
+                  "Cierre de la consultoría: 23 de octubre de 2026."))
+```
+
+::: {style="font-size:0.82em; margin-top:0.35em;"}
+La plataforma de capacitación está publicada y es accesible:
+[**fortificacion.netlify.app**](https://fortificacion.netlify.app/) — 24 módulos,
+17 ejercicios con autoevaluación y el taller completo.
+:::
 
 # Anexo {background-color="#4a7c9b"}
 
