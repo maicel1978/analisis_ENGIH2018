@@ -77,6 +77,70 @@ if (file.exists(nombres_f)) {
   message("Tabla de nombres de provincia creada en data/raw/provincias_nombres.csv")
 }
 
+# --- 1b. Presentacion: proyeccion, numeracion y clave ------------------------
+# Normas de figuras y tablas, docs/normas-figuras-y-tablas.md:
+#
+#   - Proyeccion declarada. Las coordenadas geograficas deforman las areas en
+#     un coropletico. Se proyecta a UTM 19N (EPSG:32619), que es la zona que
+#     cubre la Republica Dominicana.
+#   - Mapa identificable. Un lector que no conoce la geografia del pais debe
+#     poder saber que provincia es cada una. Con 32 provincias, rotular sobre
+#     el mapa produce colisiones, de modo que se numeran y la clave va al lado.
+#     Los numeros NO son arbitrarios: son el identificador de la Division
+#     Territorial de la ONE, el mismo que empata con la encuesta.
+#   - Sin leyenda incrustada. La leyenda la lleva el documento; la imagen lleva
+#     solo lo que necesita para leerse.
+CRS_RD <- 32619
+
+provincias <- st_transform(provincias, CRS_RD)
+centros <- provincias |>
+  st_point_on_surface() |>          # dentro del poligono aunque sea concavo
+  st_coordinates() |>
+  as.data.frame() |>
+  setNames(c("x", "y")) |>
+  bind_cols(provincias |> st_drop_geometry() |> select(id_provincia))
+
+numerar <- function(g, color = "grey20", tam = 2.5) {
+  g + geom_text(data = centros, aes(x = x, y = y, label = id_provincia),
+                size = tam, colour = color, fontface = "bold",
+                inherit.aes = FALSE)
+}
+
+# Clave de provincias como panel propio, en dos columnas.
+clave_provincias <- function(tam = 2.6) {
+  d <- provincias |> st_drop_geometry() |>
+    transmute(id_provincia, etiqueta = paste0(id_provincia, ". ", PROV_NAME)) |>
+    arrange(id_provincia) |>
+    mutate(col = if_else(row_number() <= ceiling(n() / 2), 1, 2),
+           fila = if_else(col == 1, row_number(), row_number() - ceiling(n() / 2)))
+  ggplot(d, aes(x = col, y = -fila, label = etiqueta)) +
+    geom_text(hjust = 0, size = tam, colour = "grey20") +
+    scale_x_continuous(limits = c(0.95, 3.1)) +
+    theme_void()
+}
+
+con_clave <- function(g, rel = c(1, 0.52)) {
+  plot_grid(g, clave_provincias(), nrow = 1, rel_widths = rel)
+}
+
+# Barra de escala y norte, si ggspatial esta disponible. No es obligatorio para
+# que el script corra; si falta, se declara y se sigue.
+HAY_GGSPATIAL <- requireNamespace("ggspatial", quietly = TRUE)
+if (!HAY_GGSPATIAL) {
+  message("ggspatial no esta instalado: los mapas saldran sin barra de escala ",
+          "ni norte. Instalar con install.packages(\"ggspatial\").")
+}
+escala_y_norte <- function(g) {
+  if (!HAY_GGSPATIAL) return(g)
+  g +
+    ggspatial::annotation_scale(location = "bl", width_hint = 0.28,
+                                height = unit(0.12, "cm"), text_cex = 0.6,
+                                line_width = 0.3) +
+    ggspatial::annotation_north_arrow(
+      location = "tr", height = unit(0.7, "cm"), width = unit(0.7, "cm"),
+      style = ggspatial::north_arrow_minimal(text_size = 6))
+}
+
 # --- 2. Consumo de vehiculos por provincia -----------------------------------
 # Misma definicion de vehiculo que 06: se lee el mismo archivo de parametros.
 vehiculos <- leer("data", "raw", "vehiculos_escenarios.csv")
@@ -168,7 +232,7 @@ if (any(is.na(bi$bi_class))) {
 # la construccion del gtable de ggplot2.
 mapa_de <- function(g) {
   d <- bi |> filter(grupo == g)
-  ggplot() +
+  p <- ggplot() +
     geom_sf(data = filter(d, is.na(bi_class)), fill = "grey85",
             colour = "white", linewidth = 0.18) +
     geom_sf(data = filter(d, !is.na(bi_class)), aes(fill = bi_class),
@@ -178,16 +242,19 @@ mapa_de <- function(g) {
     theme_void(base_size = 11) +
     theme(plot.title = element_text(face = "bold", hjust = 0.5, size = 13,
                                     colour = "#1a3a4a"))
+  numerar(p, color = "white", tam = 2.2)
 }
 
 leyenda <- bi_legend(pal = PALETA, dim = DIM, size = 8,
                      xlab = "Cobertura (% que lo adquiere)",
                      ylab = "Consumo (g/EMA/día)")
 
+fila_mapas <- plot_grid(mapa_de("Arroz"), mapa_de("Trigo"), leyenda,
+                        nrow = 1, rel_widths = c(1, 1, 0.62))
 ggsave(here("media", "mapas", "mapa_bivariado_vehiculos.png"),
-       plot_grid(mapa_de("Arroz"), mapa_de("Trigo"), leyenda,
-                 nrow = 1, rel_widths = c(1, 1, 0.62)),
-       width = 12, height = 5, dpi = 200, bg = "white")
+       plot_grid(fila_mapas, clave_provincias(tam = 2.3), ncol = 1,
+                 rel_heights = c(1, 0.42)),
+       width = 12, height = 6.8, dpi = 200, bg = "white")
 
 # --- 4. Coropletico de riesgo, con precision declarada -----------------------
 # Las celdas de precision insuficiente no se pintan con su valor: se declaran.
@@ -225,15 +292,12 @@ g_riesgo <- ggplot(mapa_riesgo) +
     limits = c(0, 100), labels = function(x) paste0(x, "%"),
     na.value = "grey85",
     name = "Hogares bajo el\nrequerimiento de folato") +
-  labs(caption = paste(
-    "Escenario de linea base. Gris: precision insuficiente (menos de 50 hogares o",
-    "semiamplitud del intervalo mayor de 10 puntos).\nLa provincia no es dominio de",
-    "estimacion de la encuesta. Valores de referencia provisionales.")) +
   theme_void(base_size = 11) +
-  theme(plot.caption = element_text(hjust = 0, colour = "#5a6b76", size = 8))
+  theme(legend.position = "right")
 
-ggsave(here("media", "mapas", "mapa_riesgo_folato.png"), g_riesgo,
-       width = 8.5, height = 6, dpi = 200, bg = "white")
+ggsave(here("media", "mapas", "mapa_riesgo_folato.png"),
+       con_clave(escala_y_norte(numerar(g_riesgo))),
+       width = 10.5, height = 5.6, dpi = 300, bg = "white")
 
 # --- 5. Coropletico de densidad, invariante al nivel de registro ------------
 # Decision E1: para comparacion geografica se prefiere la densidad de
@@ -281,17 +345,12 @@ g_dens <- ggplot(mapa_dens) +
     na.value = "grey85",
     name = paste0("Densidad mediana de folato\nsobre la densidad critica\n(",
                   round(dens_critica, 1), " ug DFE/1.000 kcal)")) +
-  labs(caption = paste0(
-    "Escenario de linea base. La densidad critica es el RPE de folato (", ear_folato,
-    " ug DFE) sobre el requerimiento energetico de la\nmujer adulta de referencia (",
-    KCAL_EMA, " kcal), que es el denominador del EMA. Gris: menos de ", HOGARES_MIN,
-    " hogares. La mediana no es\nuna prevalencia de adecuacion. La provincia no es ",
-    "dominio de estimacion. Valores de referencia provisionales.")) +
   theme_void(base_size = 11) +
-  theme(plot.caption = element_text(hjust = 0, colour = "#5a6b76", size = 8))
+  theme(legend.position = "right")
 
-ggsave(here("media", "mapas", "mapa_densidad_folato.png"), g_dens,
-       width = 8.5, height = 6, dpi = 200, bg = "white")
+ggsave(here("media", "mapas", "mapa_densidad_folato.png"),
+       con_clave(escala_y_norte(numerar(g_dens))),
+       width = 10.5, height = 5.6, dpi = 300, bg = "white")
 
 message("\nMapas en media/mapas/. Provincias con precision suficiente: ",
         sum(!is.na(mapa_riesgo$valor)), " de 32 en el mapa de riesgo, ",

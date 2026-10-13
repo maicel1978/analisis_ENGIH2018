@@ -359,11 +359,15 @@ completo en la cabeza.
       gradiente bajo densidad; y la advertencia de no afirmar estado
       nutricional provincial. Las dos últimas son seguros contra afirmaciones
       caras de retirar, no herramientas.
-- [ ] **M3.** Aplicar `docs/normas-figuras-y-tablas.md` a los tres mapas.
-      Después de P4: es presentación sobre contenido ya decidido. Incluye
-      producir una variante sin la leyenda incrustada, para el documento: con
-      ella dentro de la imagen, los dos coropléticos no se pueden poner lado a
-      lado sin volverse ilegibles, y hoy van apilados por eso.
+- [x] **M3. Hecho el 2026-10-13.** Los tres mapas se rehacen con: proyección
+      UTM 19N declarada, en lugar de coordenadas geográficas que deforman las
+      áreas; **numeración de provincia con clave al lado**, usando el
+      identificador de la División Territorial 2021, que es el mismo que empata
+      con la encuesta, de modo que un lector que no conoce la geografía puede
+      identificar cada unidad; barra de escala y norte cuando `ggspatial` está
+      disponible, con aviso si no lo está; sin leyenda incrustada, que ahora la
+      lleva el documento; y 300 dpi. Falta regenerarlos corriendo el script.
+
 - [ ] **M4.** Revisar que ningún README ni documento de `main` cite cifras
       superadas por la corrección de la línea base.
 - [ ] **M6. Comprobación antes de entregar cualquier documento renderizado.**

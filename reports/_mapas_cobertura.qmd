@@ -54,10 +54,13 @@ El eje horizontal de la leyenda es la proporción de hogares que adquiere el
 vehículo; el vertical, la mediana de consumo entre los hogares que lo
 adquieren, en gramos por EMA y día. El trigo se expresa en equivalentes de
 harina, que es la fracción sobre la que opera la norma. Cortes fijos en los dos
-mapas. Fuente: Encuesta Nacional de Gastos e Ingresos de los Hogares 2018,
-Banco Central de la República Dominicana; límites provinciales del geoportal
-del IDERD y la División Territorial 2021 de la Oficina Nacional de Estadística.
-La provincia no es dominio de estimación de la encuesta.
+mapas. Las provincias se identifican con el número de la División Territorial
+2021 de la Oficina Nacional de Estadística, cuya correspondencia figura a la
+derecha. Proyección UTM zona 19N (EPSG:32619). Fuente: Encuesta Nacional de
+Gastos e Ingresos de los Hogares 2018, Banco Central de la República
+Dominicana; límites provinciales del geoportal del IDERD y la División
+Territorial 2021 de la Oficina Nacional de Estadística. La provincia no es
+dominio de estimación de la encuesta.
 
 :::
 
