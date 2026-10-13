@@ -28,6 +28,20 @@ _cache
 
 data/clean/
 
+# Microdatos de la encuesta: NO se versionan. Se descargan con
+# scripts/00_descargar_datos.R desde la direccion registrada en
+# data/raw/fuentes_datos.csv, y el script comprueba que son los mismos
+# archivos con los que se hizo el analisis.
+#
+# El resto de data/raw/ SI se versiona: son los parametros del analisis
+# -escenarios, valores de referencia, vehiculos, agrupacion de alimentos,
+# normas, geometria- y las tablas de composicion. Sin ellos el repositorio
+# no vale nada.
+data/raw/Registros_Cuestionario_B.xlsx
+data/raw/Sociodemograficas_e_ingresos.xlsx
+data/raw/data_raw_sec2.csv
+data/raw/data_raw_sec3a.csv
+
 
 # Salidas automaticas de 02_eda.R (regenerables, no requieren juicio manual
 # como si lo requieren otros archivos de data/diagnosticos/ ej. FC_propuesto_*.csv)
