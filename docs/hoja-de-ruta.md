@@ -383,6 +383,14 @@ referencias cruzadas en todo el repositorio. El `README` renderizaba cinco de
 ellos; reescrito el 2026-10-13 con la cadena real, que además no estaba
 completa —listaba cinco scripts de nueve—.
 
+**Migrado el 2026-10-13.** La tabla de consumo simultáneo de `R3` se rehízo
+con el diseño muestral completo y se amplió: `06_escenarios_fortificacion.R`
+estima ahora el **alcance de cada combinación de vehículos** —qué proporción de
+hogares queda alcanzada por al menos uno— con su intervalo de confianza, y el
+reparto de hogares según cuántos vehículos adquieren. Las dos tablas entran en
+el apartado de vehículos del informe. Con eso, la única razón sustantiva para
+conservar `R3` desaparece.
+
 **Queda a decisión del autor: `R1`, `R2`, `R3`.** Son los tres cuadernos de
 cálculo recientes —4 de octubre— y su contenido está absorbido por el informe y
 el manual, con una excepción: `R3` tiene una tabla de **consumo simultáneo de

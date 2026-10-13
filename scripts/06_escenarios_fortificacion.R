@@ -108,6 +108,70 @@ consumo_vehiculo <- consumo |>
 message("Consumo de vehiculos (g por EMA y dia, ponderado):")
 print(as.data.frame(consumo_vehiculo), digits = 3)
 
+# Alcance de una estrategia sobre varios vehiculos ---------------------------
+# Una estrategia puede apoyarse en un vehiculo o en un conjunto. Lo que importa
+# para el diseno no es la cobertura de cada uno por separado sino la del
+# CONJUNTO: que proporcion de hogares queda alcanzada por al menos uno. Se
+# estima con el diseno completo, igual que cualquier otra proporcion.
+hogar_vehiculo <- consumo |>
+  mutate(grupo = case_when(vehiculo %in% c("Harina de trigo", DERIVADOS_TRIGO) ~ "Trigo",
+                           !is.na(vehiculo) ~ vehiculo)) |>
+  filter(!is.na(grupo)) |>
+  distinct(id_hogar_unico, grupo) |>
+  mutate(presente = TRUE) |>
+  pivot_wider(names_from = grupo, values_from = presente, values_fill = FALSE) |>
+  right_join(hogar, by = "id_hogar_unico")
+
+GRUPOS_VEH <- intersect(c("Trigo", "Arroz", "Azucar", "Azúcar"),
+                        names(hogar_vehiculo))
+if (length(GRUPOS_VEH) < 2) {
+  stop("Menos de dos vehiculos identificados para el alcance combinado: ",
+       paste(GRUPOS_VEH, collapse = ", "), call. = FALSE)
+}
+hogar_vehiculo <- hogar_vehiculo |>
+  mutate(across(all_of(GRUPOS_VEH), ~ coalesce(.x, FALSE)),
+         n_vehiculos = rowSums(across(all_of(GRUPOS_VEH))))
+
+# Distribucion del numero de vehiculos por hogar.
+reparto <- hogar_vehiculo |>
+  as_survey_design(ids = upm, strata = estrato, weights = factor_expansion, nest = TRUE) |>
+  group_by(n_vehiculos) |>
+  summarise(pct_hogares = 100 * survey_mean(vartype = "ci"),
+            n = unweighted(n())) |>
+  arrange(n_vehiculos)
+
+# Alcance de cada combinacion: al menos uno de los vehiculos del subconjunto.
+# El indicador de cada combinacion se calcula ANTES de declarar el diseno: una
+# sola declaracion de diseno y una columna por combinacion.
+combinaciones <- do.call(c, lapply(seq_along(GRUPOS_VEH), function(k)
+  combn(GRUPOS_VEH, k, simplify = FALSE)))
+nombres_comb <- vapply(combinaciones, paste, character(1), collapse = " o ")
+
+for (i in seq_along(combinaciones)) {
+  hogar_vehiculo[[paste0("comb_", i)]] <-
+    rowSums(hogar_vehiculo[combinaciones[[i]]]) > 0
+}
+d_veh <- hogar_vehiculo |>
+  as_survey_design(ids = upm, strata = estrato, weights = factor_expansion, nest = TRUE)
+
+alcance <- bind_rows(lapply(seq_along(combinaciones), function(i) {
+  col <- rlang::sym(paste0("comb_", i))
+  d_veh |>
+    summarise(pct_hogares = 100 * survey_mean(!!col, vartype = "ci")) |>
+    mutate(combinacion = nombres_comb[i],
+           vehiculos = length(combinaciones[[i]]), .before = 1)
+})) |>
+  arrange(vehiculos, desc(pct_hogares))
+
+message("\nHogares por numero de vehiculos adquiridos (ponderado):")
+print(as.data.frame(reparto), digits = 3)
+message("\nAlcance de cada combinacion de vehiculos (al menos uno, ponderado):")
+print(as.data.frame(alcance |> select(combinacion, pct_hogares,
+                                      pct_hogares_low, pct_hogares_upp)), digits = 3)
+
+write_delim(reparto, here("data", "clean", "escenarios_reparto_vehiculos.csv"), delim = ";")
+write_delim(alcance, here("data", "clean", "escenarios_alcance_combinado.csv"), delim = ";")
+
 # Ingesta por hogar y escenario ----------------------------------------------
 base_hogar <- consumo |>
   group_by(id_hogar_unico) |>

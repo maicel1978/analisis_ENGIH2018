@@ -602,6 +602,44 @@ alcanzar a una proporción alta de hogares y consumirse en cantidad suficiente
 para transportar el fortificante. La tabla anterior las separa; el apartado
 siguiente las examina juntas y por territorio.
 
+### Alcance de una estrategia sobre varios vehículos
+
+Una estrategia puede apoyarse en un vehículo o en un conjunto. Para el diseño
+importa menos la cobertura de cada uno por separado que la del conjunto: qué
+proporción de hogares queda alcanzada por **al menos uno**. La diferencia entre
+una cifra y otra es la superposición entre vehículos, que no se deduce de las
+coberturas individuales.
+
+```{r}
+#| label: tbl-alcance-combinado
+#| tbl-cap: "Hogares alcanzados por al menos uno de los vehículos de cada combinación. República Dominicana, 2018"
+exigir("escenarios_alcance_combinado.csv", "06_escenarios_fortificacion.R")
+alcance <- leer("escenarios_alcance_combinado.csv")
+
+alcance |>
+  transmute(`Combinación de vehículos` = combinacion,
+            `Hogares alcanzados (%)` = num(pct_hogares),
+            `IC 95%` = paste0(num(pct_hogares_low), " – ", num(pct_hogares_upp))) |>
+  kable(align = "lrr")
+```
+
+```{r}
+#| label: tbl-reparto-vehiculos
+#| tbl-cap: "Hogares según el número de vehículos de fortificación que adquieren. República Dominicana, 2018"
+exigir("escenarios_reparto_vehiculos.csv", "06_escenarios_fortificacion.R")
+leer("escenarios_reparto_vehiculos.csv") |>
+  transmute(`Vehículos adquiridos` = n_vehiculos,
+            `Hogares (n)` = n,
+            `Hogares (%)` = num(pct_hogares),
+            `IC 95%` = paste0(num(pct_hogares_low), " – ", num(pct_hogares_upp))) |>
+  kable(align = "lrrr")
+```
+
+La lectura operativa de las dos tablas es la misma: una norma sobre un solo
+vehículo deja fuera a los hogares que no lo adquieren, y la pregunta de diseño
+es si la combinación cierra ese hueco o si los mismos hogares adquieren todos
+los vehículos y la combinación no añade alcance.
+
 {{< include _mapas_cobertura.qmd >}}
 
 
