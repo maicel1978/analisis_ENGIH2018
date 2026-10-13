@@ -1,181 +1,203 @@
-# Lista de revisión pendiente
+# Lo que depende de usted
 
-Qué hay que mirar antes de dar por cerrado el informe final y el manual técnico.
-Levantada el 2026-10-12. Se va tachando.
+Documento de tarea. Todo lo que no depende de usted está hecho o está en la cola
+de `docs/hoja-de-ruta.md`. Aquí solo queda lo que nadie más puede hacer.
 
-Está ordenada por lo que más daño haría si estuviera mal. Los apartados A y B
-son los que bloquean el cierre; C y D pueden esperar.
+Está en orden de ejecución: cada bloque supone hecho el anterior. Se va tachando
+y se sobrescribe; no se duplica.
 
----
-
-## A. Las ocho figuras del informe
-
-Todas compilan. **Ninguna ha sido mirada.** Compilar solo prueba que el código
-corre, no que la figura comunique. Abrir
-`C:\proyectos\output\reports\INFORME_final.html` y recorrerlas.
-
-Lo que hay que buscar en todas: etiquetas que se salen del área, texto
-encimado, leyendas que tapan datos, escalas que no discriminan, y categorías
-que aparecen como `NA`.
-
-- [ ] **Figura 1 · Cobertura de composición por nutriente** (Factibilidad).
-      Barras horizontales con el porcentaje al final. *Comprobar:* que la
-      etiqueta numérica no se corte en la barra más larga; que ningún nutriente
-      aparezca con nombre técnico en vez de su etiqueta.
-
-- [ ] **Figura 2 · Riesgo por nutriente** (Riesgo). Punto con segmento de
-      intervalo de confianza. *Comprobar:* que los segmentos se vean —si los
-      intervalos son muy estrechos quedan ocultos bajo el punto y entonces el
-      segmento no aporta—; que la etiqueta numérica no se salga a la derecha.
-
-- [ ] **Figura 3 · Aporte de cada grupo a cada micronutriente** (Grupos). Mapa
-      de calor. **Es la figura más importante del informe.** *Comprobar:* que
-      se lean los nombres de grupo en el eje vertical; que los números blancos
-      sobre celdas claras sean legibles —si no lo son, hay que cambiar el
-      umbral o el color del texto—; que ninguna columna quede casi vacía de
-      números, lo que indicaría que el umbral del 5% es demasiado alto.
-
-- [ ] **Figura 4 · Mapa bivariado de cobertura y consumo** (Vehículos).
-      *Comprobar:* que se distingan las clases de color; que la leyenda
-      bivariada se entienda sin explicación.
-
-- [ ] **Figura 5 · Gradiente por quintil bajo los dos criterios**
-      (Desigualdad). Dos líneas. *Comprobar:* que se crucen de forma visible,
-      porque el cruce es el argumento; que los colores se distingan.
-
-- [ ] **Figura 6 · Los dos coropléticos de folato** (Desigualdad). Van
-      apilados, no lado a lado. *Comprobar:* que la leyenda **impresa dentro de
-      cada imagen** sea legible al ancho del documento. Si no lo es, hay que
-      regenerar los mapas sin leyenda incrustada, que es la tarea M7 de la hoja
-      de ruta.
-
-- [ ] **Figura 7 · Escalera de escenarios** (Escenarios). Una línea por
-      nutriente a través de los siete escenarios. *Comprobar:* que las
-      etiquetas del eje horizontal (`0`, `1a`, `1b`, `1c`, `2a`, `2b`, `3`) se
-      entiendan, o si hace falta una nota que las traduzca; que la leyenda de
-      colores no tape la figura.
-
-- [ ] **Figura 8 · Razón entre quintiles extremos por escenario**
-      (Escenarios). *Comprobar:* que la línea de referencia en 1 se vea; que
-      las etiquetas numéricas no se salgan.
+Actualizado el 2026-10-13.
 
 ---
 
-## B. Las afirmaciones del texto contra las cifras
+## 1. Correr la cadena
 
-El texto hace afirmaciones cualitativas que las cifras tienen que sostener. Las
-escribí a partir de los resultados conocidos, pero **sin ver la corrida**. Cada
-una de estas frases es falsable mirando su propia tabla o figura, en la misma
-página.
+**Nada de lo escrito esta semana se ha ejecutado nunca.** El código nuevo
+compila en apariencia, pero compilar es lo único que no se ha probado. Hasta que
+esto corra, el informe es texto sin verificar.
 
-- [ ] *«La norma vigente desplaza la proporción bajo el requerimiento, pero la
-      deja todavía en el entorno de la mitad.»* Contrastar con la Figura 7.
-- [ ] *«Extender la norma a todos los derivados del trigo añade un
-      desplazamiento menor.»* Misma figura.
-- [ ] *«Los escenarios con niveles de la OMS producen un desplazamiento
-      mayor.»* Misma figura.
-- [ ] *«El zinc, la B12 y la vitamina A permanecen prácticamente invariables a
-      lo largo de los escenarios de la norma nacional.»* Misma figura.
-- [ ] *«Solo la propuesta que incorpora arroz los desplaza.»* Misma figura.
-- [ ] *«El arroz lleva la razón entre quintiles prácticamente a la unidad.»*
-      Figura 8.
-- [ ] *«Las vitaminas D y E son las de cobertura más baja.»* Figura 1.
-- [ ] *«El rango de inadecuación cubre casi toda la escala.»* Figura 2.
-- [ ] *«Los cereales y raíces son prácticamente irrelevantes para los
-      nutrientes de origen animal.»* Figura 3.
-- [ ] *«El gradiente socioeconómico se invierte entre criterios.»* Figura 5.
-- [ ] *«La cobertura del arroz y la del trigo no dejan zonas desatendidas.»*
-      Tabla de vehículos y Figura 4.
+```
+cd C:\proyectos\analisis_ENGIH2018 && git pull
+```
 
-Si alguna no se sostiene, es error de redacción mío y se corrige sin discutir
-el dato.
+Correr en este orden. Si algo se detiene, pare y avise: una guarda que suena es
+información, no un estorbo.
+
+```
+Rscript scripts/06_escenarios_fortificacion.R
+```
+Produce dos tablas nuevas que el informe ya cita: el **alcance de cada
+combinación de vehículos** y el **reparto de hogares según cuántos adquieren**.
+Si no salen, el informe no compila.
+
+```
+Rscript scripts/07_riesgo_inadecuacion.R
+```
+```
+Rscript scripts/09_mapas.R
+```
+Los PNG de `media/mapas/` son anteriores a la numeración de provincias. Hasta
+que esto corra, los mapas que usted ve son los viejos, sin número ni clave de
+nombres. Si avisa que falta `ggspatial`: `install.packages("ggspatial")`.
+
+```
+Rscript scripts/diagnostico_outliers.R
+```
+Mide cuánto retira la exclusión de valores atípicos. **La cifra que importa es
+`pct_retirado` por nutriente.** Si es de pocas décimas, el Anexo B del informe
+queda cerrado con ella. Si pasa de un punto, hay que rehacer 04 a 07 sin la
+exclusión y comparar: eso es un brote aparte y hay que decidirlo.
+
+```
+quarto render reports/INFORME_final.qmd
+```
+```
+quarto render reports/MANUAL_tecnico.qmd
+```
+El manual **nunca se ha compilado**. Al salir, cuente las páginas: el TdR 18
+pide de 20 a 30. La estimación es 20 a 24, pero es una estimación.
+
+- [ ] La cadena corre completa sin que se detenga ninguna guarda
+- [ ] `pct_retirado` anotado: ___________
+- [ ] Páginas del manual: ___________
 
 ---
 
-## C. Lo que solo usted puede juzgar
+## 2. Mirar las figuras
 
-No son errores de código ni de cifras: son juicios de contenido.
+Compilar prueba que el código corre, no que la figura comunique. **Ninguna de
+las ocho se ha mirado.** Abra el HTML y recórralas.
 
-- [ ] **La tabla de instrumentos normativos** de la Introducción. ¿Están bien
-      descritos los niveles, los instrumentos y el estado de vigencia? ¿Falta
-      algún vehículo que debería estar?
+En todas: etiquetas que se salen del área, texto encimado, leyendas que tapan
+datos, escalas que no discriminan, categorías que aparecen como `NA`.
+
+- [ ] **Fig. 1 · Cobertura de composición por nutriente.** Que la etiqueta no se
+      corte en la barra más larga; que ningún nutriente salga con nombre técnico.
+- [ ] **Fig. 2 · Riesgo por nutriente.** Que los segmentos de intervalo se vean;
+      si son muy estrechos quedan bajo el punto y entonces no aportan.
+- [ ] **Fig. 3 · Aporte de cada grupo a cada micronutriente.** *La figura más
+      importante del informe.* Que se lean los nombres de grupo; que los números
+      blancos sobre celdas claras sean legibles; que ninguna columna quede casi
+      vacía, lo que indicaría que el umbral del 5% es alto.
+- [ ] **Fig. 4 · Mapa bivariado.** Que se distingan las clases; que la leyenda se
+      entienda sin explicación.
+- [ ] **Fig. 5 · Gradiente por quintil bajo los dos criterios.** Que el cruce se
+      vea, porque el cruce es el argumento.
+- [ ] **Fig. 6 · Los dos coropléticos de folato.** Que la clave de provincias sea
+      legible al ancho del documento.
+- [ ] **Fig. 7 · Escalera de escenarios.** Que las etiquetas del eje (`0`, `1a`,
+      `1b`, `1c`, `2a`, `2b`, `3`) se entiendan o haga falta una nota.
+- [ ] **Fig. 8 · Razón entre quintiles extremos por escenario.** Que la línea de
+      referencia en 1 se vea.
+
+Y las dos tablas nuevas, que nadie ha visto nunca:
+
+- [ ] **Alcance combinado de vehículos.** Si las tres combinaciones dan
+      prácticamente lo mismo, la tabla dice que los mismos hogares compran todo y
+      hay que escribirlo así. Si abre un hueco, ese hueco es el hallazgo.
+- [ ] **Reparto por número de vehículos.**
+
+---
+
+## 3. Contrastar el texto contra las cifras
+
+Estas frases están escritas **sin haber visto la corrida**. Cada una es
+falsable mirando su propia figura, en la misma página. Si alguna no se sostiene,
+es error de redacción y se corrige sin discutir el dato.
+
+- [ ] «La norma vigente desplaza la proporción bajo el requerimiento, pero la
+      deja todavía en el entorno de la mitad.» → Fig. 7
+- [ ] «Extender la norma a todos los derivados del trigo añade un desplazamiento
+      menor.» → Fig. 7
+- [ ] «Los escenarios con niveles de la OMS producen un desplazamiento mayor.»
+      → Fig. 7
+- [ ] «El zinc, la B12 y la vitamina A permanecen prácticamente invariables a lo
+      largo de los escenarios de la norma nacional.» → Fig. 7
+- [ ] «Solo la propuesta que incorpora arroz los desplaza.» → Fig. 7
+- [ ] «El arroz lleva la razón entre quintiles prácticamente a la unidad.» → Fig. 8
+- [ ] «Las vitaminas D y E son las de cobertura más baja.» → Fig. 1
+- [ ] «El rango de inadecuación cubre casi toda la escala.» → Fig. 2
+- [ ] «Los cereales y raíces son prácticamente irrelevantes para los nutrientes
+      de origen animal.» → Fig. 3
+- [ ] «El gradiente socioeconómico se invierte entre criterios.» → Fig. 5
+- [ ] «La cobertura del arroz y la del trigo no dejan zonas desatendidas.»
+      → Tabla de vehículos y Fig. 4
+
+Y una del anexo, que depende de una cifra que el documento calcula al compilar:
+
+- [ ] **Correlación de rangos entre los dos criterios provinciales.** La lámina
+      de la presentación la muestra. Si es alta, los dos criterios ordenan el
+      territorio casi igual y la frase que acompañe a los dos mapas tiene que
+      decir eso, no lo contrario.
+
+---
+
+## 4. Juicios de contenido
+
+No son errores de código ni de cifras. Nadie más los puede emitir.
+
+- [ ] **La tabla de instrumentos normativos** de la Introducción. ¿Están bien los
+      niveles, los instrumentos y la vigencia? ¿Falta algún vehículo?
 - [ ] **La afirmación sobre el azúcar**: norma obligatoria desde 2004, sin
-      aplicación verificable, etiqueta observada sin declaración de vitamina A.
-      ¿Está dicho de forma que se sostenga ante el ministerio?
-- [ ] **El arroz presentado como propuesta y no como norma.** ¿Es exacto para
-      2018?
+      aplicación verificable, etiqueta sin declaración de vitamina A. ¿Se sostiene
+      ante el ministerio?
+- [ ] **El arroz como propuesta y no como norma.** ¿Es exacto para 2018?
 - [ ] **Las siete conclusiones**, una por una. ¿Alguna afirma más de lo que el
       análisis sostiene?
-- [ ] **El apartado de implicaciones.** Es donde el informe se acerca más a
+- [ ] **El apartado de implicaciones.** Es donde el informe más se acerca a
       recomendar. ¿Se queda del lado correcto de la línea?
-- [ ] **La ubicación de la tabla de normas.** Hoy es la Tabla 1 y está en la
-      Introducción. Decidir si se mueve a Métodos, donde le corresponde por ser
-      un parámetro de los escenarios.
+- [ ] **La ubicación de la tabla de normas.** Hoy es Tabla 1 en la Introducción;
+      por ser un parámetro de los escenarios, su sitio es Métodos.
 
 ---
 
-## D. Lo que falta compilar
+## 5. Decisiones abiertas
 
-- [ ] **Manual técnico.** `quarto render reports/MANUAL_tecnico.qmd`. Nunca se
-      ha compilado. Hay que medir las páginas contra las 20 a 30 que pide el
-      TdR 18; la estimación es que se queda corto y habrá que ampliar.
-- [ ] Comprobar que no queda ningún comentario `<!--` en los dos documentos
-      antes de entregarlos. Es M6 de la hoja de ruta.
+Las cuatro primeras dependen de terceros y su corte propio fue el **15 de
+octubre**. Si ese día no hay respuesta, se cierra con los supuestos actuales y se
+declaran en el informe. No se espera.
+
+- [ ] **Valores de referencia**: Requerimiento Promedio Estimado del IOM frente
+      a Requerimiento Promedio Armonizado. Es sustituir `valores_referencia.csv`
+      y recompilar; altera **todas** las estimaciones de riesgo. Mientras no se
+      resuelva, la lista de referencias del informe declara la edición del IOM
+      como pendiente de confirmar.
+- [ ] **Biodisponibilidad del hierro**: 10%, 18%, o ambas como rango.
+- [ ] **Documento normativo del arroz**: obtenerlo o mantener el escenario como
+      análisis de sensibilidad.
+- [ ] **Fuente citable** para las fracciones de harina en pan, pastas y galletas.
+
+Estas tres son enteramente suyas:
+
+- [ ] **Visibilidad del repositorio y los microdatos versionados.** Sigue
+      abierto: `analisis_ENGIH2018` es público y tiene 127 MB de microdatos de
+      hogar rastreados desde el 6 de septiembre, en las dos ramas. El paso
+      reversible e inmediato es ponerlo en privado. Las opciones y sus
+      consecuencias están en el bloque de decisión abierta de la hoja de ruta.
+      **Es lo de mayor consecuencia de toda esta lista.**
+- [ ] **`INFORME_factibilidad`: corregir o congelar.** Está entregado. Si se
+      congela, se queda como está y la etiqueta `informe-factibilidad-v1` lo
+      conserva. Si se corrige, hay seis puntos suyos pendientes: la convención
+      `n (%)`, el registro del texto, el caldo de pollo ya resuelto en campo, el
+      agua purificada que no es alimento, la sección 11.2 a documento interno, y
+      la bibliografía. Más las diez apariciones de «elaboración propia», que
+      **solo** quedan en ese documento.
+- [ ] **Los dos PR de la plataforma.** `fortificacion#1` es defensivo. El #2
+      lleva ahora la corrección del módulo 24: el método que se enseña pasa a ser
+      el del análisis en cuatro puntos, incluida una tabla de factores EMA
+      atribuida a INCAP/WFP que el proyecto no usa. Quedan de ejemplo las dos
+      tablas auxiliares de conversión y porción comestible, que no se pueden
+      poner en línea; **publicarlas o no depende de qué se pueda publicar de los
+      parámetros**, y eso es decisión suya.
 
 ---
 
-## E. Decisiones que no son revisión
+## 6. Cierre
 
-Están documentadas con sus opciones y no se degradan por esperar, pero no se
-cierran solas.
-
-- [ ] **Visibilidad del repositorio** y qué hacer con los microdatos
-      versionados. Opciones en el bloque de decisión abierta de la hoja de ruta.
-- [ ] **El PR de la plataforma**, `fortificacion#1`. Defensivo, no urgente.
-- [ ] **Los comentarios de revisión**: hace falta su texto para escribir el
-      anexo de respuesta, que es lo último que le queda al informe.
-
----
-
-## F. Comentarios de revisión del autor, 2026-10-13
-
-Pendientes de aplicar. El estándar de redacción que se desprende de ellos está
-en `docs/normas-de-redaccion.md`.
-
-**Transversal a todo el proyecto**
-
-- [x] Registro: eliminar construcciones exhortativas y gerundios de los
-      documentos. Aplicado el 2026-10-13: las 8 construcciones medidas (2 en el
-      informe final, 5 en el manual técnico, 1 en el fragmento de densidad) se
-      reescribieron en tercera persona impersonal. Quedan 0.
-- [ ] Convención `n (%)` en toda presentación de recuentos.
-- [ ] Mapas con identificación de provincia para quien no conoce la geografía.
-- [ ] Figuras con los dos ejes rotulados y títulos descriptivos.
-- [ ] Retirar «elaboración propia» como fuente donde aparezca. Medido el
-      2026-10-13: aparece **solo** en `INFORME_factibilidad.qmd`, 10 veces. El
-      informe final y los demás documentos ya citan la encuesta y el script.
-      Depende por tanto de la decisión de corregir o congelar ese documento.
-
-**Informe de factibilidad** (entregado; decidir si se corrige o se congela)
-
-- [ ] «8.892 de 8.892» y equivalentes, a convención `n (%)`.
-- [ ] Registro del texto, con el ejemplo señalado: «Conviene delimitarlo desde
-      el inicio…».
-- [ ] Alimentos que concentran la pérdida: el caldo de pollo concentrado y
-      otros ya se resolvieron con el trabajo de campo. Actualizar.
-- [ ] Agua purificada: no es alimento. Retirarla o declarar su exclusión de
-      forma consistente.
-- [ ] Sección 11.2, trabajo pendiente priorizado: mover a documento interno.
-- [ ] Bibliografía.
-
-**R1_calidad_datos**
-
-- [ ] Título de la Figura 1, coloquial.
-- [ ] La discusión, mismo problema de registro.
-- [ ] Retirar juicios mecánicos del tipo «el indicador es defendible sin
-      salvedad».
-
-**Carpeta `reports/`**
-
-- [ ] Consolidación y supresión. Es P9. El autor confirma el criterio: lo que
-      era necesario durante la limpieza de datos ya no lo es.
+- [ ] Comprobar que no queda ningún `<!--` en los documentos renderizados. Los
+      comentarios HTML **sobreviven al renderizado** y quedan visibles en el
+      código fuente del entregable. El 11 de octubre se encontraron diez.
+      `findstr /c:"<!--" INFORME_final.html`
+- [ ] Fusión de `ajustes-octubre` a `main` y etiqueta de cierre.
+- [ ] **El README de `main` conserva la conclusión sobre el trigo anterior a la
+      corrección de la línea base.** Es un error visible en la rama pública.
