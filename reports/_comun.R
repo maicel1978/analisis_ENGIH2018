@@ -49,25 +49,16 @@ TRIGO_EXCLUIR <- paste0(
 # Nutrientes incluidos en esta etapa del analisis.
 NUTRIENTES_INICIALES <- c("Energia", "Hierro", "Acido folico", "Vitamina A")
 
-# Escenarios de fortificacion. Codigos ENHANCE_ID de INCAP.
+# Escenarios de fortificacion: ya NO se definen aqui.
 #
-# El marco normativo vigente esta pendiente de confirmacion, de modo que los
-# resultados se presentan como rango entre los tres escenarios.
-#
-# El aceite no se modela: los 19 aceites de INCAP tienen VITA_RAE = 0 y no
-# existe par fortificado / sin fortificar.
-ESCENARIOS <- tribble(
-  ~escenario,               ~vehiculo,         ~enhance_id,
-  # Escenario 0 -- sin fortificación (línea base biológica)
-  "0. Sin fortificar",      "Arroz",            70213004,  # blanco grano mediano crudo, s/enriquecer
-  "0. Sin fortificar",      "Harina de trigo",  70213038,  # todo uso, s/enriquecer
-  # Escenario 1 -- solo harina de trigo
-  "1. Solo harina",         "Arroz",            70213004,
-  "1. Solo harina",         "Harina de trigo",  70213039,  # enriquecida, todo uso
-  # Escenario 2 -- harina y arroz
-  "2. Harina y arroz",      "Arroz",            70213002,  # blanco grano mediano crudo, enriquecido
-  "2. Harina y arroz",      "Harina de trigo",  70213039
-)
+# La definicion vigente son los siete escenarios de
+# data/raw/escenarios_fortificacion.csv, construidos por ADICION del nivel
+# normativo sobre el alimento sin fortificar (06_escenarios_fortificacion.R).
+# La definicion anterior -tres escenarios por sustitucion del codigo de
+# composicion- quedo superada y vive dentro de INFORME_factibilidad.qmd, que
+# es el documento entregado que la usa. No se reintroduce aqui: dos
+# definiciones de escenario en el archivo que todos cargan es una invitacion a
+# publicar cifras incompatibles.
 
 # --- Rutas --------------------------------------------------------------------
 RUTA_CLEAN <- here("data", "clean")

@@ -132,25 +132,38 @@ constancia en pantalla de cuántos registros entran y cuántos se pierden.
 ### Reproducir
 
 ```r
-source(here::here("scripts", "01_import.R"))
-source(here::here("scripts", "03_transform.R"))
-source(here::here("scripts", "04_equivalente_adulto.R"))
-source(here::here("scripts", "05_ingesta_micronutrientes.R"))
+# Cadena completa, en orden. Cada script lee lo que escribio el anterior.
+for (s in c("01_import", "02_eda", "03_transform", "04_equivalente_adulto",
+            "05_ingesta_micronutrientes", "06_escenarios_fortificacion",
+            "07_riesgo_inadecuacion", "08_grupos_alimentos", "09_mapas")) {
+  source(here::here("scripts", paste0(s, ".R")))
+}
 
-quarto::quarto_render(here::here("reports", "R1_calidad_datos.qmd"))
-quarto::quarto_render(here::here("reports", "R2_modelo_base.qmd"))
-quarto::quarto_render(here::here("reports", "R3_cobertura_vehiculos.qmd"))
-quarto::quarto_render(here::here("reports", "R4_escenarios_fortificacion.qmd"))
-quarto::quarto_render(here::here("reports", "R5_equidad.qmd"))
+# Entregables.
+quarto::quarto_render(here::here("reports", "INFORME_final.qmd"))
+quarto::quarto_render(here::here("reports", "MANUAL_tecnico.qmd"))
+quarto::quarto_render(here::here("reports", "presentacion_cierre.qmd"))
 ```
+
+Los diagnosticos de `scripts/diagnostico_*.R` son de un solo uso: contrastan una
+hipotesis, escriben su salida en `data/diagnosticos/` y no alimentan a ningun
+script posterior. Se corren cuando la pregunta que responden vuelve a
+plantearse.
 
 Requiere R con `dplyr`, `readr`, `tidyr`, `readxl`, `writexl`, `here`, `knitr`,
 `janitor`, `srvyr`, `dlookr`, `conflicted`, `ggplot2`, y Quarto.
 
 `reports/_comun.R` centraliza rutas, carga de datos, definición de los vehículos
-de fortificación, escenarios y la regla de elegibilidad compartida. **Una
-definición se cambia allí y se propaga a todos los informes**, lo que evita que
-dos documentos publiquen cifras incompatibles.
+de fortificación y la regla de elegibilidad compartida. **Una definición se
+cambia allí y se propaga a todos los informes**, lo que evita que dos
+documentos publiquen cifras incompatibles.
+
+Los **escenarios de fortificación no están ahí**: son los siete de
+`data/raw/escenarios_fortificacion.csv`, construidos por adición del nivel
+normativo sobre el alimento sin fortificar. Cambiar un escenario es cambiar una
+fila de ese archivo; el código que lo lee no cambia. Lo mismo vale para los
+valores de referencia, el requerimiento de hierro, las fracciones de harina de
+cada derivado y la agrupación de alimentos.
 
 ---
 

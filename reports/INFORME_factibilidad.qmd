@@ -88,6 +88,31 @@ pct_incompleto <- round(100 * mean(dias_hog$dias_observados_hogar < 7), 1)
 
 p3a <- 100 * sum(sec3a$entra_calculo) / nrow(sec3a)
 p2  <- 100 * sum(sec2$entra_calculo)  / nrow(sec2)
+# Escenarios de este documento, superados por la definicion vigente.
+#
+# Este informe fue entregado el 2026-10-04 con tres escenarios construidos por
+# SUSTITUCION del codigo de composicion del vehiculo. La definicion vigente del
+# proyecto son siete escenarios construidos por ADICION del nivel normativo
+# (data/raw/escenarios_fortificacion.csv, 06_escenarios_fortificacion.R).
+#
+# El bloque se traslado aqui desde reports/_comun.R el 2026-10-13, para que el
+# archivo compartido no cargue una definicion superada en todos los documentos.
+# Permanece en este archivo unicamente para que el documento entregado siga
+# compilando tal como se entrego. La version entregada esta en la etiqueta
+# informe-factibilidad-v1.
+ESCENARIOS <- tribble(
+  ~escenario,               ~vehiculo,         ~enhance_id,
+  # Escenario 0 -- sin fortificación (línea base biológica)
+  "0. Sin fortificar",      "Arroz",            70213004,  # blanco grano mediano crudo, s/enriquecer
+  "0. Sin fortificar",      "Harina de trigo",  70213038,  # todo uso, s/enriquecer
+  # Escenario 1 -- solo harina de trigo
+  "1. Solo harina",         "Arroz",            70213004,
+  "1. Solo harina",         "Harina de trigo",  70213039,  # enriquecida, todo uso
+  # Escenario 2 -- harina y arroz
+  "2. Harina y arroz",      "Arroz",            70213002,  # blanco grano mediano crudo, enriquecido
+  "2. Harina y arroz",      "Harina de trigo",  70213039
+)
+
 ```
 
 ::: {.callout-note appearance="simple"}

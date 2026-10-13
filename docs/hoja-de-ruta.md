@@ -344,6 +344,54 @@ no pasa las dos pruebas no se entrega. Y lo que además no aporta, se va.
 4. `dashboard_decision_fortificacion` — la pieza que sirve a quien decide.
 5. `presentacion_cierre` — entregada el 9 de octubre.
 
+### Auditoría de `reports/`, 2026-10-13
+
+Catorce archivos `.qmd`. Cada uno se revisó contra dos preguntas: qué responde
+que ningún otro responda, y si lo que afirma sigue siendo cierto.
+
+**Hallazgo que cambia la hipótesis anterior.** El punto 4 de esa lista no se
+sostiene. `dashboard_decision_fortificacion.qmd` escribe los Requerimientos
+Promedio Estimados a mano dentro del documento —8,1 / 320 / 500— en vez de
+leerlos de `data/raw/valores_referencia.csv`. Cuando se resuelva el desbloqueo
+y cambien los valores de referencia, ese documento conservará los viejos **en
+silencio** y publicará cifras incompatibles con el informe. Su papel, el de la
+pieza que sirve a quien decide, lo cubre P8.
+
+**Hallazgo de fondo: había dos definiciones de escenario en el repositorio.**
+`reports/_comun.R`, el archivo que cargan todos los documentos, seguía
+definiendo los **tres** escenarios antiguos por sustitución del código de
+composición. La definición vigente son los **siete** de
+`data/raw/escenarios_fortificacion.csv`, por adición del nivel normativo. El
+informe, el manual y la presentación leen el archivo correcto, de modo que
+ninguna cifra publicada está afectada; pero la definición superada se cargaba
+en cada sesión y es lo primero que encontraría quien adapte el código.
+Trasladada el 2026-10-13 al interior de `INFORME_factibilidad.qmd`, que es el
+documento entregado que la usa y que debe seguir compilando como se entregó.
+
+**Se retiran del árbol de trabajo, cinco:**
+
+| Documento | Razón, verificada |
+|---|---|
+| `R4_escenarios_fortificacion` | Construye los escenarios por sustitución del código de composición. Contradice el método aditivo vigente |
+| `R5_equidad` | Anterior a la corrección de la línea base; usa la definición superada de escenarios |
+| `dashboard_decision_fortificacion` | Valores de referencia escritos a mano dentro del documento; definición superada de escenarios |
+| `dashboard_estado_datos` | Instrumento de la limpieza de datos. Esa etapa terminó |
+| `presentacion_revision` | Sustituida por la presentación vigente, que es un documento vivo |
+
+Ninguno es leído por un documento vivo: la comprobación se hizo buscando
+referencias cruzadas en todo el repositorio. El `README` renderizaba cinco de
+ellos; reescrito el 2026-10-13 con la cadena real, que además no estaba
+completa —listaba cinco scripts de nueve—.
+
+**Queda a decisión del autor: `R1`, `R2`, `R3`.** Son los tres cuadernos de
+cálculo recientes —4 de octubre— y su contenido está absorbido por el informe y
+el manual, con una excepción: `R3` tiene una tabla de **consumo simultáneo de
+vehículos** —cuántos hogares quedarían alcanzados por al menos uno de varios
+vehículos— que no está en ningún otro documento y que es directamente útil para
+diseñar una estrategia. Esa tabla está calculada **sin ponderar**, de modo que
+hoy es un recuento de la muestra y no una estimación poblacional. Si se traslada
+al informe hay que rehacerla con el diseño completo.
+
 **A decidir en ese momento:** los cinco informes modulares, que suman 2.019
 líneas y que P4 está absorbiendo por construcción, pasan a anexos del informe
 final o salen del conjunto de entrega y quedan como material de trabajo. El
