@@ -278,15 +278,13 @@ v_con <- veh |> slice_max(mediana_consumidores, n = 1)
 n_mayoria <- sum(veh$pct_hogares >= 50)
 ```
 
-::: {style="font-size:0.92em;"}
-**`r n_mayoria` de los `r nrow(veh)` vehículos evaluados llegan a la mayoría de
-los hogares.**
+::: {style="font-size:1.0em;"}
+**El alcance poblacional no distingue entre los vehículos candidatos: todos
+llegan a la mayoría de los hogares.**
 
-El de mayor alcance es **`r tolower(v_cob$grupo)`**, con
-`r fmt(v_cob$pct_hogares)`% de hogares. El de mayor consumo entre quienes lo
-adquieren es **`r tolower(v_con$grupo)`**, con
-`r fmt(v_con$mediana_consumidores, 0)` g por EMA y día.
+Lo que los distingue es la cantidad que cada uno transporta.
 :::
+
 
 ::: {.notes}
 PREP. Punto: los vehiculos candidatos no tienen problema de alcance. Razon: la
@@ -297,6 +295,16 @@ transportan, y eso lleva al hallazgo siguiente.
 :::
 
 ## Cobertura y consumo de los vehículos de fortificación
+
+::: {style="font-size:0.92em;"}
+**`r n_mayoria` de los `r nrow(veh)` vehículos evaluados llegan a la mayoría de
+los hogares.**
+
+El de mayor alcance es **`r tolower(v_cob$grupo)`**, con
+`r fmt(v_cob$pct_hogares)`% de hogares. El de mayor consumo entre quienes lo
+adquieren es **`r tolower(v_con$grupo)`**, con
+`r fmt(v_con$mediana_consumidores, 0)` g por EMA y día.
+:::
 
 ```{r}
 #| label: fig-vehiculos
@@ -337,7 +345,7 @@ linealización de Taylor. EMA: Equivalente de Mujer Adulta.
 
 ```{r}
 #| label: fig-dispersion-provincial
-#| fig-cap: "Proporción de hogares que adquiere cada vehículo, en cada una de las 32 provincias. Cada punto es una provincia; el rombo es el valor nacional. República Dominicana, 2018"
+#| fig-cap: "Cobertura provincial de cada vehículo de fortificación. Cada punto azul es una de las 32 provincias, separadas en vertical para que no se superpongan; el rombo es la estimación nacional. República Dominicana, 2018"
 #| fig-width: 10.5
 #| fig-height: 3.6
 nac_veh <- veh |> select(grupo, pct_nacional = pct_hogares)
@@ -346,13 +354,18 @@ dis_prov <- vehp |>
   inner_join(nac_veh, by = "grupo") |>
   mutate(grupo = reorder(grupo, pct_nacional))
 
+# Con 32 provincias de cobertura parecida los puntos se superponen y el
+# conjunto parece uno solo. Se separan en vertical para que se vea que son 32 y
+# que estan juntos, que es justamente el hallazgo.
+set.seed(1)
 ggplot(dis_prov, aes(pct_hogares, grupo)) +
-  geom_point(colour = AZUL_C, size = 2.6, alpha = 0.75) +
-  geom_point(aes(x = pct_nacional), shape = 23, size = 4,
-             fill = ACENTO, colour = "white", stroke = 0.7) +
+  geom_jitter(height = 0.18, width = 0, colour = AZUL_C, size = 2.4,
+              alpha = 0.8) +
+  geom_point(aes(x = pct_nacional), shape = 23, size = 4.6,
+             fill = ACENTO, colour = "white", stroke = 0.8) +
   scale_x_continuous(limits = c(0, 100), breaks = seq(0, 100, 25),
                      labels = function(x) paste0(x, "%")) +
-  labs(x = "Hogares que lo adquieren (%)", y = NULL) +
+  labs(x = "Hogares de la provincia que lo adquieren (%)", y = NULL) +
   tema()
 ```
 
@@ -392,18 +405,13 @@ cmp <- tibble::tibble(
   mutate(Nutriente = NOMBRE[nutriente], reduccion = sin - base)
 ```
 
-::: {style="font-size:0.92em;"}
-**Riesgo de ingesta inadecuada de folato:
-`r fmt(riesgo_nac(E_SIN, "folato_mcg_dfe"))`% sin fortificación,
-`r fmt(riesgo_nac(E_BASE, "folato_mcg_dfe"))`% con la norma vigente,
-`r fmt(riesgo_nac(E_ARROZ, "folato_mcg_dfe"))`% si todo el arroz llevara los
-niveles de la propuesta nacional.**
+::: {style="font-size:1.0em;"}
+**La norma vigente reduce el riesgo de ingesta inadecuada, y no lo cubre.**
 
-La norma reduce la inadecuación de folato en
-`r fmt(cmp$reduccion[cmp$nutriente == "folato_mcg_dfe"], 1)` puntos porcentuales
-y la de hierro en `r fmt(cmp$reduccion[cmp$nutriente == "hierro_mg"], 1)`. En los
-nutrientes que no añade, no cambia nada.
+Su efecto está acotado por diseño: actúa sobre un solo vehículo y solo sobre
+los nutrientes que añade.
 :::
+
 
 ::: {.notes}
 PREP. Punto: la norma vigente funciona y no agota el problema. Razon: actua
@@ -416,6 +424,19 @@ implicaciones.
 
 
 ## Ingesta de folato y riesgo, por escenario
+
+::: {style="font-size:0.92em;"}
+**Riesgo de ingesta inadecuada de folato:
+`r fmt(riesgo_nac(E_SIN, "folato_mcg_dfe"))`% sin fortificación,
+`r fmt(riesgo_nac(E_BASE, "folato_mcg_dfe"))`% con la norma vigente,
+`r fmt(riesgo_nac(E_ARROZ, "folato_mcg_dfe"))`% si todo el arroz llevara los
+niveles de la propuesta nacional.**
+
+La norma reduce la inadecuación de folato en
+`r fmt(cmp$reduccion[cmp$nutriente == "folato_mcg_dfe"], 1)` puntos porcentuales
+y la de hierro en `r fmt(cmp$reduccion[cmp$nutriente == "hierro_mg"], 1)`. En los
+nutrientes que no añade, no cambia nada.
+:::
 
 ```{r}
 #| label: fig-riesgo
@@ -506,12 +527,14 @@ Abrir por aquí y no por el avance de la semana. Esta lámina responde una pregu
 
 ## Hallazgo 3 · Distribución social del beneficio
 
-::: {style="font-size:0.9em; margin-bottom:-0.2em;"}
-**Razón de ingesta de folato entre los quintiles extremos de gasto:
-`r fmt(razon_esc(E_BASE), 2)` con la norma vigente, `r fmt(razon_esc(E_ARROZ), 2)`
-al incorporar el arroz.** El arroz se consume de forma transversal; los
-derivados del trigo, no.
+::: {style="font-size:1.0em;"}
+**El beneficio de la fortificación no se reparte por igual entre estratos, y la
+desigualdad depende del vehículo elegido.**
+
+Un vehículo de consumo transversal la cierra; uno de consumo desigual la
+conserva.
 :::
+
 
 ::: {.notes}
 PREP. Punto: el beneficio de la fortificacion no se reparte igual entre
@@ -523,6 +546,13 @@ objetivos distintos y no se consiguen con la misma decision.
 
 
 ## Ingesta de folato en los quintiles extremos, por escenario
+
+::: {style="font-size:0.9em; margin-bottom:-0.2em;"}
+**Razón de ingesta de folato entre los quintiles extremos de gasto:
+`r fmt(razon_esc(E_BASE), 2)` con la norma vigente, `r fmt(razon_esc(E_ARROZ), 2)`
+al incorporar el arroz.** El arroz se consume de forma transversal; los
+derivados del trigo, no.
+:::
 
 ```{r}
 #| label: fig-equidad
@@ -573,16 +603,14 @@ fol_top <- top_grupo |> filter(n == "folato_mcg_dfe")
 b12_top <- top_grupo |> filter(n == "vitamina_b12_mcg")
 ```
 
-::: {style="font-size:0.92em;"}
-**El aporte de cada micronutriente está concentrado en pocos grupos de
-alimentos.** En folato, `r tolower(fol_top$Grupo)` aporta el
-`r fmt(fol_top$pct)`% del total; en vitamina B12, el grupo principal es
-`r tolower(b12_top$Grupo)`, con el `r fmt(b12_top$pct)`%.
+::: {style="font-size:1.0em;"}
+**El vehículo determina qué nutrientes es posible corregir, no solo a cuántos
+hogares se llega.**
 
-Un escenario que fortifica un cereal no puede mover un nutriente que el cereal
-no aporta, cualquiera que sea el nivel de adición. La restricción es
-estructural.
+El aporte de cada micronutriente se concentra en pocos grupos de alimentos, y
+un cereal no puede entregar lo que no contiene.
 :::
+
 
 ::: {.notes}
 PREP. Punto: el vehiculo determina que nutrientes es posible corregir, no solo
@@ -594,6 +622,17 @@ restriccion precede a cualquier discusion sobre el nivel de adicion.
 
 
 ## Aporte de cada grupo de alimentos a cada micronutriente
+
+::: {style="font-size:0.92em;"}
+**El aporte de cada micronutriente está concentrado en pocos grupos de
+alimentos.** En folato, `r tolower(fol_top$Grupo)` aporta el
+`r fmt(fol_top$pct)`% del total; en vitamina B12, el grupo principal es
+`r tolower(b12_top$Grupo)`, con el `r fmt(b12_top$pct)`%.
+
+Un escenario que fortifica un cereal no puede mover un nutriente que el cereal
+no aporta, cualquiera que sea el nivel de adición. La restricción es
+estructural.
+:::
 
 ```{r}
 #| label: fig-grupos

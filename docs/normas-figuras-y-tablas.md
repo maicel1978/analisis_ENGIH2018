@@ -35,6 +35,20 @@ viva en un archivo y no en la cabeza de quien lo aplica.
 6. **Cortes idénticos entre figuras comparables.** Dos mapas con escalas
    distintas no se comparan, aunque estén lado a lado.
 
+## Un hallazgo es una conclusión, no un dato
+
+La lámina o el párrafo que enuncia un hallazgo dice **qué se concluye**, en
+palabras y sin cifras. Las cifras son la evidencia y van junto a la figura o la
+tabla que las sostiene.
+
+- *Mal:* «Riesgo de inadecuación de folato: 73,1% sin fortificación, 60,2% con
+  la norma vigente.» Eso es un resultado.
+- *Bien:* «La norma vigente reduce el riesgo de ingesta inadecuada y no lo
+  cubre.» Eso es el hallazgo; las tres cifras acompañan a la figura.
+
+La prueba: si la frase no se puede afirmar sin leer un número, todavía no es un
+hallazgo.
+
 ## La figura tiene que corresponder al hallazgo
 
 La norma que más veces se incumple no es de formato. Una figura puede estar
