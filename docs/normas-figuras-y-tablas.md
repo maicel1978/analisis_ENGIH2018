@@ -101,11 +101,20 @@ contradecirse.
 
 `media/mapas/`, producidos por `scripts/09_mapas.R`:
 
-| Mapa | Falta |
+`scripts/09_mapas.R` ya numera las provincias, adjunta la clave de nombres,
+proyecta a UTM 19N y anade barra de escala y norte cuando `ggspatial` esta
+instalado. Los archivos de `media/mapas/` son anteriores a ese cambio: hay que
+volver a correr el script para que las imagenes publicadas lo incorporen.
+
+| Mapa | Falta tras regenerar |
 |---|---|
-| `mapa_bivariado_vehiculos.png` | Leyenda al pie completa; fuente de los datos y de la geometría; proyección; barra de escala y norte; explicación del gris |
-| `mapa_riesgo_folato.png` | Título o numeración; fuente de los datos y de la geometría; proyección; barra de escala y norte |
+| `mapa_bivariado_vehiculos.png` | Fuente de los datos y de la geometría en la leyenda al pie |
+| `mapa_riesgo_folato.png` | Fuente de los datos y de la geometría en la leyenda al pie |
 | `mapa_densidad_folato.png` | Lo mismo, y la condición de uso del criterio de densidad por nutriente |
+
+El título y la numeración de los tres los aporta ahora el documento que los
+inserta (`fig-cap`), no la imagen: así la misma imagen sirve a la presentación
+y al informe sin duplicar el rótulo.
 
 ## Orden de aplicación
 

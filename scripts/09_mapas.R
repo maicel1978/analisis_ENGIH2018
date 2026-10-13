@@ -343,8 +343,8 @@ g_dens <- ggplot(mapa_dens) +
     low = "#F21A00", mid = "#EBCC2A", high = "#3B9AB2", midpoint = 1,
     labels = function(x) ifelse(is.na(x), "", sprintf("%.1fx", x)),
     na.value = "grey85",
-    name = paste0("Densidad mediana de folato\nsobre la densidad critica\n(",
-                  round(dens_critica, 1), " ug DFE/1.000 kcal)")) +
+    name = paste0("Densidad mediana de folato\nsobre la densidad crítica\n(",
+                  round(dens_critica, 1), " µg DFE/1.000 kcal)")) +
   theme_void(base_size = 11) +
   theme(legend.position = "right")
 
