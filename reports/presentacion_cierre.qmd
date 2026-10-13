@@ -27,14 +27,12 @@ execute:
   echo: false
 ---
 
-<!-- Presentacion viva del proyecto. Se actualiza; no se duplica. Las versiones
-     anteriores estan en la historia de git: para recuperar la del 9 de octubre,
-     git log --oneline -- reports/presentacion_cierre.qmd
-     git show <hash>:reports/presentacion_cierre.qmd > version_9_oct.qmd -->
-
-
 ```{r}
 #| label: setup
+# Presentacion viva del proyecto. Se actualiza; no se duplica. Las versiones
+# anteriores estan en la historia de git:
+#   git log --oneline -- reports/presentacion_cierre.qmd
+#   git show <hash>:reports/presentacion_cierre.qmd > version_anterior.qmd
 ruta_comun <- c(here::here("reports", "_comun.R"),
                 here::here("scripts", "_comun.R"))
 source(ruta_comun[file.exists(ruta_comun)][1])
@@ -187,7 +185,7 @@ La plataforma de capacitación está publicada y es accesible:
 17 ejercicios con autoevaluación y el taller completo.
 :::
 
-## Qué cambió esta semana {.smaller}
+## Avance del período {.smaller}
 
 - **Informe analítico final**: de esqueleto a borrador completo, con ocho figuras. Compila en HTML y Word.
 - **Manual técnico**: diecisiete capítulos, con la tabla de supuestos y las hipótesis descartadas.
@@ -202,35 +200,50 @@ Abrir por el avance, breve, y pasar enseguida a los hallazgos, que es donde est�
 
 # Hallazgos {background-color="#2c5364"}
 
-## Lo que la norma vigente ya evita {.smaller}
+## Contribución de la norma vigente a la reducción del riesgo {.smaller}
 
 ```{r}
 #| label: fig-norma-evita
+#| fig-cap: "Hogares bajo el requerimiento sin fortificación y con la norma vigente de harina de trigo, según nutriente. República Dominicana, 2018"
 #| fig-width: 10
 #| fig-height: 3.6
 NUT5 <- c("folato_mcg_dfe", "hierro_mg", "zinc_mg", "vitamina_b12_mcg",
           "vitamina_a_mcg_rae")
+S_SIN <- "Sin fortificación"
+S_NOR <- "Norma vigente: harina y pan"
+
 cmp <- tibble::tibble(
   nutriente = NUT5,
   sin  = vapply(NUT5, function(n) riesgo_nac(E_SIN,  n), numeric(1)),
   base = vapply(NUT5, function(n) riesgo_nac(E_BASE, n), numeric(1))) |>
-  mutate(Nutriente = NOMBRE[nutriente], evita = sin - base) |>
-  arrange(desc(evita))
+  mutate(Nutriente = NOMBRE[nutriente], reduccion = sin - base)
 
-ggplot(cmp, aes(x = reorder(Nutriente, evita))) +
-  geom_segment(aes(xend = reorder(Nutriente, evita), y = base, yend = sin),
-               colour = GRIS, linewidth = 1.6) +
-  geom_point(aes(y = sin),  size = 4, colour = ACENTO) +
-  geom_point(aes(y = base), size = 4, colour = AZUL) +
-  geom_text(aes(y = (sin + base) / 2,
-                label = if_else(evita >= 1, paste0("-", fmt(evita, 1)), "")),
-            vjust = -0.9, size = 4.4, colour = "#5a6b76") +
+largo_cmp <- cmp |>
+  tidyr::pivot_longer(c(sin, base), names_to = "esc", values_to = "pct") |>
+  mutate(Escenario = factor(if_else(esc == "sin", S_SIN, S_NOR),
+                            levels = c(S_SIN, S_NOR)))
+
+ggplot(largo_cmp, aes(x = reorder(Nutriente, reduccion))) +
+  geom_line(aes(y = pct, group = Nutriente), colour = GRIS, linewidth = 1.4) +
+  geom_point(aes(y = pct, colour = Escenario), size = 4) +
+  geom_text(data = cmp,
+            aes(x = reorder(Nutriente, reduccion), y = (sin + base) / 2,
+                label = if_else(reduccion >= 1,
+                                paste0("−", fmt(reduccion, 1), " pp"), "")),
+            vjust = -1, size = 4, colour = "#5a6b76", inherit.aes = FALSE) +
+  scale_colour_manual(values = setNames(c(ACENTO, AZUL), c(S_SIN, S_NOR))) +
   coord_flip() +
-  labs(x = NULL, y = "Hogares bajo el requerimiento (%)") +
-  tema()
+  labs(x = NULL, y = "Hogares bajo el requerimiento (% del total de hogares)",
+       colour = NULL) +
+  tema() + theme(legend.position = "top")
 ```
 
-Rojo: sin fortificación. Azul: con la norma vigente de harina de trigo. **La diferencia es lo que el país ya gana con la política que tiene**, y es una cifra que sirve para defenderla.
+::: {style="font-size:0.88em;"}
+La fortificación de la harina de trigo reduce la proporción de hogares bajo el
+requerimiento de folato en **`r fmt(cmp$reduccion[cmp$nutriente == "folato_mcg_dfe"], 1)` puntos porcentuales**
+y la de hierro en **`r fmt(cmp$reduccion[cmp$nutriente == "hierro_mg"], 1)`**.
+Los nutrientes que la norma no añade no se modifican.
+:::
 
 ::: {.notes}
 Abrir por aquí y no por el avance de la semana. Esta lámina responde una pregunta que nadie suele tener contestada: cuánto aporta lo que ya existe. Sirve para discutir presupuesto de fiscalización.
@@ -287,7 +300,7 @@ bind_rows(linea_base, resumen_esc) |>
 ```
 
 
-## Los escenarios, por la decisión que exigen {.smaller}
+## Escenarios según la acción institucional que requieren {.smaller}
 
 | Escenario | Qué acción institucional exige |
 |---|---|
@@ -358,8 +371,10 @@ largo |> mutate(Grupo = factor(Grupo, levels = orden)) |>
             colour = "white", fontface = "bold", size = 4) +
   scale_fill_gradientn(colours = c("#eef2f4", AZUL_C, AZUL), limits = c(0, 100)) +
   labs(x = NULL, y = NULL) +
+  labs(fill = "Aporte al nutriente (%)") +
   theme_minimal(base_size = 15) +
-  theme(panel.grid = element_blank(), legend.position = "none",
+  theme(panel.grid = element_blank(), legend.position = "bottom",
+        legend.key.width = unit(2.2, "cm"),
         axis.text.x = element_text(angle = 25, hjust = 1))
 ```
 
@@ -367,7 +382,7 @@ largo |> mutate(Grupo = factor(Grupo, levels = orden)) |>
 El número es el porcentaje del total del nutriente que aporta ese grupo. La lectura es por columna.
 :::
 
-## La consecuencia
+## Implicación para la selección del vehículo
 
 **Un escenario que fortifica un cereal no puede mover un nutriente que el cereal no aporta**, por alto que sea el nivel de adición.
 
@@ -379,12 +394,12 @@ Para un oficial de nutrición se traduce en una frase operativa: fortificar hari
 Aquí es donde la figura anterior deja de ser descriptiva y pasa a ser una restricción de diseño de política.
 :::
 
-## Dónde llegan los vehículos
+## Distribución territorial de la cobertura y el consumo
 
 ![](../media/mapas/mapa_bivariado_vehiculos.png)
 
 ::: {style="font-size:0.88em;"}
-Los dos vehículos alcanzan a todo el país: **no hay zonas desatendidas**. La diferencia está en el otro eje —el arroz en la banda alta de consumo, el trigo en la baja—, porque del pan y las pastas solo una fracción es harina.
+Ambos vehículos presentan cobertura alta en las 32 provincias, sin zonas desatendidas. Difieren en el eje de consumo: el arroz se sitúa en la banda superior y el trigo en equivalentes de harina en la inferior, por la fracción de harina que contienen sus derivados.
 :::
 
 ::: {.notes}
@@ -570,7 +585,7 @@ ggplot(dom, aes(pct_inadecuado, reorder(nivel, pct_inadecuado))) +
 **NOTA:** Escenario de línea base. Barras: intervalo de confianza del 95%. Región y zona son dominios de estimación de la encuesta; la provincia no lo es. **Valores de referencia provisionales.**
 :::
 
-## El enunciado
+## Implicación para el diseño de la intervención
 
 La @fig-equidad lo muestra en una sola imagen: subir el nivel normativo sobre un vehículo de **consumo desigual** mejora el promedio y **conserva** el gradiente social.
 
@@ -584,7 +599,7 @@ Esta es la conjetura que se formuló antes de ver los datos, y quedó respaldada
 
 # 3 · El patrón geográfico está gobernado por el nivel de registro
 
-## El punto de partida
+## Dispersión provincial del riesgo y energía registrada
 
 En el escenario de línea base, la inadecuación de folato va de
 `r sprintf("%.1f", min(fol_prov$pct_ing_comp))`% a
@@ -597,7 +612,7 @@ a `r fmt(e_nac, 0)` nacional.
 
 **Esa cifra no es interpretable como consumo.**
 
-## El territorio bajo el criterio de ingesta absoluta
+## Riesgo de folato por provincia · criterio de ingesta absoluta
 
 ![](../media/mapas/mapa_riesgo_folato.png)
 
@@ -605,19 +620,19 @@ a `r fmt(e_nac, 0)` nacional.
 Gris: precisión insuficiente. La provincia **no es dominio de estimación** de la encuesta.
 :::
 
-## El mismo nutriente, bajo el criterio de densidad
+## Riesgo de folato por provincia · criterio de densidad
 
 ![](../media/mapas/mapa_densidad_folato.png)
 
 ::: {style="font-size:0.82em;"}
-Razón entre la densidad mediana y la que requiere la mujer de referencia, centrada en 1. **El mismo escenario y los mismos hogares producen otro ordenamiento del territorio.**
+Razón entre la densidad mediana observada y la densidad crítica, centrada en 1. El mismo nutriente, el mismo escenario y los mismos hogares producen un ordenamiento territorial distinto del obtenido con la ingesta absoluta.
 :::
 
 ::: {.notes}
 El contraste entre las dos laminas es la magnitud del problema. Si alguien va a hacer una afirmacion subnacional, tiene que ver estas dos antes.
 :::
 
-## Siete mecanismos examinados
+## Mecanismos examinados para explicar el patrón geográfico
 
 | Mecanismo | Resultado |
 |---|---|
@@ -633,7 +648,7 @@ El contraste entre las dos laminas es la magnitud del problema. Si alguien va a 
 Los seis primeros se descartaron la semana pasada. El séptimo es de esta semana y es el interesante.
 :::
 
-## Una falacia ecológica con datos reales
+## Producción propia y energía registrada según nivel de análisis
 
 ```{r}
 #| label: tbl-falacia
@@ -653,7 +668,7 @@ La prueba decisiva: en las tres provincias de menor riesgo, los hogares **sin na
 
 **De no haberse examinado a nivel de hogar, la conclusión habría sido equivocada y perfectamente plausible.**
 
-## Lo que queda abierto
+## Hipótesis pendiente de verificación · factores de conversión
 
 Siete mecanismos descartados, y el residuo sigue sin explicar.
 
@@ -690,7 +705,7 @@ propia encuesta— y se corrigió.
 
 # 4 · Contribución metodológica: la densidad crítica
 
-## El umbral no exige valores de referencia nuevos
+## Derivación de la densidad crítica
 
 El denominador del Equivalente de Mujer Adulta son **`r fmt(KCAL_EMA, 0)` kcal**, el requerimiento de la mujer adulta de referencia (FAO/WHO/UNU, 2004).
 
@@ -703,7 +718,7 @@ $$d_{\text{crítica}} = \frac{\text{RPE}}{2291} \times 1000
 El punto es que no se introduce ningún parámetro nuevo: la densidad crítica queda determinada por los dos que el análisis ya usa.
 :::
 
-## Una identidad exacta, y una validación
+## Relación entre los dos criterios y verificación nacional
 
 $$\frac{d}{d_{\text{crítica}}} = \frac{\text{ingesta}}{\text{RPE}} \times \frac{2291}{\text{energía}}$$
 
@@ -718,7 +733,7 @@ En folato, `r sprintf("%.1f", fol_nac$pct_ing_comp)`% bajo ingesta absoluta y
 
 **La cifra nacional queda validada por una vía que no depende del nivel de registro.**
 
-## El criterio tiene dominio de validez, y es por nutriente
+## Dominio de validez del criterio de densidad, por nutriente
 
 ```{r}
 #| label: tbl-acoplamiento
@@ -735,7 +750,7 @@ acop |>
 
 Los dos nutrientes más acoplados quedan empujados a extremos opuestos. El criterio **se aplica por nutriente, no en bloque**.
 
-## La trampa, y por qué está dicha en el informe
+## Gradiente socioeconómico del folato bajo cada criterio
 
 ```{r}
 #| label: fig-quintiles
@@ -752,7 +767,7 @@ quint |> select(nivel, Ingesta = pct_ing_comp, Densidad = pct_densidad) |>
 
 La densidad **corrige el sobrerregistro**, y solo procede donde la variación de energía es artefactual. Entre quintiles es real. Dividir ahí no quita ruido: quita señal.
 
-## Qué se puede hacer, y qué rinde cada opción {.smaller}
+## Opciones de intervención, acción requerida y rendimiento {.smaller}
 
 ```{r}
 #| label: tbl-intervenciones
@@ -792,7 +807,7 @@ Si solo se recuerda una lamina de toda la presentacion, que sea esta. Convierte 
 
 # 5 · Cuestiones abiertas para discutir
 
-## Valores de referencia: RPE frente a RPA
+## Valores de referencia · Requerimiento Promedio Estimado frente a Armonizado
 
 ```{r}
 #| label: tbl-refs
@@ -804,7 +819,7 @@ refs |> transmute(Nutriente = NOMBRE[nutriente], RPE = ear, Unidad = unidad,
 
 **Propuesta: reportar ambos como análisis de sensibilidad.** El criterio de elección no puede ser cuál produce más discriminación, porque eso lo hace dependiente del resultado. Si uno representa mejor a la población dominicana, ese es el principal y la razón se declara; el otro acompaña.
 
-## Biodisponibilidad del hierro: derivable, no elegible
+## Supuesto de biodisponibilidad del hierro
 
 El supuesto de biodisponibilidad **no es un estándar de referencia: es un parámetro de la dieta.**
 
@@ -812,7 +827,7 @@ Y la dieta está medida. La proporción del hierro que proviene de alimentos de 
 
 **Se propone derivar el supuesto de los datos en lugar de escogerlo.** Así el parámetro deja de depender del resultado que produce.
 
-## Un supuesto que conviene declarar
+## Variables registradas por la encuesta y no incorporadas al cálculo
 
 La Sección 3A registra, y la cadena de cálculo no utiliza:
 
@@ -822,7 +837,7 @@ La Sección 3A registra, y la cadena de cálculo no utiliza:
 
 La cantidad entra completa aunque la adquisición fuera para un negocio. Nacionalmente es pequeño; el supuesto queda declarado en el manual técnico.
 
-## Para discutir hoy
+## Cuestiones sometidas a discusión
 
 1. Valores de referencia: ¿ambos como sensibilidad?
 2. Biodisponibilidad del hierro: ¿derivarla de la composición de la dieta?
