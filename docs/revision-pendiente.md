@@ -134,3 +134,44 @@ cierran solas.
 - [ ] **El PR de la plataforma**, `fortificacion#1`. Defensivo, no urgente.
 - [ ] **Los comentarios de revisión**: hace falta su texto para escribir el
       anexo de respuesta, que es lo último que le queda al informe.
+
+---
+
+## F. Comentarios de revisión del autor, 2026-10-13
+
+Pendientes de aplicar. El estándar de redacción que se desprende de ellos está
+en `docs/normas-de-redaccion.md`.
+
+**Transversal a todo el proyecto**
+
+- [ ] Registro: eliminar construcciones exhortativas y gerundios de los
+      documentos. Medido el 2026-10-13: 2 en el informe final, 5 en el manual
+      técnico, 1 en el fragmento de densidad. Acotado.
+- [ ] Convención `n (%)` en toda presentación de recuentos.
+- [ ] Mapas con identificación de provincia para quien no conoce la geografía.
+- [ ] Figuras con los dos ejes rotulados y títulos descriptivos.
+- [ ] Retirar «elaboración propia» como fuente donde aparezca.
+
+**Informe de factibilidad** (entregado; decidir si se corrige o se congela)
+
+- [ ] «8.892 de 8.892» y equivalentes, a convención `n (%)`.
+- [ ] Registro del texto, con el ejemplo señalado: «Conviene delimitarlo desde
+      el inicio…».
+- [ ] Alimentos que concentran la pérdida: el caldo de pollo concentrado y
+      otros ya se resolvieron con el trabajo de campo. Actualizar.
+- [ ] Agua purificada: no es alimento. Retirarla o declarar su exclusión de
+      forma consistente.
+- [ ] Sección 11.2, trabajo pendiente priorizado: mover a documento interno.
+- [ ] Bibliografía.
+
+**R1_calidad_datos**
+
+- [ ] Título de la Figura 1, coloquial.
+- [ ] La discusión, mismo problema de registro.
+- [ ] Retirar juicios mecánicos del tipo «el indicador es defendible sin
+      salvedad».
+
+**Carpeta `reports/`**
+
+- [ ] Consolidación y supresión. Es P9. El autor confirma el criterio: lo que
+      era necesario durante la limpieza de datos ya no lo es.
