@@ -239,10 +239,25 @@ descartadas, que documentan el alcance de la verificación y evitan que se
 vuelvan a ensayar; y las guardas, con el criterio de que una guarda que se
 relaja la primera vez que suena no sirve de nada.
 
-Pendiente: compilar y medir contra las 20 a 30 páginas que pide el TdR —el
-borrador ronda las veinte con el capítulo incluido, de modo que probablemente
-haya que ampliar—, y revisar el capítulo de limitaciones contra el informe
-final cuando esté.
+**Ampliado el 2026-10-13 con dos capítulos que faltaban.** Cartografía: la
+proyección y por qué no se mapea en grados, la identificación de la provincia
+por el número de la División Territorial con la clave al lado, la fuente de la
+geometría, la guarda de nombres, y las dos lecciones sobre cuándo un mapa o un
+esquema bivariado son el recurso equivocado. Y adaptación a otra encuesta y a
+otro país, que es el punto 9 de los TdR y no tenía capítulo: qué cambia, qué se
+reutiliza —la arquitectura, no el código— y el orden de trabajo, con la
+advertencia de que el emparejamiento con la tabla de composición es el paso que
+determina la calidad del resultado y que un emparejamiento incompleto no
+produce un error sino una estimación silenciosamente baja.
+
+Corregido además el capítulo de valores atípicos, que repetía el error del
+informe: decía que el método de corrección no se toma de forma automática
+cuando la cadena los excluye. Reescrito con la separación entre detectar y
+decidir, que es la parte trasladable a otra encuesta.
+
+Extensión al 2026-10-13: 5.715 palabras más las 1.911 del fragmento de densidad
+que se incluye. Pendiente: compilar y medir contra las 20 a 30 páginas que pide
+el TdR, y revisar el capítulo de limitaciones contra el informe final.
 
 **P6. Módulos de capacitación, TdR 9 a 17.** *Corto a medio tras M1. Depende
 de P4 para las cifras.* M1 mostró que el tema 5 no está lleno de datos

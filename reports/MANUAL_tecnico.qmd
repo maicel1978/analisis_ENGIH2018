@@ -175,17 +175,42 @@ transformación.
 
 ## Valores atípicos
 
-Los valores atípicos se **detectan y se marcan, pero no se corrigen
-automáticamente**. La detección opera por alimento, comparando cada registro
-contra la distribución de ese alimento.
+El tratamiento se separa en dos pasos deliberadamente, y esa separación es lo
+que se traslada a otra encuesta: **detectar** y **decidir qué hacer con lo
+detectado** son decisiones distintas y viven en scripts distintos.
 
-Dos consecuencias hay que tener presentes. La primera es que un hogar puede
-acumular varios valores altos sin que ninguno sea atípico en su alimento, de
-modo que la detección por alimento no controla valores extremos a nivel de
-hogar. La segunda es que el método de corrección es una decisión metodológica
-que este análisis deliberadamente no toma de forma automática: corregir
-silenciosamente valores extremos en una encuesta de gasto equivale a decidir
-qué hogares son creíbles, y esa decisión debe ser explícita.
+**Detección**, en `03_transform.R`. Opera por alimento, no por hogar ni sobre
+el conjunto. Entre los alimentos con al menos veinte observaciones, se marca el
+registro cuyo consumo diario supera cinco veces el percentil 99,5 de ese
+alimento, o queda por debajo de la quinta parte de su percentil 0,5. Comparar
+cada registro contra la distribución de su propio alimento, y no contra la
+distribución general, evita que el arroz y la canela se juzguen con la misma
+vara.
+
+**Decisión**, en `04_equivalente_adulto.R`. Las filas marcadas **se excluyen**
+de la estimación principal. No se sustituyen por la mediana del alimento, no se
+recortan a un máximo y no se imputa ningún valor en su lugar: la fila se retira
+y la marca permanece en los archivos intermedios, de modo que la exclusión es
+trazable y reversible sin volver a detectar.
+
+Tres consecuencias se derivan de este diseño.
+
+La primera es que la detección por alimento **no controla valores extremos a
+nivel de hogar**: un hogar puede acumular varios registros altos sin que
+ninguno sea atípico dentro de su propio alimento. Ese control no se aplica.
+
+La segunda es que excluir no es neutral. Retirar una fila equivale a afirmar
+que ese registro no describe el consumo del hogar, y la afirmación puede ser
+falsa: una compra grande y real se parece a un error de digitación. Por eso el
+umbral se fija en cinco veces el percentil 99,5 y no en un valor más próximo a
+la distribución, y por eso la magnitud de lo retirado se mide en vez de
+suponerse: `scripts/diagnostico_outliers.R` reporta qué fracción de filas, de
+gramos y de cada nutriente desaparece con la exclusión.
+
+La tercera es que el umbral es un parámetro, no una ley. Está escrito en un
+solo lugar del código y otra encuesta, con otra estructura de declaración,
+puede necesitar otro. Lo que no cambia al adaptar el código es la separación
+entre detectar y decidir.
 
 Como control complementario se aplica un filtro de **plausibilidad energética**
 —un rango admisible de energía por EMA y día— que **no** se usa para la
@@ -441,6 +466,59 @@ clasificación con sus cortes, la regla de precisión y qué significa el color
 ausente. En los mapas se añaden la proyección, la fuente de la geometría con su
 fecha y licencia, y la advertencia de dominio.
 
+## Cartografía
+
+Los mapas se producen en `09_mapas.R` y obedecen a cuatro decisiones que no son
+estéticas.
+
+**Proyección.** La geometría de origen viene en coordenadas geográficas, y un
+coroplético dibujado en grados deforma las áreas: las provincias del norte y
+las del sur dejan de ser comparables a la vista. Todos los mapas se proyectan a
+UTM zona 19N (EPSG:32619), que es la que cubre el país, y la proyección se
+declara en la leyenda.
+
+**Identificación de la provincia.** Un lector que no conoce la geografía del
+país tiene que poder saber qué provincia está viendo. Con treinta y dos
+polígonos, rotular el nombre sobre el mapa produce colisiones, de modo que cada
+polígono lleva un número y la clave de nombres va en un panel adjunto. Los
+números no son arbitrarios: son el identificador de la División Territorial de
+la Oficina Nacional de Estadística, el mismo que empata con la encuesta. La
+etiqueta se sitúa con un punto interior al polígono y no con su centroide,
+porque el centroide de una provincia cóncava o de una península cae fuera de
+ella.
+
+**Fuente de la geometría.** Está declarada con su procedencia, su fecha de
+extracción y su licencia en `data/raw/provincias_rd_FUENTE.txt`, y de ahí pasa
+a la leyenda de cada mapa. Un mapa cuya geometría no se puede rastrear no es
+reproducible aunque el dato sí lo sea.
+
+**Lo que la imagen no lleva.** Ni título ni leyenda al pie. Los aporta el
+documento que inserta la imagen, de modo que la misma imagen sirva a la
+presentación y al informe sin que el rótulo se duplique ni diverja.
+
+Una guarda sostiene todo esto: si la tabla de nombres de provincia deja de
+coincidir con la geometría, el script se detiene e imprime las filas que no
+empatan. La tabla se genera sola la primera vez; después, cualquier divergencia
+es un error que hay que mirar.
+
+### Cuándo un mapa es el recurso equivocado
+
+Dos lecciones del análisis, que valen más que las normas de formato.
+
+La primera: **un mapa sirve cuando la posición importa**. Si el hallazgo es que
+la posición no importa —que las provincias no difieren, o que difieren por un
+artefacto del registro y no por la dieta— el mapa lo oculta en lugar de
+mostrarlo, porque cualquier coroplético produce manchas y el ojo las lee como
+patrón. Para mostrar ausencia de variación sirve mejor una dispersión de los
+valores provinciales con el nacional marcado.
+
+La segunda: **un esquema bivariado necesita variación en los dos ejes**.
+Dieciséis clases de color permiten cruzar cobertura con consumo, pero si la
+cobertura es homogénea entre territorios las dieciséis clases se reducen a dos
+y la leyenda deja de transportar información. El mapa bivariado de este
+análisis se conserva por comparabilidad con los análisis de referencia del
+proyecto, con esa limitación declarada.
+
 # Supuestos
 
 Los supuestos que sostienen el análisis, reunidos. Ninguno es una omisión: cada
@@ -535,6 +613,89 @@ silencioso: en este análisis, dos de las treinta y dos provincias tienen
 denominaciones distintas entre la encuesta y la fuente oficial de límites, y un
 emparejamiento por texto las habría perdido sin aviso.
 
+# Adaptación a otra encuesta y a otro país
+
+**El código de este proyecto no se traslada directamente a otra encuesta ni a
+otro país.** La advertencia del primer capítulo se desarrolla aquí, porque es
+la pregunta que se hará quien reciba este material: qué se puede reutilizar y
+qué hay que rehacer.
+
+## Lo que cambia
+
+```{r}
+#| label: tbl-adaptacion
+#| tbl-cap: "Elementos que cambian al trasladar el análisis a otra encuesta"
+tibble::tribble(
+  ~Elemento, ~`Por qué cambia`,
+  "Estructura de módulos y secciones",
+    "Una encuesta puede medir adquisiciones en un diario de siete días, en un recordatorio de un mes o en ambos. El período de medición y el solapamiento entre instrumentos dependen de ese diseño",
+  "Nombres y tipos de variable",
+    "No hay convención común entre institutos de estadística. Los nombres cambian y los tipos también: una misma variable puede venir como texto en un módulo y como número en otro",
+  "Codificación de unidades de presentación",
+    "El catálogo de unidades y sus factores de conversión a gramos es propio de cada encuesta",
+  "Sistema de clasificación de alimentos",
+    "El identificador de alimento de la encuesta debe emparejarse con una tabla de composición. Ese emparejamiento es específico del país y es la parte más costosa del trabajo",
+  "Tabla de composición de alimentos",
+    "La tabla aplicable depende del patrón alimentario del país. Cambiarla cambia toda la estimación de ingesta",
+  "Valores de referencia",
+    "El requerimiento promedio estimado y el límite superior dependen de la referencia adoptada y de la población de referencia",
+  "Diseño muestral",
+    "Los estratos, las unidades primarias y el factor de expansión son propios de cada encuesta, y con ellos cambia la varianza de toda estimación",
+  "Vehículos y normas de fortificación",
+    "El marco normativo es nacional. Los vehículos obligatorios, los niveles y los nutrientes añadidos cambian de un país a otro"
+) |> kable()
+```
+
+## Lo que se reutiliza
+
+Lo que se traslada no es el código línea por línea: es la arquitectura.
+
+**La separación entre parámetros y código.** Los niveles de adición, las
+fracciones de harina, los valores de referencia, la agrupación de alimentos y
+la correspondencia con la tabla de composición están en archivos de datos, no
+en constantes dentro de los scripts. Adaptar a otro país es, en buena medida,
+sustituir archivos. El código que los lee no cambia.
+
+**La separación entre detectar y decidir.** Vale para los valores atípicos,
+para el solapamiento entre instrumentos y para la plausibilidad energética: un
+paso marca y otro, explícito y en otro lugar, decide qué hacer con lo marcado.
+Esa separación es lo que permite auditar una decisión metodológica sin leer
+toda la cadena.
+
+**La normalización por equivalente.** La forma de comparar hogares de distinta
+composición demográfica no depende del país. Lo que cambia es la tabla de
+requerimiento energético si se adopta otra referencia.
+
+**La declaración del diseño complejo.** Estratos, conglomerados y pesos en cada
+estimación, con linealización de Taylor para la varianza. Cambian los nombres
+de las variables; no el procedimiento.
+
+**Las guardas.** Un script que se detiene cuando un supuesto deja de cumplirse
+es más valioso en una adaptación que en el proyecto original, porque quien
+adapta no conoce los supuestos. Las guardas los hacen explícitos en el momento
+en que se rompen.
+
+## Orden de trabajo sugerido
+
+1. Inventariar las secciones de la encuesta y decidir cuál mide adquisiciones,
+   cuál existencias y si se solapan.
+2. Resolver el período de medición de cada sección, y comprobar si es constante
+   entre hogares o no.
+3. Construir el catálogo de unidades y sus factores de conversión a gramos.
+4. Construir la correspondencia entre el identificador de alimento de la
+   encuesta y la tabla de composición, y **medir su cobertura**: esa cobertura
+   condiciona la lectura de todas las estimaciones posteriores.
+5. Incorporar las variables de diseño muestral antes de producir cualquier
+   cifra, no después.
+6. Sustituir los archivos de parámetros: valores de referencia, normas de
+   fortificación, agrupación de alimentos.
+7. Correr la cadena y comprobar que las guardas no se disparan. Si alguna se
+   dispara, revisar el supuesto, no la guarda.
+
+El paso 4 es el que consume la mayor parte del tiempo y el que determina la
+calidad del resultado. Un emparejamiento incompleto no produce un error: produce
+una estimación silenciosamente baja.
+
 # Limitaciones
 
 Las limitaciones de fondo, en orden de importancia.
@@ -574,7 +735,7 @@ Sciences*, 1508: 105–122. doi:10.1111/nyas.14697.
 
 Weisell, R. y Dop, M. C. 2012. The adult male equivalent concept and its
 application to Household Consumption and Expenditures Surveys (HCES). *Food and
-Nutrition Bulletin*, 33(3 Suppl).
+Nutrition Bulletin*, 33(3 Suppl.), S157–S162. doi:10.1177/15648265120333S203.
 
 Banco Central de la República Dominicana. *Encuesta Nacional de Gastos e
 Ingresos de los Hogares 2018. Documento metodológico*.

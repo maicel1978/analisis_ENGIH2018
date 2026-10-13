@@ -326,7 +326,8 @@ específico emplea una regla de agotamiento.
 ## Normalización por Equivalente de Mujer Adulta
 
 Para comparar hogares de distinta composición demográfica, la ingesta se expresa
-por Equivalente de Mujer Adulta y día. Cada miembro se expresa como la razón
+por Equivalente de Mujer Adulta y día, según el concepto de equivalente adulto
+aplicado a encuestas de consumo y gasto de los hogares (Weisell y Dop, 2012). Cada miembro se expresa como la razón
 entre su requerimiento energético y las 2.291 kcal de la mujer adulta de
 referencia de 18 a 30 años (FAO/WHO/UNU, 2004), y el hogar es la suma de esas
 razones.
@@ -989,11 +990,18 @@ Expert Consultation, Rome, 17–24 October 2001*. Roma: Organización de las
 Naciones Unidas para la Alimentación y la Agricultura.
 <https://www.fao.org/4/y5686e/y5686e00.htm>
 
+Institute of Medicine. 2000. *Dietary Reference Intakes: applications in dietary
+assessment*. Washington, D.C.: National Academies Press.
+<https://doi.org/10.17226/9956> — fuente del método del punto de corte.
+
 Institute of Medicine. *Dietary Reference Intakes*. Washington, D.C.: National
 Academies Press. Los requerimientos promedio estimados y los límites superiores
 tolerables empleados proceden de esta serie. La edición correspondiente a cada
 nutriente está pendiente de confirmación y los valores se declaran
 provisionales en todo el documento.
+
+Oficina Nacional de Estadística. 2021. *División Territorial 2021*. Santo
+Domingo. Identificador provincial empleado en la numeración de los mapas.
 
 Organización Mundial de la Salud. 2009. *Recommendations on wheat and maize
 flour fortification. Meeting report: interim consensus statement*. Ginebra:
@@ -1005,6 +1013,11 @@ Dary, O., Ander, E. L. y Joy, E. J. M. 2022. Modeling food fortification
 contributions to micronutrient requirements in Malawi using Household
 Consumption and Expenditure Surveys. *Annals of the New York Academy of
 Sciences*, 1508(1), 105–122. <https://doi.org/10.1111/nyas.14697>
+
+Weisell, R. y Dop, M. C. 2012. The adult male equivalent concept and its
+application to Household Consumption and Expenditures Surveys (HCES). *Food and
+Nutrition Bulletin*, 33(3 Suppl.), S157–S162.
+<https://doi.org/10.1177/15648265120333S203>
 
 **Instrumentos normativos.** Los niveles de adición de cada vehículo proceden
 de los instrumentos recogidos en la tabla de la Introducción, con su numeral y
