@@ -65,6 +65,8 @@ gru   <- leer_clean("grupos_alimentos.csv", "08_grupos_alimentos.R")
 refs  <- leer_limpio(file.path(RUTA_RAW, "valores_referencia.csv"))
 auditoria <- leer_limpio(here::here("data", "auditoria",
                                     "verificacion_punto_venta_2026-10-04.csv"))
+entregables <- leer_limpio(file.path(RUTA_RAW, "entregables_estado.csv")) |>
+  arrange(orden)
 
 mil <- function(x) format(x, big.mark = ".", trim = TRUE)
 
@@ -140,6 +142,45 @@ prov_alta <- fol_prov |> slice_max(energia, n = 1)
 dc_fol <- refs |> filter(nutriente == "folato_mcg_dfe") |>
   mutate(dc = 1000 * ear / KCAL_EMA) |> pull(dc)
 ```
+
+## Estado de los productos y fechas de entrega
+
+```{r}
+#| label: tbl-entregables
+#| tbl-cap: "Situación de los productos comprometidos en los términos de referencia y fecha de entrega. Consultoría ENGIH 2018"
+
+entregables |>
+  transmute(
+    Producto = entregable,
+    `TdR`    = tdr,
+    Situación = situacion,
+    Entrega  = if_else(is.na(fecha_compromiso), "—",
+                       format(as.Date(fecha_compromiso), "%d de octubre"))
+  ) |>
+  tabla(fuente = "Fuente: registro de avance del repositorio del proyecto.",
+        notas = "Cierre de la consultoría: 23 de octubre de 2026.")
+```
+
+::: {style="font-size:0.82em; margin-top:0.35em;"}
+La plataforma de capacitación está publicada y es accesible:
+[**fortificacion.netlify.app**](https://fortificacion.netlify.app/) — 24 módulos,
+17 ejercicios con autoevaluación y el taller completo.
+:::
+
+## Qué cambió esta semana {.smaller}
+
+- **Informe analítico final**: de esqueleto a borrador completo, con ocho figuras. Compila en HTML y Word.
+- **Manual técnico**: diecisiete capítulos, con la tabla de supuestos y las hipótesis descartadas.
+- **Mapas provinciales**: bivariado de cobertura y consumo, y coropléticos de riesgo y de densidad, con proyección e identificación de provincia.
+- **Análisis por grupos de alimentos** extendido a cada micronutriente. Completa el TdR 8.4.
+
+Y tres hallazgos que no estaban la semana pasada, que son el objeto de esta sesión.
+
+::: {.notes}
+Abrir por el avance, breve, y pasar enseguida a los hallazgos, que es donde está la discusión. El informe y el manual están para enseñarlos si preguntan.
+:::
+
+# Hallazgos {background-color="#2c5364"}
 
 ## Lo que la norma vigente ya evita {.smaller}
 
@@ -767,19 +808,6 @@ La cantidad entra completa aunque la adquisición fuera para un negocio. Naciona
 2. Biodisponibilidad del hierro: ¿derivarla de la composición de la dieta?
 3. El residuo geográfico: ¿se persigue la hipótesis de los factores de conversión?
 4. Procedencia y destino: ¿se incorporan o se declaran como supuesto?
-
-## Qué cambió esta semana {.smaller}
-
-- **Informe analítico final**: de esqueleto a borrador completo, con ocho figuras. Compila en HTML y Word.
-- **Manual técnico**: diecisiete capítulos, con la tabla de supuestos y las hipótesis descartadas.
-- **Mapas provinciales**: bivariado de cobertura y consumo, y coropléticos de riesgo y de densidad, con proyección e identificación de provincia.
-- **Análisis por grupos de alimentos** extendido a cada micronutriente. Completa el TdR 8.4.
-
-Y tres hallazgos que no estaban la semana pasada, que son el objeto de esta sesión.
-
-::: {.notes}
-Abrir por el avance, breve, y pasar enseguida a los hallazgos, que es donde está la discusión. El informe y el manual están para enseñarlos si preguntan.
-:::
 
 ## Referencias {.smaller}
 
