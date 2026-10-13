@@ -166,16 +166,24 @@ dc_fol <- refs |> filter(nutriente == "folato_mcg_dfe") |>
 #| label: tbl-entregables
 #| tbl-cap: "Situación de los productos comprometidos en los términos de referencia y fecha de entrega. Consultoría ENGIH 2018"
 
+# La columna de cambio responde la pregunta que se hace en estas reuniones:
+# que se movio desde la sesion anterior. El estado previo esta versionado en el
+# propio archivo, de modo que la comparacion no depende de la memoria.
 entregables |>
   transmute(
     Producto = entregable,
     `TdR`    = tdr,
     Situación = situacion,
+    `Cambio desde el 9 de octubre` = if_else(situacion == situacion_previa, "—",
+                                             paste(situacion_previa, "→", situacion)),
     Entrega  = if_else(is.na(fecha_compromiso), "—",
                        format(as.Date(fecha_compromiso), "%d de octubre"))
   ) |>
   tabla(fuente = "Fuente: registro de avance del repositorio del proyecto.",
-        notas = "Cierre de la consultoría: 23 de octubre de 2026.")
+        notas = c(paste0("Productos que cambiaron de situación en el período: ",
+                         sum(entregables$situacion != entregables$situacion_previa),
+                         " de ", nrow(entregables), "."),
+                  "Cierre de la consultoría: 23 de octubre de 2026."))
 ```
 
 ::: {style="font-size:0.82em; margin-top:0.35em;"}
@@ -186,16 +194,25 @@ La plataforma de capacitación está publicada y es accesible:
 
 ## Avance del período {.smaller}
 
-- **Informe analítico final**: de esqueleto a borrador completo, con ocho figuras. Compila en HTML y Word.
-- **Manual técnico**: diecisiete capítulos, con la tabla de supuestos y las hipótesis descartadas.
-- **Mapas provinciales**: bivariado de cobertura y consumo, y coropléticos de riesgo y de densidad, con proyección e identificación de provincia.
-- **Análisis por grupos de alimentos** extendido a cada micronutriente. Completa el TdR 8.4.
+**Productos.** El informe analítico final pasa de esquema a borrador completo,
+con ocho figuras, y compila en los dos formatos. El manual técnico tiene
+borrador de diecisiete capítulos. Los mapas provinciales y el análisis por
+grupos de alimentos quedan completos e incorporados al informe.
 
-Y tres hallazgos que no estaban la semana pasada, que son el objeto de esta sesión.
+**Resultados nuevos**, que no son productos y son el objeto de esta sesión:
+
+1. El aporte de cada grupo de alimentos a cada micronutriente, que determina
+   qué nutrientes puede corregir cada vehículo.
+2. La distinción entre elevar la ingesta media y cerrar la brecha social.
+3. El patrón geográfico del riesgo y su explicación, con siete mecanismos
+   alternativos examinados.
+4. Un criterio complementario invariante al nivel de registro, con su dominio
+   de validez por nutriente.
 
 ::: {.notes}
-Abrir por el avance, breve, y pasar enseguida a los hallazgos, que es donde está la discusión. El informe y el manual están para enseñarlos si preguntan.
+La tabla anterior responde que se movio. Esta responde que hay de nuevo que no estaba la semana pasada.
 :::
+
 
 # Hallazgos {background-color="#2c5364"}
 
