@@ -66,6 +66,7 @@ acop  <- leer_clean("acoplamiento_energia.csv",  "diagnostico_densidad_critica.R
 proc  <- leer_clean("procedencia_por_provincia.csv", "diagnostico_procedencia.R")
 veh   <- leer_clean("escenarios_consumo_vehiculos.csv", "06_escenarios_fortificacion.R")
 gru   <- leer_clean("grupos_alimentos.csv", "08_grupos_alimentos.R")
+vehp  <- leer_clean("vehiculos_por_provincia.csv", "09_mapas.R")
 refs  <- leer_limpio(file.path(RUTA_RAW, "valores_referencia.csv"))
 auditoria <- leer_limpio(here::here("data", "auditoria",
                                     "verificacion_punto_venta_2026-10-04.csv"))
@@ -332,16 +333,47 @@ linealización de Taylor. EMA: Equivalente de Mujer Adulta.
 :::
 
 
-## Distribución territorial de la cobertura y el consumo
+## Dispersión provincial de la cobertura, por vehículo {.smaller}
 
-![](../media/mapas/mapa_bivariado_vehiculos.png)
+```{r}
+#| label: fig-dispersion-provincial
+#| fig-cap: "Proporción de hogares que adquiere cada vehículo, en cada una de las 32 provincias. Cada punto es una provincia; el rombo es el valor nacional. República Dominicana, 2018"
+#| fig-width: 10.5
+#| fig-height: 3.6
+nac_veh <- veh |> select(grupo, pct_nacional = pct_hogares)
+
+dis_prov <- vehp |>
+  inner_join(nac_veh, by = "grupo") |>
+  mutate(grupo = reorder(grupo, pct_nacional))
+
+ggplot(dis_prov, aes(pct_hogares, grupo)) +
+  geom_point(colour = AZUL_C, size = 2.6, alpha = 0.75) +
+  geom_point(aes(x = pct_nacional), shape = 23, size = 4,
+             fill = ACENTO, colour = "white", stroke = 0.7) +
+  scale_x_continuous(limits = c(0, 100), breaks = seq(0, 100, 25),
+                     labels = function(x) paste0(x, "%")) +
+  labs(x = "Hogares que lo adquieren (%)", y = NULL) +
+  tema()
+```
 
 ::: {style="font-size:0.88em;"}
-Ambos vehículos presentan cobertura alta en las 32 provincias, sin zonas desatendidas. Difieren en el eje de consumo: el arroz se sitúa en la banda superior y el trigo en equivalentes de harina en la inferior, por la fracción de harina que contienen sus derivados.
+```{r}
+#| label: calculo-dispersion
+#| include: false
+rango <- dis_prov |> group_by(grupo) |>
+  summarise(amp = max(pct_hogares) - min(pct_hogares), .groups = "drop") |>
+  slice_max(amp, n = 1)
+```
+La amplitud entre la provincia de mayor y la de menor cobertura no supera
+`r fmt(rango$amp)` puntos porcentuales en ningún vehículo: **no hay zonas
+desatendidas y el alcance no distingue entre territorios.**
 :::
 
 ::: {.notes}
-Hallazgo negativo que ahorra dinero: no hace falta focalizar geográficamente el vehículo. Decirle a alguien dónde no gastar es un servicio.
+Hallazgo negativo que ahorra dinero: no hace falta focalizar geograficamente el
+vehiculo. El mapa bivariado esta en el anexo; aqui la dispersion dice lo mismo
+con menos aparato, porque lo que hay que mostrar es la AUSENCIA de variacion y
+un esquema de dieciseis clases para dos clases no la muestra.
 :::
 
 ## Hallazgo 2 · Contribución y margen de la norma vigente
@@ -733,6 +765,19 @@ Carta de opciones con su costo institucional y su rendimiento al lado. No se pre
 # Anexo {background-color="#4a7c9b"}
 
 # Escenarios y equidad
+
+## Mapa bivariado de cobertura y consumo
+
+![](../media/mapas/mapa_bivariado_vehiculos.png)
+
+::: {style="font-size:0.82em;"}
+Cobertura en el eje horizontal de la leyenda y consumo mediano entre
+consumidores en el vertical, con cortes fijos en los dos mapas. Las provincias
+se identifican con el número de la División Territorial 2021. **La construcción
+bivariada no discrimina en este caso**: la cobertura es homogénea entre
+provincias, de modo que las dieciséis clases disponibles se reducen a dos. Se
+conserva por comparabilidad con los análisis de referencia del proyecto.
+:::
 
 ## Ingesta de hierro y folato en los siete escenarios
 

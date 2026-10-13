@@ -35,6 +35,31 @@ viva en un archivo y no en la cabeza de quien lo aplica.
 6. **Cortes idénticos entre figuras comparables.** Dos mapas con escalas
    distintas no se comparan, aunque estén lado a lado.
 
+## La figura tiene que corresponder al hallazgo
+
+La norma que más veces se incumple no es de formato. Una figura puede estar
+bien construida y no decir nada, porque el recurso elegido no corresponde a lo
+que se encontró.
+
+- **Un esquema bivariado de dieciséis clases sirve cuando hay variación en los
+  dos ejes.** Aplicado a una variable homogénea entre territorios, las
+  dieciséis clases se reducen a dos y la leyenda deja de transportar
+  información. Para mostrar **ausencia** de variación sirve mejor la
+  dispersión: los 32 valores provinciales en un eje y el nacional marcado.
+- **Un mapa sirve cuando la posición importa.** Si el hallazgo es que la
+  posición no importa, el mapa lo oculta en vez de mostrarlo.
+- La prueba: enunciar el hallazgo en una frase y preguntarse si la figura la
+  sostiene. Si la frase es «no hay diferencia» y la figura está construida para
+  mostrar diferencias, la figura es la equivocada.
+
+## Toda afirmación numérica del texto se calcula del mismo archivo que la figura
+
+Una afirmación escrita a mano junto a una figura generada del dato pueden
+discrepar sin que nadie lo advierta hasta que alguien lo nota en pantalla. Las
+superlativas —el mayor, el de más alcance, el principal— se obtienen con código
+del mismo archivo que alimenta la figura. Así las dos leen lo mismo y no pueden
+contradecirse.
+
 ## Específico de mapas
 
 7. **Barra de escala y norte.** `ggspatial::annotation_scale()` y
