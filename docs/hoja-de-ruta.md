@@ -200,9 +200,26 @@ donde corresponde a un objeto de resultados.
 **El borrador está completo al 2026-10-11**, con ocho figuras. Escritos los
 seis apartados de Resultados, la Discusión, las Conclusiones y el Resumen.
 
-**Pendientes:** los Anexos —calidad de datos y adaptaciones metodológicas,
-decisiones adoptadas, respuesta a los comentarios de revisión,
-reproducibilidad— y, sobre todo, **la corrida**. Ninguna de las ocho figuras ha
+**Anexos y referencias escritos el 2026-10-13.** Cuatro anexos: variables
+utilizadas, variables no disponibles con su efecto y adaptaciones aplicadas
+(punto 4.2 de los TdR); tratamiento de los datos, con la declaración de que no
+se imputó ningún valor y la regla de cada uno de los cuatro tratamientos
+aplicados (punto 6); respuesta a los comentarios de revisión; y
+reproducibilidad, con el orden de la cadena, las guardas y los parámetros
+editables sin tocar el código. Añadida también la sección de Referencias, que
+no existía: seis entradas, cada una verificada contra su fuente, más los
+instrumentos normativos. La edición del IOM correspondiente a cada nutriente
+sigue pendiente de confirmación y así se declara.
+
+**Hallazgo del 2026-10-13: el tratamiento de valores atípicos estaba descrito
+de forma inexacta.** Métodos decía que se marcan «pero no se corrigen
+automáticamente», lo que un lector entiende como que permanecen. En realidad
+`04_equivalente_adulto.R` los **excluye** de la estimación principal. Corregido
+el texto de Métodos, el encabezado de `03_transform.R` —que todavía daba la
+decisión por pendiente— y escrito `scripts/diagnostico_outliers.R`, que mide
+cuánto retira la exclusión. Falta correrlo.
+
+**Pendientes:** **la corrida**. Ninguna de las ocho figuras ha
 sido compilada: el código de gráficos no se ha probado y la corrida es la
 prueba. Hasta entonces el borrador es texto sin verificar. El esqueleto lleva, en comentarios
 ocultos, lo que corresponde a cada uno.

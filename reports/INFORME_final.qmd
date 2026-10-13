@@ -304,12 +304,19 @@ Los factores de conversión de las presentaciones más frecuentes se verificaron
 en punto de venta, con registro fotográfico, de modo que las equivalencias no
 dependen únicamente de tablas externas.
 
-Los valores atípicos se detectan y se marcan, pero **no se corrigen
-automáticamente**: corregir en silencio valores extremos en una encuesta de
-gasto equivale a decidir qué hogares son creíbles, y esa decisión debe ser
-explícita. Un filtro de plausibilidad energética se emplea solo como análisis
-de sensibilidad, porque los hogares que lo exceden se concentran en los
-quintiles altos y excluirlos sesgaría las comparaciones entre grupos.
+Los valores atípicos se detectan **por alimento**: entre los alimentos con al
+menos veinte observaciones, se marca la fila cuyo consumo diario supera cinco
+veces el percentil 99,5 de ese alimento o queda por debajo de la quinta parte
+de su percentil 0,5. Las filas marcadas **se excluyen** de la estimación
+principal. No se sustituyen por un valor imputado ni se recortan a un máximo:
+la fila se retira y la marca queda en los archivos intermedios, de modo que la
+exclusión es trazable y reversible. La regla opera por alimento, de modo que un
+hogar puede acumular varios valores altos sin que ninguno resulte
+individualmente extremo; el control a nivel de hogar no se aplica.
+
+Un filtro de plausibilidad energética se emplea solo como análisis de
+sensibilidad, porque los hogares que lo exceden se concentran en los quintiles
+altos y excluirlos sesgaría las comparaciones entre grupos.
 
 Un alimento almacenable puede figurar en las dos secciones. Se reporta la
 **suma** como estimación principal, por ser la única plausible, y el
@@ -636,7 +643,7 @@ El gradiente socioeconómico del folato existe y es del signo esperado cuando se
 mide sobre la ingesta absoluta: el déficit es mayor en los hogares de menor
 gasto. Medido sobre la densidad de nutrientes, **el gradiente se invierte**.
 
-La inversión no es un resultado sobre bienestar y conviene decir por qué. El
+La inversión no es un resultado sobre bienestar. El
 criterio de densidad corrige el nivel de adquisición registrada, y esa
 corrección solo procede donde la variación de ese nivel es artefactual. Entre
 quintiles la variación es plausiblemente real, porque responde a diferencias
@@ -796,7 +803,7 @@ El hallazgo tiene una consecuencia de política que no es evidente de antemano:
 no se consiguen con la misma decisión.** Subir el nivel normativo sobre un
 vehículo desigual mejora el promedio y mantiene la desigualdad; cambiar a un
 vehículo transversal cierra la brecha. Qué se prioriza es una decisión política,
-pero conviene tomarla sabiendo que son dos decisiones y no una.
+y se toma sobre dos decisiones distintas, no sobre una.
 
 ### El límite superior
 
@@ -966,6 +973,236 @@ geográfico que este informe documenta sin explicar.
    fueron examinados y descartados. El criterio de densidad reduce esa
    dependencia pero no la agota, y el residuo queda abierto.
 
+# Referencias {.unnumbered}
+
+Banco Central de la República Dominicana. 2020. *Encuesta Nacional de Gastos e
+Ingresos de los Hogares 2018: principales resultados y síntesis metodológica*.
+Santo Domingo: Departamento de Cuentas Nacionales y Estadísticas Económicas.
+Levantamiento con la colaboración de la Oficina Nacional de Estadística.
+
+FAO. 2021. *Minimum dietary diversity for women: an updated guide to
+measurement — from collection to action*. Roma: Organización de las Naciones
+Unidas para la Alimentación y la Agricultura.
+
+FAO/WHO/UNU. 2004. *Human energy requirements: report of a Joint FAO/WHO/UNU
+Expert Consultation, Rome, 17–24 October 2001*. Roma: Organización de las
+Naciones Unidas para la Alimentación y la Agricultura.
+<https://www.fao.org/4/y5686e/y5686e00.htm>
+
+Institute of Medicine. *Dietary Reference Intakes*. Washington, D.C.: National
+Academies Press. Los requerimientos promedio estimados y los límites superiores
+tolerables empleados proceden de esta serie. La edición correspondiente a cada
+nutriente está pendiente de confirmación y los valores se declaran
+provisionales en todo el documento.
+
+Organización Mundial de la Salud. 2009. *Recommendations on wheat and maize
+flour fortification. Meeting report: interim consensus statement*. Ginebra:
+Organización Mundial de la Salud. WHO/NMH/NHD/MNM/09.1.
+
+Tang, K., Adams, K. P., Ferguson, E. L., Woldt, M., Kalimbira, A. A., Likoswe,
+B., Yourkavitch, J., Chrisinger, B., Pedersen, S., Segovia De La Revilla, L.,
+Dary, O., Ander, E. L. y Joy, E. J. M. 2022. Modeling food fortification
+contributions to micronutrient requirements in Malawi using Household
+Consumption and Expenditure Surveys. *Annals of the New York Academy of
+Sciences*, 1508(1), 105–122. <https://doi.org/10.1111/nyas.14697>
+
+**Instrumentos normativos.** Los niveles de adición de cada vehículo proceden
+de los instrumentos recogidos en la tabla de la Introducción, con su numeral y
+su estado de vigencia: NORDOM 14 para la sal, NORDOM 602 para el azúcar, RTD
+616 para la harina de trigo y la propuesta nacional de reglamento para el
+arroz.
+
 # Anexos {.unnumbered}
 
-*Por incorporar: calidad de datos y adaptaciones metodológicas; decisiones adoptadas y su fundamento; respuesta a los comentarios de revisión; reproducibilidad.*
+## Anexo A. Variables utilizadas, variables no disponibles y adaptaciones {.unnumbered}
+
+Responde al punto 4.2 de los términos de referencia: qué variables de la ENGIH
+2018 pueden utilizarse, cuáles no están disponibles y qué adaptaciones
+metodológicas se requieren.
+
+### A.1 Variables que entran en la cadena de cálculo {.unnumbered}
+
+```{r}
+#| label: tbl-anexo-variables
+#| tbl-cap: "Variables de la ENGIH 2018 utilizadas, por etapa de la cadena de cálculo"
+tibble::tribble(
+  ~Etapa, ~Variables, ~Uso,
+  "Identificación", "Identificador de hogar; estrato; unidad primaria de muestreo; factor de expansión",
+    "Enlace entre módulos y declaración del diseño muestral complejo",
+  "Adquisiciones (Sección 3A)", "Cantidad declarada; unidad de presentación; identificador de variedad; descripción; día de registro",
+    "Cantidad, conversión a gramos y período de medición por hogar",
+  "Existencias (Sección 2)", "Inventario inicial; consumo del inventario; inventario final; identificador de variedad",
+    "Disponibilidad neta de alimentos almacenables y regla de agotamiento",
+  "Sociodemografía", "Edad; sexo; parentesco; región; zona; provincia; quintil de gasto",
+    "Equivalente de Mujer Adulta y dominios de desagregación",
+  "Auxiliares del proyecto", "Factor de conversión por unidad; porción comestible; equivalencia a tabla de composición",
+    "Paso de unidad declarada a gramos de porción comestible y a nutrientes"
+) |> kable()
+```
+
+### A.2 Lo que la encuesta no registra {.unnumbered}
+
+```{r}
+#| label: tbl-anexo-ausentes
+#| tbl-cap: "Variables no disponibles en la ENGIH 2018 y efecto de su ausencia sobre las estimaciones"
+tibble::tribble(
+  ~`No registrado`, ~`Efecto sobre la estimación`,
+  "Embarazo y lactancia",
+    "El Equivalente de Mujer Adulta no aplica el incremento de requerimiento correspondiente. Subestima el requerimiento de los hogares con mujeres en esa condición y, por tanto, subestima su riesgo",
+  "Peso individual",
+    "El requerimiento del adulto se calcula con un peso fijo por sexo. El error es individual y no direccional en el agregado",
+  "Edad en meses de los menores de un año",
+    "A la edad cero se le asigna el promedio de los doce valores mensuales, por sexo",
+  "Lactancia materna",
+    "La ingesta del lactante no se descuenta del consumo del hogar. Sobrestima levemente el consumo atribuido al resto",
+  "Reparto de los alimentos dentro del hogar",
+    "Se supone proporcional al requerimiento energético. Donde el reparto real se aparta, la estimación por equivalente sobrestima la ingesta de quien recibe menos",
+  "Estado de fortificación del producto adquirido",
+    "La encuesta registra el alimento, no si el lote cumplía la norma. Los escenarios suponen cumplimiento pleno y son, por tanto, una cota superior",
+  "Marca y establecimiento",
+    "Impide verificar el nivel real de adición por producto",
+  "Alimentos consumidos fuera del hogar",
+    "Quedan fuera de la estimación de consumo aparente, que es de adquisiciones del hogar"
+) |> kable()
+```
+
+### A.3 Adaptaciones metodológicas aplicadas {.unnumbered}
+
+```{r}
+#| label: tbl-anexo-adaptaciones
+#| tbl-cap: "Adaptaciones aplicadas al método de referencia y su fundamento"
+tibble::tribble(
+  ~Adaptación, ~Fundamento,
+  "El período de medición de la Sección 3A es el número de días distintos con registro **en cada hogar**, y no una constante",
+    "El número de días con registro varía entre hogares. Una constante multiplicaría o dividiría el consumo de los hogares que se apartan de ella",
+  "Regla de agotamiento para los alimentos presentes en las dos secciones",
+    "La pregunta de consumo del inventario y las adquisiciones de la semana se solapan en los alimentos almacenables. La regla marca como almacenado lo adquirido que el hogar aún conserva al octavo día",
+  "Equivalente de Mujer Adulta con peso fijo por sexo y sin ajuste por estado fisiológico",
+    "La encuesta no registra peso ni embarazo ni lactancia. Las hipótesis son las del documento metodológico de referencia",
+  "Composición de dos tablas, unificadas por identificador",
+    "Ninguna tabla cubre por sí sola el universo de alimentos de la encuesta. La intersección de identificadores entre tablas es vacía y se comprueba en código",
+  "Sustitución de la composición de los derivados del trigo por la de harina sin enriquecer, en proporción a su contenido de harina",
+    "La tabla de composición los trae elaborados con harina ya enriquecida. Sin la sustitución, el escenario sin fortificación partiría de un alimento ya fortificado",
+  "Requerimiento de hierro escalado por la razón entre la biodisponibilidad tabulada y la supuesta",
+    "El requerimiento publicado supone 18% de biodisponibilidad; una dieta con otro perfil de absorción exige otro requerimiento dietético",
+  "El límite superior tolerable se evalúa solo sobre la forma añadida del nutriente",
+    "En folato y vitamina A el límite aplica al ácido fólico sintético y al retinol preformado añadidos, no al nutriente total de la dieta"
+) |> kable()
+```
+
+El detalle de cada adaptación, con el código donde se implementa, está en el
+manual técnico.
+
+## Anexo B. Tratamiento de los datos {.unnumbered}
+
+Responde al punto 6 de los términos de referencia: todo método de imputación o
+tratamiento especial debe quedar documentado y justificado.
+
+**No se imputó ningún valor.** Ninguna etapa de la cadena sustituye un dato
+faltante por un valor estimado, modelado o arrastrado de otra observación. Las
+filas sin la información necesaria para el cálculo se retiran y su número se
+reporta. Los tratamientos aplicados son los cuatro siguientes.
+
+```{r}
+#| label: tbl-anexo-tratamientos
+#| tbl-cap: "Tratamientos aplicados a los datos, regla y destino de las observaciones afectadas"
+tibble::tribble(
+  ~Tratamiento, ~Regla, ~`Destino de la observación`,
+  "Valores atípicos",
+    "Por alimento, entre los que tienen al menos veinte observaciones: consumo diario superior a cinco veces el percentil 99,5 del alimento, o inferior a la quinta parte de su percentil 0,5",
+    "Se excluye de la estimación principal. La marca se conserva en los archivos intermedios y la exclusión es reversible",
+  "Plausibilidad energética del hogar",
+    "Energía por equivalente fuera del intervalo de 500 a 6.000 kcal por día",
+    "**No se excluye.** Se marca y se emplea como análisis de sensibilidad, porque los hogares que exceden el límite se concentran en los quintiles altos",
+  "Solapamiento entre secciones",
+    "Alimento almacenable adquirido en la semana que el hogar aún conserva del inventario inicial al octavo día",
+    "Se marca como almacenado. La estimación principal lo descuenta; la variante sin la regla se reporta como sensibilidad",
+  "Observaciones sin equivalencia de composición",
+    "Alimento sin correspondencia validada con la tabla de composición",
+    "Queda fuera del cálculo de nutrientes. La cobertura resultante se reporta por nutriente y condiciona la lectura de cada estimación"
+) |> kable()
+```
+
+Ninguno de los cuatro es una imputación: tres retiran observaciones y el cuarto
+las marca sin retirarlas. La consecuencia de que la cobertura de composición sea
+inferior al total es que toda estimación de ingesta es un **límite inferior**, y
+así se declara en los resultados.
+
+## Anexo C. Respuesta a los comentarios de revisión {.unnumbered}
+
+Cada comentario se recoge con su origen, la respuesta y el lugar del documento
+donde se resolvió. Los comentarios que afectan al informe de factibilidad ya
+entregado se tratan por separado, porque ese documento está entregado y su
+corrección es una decisión distinta de la de este informe.
+
+```{r}
+#| label: tbl-anexo-revision
+#| tbl-cap: "Comentarios de revisión sobre el informe analítico, respuesta y ubicación"
+tibble::tribble(
+  ~Comentario, ~Respuesta, ~Ubicación,
+  "Falta el contexto de país y de las políticas de fortificación",
+    "Se incorpora un apartado propio, con la tabla de instrumentos normativos leída del archivo de parámetros y no transcrita",
+    "Introducción",
+  "Falta de rigor en la presentación de resultados estadísticos",
+    "Los recuentos se presentan con la convención de frecuencia y porcentaje. Las proporciones de riesgo llevan intervalo de confianza de diseño complejo",
+    "Resultados",
+  "El registro del texto no corresponde al de un documento científico",
+    "Se retiran las construcciones exhortativas y los gerundios de enlace. El criterio queda fijado en las normas de redacción del proyecto",
+    "Todo el documento",
+  "Las figuras deben ser autoexplicativas",
+    "Cada figura lleva título descriptivo, los dos ejes rotulados con su unidad y su denominador, y la leyenda al pie con fuente, regla de precisión y estado de los valores de referencia",
+    "Todas las figuras",
+  "Los mapas no permiten identificar la provincia a quien no conoce la geografía",
+    "Los mapas provinciales llevan el número de la División Territorial sobre cada polígono y la clave de nombres como panel adjunto",
+    "Resultados y anexo cartográfico",
+  "La fuente de elaboración propia no se declara como fuente",
+    "La fuente de las figuras y tablas es la encuesta, con el script que produce la cifra",
+    "Todas las figuras y tablas"
+) |> kable()
+```
+
+## Anexo D. Reproducibilidad {.unnumbered}
+
+El análisis se reproduce corriendo los scripts en orden. Cada uno escribe sus
+salidas en `data/clean/` y el siguiente las lee; ninguno depende del estado de
+la sesión anterior.
+
+```{r}
+#| label: tbl-anexo-pipeline
+#| tbl-cap: "Orden de ejecución de la cadena de análisis y producto de cada etapa"
+tibble::tribble(
+  ~Script, ~Produce,
+  "`01_import.R`", "Lectura de las dos secciones y ensamblaje de cantidad, factor de conversión, porción comestible y período de medición",
+  "`02_eda.R`", "Control de calidad y caracterización; diagnósticos de cobertura",
+  "`03_transform.R`", "Consumo diario por alimento y marca de valores atípicos",
+  "`04_equivalente_adulto.R`", "Equivalente de Mujer Adulta por hogar; regla de agotamiento; gramos por equivalente",
+  "`05_ingesta_micronutrientes.R`", "Ingesta aparente de micronutrientes por equivalente y día; cobertura de composición",
+  "`06_escenarios_fortificacion.R`", "Ingesta bajo cada escenario de fortificación",
+  "`07_riesgo_inadecuacion.R`", "Riesgo de ingesta inadecuada por nutriente, escenario y dominio",
+  "`08_grupos_alimentos.R`", "Aporte de cada grupo de alimentos a cada nutriente",
+  "`09_mapas.R`", "Cartografía provincial",
+  "`diagnostico_*.R`", "Contrastes de hipótesis sobre el patrón geográfico y sobre el criterio de densidad"
+) |> kable()
+```
+
+**Guardas.** Los scripts se detienen cuando una condición necesaria deja de
+cumplirse: cuando cambia la base energética del equivalente, cuando el archivo
+de nombres de provincia deja de corresponder con la geometría, cuando un
+vehículo o un nutriente del archivo de escenarios no está definido, o cuando el
+número de registros de la sección no coincide con el esperado. El criterio del
+proyecto es que **una guarda que se relaja la primera vez que suena no cumple
+ninguna función**: cuando una guarda se dispara, se revisa el supuesto, no la
+guarda.
+
+**Parámetros editables sin tocar el código.** Los valores de referencia, el
+requerimiento de hierro, los niveles de cada escenario, la fracción de harina de
+cada derivado y la agrupación de alimentos están en archivos de `data/raw/`. Un
+cambio de valores de referencia se hace sustituyendo un archivo y recompilando;
+ninguna cifra de este informe está escrita a mano.
+
+```{r}
+#| label: sesion
+#| echo: true
+sessionInfo()
+```
+

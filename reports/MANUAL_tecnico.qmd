@@ -47,7 +47,7 @@ justificación y su fuente.
 
 Está escrito para que un analista con formación estadística pueda reproducir el
 análisis, auditarlo y adaptarlo. Esa última palabra merece una advertencia que
-se repite en los módulos de capacitación y conviene fijar desde aquí: **el
+se repite en los módulos de capacitación y queda fijada desde aquí: **el
 código desarrollado para la ENGIH 2018 no se traslada directamente a otra
 encuesta ni a otro país.** Las encuestas de gasto y consumo de los hogares
 difieren en estructura, en variables, en sistemas de clasificación de alimentos
@@ -108,7 +108,7 @@ pequeño.
 ## Lo que la encuesta registra y este análisis no utiliza
 
 La Sección 3A del archivo original contiene variables que la cadena de cálculo
-no incorpora, y conviene declararlo porque constituye un supuesto implícito.
+no incorpora. Su omisión constituye un supuesto implícito y se declara.
 
 - `QUIEN_PAGO1`, la **procedencia** de la adquisición, que distingue la compra
   del hogar, la producción propia, el retiro del negocio del hogar, el pago en
@@ -239,7 +239,7 @@ alimento y su validación está registrada; solo las correspondencias marcadas
 como validadas entran al cálculo.
 
 La equivalencia entre columnas de las dos tablas se verificó una a una. Dos
-detalles conviene conocer porque son fuente clásica de error: una de las tablas
+detalles son fuente clásica de error: una de las tablas
 trae **cuatro columnas de folato** y solo la expresada en equivalentes
 dietéticos corresponde a la otra; y varios encabezados contienen saltos de
 línea internos, de modo que las columnas se resuelven **por patrón** y no por
@@ -315,7 +315,7 @@ La proporción de hogares con ingesta inadecuada se estima comparando la ingesta
 aparente por EMA y día contra el **Requerimiento Promedio Estimado**, y
 contando la proporción por debajo.
 
-El método es válido bajo condiciones que conviene enunciar, porque se cumplen
+El método es válido bajo tres condiciones, que se cumplen
 de manera desigual: que la distribución del requerimiento sea aproximadamente
 simétrica, que la ingesta y el requerimiento sean independientes, y que la
 distribución utilizada sea la de la ingesta **habitual**, no la de un período
@@ -375,7 +375,7 @@ leer_limpio(file.path(RUTA_RAW, "valores_referencia.csv")) |>
 
 El capítulo que sigue se incluye **desde el mismo archivo que alimenta el
 informe analítico**, `reports/_metodo_densidad.qmd`, de modo que las dos
-versiones no puedan divergir. Si en algún momento conviene que el manual trate
+versiones no puedan divergir. Si en algún momento el manual requiere tratar
 el tema con más detalle que el informe, se sustituye la inclusión por un
 archivo propio; mientras tanto, una sola fuente.
 

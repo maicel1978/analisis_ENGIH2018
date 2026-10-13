@@ -203,7 +203,7 @@ estimación alternativa.**
 
 ### Los dos usos de la densidad, que no son el mismo
 
-La densidad admite dos lecturas y conviene no mezclarlas, porque su validez no
+La densidad admite dos lecturas que no deben mezclarse, porque su validez no
 es la misma.
 
 **Como descripción de la calidad de la dieta** es válida en cualquier

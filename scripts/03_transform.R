@@ -16,8 +16,11 @@
 #   - Tratamiento del solapamiento entre Sec 2 y Sec 3A en alimentos
 #     almacenables. Se resuelve en 04_equivalente_adulto.R con la regla de
 #     agotamiento.
-#   - Corrección de outliers. Aquí solo se marcan (`es_outlier`); el método de
-#     corrección es una decisión metodológica pendiente de documentar.
+#   - Corrección de outliers. Aquí solo se marcan (`es_outlier`). El
+#     tratamiento quedó decidido y documentado: 04_equivalente_adulto.R
+#     EXCLUYE las filas marcadas de la estimación principal; no se sustituyen
+#     por un valor imputado ni se recortan. Ver el Anexo B del informe final y
+#     scripts/diagnostico_outliers.R, que mide cuánto retira la exclusión.
 #   - Control de outliers a nivel de hogar. La detección opera por alimento, de
 #     modo que un hogar puede acumular varios valores altos sin que ninguno sea
 #     individualmente extremo.
@@ -169,7 +172,6 @@ message(
 #
 # PENDIENTE (no acá, ver docs/hoja-de-ruta.md):
 #   - Disponibilidad neta Sec 2 + Sec 3A para alimentos almacenables.
-#   - Decidir y documentar el método de corrección de outliers (hoy solo
-#     se marcan, no se corrigen).
-#   - Control de outliers a nivel de hogar, una vez resuelto el tratamiento de
-#     las dos secciones.
+#   - Control de outliers a nivel de hogar. La detección opera por alimento,
+#     de modo que un hogar puede acumular varios valores altos sin que ninguno
+#     sea individualmente extremo.

@@ -144,13 +144,17 @@ en `docs/normas-de-redaccion.md`.
 
 **Transversal a todo el proyecto**
 
-- [ ] Registro: eliminar construcciones exhortativas y gerundios de los
-      documentos. Medido el 2026-10-13: 2 en el informe final, 5 en el manual
-      técnico, 1 en el fragmento de densidad. Acotado.
+- [x] Registro: eliminar construcciones exhortativas y gerundios de los
+      documentos. Aplicado el 2026-10-13: las 8 construcciones medidas (2 en el
+      informe final, 5 en el manual técnico, 1 en el fragmento de densidad) se
+      reescribieron en tercera persona impersonal. Quedan 0.
 - [ ] Convención `n (%)` en toda presentación de recuentos.
 - [ ] Mapas con identificación de provincia para quien no conoce la geografía.
 - [ ] Figuras con los dos ejes rotulados y títulos descriptivos.
-- [ ] Retirar «elaboración propia» como fuente donde aparezca.
+- [ ] Retirar «elaboración propia» como fuente donde aparezca. Medido el
+      2026-10-13: aparece **solo** en `INFORME_factibilidad.qmd`, 10 veces. El
+      informe final y los demás documentos ya citan la encuesta y el script.
+      Depende por tanto de la decisión de corregir o congelar ese documento.
 
 **Informe de factibilidad** (entregado; decidir si se corrige o se congela)
 
