@@ -314,7 +314,7 @@ bind_rows(linea_base, resumen_esc) |>
 El azúcar no es «un escenario más»: es el único que **no exige crear nada**. La norma existe desde 2004 y el producto en venta no la cumple.
 
 ::: {.notes}
-Esta es la lámina que convierte la modelación en una herramienta de decisión. Si solo se recuerda una, que sea esta.
+Lamina de referencia: traduce cada escenario al tipo de accion que requiere. Util si la discusion deriva a factibilidad.
 :::
 
 ## Verificación en punto de venta
@@ -385,7 +385,7 @@ El número es el porcentaje del total del nutriente que aporta ese grupo. La lec
 
 La restricción es estructural y precede a cualquier discusión sobre dosis.
 
-Para un oficial de nutrición se traduce en una frase operativa: fortificar harina no resolverá los nutrientes de origen animal, y proponerlo gasta capital político sin resultado posible.
+En términos operativos: un escenario sobre harina de trigo no modifica los nutrientes que provienen de alimentos de origen animal, cualquiera que sea el nivel de adición.
 
 ::: {.notes}
 Aquí es donde la figura anterior deja de ser descriptiva y pasa a ser una restricción de diseño de política.
@@ -453,7 +453,7 @@ La @fig-equidad lo muestra en una sola imagen: subir el nivel normativo sobre un
 
 Cambiar a un vehículo de **consumo transversal** cierra el gradiente.
 
-Las dos decisiones son defendibles. **No son intercambiables**, y conviene tomarlas sabiendo que son dos y no una.
+Ambas opciones son defendibles y **no son intercambiables**. El análisis las distingue y las cuantifica; la elección entre una y otra es de política.
 
 ::: {.notes}
 Esta es la conjetura que se formuló antes de ver los datos, y quedó respaldada. Está enunciada como pregunta 7 en el informe, no como apartado de hipótesis, por formato IMRyD.
@@ -506,10 +506,10 @@ opciones |>
                        "Valores de referencia provisionales."))
 ```
 
-La única que **no exige crear nada** es la primera.
+El análisis ordena las opciones por rendimiento y por la acción que requieren; no sustituye la decisión. De las cuatro, solo la primera opera sobre una norma ya existente.
 
 ::: {.notes}
-Si solo se recuerda una lamina de toda la presentacion, que sea esta. Convierte el analisis en una carta de opciones con su costo institucional y su rendimiento.
+Carta de opciones con su costo institucional y su rendimiento al lado. No se presenta como recomendacion.
 :::
 
 ## Cuestiones sometidas a discusión
@@ -710,10 +710,10 @@ El contraste entre las dos laminas es la magnitud del problema. Si alguien va a 
 Los seis primeros se descartaron la semana pasada. El séptimo es de esta semana y es el interesante.
 :::
 
-## Producción propia y energía registrada según nivel de análisis
+## Producción propia y energía registrada, por nivel de análisis
 
 ```{r}
-#| label: tbl-falacia
+#| label: tbl-niveles
 # La correlacion provincial se recalcula aqui del archivo. La correlacion entre
 # hogares la imprime diagnostico_procedencia.R y no queda en archivo: si se
 # vuelve a correr ese diagnostico, hay que verificar que siga siendo este valor.
@@ -728,7 +728,7 @@ tabla(d, fuente = "Fuente: ENGIH 2018; scripts/diagnostico_procedencia.R.",
 
 La prueba decisiva: en las tres provincias de menor riesgo, los hogares **sin nada** de producción propia registran el mismo exceso que el conjunto de esas provincias.
 
-**De no haberse examinado a nivel de hogar, la conclusión habría sido equivocada y perfectamente plausible.**
+La hipótesis se sostenía al nivel de la provincia y desapareció al descender al hogar. Se descartó.
 
 ## Hipótesis pendiente de verificación · factores de conversión
 
