@@ -160,12 +160,37 @@ prov_alta <- fol_prov |> slice_max(energia, n = 1)
 dc_fol <- refs |> filter(nutriente == "folato_mcg_dfe") |>
   mutate(dc = 1000 * ear / KCAL_EMA) |> pull(dc)
 ```
-
 ## Estado de los productos y fechas de entrega
 
 ```{r}
 #| label: tbl-entregables
 #| tbl-cap: "Situación de los productos comprometidos en los términos de referencia y fecha de entrega. Consultoría ENGIH 2018"
+
+# La columna de cambio responde la pregunta que se hace en estas reuniones:
+# que se movio desde la sesion anterior. El estado previo esta versionado en el
+# propio archivo, de modo que la comparacion no depende de la memoria.
+entregables |>
+  transmute(
+    Producto = entregable,
+    `TdR`    = tdr,
+    Situación = situacion,
+    `Cambio desde el 9 de octubre` = if_else(situacion == situacion_previa, "—",
+                                             paste(situacion_previa, "→", situacion)),
+    Entrega  = if_else(is.na(fecha_compromiso), "—",
+                       format(as.Date(fecha_compromiso), "%d de octubre"))
+  ) |>
+  tabla(fuente = "Fuente: registro de avance del repositorio del proyecto.",
+        notas = c(paste0("Productos que cambiaron de situación en el período: ",
+                         sum(entregables$situacion != entregables$situacion_previa),
+                         " de ", nrow(entregables), "."),
+                  "Cierre de la consultoría: 23 de octubre de 2026."))
+```
+
+::: {style="font-size:0.82em; margin-top:0.35em;"}
+La plataforma de capacitación está publicada y es accesible:
+[**fortificacion.netlify.app**](https://fortificacion.netlify.app/) — 24 módulos,
+17 ejercicios con autoevaluación y el taller completo.
+:::
 
 ## Avance del período {.smaller}
 
@@ -188,71 +213,8 @@ grupos de alimentos quedan completos e incorporados al informe.
 La tabla anterior responde que se movio. Esta responde que hay de nuevo que no estaba la semana pasada.
 :::
 
-
 # Hallazgos {background-color="#2c5364"}
 
-## Contribución de la norma vigente a la reducción del riesgo
-
-```{r}
-#| label: calculo-norma
-#| include: false
-NUT5 <- c("folato_mcg_dfe", "hierro_mg", "zinc_mg", "vitamina_b12_mcg",
-          "vitamina_a_mcg_rae")
-S_SIN <- "Sin fortificación"
-S_NOR <- "Norma vigente: harina y pan"
-cmp <- tibble::tibble(
-  nutriente = NUT5,
-  sin  = vapply(NUT5, function(n) riesgo_nac(E_SIN,  n), numeric(1)),
-  base = vapply(NUT5, function(n) riesgo_nac(E_BASE, n), numeric(1))) |>
-  mutate(Nutriente = NOMBRE[nutriente], reduccion = sin - base)
-```
-
-::: {style="font-size:1.05em;"}
-**La fortificación de la harina de trigo reduce la proporción de hogares bajo el
-requerimiento de folato en `r fmt(cmp$reduccion[cmp$nutriente == "folato_mcg_dfe"], 1)`
-puntos porcentuales y la de hierro en
-`r fmt(cmp$reduccion[cmp$nutriente == "hierro_mg"], 1)`.**
-
-Los nutrientes que la norma no añade no se modifican.
-:::
-
-::: {.notes}
-Abrir por aquí y no por el avance de la semana. Esta lámina responde una pregunta que nadie suele tener contestada: cuánto aporta lo que ya existe. Sirve para discutir presupuesto de fiscalización.
-:::
-
-## Hogares bajo el requerimiento, por nutriente y escenario {.smaller}
-
-```{r}
-#| label: fig-norma-evita
-#| fig-cap: "Hogares bajo el requerimiento sin fortificación y con la norma vigente de harina de trigo, según nutriente. República Dominicana, 2018"
-#| fig-width: 10
-#| fig-height: 3.6
-largo_cmp <- cmp |>
-  tidyr::pivot_longer(c(sin, base), names_to = "esc", values_to = "pct") |>
-  mutate(Escenario = factor(if_else(esc == "sin", S_SIN, S_NOR),
-                            levels = c(S_SIN, S_NOR)))
-
-ggplot(largo_cmp, aes(x = reorder(Nutriente, reduccion))) +
-  geom_line(aes(y = pct, group = Nutriente), colour = GRIS, linewidth = 1.4) +
-  geom_point(aes(y = pct, colour = Escenario), size = 4) +
-  geom_text(data = cmp,
-            aes(x = reorder(Nutriente, reduccion), y = (sin + base) / 2,
-                label = if_else(reduccion >= 1,
-                                paste0("−", fmt(reduccion, 1), " pp"), "")),
-            vjust = -1, size = 4, colour = "#5a6b76", inherit.aes = FALSE) +
-  scale_colour_manual(values = setNames(c(ACENTO, AZUL), c(S_SIN, S_NOR))) +
-  coord_flip() +
-  labs(x = NULL, y = "Hogares bajo el requerimiento (% del total de hogares)",
-       colour = NULL) +
-  tema() + theme(legend.position = "top")
-```
-
-::: {style="font-size:0.88em;"}
-La fortificación de la harina de trigo reduce la proporción de hogares bajo el
-requerimiento de folato en **`r fmt(cmp$reduccion[cmp$nutriente == "folato_mcg_dfe"], 1)` puntos porcentuales**
-y la de hierro en **`r fmt(cmp$reduccion[cmp$nutriente == "hierro_mg"], 1)`**.
-Los nutrientes que la norma no añade no se modifican.
-:::
 ## Escenarios de fortificación modelados
 
 ```{r}
@@ -303,6 +265,300 @@ bind_rows(linea_base, resumen_esc) |>
                       "los siete."))
 ```
 
+## Hallazgo 1 · Alcance poblacional de los vehículos
+
+::: {style="font-size:0.9em; margin-bottom:-0.2em;"}
+**Los tres vehículos llegan a la mayoría de los hogares.** El arroz es el de
+mayor alcance y mayor nivel de consumo.
+:::
+
+## Cobertura y consumo de los vehículos de fortificación
+
+```{r}
+#| label: fig-vehiculos
+#| fig-cap: "Hogares que adquieren cada vehículo de fortificación y consumo mediano entre quienes lo adquieren, por Equivalente de Mujer Adulta y día. República Dominicana, 2018"
+#| fig-width: 10.5
+#| fig-height: 3.2
+
+veh |>
+  mutate(grupo = reorder(grupo, pct_hogares)) |>
+  ggplot(aes(pct_hogares, grupo)) +
+  geom_segment(aes(x = 0, xend = pct_hogares, yend = grupo),
+               colour = GRIS, linewidth = 1.6) +
+  geom_point(colour = AZUL, size = 4.4) +
+  geom_text(aes(label = paste0(fmt(pct_hogares), "%  ·  ",
+                               fmt(mediana_consumidores, 0), " g")),
+            hjust = -0.2, size = 4, colour = "#44555f") +
+  scale_x_continuous(limits = c(0, 130), breaks = seq(0, 100, 25),
+                     labels = function(x) paste0(x, "%")) +
+  labs(x = "Hogares que lo adquieren (%)", y = NULL) +
+  tema()
+```
+
+::: {.notapie}
+**NOTA:** Porcentaje de hogares que adquiere el vehículo y consumo mediano entre quienes lo adquieren. El trigo se expresa en equivalentes de harina, con factores de contenido provisionales.
+:::
+
+::: {.notes}
+Nota metodológica completa. El trigo en equivalentes de harina convierte pan,
+pastas, galletas y repostería a gramos de harina mediante factores de contenido
+provisionales, sin fuente citable identificada hasta la fecha. Estimaciones
+ponderadas con el diseño muestral complejo de la encuesta: 8 estratos, 933
+unidades primarias de muestreo y factor de expansión por hogar, con
+linealización de Taylor. EMA: Equivalente de Mujer Adulta.
+:::
+
+
+## Distribución territorial de la cobertura y el consumo
+
+![](../media/mapas/mapa_bivariado_vehiculos.png)
+
+::: {style="font-size:0.88em;"}
+Ambos vehículos presentan cobertura alta en las 32 provincias, sin zonas desatendidas. Difieren en el eje de consumo: el arroz se sitúa en la banda superior y el trigo en equivalentes de harina en la inferior, por la fracción de harina que contienen sus derivados.
+:::
+
+::: {.notes}
+Hallazgo negativo que ahorra dinero: no hace falta focalizar geográficamente el vehículo. Decirle a alguien dónde no gastar es un servicio.
+:::
+
+## Hallazgo 2 · Margen no utilizado por la norma vigente
+
+::: {style="font-size:0.9em; margin-bottom:-0.2em;"}
+**Riesgo de ingesta inadecuada de folato:
+`r fmt(riesgo_nac(E_SIN, "folato_mcg_dfe"))`% sin fortificación,
+`r fmt(riesgo_nac(E_BASE, "folato_mcg_dfe"))`% con la norma vigente,
+`r fmt(riesgo_nac(E_ARROZ, "folato_mcg_dfe"))`% si todo el arroz llevara los
+niveles de la propuesta nacional.**
+:::
+
+## Ingesta de folato y riesgo, por escenario
+
+```{r}
+#| label: fig-riesgo
+#| fig-cap: "Hogares con ingesta aparente por Equivalente de Mujer Adulta inferior al requerimiento promedio estimado, según nutriente y escenario de fortificación. República Dominicana, 2018"
+#| fig-width: 10.5
+#| fig-height: 3.2
+
+ETIQ_NUT <- c(folato_mcg_dfe     = "Folato",
+              hierro_mg          = "Hierro",
+              vitamina_a_mcg_rae = "Vitamina A",
+              zinc_mg            = "Zinc",
+              vitamina_b12_mcg   = "Vitamina B12")
+
+pend <- rie |>
+  filter(dominio == "Nacional", hogares == "Todos",
+         escenario %in% c(E_SIN, E_BASE, E_ARROZ),
+         metodo %in% c("Punto de corte", "Probabilidad, biodisponibilidad 10%"),
+         nutriente %in% names(ETIQ_NUT)) |>
+  mutate(escenario = factor(corto(escenario),
+                            levels = corto(c(E_SIN, E_BASE, E_ARROZ))),
+         nut = ETIQ_NUT[nutriente])
+
+ggplot(pend, aes(escenario, pct_inadecuado, group = nut)) +
+  geom_line(colour = AZUL_C, linewidth = 1.1) +
+  geom_point(colour = AZUL, size = 3) +
+  geom_text(data = pend |> filter(escenario == last(levels(pend$escenario))),
+            aes(label = paste0(" ", nut, ": ", fmt(pct_inadecuado, 0), "%")),
+            hjust = 0, size = 3.9, colour = "#44555f") +
+  scale_y_continuous(limits = c(0, 100), labels = function(x) paste0(x, "%")) +
+  scale_x_discrete(expand = expansion(mult = c(0.08, 0.52))) +
+  labs(x = "Escenario de fortificación", y = "Hogares bajo el requerimiento (%)") +
+  tema(14) +
+  theme(axis.text.x = element_text(lineheight = 0.95))
+```
+
+::: {.notapie}
+**NOTA:** **Valores de referencia provisionales: no citables.** Riesgo de ingesta inadecuada estimado a nivel de hogar, no prevalencia de deficiencia.
+:::
+
+::: {.notes}
+Nota metodológica completa. Método del punto de corte del requerimiento
+promedio estimado, salvo en hierro, donde se aplica el enfoque de probabilidad
+con la distribución del requerimiento y un supuesto de 10% de biodisponibilidad.
+La ingesta es aparente, estimada a nivel de hogar, y el reparto intrafamiliar se
+supone proporcional al requerimiento energético. El escenario con arroz supone
+que la totalidad del arroz consumido lleva los niveles de la propuesta nacional;
+la línea base lo supone sin fortificar. Ácido fólico añadido por encima del
+límite superior tolerable en ese escenario: `r fmt(esc |> filter(escenario == E_ARROZ) |> distinct(pct_folico_sobre_ul) |> pull())`% de los hogares.
+:::
+
+## Contribución de la norma vigente a la reducción del riesgo
+
+## Hogares bajo el requerimiento, por nutriente y escenario
+
+```{r}
+#| label: fig-norma-evita
+#| fig-cap: "Hogares bajo el requerimiento sin fortificación y con la norma vigente de harina de trigo, según nutriente. República Dominicana, 2018"
+#| fig-width: 10
+#| fig-height: 3.6
+NUT5 <- c("folato_mcg_dfe", "hierro_mg", "zinc_mg", "vitamina_b12_mcg",
+          "vitamina_a_mcg_rae")
+S_SIN <- "Sin fortificación"
+S_NOR <- "Norma vigente: harina y pan"
+
+cmp <- tibble::tibble(
+  nutriente = NUT5,
+  sin  = vapply(NUT5, function(n) riesgo_nac(E_SIN,  n), numeric(1)),
+  base = vapply(NUT5, function(n) riesgo_nac(E_BASE, n), numeric(1))) |>
+  mutate(Nutriente = NOMBRE[nutriente], reduccion = sin - base)
+
+largo_cmp <- cmp |>
+  tidyr::pivot_longer(c(sin, base), names_to = "esc", values_to = "pct") |>
+  mutate(Escenario = factor(if_else(esc == "sin", S_SIN, S_NOR),
+                            levels = c(S_SIN, S_NOR)))
+
+ggplot(largo_cmp, aes(x = reorder(Nutriente, reduccion))) +
+  geom_line(aes(y = pct, group = Nutriente), colour = GRIS, linewidth = 1.4) +
+  geom_point(aes(y = pct, colour = Escenario), size = 4) +
+  geom_text(data = cmp,
+            aes(x = reorder(Nutriente, reduccion), y = (sin + base) / 2,
+                label = if_else(reduccion >= 1,
+                                paste0("−", fmt(reduccion, 1), " pp"), "")),
+            vjust = -1, size = 4, colour = "#5a6b76", inherit.aes = FALSE) +
+  scale_colour_manual(values = setNames(c(ACENTO, AZUL), c(S_SIN, S_NOR))) +
+  coord_flip() +
+  labs(x = NULL, y = "Hogares bajo el requerimiento (% del total de hogares)",
+       colour = NULL) +
+  tema() + theme(legend.position = "top")
+```
+
+::: {style="font-size:0.88em;"}
+La fortificación de la harina de trigo reduce la proporción de hogares bajo el
+requerimiento de folato en **`r fmt(cmp$reduccion[cmp$nutriente == "folato_mcg_dfe"], 1)` puntos porcentuales**
+y la de hierro en **`r fmt(cmp$reduccion[cmp$nutriente == "hierro_mg"], 1)`**.
+Los nutrientes que la norma no añade no se modifican.
+:::
+
+::: {.notes}
+Abrir por aquí y no por el avance de la semana. Esta lámina responde una pregunta que nadie suele tener contestada: cuánto aporta lo que ya existe. Sirve para discutir presupuesto de fiscalización.
+:::
+
+## Hallazgo 3 · Distribución social del beneficio
+
+::: {style="font-size:0.9em; margin-bottom:-0.2em;"}
+**Razón de ingesta de folato entre los quintiles extremos de gasto:
+`r fmt(razon_esc(E_BASE), 2)` con la norma vigente, `r fmt(razon_esc(E_ARROZ), 2)`
+al incorporar el arroz.** El arroz se consume de forma transversal; los
+derivados del trigo, no.
+:::
+
+## Ingesta de folato en los quintiles extremos, por escenario
+
+```{r}
+#| label: fig-equidad
+#| fig-cap: "Ingesta aparente mediana de folato por Equivalente de Mujer Adulta y día en los quintiles extremos de gasto del hogar, según escenario de fortificación. República Dominicana, 2018"
+#| fig-width: 10.5
+#| fig-height: 3.2
+
+eq <- esc |>
+  distinct(escenario, folato_q1, folato_q5, razon_q5_q1) |>
+  mutate(etq = factor(corto(escenario), levels = rev(ORDEN_CORTO)))
+
+ggplot(eq, aes(y = etq)) +
+  geom_segment(aes(x = folato_q1, xend = folato_q5, yend = etq),
+               colour = GRIS, linewidth = 1.6) +
+  geom_point(aes(x = folato_q1), colour = AZUL, size = 3.6) +
+  geom_point(aes(x = folato_q5), colour = ACENTO, size = 3.6) +
+  geom_text(aes(x = folato_q5, label = paste0("  razón ", fmt(razon_q5_q1, 2))),
+            hjust = 0, size = 3.7, colour = "#44555f") +
+  scale_x_continuous(expand = expansion(mult = c(0.04, 0.26))) +
+  labs(x = "Folato (µg DFE por Equivalente de Mujer Adulta y día)", y = NULL) +
+  tema(14) +
+  theme(axis.text.y = element_text(lineheight = 0.95))
+```
+
+::: {.notapie}
+**NOTA:** Punto azul: quintil de menor gasto. Punto anaranjado: quintil de mayor gasto. Un valor de la razón próximo a 1 indica que el vehículo alcanza por igual a ambos extremos.
+:::
+
+::: {.notes}
+Nota metodológica completa. La razón es el cociente entre las medianas de los
+quintiles extremos. El quintil es el definido por la propia encuesta.
+Estimaciones ponderadas con el diseño muestral complejo: 8 estratos, 933
+unidades primarias de muestreo y factor de expansión por hogar. DFE:
+equivalentes dietéticos de folato. EMA: Equivalente de Mujer Adulta.
+:::
+
+## Hallazgo 4 · Concentración del aporte por grupo de alimentos
+
+::: {style="font-size:0.95em;"}
+**El aporte de cada micronutriente está concentrado en pocos grupos de
+alimentos.** Un escenario que fortifica un cereal no puede mover un nutriente
+que el cereal no aporta, cualquiera que sea el nivel de adición.
+
+La restricción es estructural y precede a cualquier discusión sobre dosis.
+:::
+
+::: {.notes}
+Hallazgo nuevo de esta semana. La figura siguiente lo muestra por grupo y nutriente; la lectura es por columna.
+:::
+
+## Aporte de cada grupo de alimentos a cada micronutriente
+
+```{r}
+#| label: fig-grupos
+#| fig-width: 11
+#| fig-height: 5
+largo <- gnut |>
+  pivot_longer(all_of(names(NOMBRE)), names_to = "n", values_to = "pct") |>
+  mutate(Grupo = sub("^[0-9]{2} ", "", grupo_mddw),
+         Nutriente = factor(NOMBRE[n], levels = NOMBRE))
+orden <- largo |> filter(n == "folato_mcg_dfe") |> arrange(pct) |> pull(Grupo)
+
+largo |> mutate(Grupo = factor(Grupo, levels = orden)) |>
+  ggplot(aes(Nutriente, Grupo, fill = pct)) +
+  geom_tile(colour = "white", linewidth = 0.6) +
+  geom_text(aes(label = if_else(pct >= 8, sprintf("%.0f", pct), "")),
+            colour = "white", fontface = "bold", size = 4) +
+  scale_fill_gradientn(colours = c("#eef2f4", AZUL_C, AZUL), limits = c(0, 100)) +
+  labs(x = NULL, y = NULL) +
+  labs(fill = "Aporte al nutriente (%)") +
+  theme_minimal(base_size = 15) +
+  theme(panel.grid = element_blank(), legend.position = "bottom",
+        legend.key.width = unit(2.2, "cm"),
+        axis.text.x = element_text(angle = 25, hjust = 1))
+```
+
+::: {.notes}
+El número es el porcentaje del total del nutriente que aporta ese grupo. La lectura es por columna.
+:::
+
+## Hallazgo 5 · El patrón provincial sigue al nivel de registro
+
+::: {style="font-size:0.95em;"}
+**La proporción de hogares bajo el requerimiento, estimada por provincia, sigue
+al nivel de adquisición registrada y no a diferencias en la dieta.** Se
+examinaron siete mecanismos alternativos y ninguno explica el patrón.
+
+La provincia tampoco es dominio de estimación de la encuesta. **Estos datos no
+sostienen una afirmación de estado nutricional provincial.**
+:::
+
+::: {.notes}
+Hallazgo nuevo de esta semana. Una frase y seguir. El desarrollo esta en el anexo.
+:::
+
+## Riesgo de folato por provincia · criterio de ingesta absoluta
+
+![](../media/mapas/mapa_riesgo_folato.png)
+
+::: {style="font-size:0.82em;"}
+Gris: precisión insuficiente. La provincia **no es dominio de estimación** de la encuesta.
+:::
+
+## Riesgo de folato por provincia · criterio de densidad
+
+![](../media/mapas/mapa_densidad_folato.png)
+
+::: {style="font-size:0.82em;"}
+Razón entre la densidad mediana observada y la densidad crítica, centrada en 1. El mismo nutriente, el mismo escenario y los mismos hogares producen un ordenamiento territorial distinto del obtenido con la ingesta absoluta.
+:::
+
+::: {.notes}
+El contraste entre las dos laminas es la magnitud del problema. Si alguien va a hacer una afirmacion subnacional, tiene que ver estas dos antes.
+:::
+
+# Implicaciones {background-color="#2c5364"}
 
 ## Escenarios según la acción institucional que requieren {.smaller}
 
@@ -354,149 +610,6 @@ toda norma vigente. Ese escenario no es hipotético.
 **NOTA:** Un establecimiento, un día; no constituye una muestra representativa del mercado. El detalle del pesaje está en el anexo.
 :::
 
-## Implicación para la selección del vehículo
-
-::: {style="font-size:1.05em;"}
-**El aporte de cada micronutriente está concentrado en pocos grupos de
-alimentos, y un escenario que fortifica un cereal no puede mover un nutriente
-que el cereal no aporta.**
-
-La restricción es estructural: precede a cualquier discusión sobre el nivel de
-adición.
-:::
-
-::: {.notes}
-La figura siguiente lo muestra por grupo y nutriente. La lectura es por columna.
-:::
-
-## Aporte de cada grupo de alimentos a cada micronutriente
-
-```{r}
-#| label: fig-grupos
-#| fig-width: 11
-#| fig-height: 5
-largo <- gnut |>
-  pivot_longer(all_of(names(NOMBRE)), names_to = "n", values_to = "pct") |>
-  mutate(Grupo = sub("^[0-9]{2} ", "", grupo_mddw),
-         Nutriente = factor(NOMBRE[n], levels = NOMBRE))
-orden <- largo |> filter(n == "folato_mcg_dfe") |> arrange(pct) |> pull(Grupo)
-
-largo |> mutate(Grupo = factor(Grupo, levels = orden)) |>
-  ggplot(aes(Nutriente, Grupo, fill = pct)) +
-  geom_tile(colour = "white", linewidth = 0.6) +
-  geom_text(aes(label = if_else(pct >= 8, sprintf("%.0f", pct), "")),
-            colour = "white", fontface = "bold", size = 4) +
-  scale_fill_gradientn(colours = c("#eef2f4", AZUL_C, AZUL), limits = c(0, 100)) +
-  labs(x = NULL, y = NULL) +
-  labs(fill = "Aporte al nutriente (%)") +
-  theme_minimal(base_size = 15) +
-  theme(panel.grid = element_blank(), legend.position = "bottom",
-        legend.key.width = unit(2.2, "cm"),
-        axis.text.x = element_text(angle = 25, hjust = 1))
-```
-
-::: {.notes}
-El número es el porcentaje del total del nutriente que aporta ese grupo. La lectura es por columna.
-:::
-
-## Alcance territorial de los vehículos
-
-::: {style="font-size:1.05em;"}
-**Los dos vehículos presentan cobertura alta en las 32 provincias: no hay zonas
-desatendidas.**
-
-Difieren en la cantidad que transportan. Una norma aplicada a cualquiera de
-ellos alcanza a todo el país; la cantidad de nutriente que entrega no es la
-misma.
-:::
-
-::: {.notes}
-Hallazgo negativo que ahorra dinero: no hace falta focalizar geograficamente el vehiculo.
-:::
-
-## Distribución territorial de la cobertura y el consumo
-
-![](../media/mapas/mapa_bivariado_vehiculos.png)
-
-::: {style="font-size:0.88em;"}
-Ambos vehículos presentan cobertura alta en las 32 provincias, sin zonas desatendidas. Difieren en el eje de consumo: el arroz se sitúa en la banda superior y el trigo en equivalentes de harina en la inferior, por la fracción de harina que contienen sus derivados.
-:::
-
-::: {.notes}
-Hallazgo negativo que ahorra dinero: no hace falta focalizar geográficamente el vehículo. Decirle a alguien dónde no gastar es un servicio.
-:::
-
-## Implicación para el diseño de la intervención
-
-La @fig-equidad lo muestra en una sola imagen: subir el nivel normativo sobre un vehículo de **consumo desigual** mejora el promedio y **conserva** el gradiente social.
-
-Cambiar a un vehículo de **consumo transversal** cierra el gradiente.
-
-Ambas opciones son defendibles y **no son intercambiables**. El análisis las distingue y las cuantifica; la elección entre una y otra es de política.
-
-::: {.notes}
-Esta es la conjetura que se formuló antes de ver los datos, y quedó respaldada. Está enunciada como pregunta 7 en el informe, no como apartado de hipótesis, por formato IMRyD.
-:::
-
-## Hallazgo 3 · Distribución social del beneficio
-
-::: {style="font-size:0.9em; margin-bottom:-0.2em;"}
-**Razón de ingesta de folato entre los quintiles extremos de gasto:
-`r fmt(razon_esc(E_BASE), 2)` con la norma vigente, `r fmt(razon_esc(E_ARROZ), 2)`
-al incorporar el arroz.** El arroz se consume de forma transversal; los
-derivados del trigo, no.
-:::
-
-```{r}
-#| label: fig-equidad
-#| fig-cap: "Ingesta aparente mediana de folato por Equivalente de Mujer Adulta y día en los quintiles extremos de gasto del hogar, según escenario de fortificación. República Dominicana, 2018"
-#| fig-width: 10.5
-#| fig-height: 3.2
-
-eq <- esc |>
-  distinct(escenario, folato_q1, folato_q5, razon_q5_q1) |>
-  mutate(etq = factor(corto(escenario), levels = rev(ORDEN_CORTO)))
-
-ggplot(eq, aes(y = etq)) +
-  geom_segment(aes(x = folato_q1, xend = folato_q5, yend = etq),
-               colour = GRIS, linewidth = 1.6) +
-  geom_point(aes(x = folato_q1), colour = AZUL, size = 3.6) +
-  geom_point(aes(x = folato_q5), colour = ACENTO, size = 3.6) +
-  geom_text(aes(x = folato_q5, label = paste0("  razón ", fmt(razon_q5_q1, 2))),
-            hjust = 0, size = 3.7, colour = "#44555f") +
-  scale_x_continuous(expand = expansion(mult = c(0.04, 0.26))) +
-  labs(x = "Folato (µg DFE por Equivalente de Mujer Adulta y día)", y = NULL) +
-  tema(14) +
-  theme(axis.text.y = element_text(lineheight = 0.95))
-```
-
-::: {.notapie}
-**NOTA:** Punto azul: quintil de menor gasto. Punto anaranjado: quintil de mayor gasto. Un valor de la razón próximo a 1 indica que el vehículo alcanza por igual a ambos extremos.
-:::
-
-::: {.notes}
-Nota metodológica completa. La razón es el cociente entre las medianas de los
-quintiles extremos. El quintil es el definido por la propia encuesta.
-Estimaciones ponderadas con el diseño muestral complejo: 8 estratos, 933
-unidades primarias de muestreo y factor de expansión por hogar. DFE:
-equivalentes dietéticos de folato. EMA: Equivalente de Mujer Adulta.
-:::
-
-## Salvedad sobre las comparaciones entre provincias
-
-La proporción de hogares bajo el requerimiento, estimada por provincia, sigue al
-**nivel de adquisición registrada** y no a diferencias en la dieta. La provincia
-tampoco es dominio de estimación de la encuesta.
-
-Se examinaron siete mecanismos alternativos y ninguno explica el patrón. El
-desarrollo está en el anexo.
-
-**Estos datos no sostienen una afirmación de estado nutricional provincial.**
-
-::: {.notes}
-Una frase y seguir. Si preguntan por el detalle, el anexo tiene la secuencia completa: los siete mecanismos, el contraste por nivel de analisis y la hipotesis que queda abierta.
-:::
-
 ## Opciones de intervención, acción requerida y rendimiento {.smaller}
 
 ```{r}
@@ -542,41 +655,9 @@ Carta de opciones con su costo institucional y su rendimiento al lado. No se pre
 3. El residuo geográfico: ¿se persigue la hipótesis de los factores de conversión?
 4. Procedencia y destino: ¿se incorporan o se declaran como supuesto?
 
-
-
 # Anexo {background-color="#4a7c9b"}
 
-# La columna de cambio responde la pregunta que se hace en estas reuniones:
-# que se movio desde la sesion anterior. El estado previo esta versionado en el
-# propio archivo, de modo que la comparacion no depende de la memoria.
-entregables |>
-  transmute(
-    Producto = entregable,
-    `TdR`    = tdr,
-    Situación = situacion,
-    `Cambio desde el 9 de octubre` = if_else(situacion == situacion_previa, "—",
-                                             paste(situacion_previa, "→", situacion)),
-    Entrega  = if_else(is.na(fecha_compromiso), "—",
-                       format(as.Date(fecha_compromiso), "%d de octubre"))
-  ) |>
-  tabla(fuente = "Fuente: registro de avance del repositorio del proyecto.",
-        notas = c(paste0("Productos que cambiaron de situación en el período: ",
-                         sum(entregables$situacion != entregables$situacion_previa),
-                         " de ", nrow(entregables), "."),
-                  "Cierre de la consultoría: 23 de octubre de 2026."))
-```
-
-::: {style="font-size:0.82em; margin-top:0.35em;"}
-La plataforma de capacitación está publicada y es accesible:
-[**fortificacion.netlify.app**](https://fortificacion.netlify.app/) — 24 módulos,
-17 ejercicios con autoevaluación y el taller completo.
-:::
-
-# Anexo {background-color="#4a7c9b"}
-
-# 1 · La elección del vehículo determina qué nutrientes se pueden corregir
-
-# 2 · Elevar la media y cerrar la brecha son dos decisiones
+# Escenarios y equidad
 
 ## Ingesta de hierro y folato en los siete escenarios
 
@@ -619,65 +700,6 @@ disponible. El escenario estima, por tanto, una cota superior del incremento
 atribuible a una norma de arroz.
 :::
 
-## Hallazgo 2 · Margen no utilizado por la norma vigente
-
-::: {style="font-size:0.9em; margin-bottom:-0.2em;"}
-**Riesgo de ingesta inadecuada de folato:
-`r fmt(riesgo_nac(E_SIN, "folato_mcg_dfe"))`% sin fortificación,
-`r fmt(riesgo_nac(E_BASE, "folato_mcg_dfe"))`% con la norma vigente,
-`r fmt(riesgo_nac(E_ARROZ, "folato_mcg_dfe"))`% si todo el arroz llevara los
-niveles de la propuesta nacional.**
-:::
-
-```{r}
-#| label: fig-riesgo
-#| fig-cap: "Hogares con ingesta aparente por Equivalente de Mujer Adulta inferior al requerimiento promedio estimado, según nutriente y escenario de fortificación. República Dominicana, 2018"
-#| fig-width: 10.5
-#| fig-height: 3.2
-
-ETIQ_NUT <- c(folato_mcg_dfe     = "Folato",
-              hierro_mg          = "Hierro",
-              vitamina_a_mcg_rae = "Vitamina A",
-              zinc_mg            = "Zinc",
-              vitamina_b12_mcg   = "Vitamina B12")
-
-pend <- rie |>
-  filter(dominio == "Nacional", hogares == "Todos",
-         escenario %in% c(E_SIN, E_BASE, E_ARROZ),
-         metodo %in% c("Punto de corte", "Probabilidad, biodisponibilidad 10%"),
-         nutriente %in% names(ETIQ_NUT)) |>
-  mutate(escenario = factor(corto(escenario),
-                            levels = corto(c(E_SIN, E_BASE, E_ARROZ))),
-         nut = ETIQ_NUT[nutriente])
-
-ggplot(pend, aes(escenario, pct_inadecuado, group = nut)) +
-  geom_line(colour = AZUL_C, linewidth = 1.1) +
-  geom_point(colour = AZUL, size = 3) +
-  geom_text(data = pend |> filter(escenario == last(levels(pend$escenario))),
-            aes(label = paste0(" ", nut, ": ", fmt(pct_inadecuado, 0), "%")),
-            hjust = 0, size = 3.9, colour = "#44555f") +
-  scale_y_continuous(limits = c(0, 100), labels = function(x) paste0(x, "%")) +
-  scale_x_discrete(expand = expansion(mult = c(0.08, 0.52))) +
-  labs(x = "Escenario de fortificación", y = "Hogares bajo el requerimiento (%)") +
-  tema(14) +
-  theme(axis.text.x = element_text(lineheight = 0.95))
-```
-
-::: {.notapie}
-**NOTA:** **Valores de referencia provisionales: no citables.** Riesgo de ingesta inadecuada estimado a nivel de hogar, no prevalencia de deficiencia.
-:::
-
-::: {.notes}
-Nota metodológica completa. Método del punto de corte del requerimiento
-promedio estimado, salvo en hierro, donde se aplica el enfoque de probabilidad
-con la distribución del requerimiento y un supuesto de 10% de biodisponibilidad.
-La ingesta es aparente, estimada a nivel de hogar, y el reparto intrafamiliar se
-supone proporcional al requerimiento energético. El escenario con arroz supone
-que la totalidad del arroz consumido lleva los niveles de la propuesta nacional;
-la línea base lo supone sin fortificar. Ácido fólico añadido por encima del
-límite superior tolerable en ese escenario: `r fmt(esc |> filter(escenario == E_ARROZ) |> distinct(pct_folico_sobre_ul) |> pull())`% de los hogares.
-:::
-
 ## Riesgo de ingesta inadecuada por dominio
 
 ```{r}
@@ -711,7 +733,7 @@ ggplot(dom, aes(pct_inadecuado, reorder(nivel, pct_inadecuado))) +
 **NOTA:** Escenario de línea base. Barras: intervalo de confianza del 95%. Región y zona son dominios de estimación de la encuesta; la provincia no lo es. **Valores de referencia provisionales.**
 :::
 
-# 3 · El patrón geográfico está gobernado por el nivel de registro
+# Patrón geográfico del riesgo
 
 ## Dispersión provincial del riesgo y energía registrada
 
@@ -725,26 +747,6 @@ La provincia de mayor energía registrada declara
 a `r fmt(e_nac, 0)` nacional.
 
 **Esa cifra no es interpretable como consumo.**
-
-## Riesgo de folato por provincia · criterio de ingesta absoluta
-
-![](../media/mapas/mapa_riesgo_folato.png)
-
-::: {style="font-size:0.82em;"}
-Gris: precisión insuficiente. La provincia **no es dominio de estimación** de la encuesta.
-:::
-
-## Riesgo de folato por provincia · criterio de densidad
-
-![](../media/mapas/mapa_densidad_folato.png)
-
-::: {style="font-size:0.82em;"}
-Razón entre la densidad mediana observada y la densidad crítica, centrada en 1. El mismo nutriente, el mismo escenario y los mismos hogares producen un ordenamiento territorial distinto del obtenido con la ingesta absoluta.
-:::
-
-::: {.notes}
-El contraste entre las dos laminas es la magnitud del problema. Si alguien va a hacer una afirmacion subnacional, tiene que ver estas dos antes.
-:::
 
 ## Mecanismos examinados para explicar el patrón geográfico
 
@@ -817,7 +819,7 @@ propia encuesta— y se corrigió.
 :::
 :::
 
-# 4 · Contribución metodológica: la densidad crítica
+# La densidad como criterio complementario
 
 ## Derivación de la densidad crítica
 
@@ -881,7 +883,7 @@ quint |> select(nivel, Ingesta = pct_ing_comp, Densidad = pct_densidad) |>
 
 La densidad **corrige el sobrerregistro**, y solo procede donde la variación de energía es artefactual. Entre quintiles es real. Dividir ahí no quita ruido: quita señal.
 
-# 5 · Cuestiones abiertas para discutir
+# Cuestiones abiertas
 
 ## Valores de referencia · Requerimiento Promedio Estimado frente a Armonizado
 
@@ -924,3 +926,4 @@ Institute of Medicine. 2000. *Dietary Reference Intakes: Applications in Dietary
 Tang, K. *et al.* 2022. Modeling food fortification contributions to micronutrient requirements in Malawi using Household Consumption and Expenditure Surveys. *Annals of the New York Academy of Sciences*, 1508: 105–122. doi:10.1111/nyas.14697.
 
 Weisell, R. y Dop, M. C. 2012. The adult male equivalent concept and its application to Household Consumption and Expenditures Surveys. *Food and Nutrition Bulletin*, 33(3 Suppl).
+
