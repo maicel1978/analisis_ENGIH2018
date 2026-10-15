@@ -151,11 +151,21 @@ mueve <- function(desde, hasta, umbral = 0.5) {
   d <- sort(d)
   # Cada cambio con su intervalo de confianza: un cambio en puntos
   # porcentuales sin intervalo no es citable.
-  ic <- vapply(names(d), function(n) {
-    m <- metodo_de(n)
-    r <- dif |> filter(escenario_desde == desde, escenario_hasta == hasta,
-                       nutriente == n, metodo == m)
-    if (nrow(r) != 1) stop("Diferencia no identificada para ", n, ".", call. = FALSE)
+  #
+  # El nombre de la variable del bucle NO puede ser `n`: diferencias_escenarios
+  # tiene una columna `n` (hogares), y dentro de filter() la columna enmascara
+  # a la variable, de modo que la comparacion se hace contra 8.778 y no contra
+  # el nutriente. Se usa nut_ y se cualifica con .env para que no vuelva a
+  # ocurrir si el archivo gana columnas.
+  ic <- vapply(names(d), function(nut_) {
+    m_ <- metodo_de(nut_)
+    r <- dif |> filter(escenario_desde == .env$desde,
+                       escenario_hasta == .env$hasta,
+                       nutriente == .env$nut_, metodo == .env$m_)
+    if (nrow(r) != 1) {
+      stop("Diferencia no identificada para ", nut_, " (", nrow(r), " filas).",
+           call. = FALSE)
+    }
     paste0("(", fmt(r$dif_pp_low), " a ", fmt(r$dif_pp_upp), ")")
   }, character(1))
   paste(paste0(ETIQ_NUT[names(d)], " ", if_else(d < 0, "−", "+"),
@@ -169,8 +179,9 @@ dif <- leer_clean("diferencias_escenarios.csv", "07_riesgo_inadecuacion.R")
 
 dif_ic <- function(desde, hasta, nutriente_) {
   m <- metodo_de(nutriente_)
-  r <- dif |> filter(escenario_desde == desde, escenario_hasta == hasta,
-                     nutriente == nutriente_, metodo == m)
+  r <- dif |> filter(escenario_desde == .env$desde,
+                     escenario_hasta == .env$hasta,
+                     nutriente == .env$nutriente_, metodo == .env$m)
   if (nrow(r) != 1) stop("Diferencia no identificada: ", desde, " -> ", hasta,
                          " / ", nutriente_, ".", call. = FALSE)
   paste0(if_else(r$dif_pp < 0, "−", "+"), fmt(abs(r$dif_pp)),
@@ -741,9 +752,18 @@ tibble::tribble(
   "Incorporar el arroz", E_TODOS, E_ARROZ,
     "Legislar una norma nueva. Ya se comercializa fortificado"
 ) |>
-  mutate(`Qué mueve` = vapply(seq_along(Acción),
-                              function(i) mueve(desde[i], hasta[i]), character(1))) |>
-  select(Acción, `Qué exige`, `Qué mueve`) |>
+  mutate(
+    `Qué mueve` = vapply(seq_along(Acción),
+                         function(i) mueve(desde[i], hasta[i]), character(1)),
+    # Contrapartida: acido folico sintetico anadido por encima del limite
+    # superior tolerable. Omitirla dejaria la tabla de un solo lado.
+    ul = vapply(hasta, function(e) {
+      v <- esc |> filter(escenario == e) |> distinct(pct_folico_sobre_ul) |> pull()
+      if (length(v) != 1) NA_real_ else v }, numeric(1)),
+    `Hogares sobre el límite de ácido fólico (%)` =
+      if_else(is.na(ul), "—", fmt(ul, 1))) |>
+  select(Acción, `Qué exige`, `Qué mueve`,
+         `Hogares sobre el límite de ácido fólico (%)`) |>
   tabla(fuente = "Fuente: ENGIH 2018, Banco Central de la República Dominicana.",
         notas = c(paste("Los escenarios están anidados. Cada acción se compara",
                         "contra la situación inmediatamente anterior, no contra",
@@ -752,6 +772,12 @@ tibble::tribble(
                   paste("Se omiten los nutrientes que la acción no desplaza. Un",
                         "vehículo no mueve un nutriente que no transporta,",
                         "cualquiera que sea el nivel de adición."),
+                  paste("Entre paréntesis, el intervalo de confianza al 95% de",
+                        "la diferencia, estimada sobre los mismos hogares bajo",
+                        "ambos escenarios."),
+                  paste("El límite superior aplica al ácido fólico sintético",
+                        "añadido, no al folato total, y la proporción se calcula",
+                        "sobre la fracción añadida: es una cota máxima."),
                   paste("Todas las cifras suponen cumplimiento pleno de la norma",
                         "en la totalidad del vehículo. La proporción del",
                         "suministro efectivamente fortificada no se mide con esta",
