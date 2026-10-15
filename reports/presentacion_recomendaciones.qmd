@@ -356,6 +356,19 @@ indice de lo que sigue.
 
 # Resultados {background-color="#2c5364"}
 
+## Los alimentos que se pueden fortificar ya llegan a casi todos {background-color="#eef2f4"}
+
+::: {style="font-size:1.15em; margin-top:1.2em;"}
+Comprar harina, arroz, azúcar o sal es algo que hacen prácticamente
+todos los hogares del país. Un cambio en esos alimentos llega a casi
+toda la población sin necesidad de repartir nada ni de abrir ningún
+programa nuevo.
+:::
+
+::: {.notes}
+Primera idea. Decirla y pasar a la cifra. Diez segundos.
+:::
+
 ## Cobertura de los vehículos de fortificación
 
 ::: {style="font-size:1em;"}
@@ -390,6 +403,18 @@ veh |>
 
 ::: {.notapie}
 **NOTA:** Cobertura y consumo mediano entre quienes adquieren. El trigo se expresa en equivalentes de harina, con factores de contenido provisionales.
+:::
+
+## A muchos hogares no les llega suficiente {background-color="#eef2f4"}
+
+::: {style="font-size:1.15em; margin-top:1.2em;"}
+La comida que compran muchos hogares no aporta todas las vitaminas y
+minerales que el cuerpo necesita cada día. Y no faltan todos por igual:
+unos faltan mucho más que otros, y eso decide dónde conviene actuar.
+:::
+
+::: {.notes}
+Segunda idea. No adelantar cifras aqui: estan en la lamina siguiente.
 :::
 
 ## Riesgo de ingesta inadecuada, por micronutriente
@@ -429,6 +454,19 @@ ggplot(base_nut, aes(pct_inadecuado, nut)) +
 
 ::: {.notapie}
 **NOTA:** **Valores de referencia provisionales.** Barra: intervalo de confianza al 95%. Riesgo estimado a nivel de hogar, no prevalencia de deficiencia.
+:::
+
+## Lo que ya se hace ayuda, pero no alcanza {background-color="#eef2f4"}
+
+::: {style="font-size:1.15em; margin-top:1.2em;"}
+La harina de trigo que se vende en el país ya lleva vitaminas y hierro
+añadidos, por una norma que está en vigor. Eso mejora la situación de
+forma medible. No la resuelve.
+:::
+
+::: {.notes}
+Tercera idea. Importante decir que la norma SI funciona: no se trata de
+que lo hecho hasta ahora este mal, sino de que queda margen.
 :::
 
 ## Efecto de la norma vigente de harina de trigo
@@ -474,6 +512,20 @@ ggplot(par_nut, aes(y = nut)) +
 **NOTA:** Naranja: sin fortificación. Azul: con la norma vigente. La distancia entre los dos puntos es lo que la norma evita. **Supone cumplimiento pleno de la norma en todo el vehículo.**
 :::
 
+## Cada alimento trae unas vitaminas y no otras {background-color="#eef2f4"}
+
+::: {style="font-size:1.15em; margin-top:1.2em;"}
+Ningún alimento trae de todo. Por eso fortificar un cereal no puede
+resolver la falta de una vitamina que ese cereal no contiene, por mucho
+que se le añada. La elección del alimento decide qué problema se puede
+corregir y cuál no.
+:::
+
+::: {.notes}
+Cuarta idea. Es la que hace entendible todo lo que viene despues: sin
+ella, los resultados de los escenarios parecen arbitrarios.
+:::
+
 ## Origen del aporte de cada micronutriente
 
 ::: {style="font-size:1em;"}
@@ -516,6 +568,20 @@ largo |> mutate(Grupo = factor(Grupo, levels = orden)) |>
 
 # Opciones de intervención {background-color="#2c5364"}
 
+## Hay una norma desde 2004 que no se está cumpliendo {background-color="#eef2f4"}
+
+::: {style="font-size:1.15em; margin-top:1.2em;"}
+El azúcar que se vende en el país debería llevar vitamina A desde hace
+más de veinte años. No la lleva. Hacer que se cumpla esa norma sería el
+cambio más grande de todos los que se han evaluado, **y no requiere
+aprobar ninguna ley nueva**.
+:::
+
+::: {.notes}
+Quinta idea, y la mas importante de la presentacion. Decirla despacio.
+Si alguien se lleva una sola frase a casa, que sea esta.
+:::
+
 ## Cumplimiento de la norma del azúcar: efecto estimado
 
 ::: {style="font-size:1em;"}
@@ -530,9 +596,9 @@ requerimiento de vitamina A pasa de
 **`r fmt(abs(delta(E_TODOS, E_AZUC, "vitamina_a_mcg_rae")))` puntos
 porcentuales**.
 
-**Es la mayor reducción estimada para una acción que no requiere modificar la
-normativa.** El azúcar no modifica el aporte de los demás micronutrientes
-evaluados.
+**El azúcar es el único vehículo evaluado que desplaza la vitamina A**, y no
+modifica el aporte de los demás micronutrientes. Ninguna norma construida sobre
+la harina de trigo la mueve.
 :::
 
 ::: {.notapie}
