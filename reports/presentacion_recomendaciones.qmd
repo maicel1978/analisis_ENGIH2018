@@ -1,6 +1,6 @@
 ---
 title: "Fortificación de alimentos en la República Dominicana"
-subtitle: "Resultados y opciones de intervención · ENGIH 2018"
+subtitle: "Resultados del análisis y opciones de intervención · ENGIH 2018"
 author: "Maicel E. Monzón, PhD — Consultor internacional"
 date: last-modified
 date-format: "D [de] MMMM [de] YYYY"
@@ -28,7 +28,10 @@ execute:
 
 ```{r}
 #| label: setup
-# Presentacion operativa, para quien decide y no para quien revisa el metodo.
+# Presentacion para direccion: destinatario no especialista en nutricion.
+# Registro sobrio y declarativo. Sin metaforas, sin figuras retoricas y sin
+# jerga tecnica sin glosar: cada lamina enuncia un hecho con su cifra, su
+# unidad y su salvedad. El metodo se discute en presentacion_cierre.qmd.
 # Es un documento vivo: se sobrescribe, no se duplica.
 #
 # No comparte contenido con presentacion_cierre.qmd: aquella discute el metodo
@@ -157,19 +160,27 @@ v_con <- veh |> slice_max(mediana_consumidores, n = 1)
 n_mayoria <- sum(veh$pct_hogares >= 50)
 ```
 
-## De qué trata esto
+## Objeto del análisis
 
 ::: {style="font-size:1em;"}
-La Encuesta Nacional de Gastos e Ingresos de los Hogares de 2018 registra lo que
-adquirieron **`r fmt(n_analitico(), 0)` hogares**. A partir de esas
-adquisiciones se estima cuánto micronutriente llega hoy a la mesa, y cuánto
-llegaría bajo distintas normas de fortificación.
+Fuente: Encuesta Nacional de Gastos e Ingresos de los Hogares, 2018, Banco
+Central de la República Dominicana. Muestra analítica: **`r fmt(n_analitico(), 0)`
+hogares**, con el diseño muestral completo de la encuesta.
 
-Tres preguntas, en este orden:
+A partir de los alimentos que cada hogar declaró adquirir se estima el aporte de
+micronutrientes de esa canasta, y el aporte que resultaría bajo distintas normas
+de fortificación.
 
-1. ¿A cuántos hogares llegan los vehículos que podrían fortificarse?
-2. ¿Dónde está hoy el déficit, y en qué nutrientes?
-3. ¿Qué compra cada opción de intervención, y qué exige a cambio?
+El análisis responde tres preguntas:
+
+1. Qué proporción de hogares adquiere cada alimento susceptible de fortificarse.
+2. Qué proporción de hogares queda por debajo del requerimiento de cada
+   micronutriente en la situación actual.
+3. Qué efecto tendría cada norma alternativa, y qué acción institucional exige.
+:::
+
+::: {.notapie}
+**NOTA:** El análisis estima el aporte de la canasta adquirida. No mide el estado nutricional de las personas.
 :::
 
 ::: {.notes}
@@ -179,15 +190,16 @@ sangre, mide lo que entra al hogar. Pasar rapido.
 
 # Resultados {background-color="#2c5364"}
 
-## El alcance no es el problema
+## Cobertura de los vehículos de fortificación
 
 ::: {style="font-size:1em;"}
-**Los vehículos candidatos llegan a la gran mayoría de los hogares del país.**
-De los `r nrow(veh)` grupos evaluados, `r n_mayoria` alcanzan al menos a la
-mitad de los hogares.
+De los `r nrow(veh)` alimentos evaluados como vehículo posible,
+`r n_mayoria` son adquiridos por al menos la mitad de los hogares del país.
 
-La consecuencia operativa es directa: **la palanca no es llegar a más hogares,
-es qué lleva adentro lo que ya llega.**
+**La cobertura no es la restricción.** Una norma de fortificación sobre estos
+alimentos alcanza a la mayor parte de la población sin necesidad de ampliar su
+distribución. La variable sobre la que se puede actuar es el contenido de
+micronutrientes, no el alcance.
 :::
 
 ```{r}
@@ -214,14 +226,16 @@ veh |>
 **NOTA:** Cobertura y consumo mediano entre quienes adquieren. El trigo se expresa en equivalentes de harina, con factores de contenido provisionales.
 :::
 
-## El déficit no es parejo entre nutrientes
+## Riesgo de ingesta inadecuada, por micronutriente
 
 ::: {style="font-size:1em;"}
-Con la norma que rige hoy —harina de trigo— la proporción de hogares por debajo
-del requerimiento es **`r riesgo_ic(E_BASE, "folato_mcg_dfe")`** en folato y
+Situación actual, con la norma vigente de fortificación de la harina de trigo.
+Proporción de hogares cuya canasta adquirida aporta menos del requerimiento:
+**`r riesgo_ic(E_BASE, "folato_mcg_dfe")`** en folato y
 **`r riesgo_ic(E_BASE, "hierro_mg")`** en hierro.
 
-**Dónde se actúa no es indiferente: cada nutriente parte de un punto distinto.**
+**La magnitud difiere entre micronutrientes.** La elección del micronutriente
+sobre el que se actúa determina el rendimiento de la intervención.
 :::
 
 ```{r}
@@ -251,11 +265,13 @@ ggplot(base_nut, aes(pct_inadecuado, nut)) +
 **NOTA:** **Valores de referencia provisionales.** Barra: intervalo de confianza al 95%. Riesgo estimado a nivel de hogar, no prevalencia de deficiencia.
 :::
 
-## La norma vigente consigue algo, y deja margen
+## Efecto de la norma vigente de harina de trigo
 
 ::: {style="font-size:1em;"}
-**La fortificación de la harina de trigo ya está evitando una parte del déficit,
-y la parte que no cubre sigue siendo grande.**
+**La norma vigente reduce la proporción de hogares por debajo del requerimiento
+en folato y en hierro, y no la reduce en los demás micronutrientes evaluados.**
+La distancia entre los dos puntos de cada fila es la reducción atribuible a la
+norma actual.
 :::
 
 ```{r}
@@ -292,16 +308,17 @@ ggplot(par_nut, aes(y = nut)) +
 **NOTA:** Naranja: sin fortificación. Azul: con la norma vigente. La distancia entre los dos puntos es lo que la norma evita. **Supone cumplimiento pleno de la norma en todo el vehículo.**
 :::
 
-## Un cereal no mueve lo que un cereal no aporta
+## Origen del aporte de cada micronutriente
 
 ::: {style="font-size:1em;"}
-**El aporte de cada micronutriente está concentrado en pocos grupos de
-alimentos, y eso limita qué puede corregir cada vehículo.** Fortificar un
-cereal no desplaza un nutriente que el cereal no transporta, cualquiera que sea
-el nivel de adición.
+**El aporte de cada micronutriente se concentra en un número reducido de grupos
+de alimentos.** Esta distribución determina qué micronutriente puede corregir
+cada vehículo: una norma sobre un cereal no modifica el aporte de un
+micronutriente que ese cereal no contiene, con independencia del nivel de
+adición que se fije.
 
-Es la razón por la que el zinc, la vitamina B12 y la vitamina A apenas se mueven
-entre los escenarios de la norma nacional.
+Explica que el zinc, la vitamina B12 y la vitamina A no varíen entre los
+escenarios construidos sobre la norma nacional de harina de trigo.
 :::
 
 ```{r}
@@ -331,23 +348,25 @@ largo |> mutate(Grupo = factor(Grupo, levels = orden)) |>
 **NOTA:** Por ciento del total de cada micronutriente aportado por cada grupo. Se rotulan los valores de 5% o más. Clasificación de grupos de la diversidad alimentaria mínima en mujeres, aplicada a adquisiciones del hogar.
 :::
 
-# Opciones {background-color="#2c5364"}
+# Opciones de intervención {background-color="#2c5364"}
 
-## La acción de mayor rendimiento no exige legislar nada
+## Cumplimiento de la norma del azúcar: efecto estimado
 
 ::: {style="font-size:1em;"}
-**La norma que obliga a fortificar el azúcar con vitamina A existe desde 2004 y
-su aplicación no está verificada.** La etiqueta observada en punto de venta no
+La NORDOM 602 obliga desde 2004 a fortificar el azúcar con vitamina A. Su
+aplicación no está verificada: la etiqueta registrada en punto de venta no
 declara vitamina A.
 
-Si esa norma se cumpliera en todo el azúcar, la proporción de hogares por debajo
-del requerimiento de vitamina A pasaría de
+Bajo cumplimiento pleno de esa norma, la proporción de hogares por debajo del
+requerimiento de vitamina A pasa de
 **`r fmt(riesgo_nac(E_TODOS, "vitamina_a_mcg_rae"))`%** a
-**`r fmt(riesgo_nac(E_AZUC, "vitamina_a_mcg_rae"))`%**:
+**`r fmt(riesgo_nac(E_AZUC, "vitamina_a_mcg_rae"))`%**, es decir
 **`r fmt(abs(delta(E_TODOS, E_AZUC, "vitamina_a_mcg_rae")))` puntos
-porcentuales con una norma que ya está escrita.**
+porcentuales**.
 
-Ninguna otra acción de esta lista consigue tanto sin legislar.
+**Es la mayor reducción estimada para una acción que no requiere modificar la
+normativa.** El azúcar no modifica el aporte de los demás micronutrientes
+evaluados.
 :::
 
 ::: {.notapie}
@@ -360,7 +379,7 @@ El azucar no mueve ningun otro nutriente: solo lleva vitamina A. Decirlo, para
 que nadie entienda que el azucar resuelve el folato.
 :::
 
-## Qué mueve cada acción adicional {.smaller}
+## Efecto estimado de cada acción adicional {.smaller}
 
 ```{r}
 #| label: tbl-opciones
@@ -398,21 +417,21 @@ tibble::tribble(
 **El análisis ordena las acciones; no elige.** De las cuatro, **solo el arroz exige legislar una norma nueva**. Las otras tres operan sobre normas que ya existen, y una de ellas —el azúcar— no exige cambio normativo alguno: solo que se cumpla.
 :::
 
-## Lo mismo, ordenado por lo que cuesta institucionalmente
+## Acciones según la exigencia institucional
 
 ::: {style="font-size:0.95em;"}
-| Qué exige | Opción |
+| Exigencia institucional | Acción |
 |---|---|
-| **Nada: ya es la situación de hoy** | Norma vigente sobre harina y pan |
-| **Fiscalizar.** La norma existe desde 2004 | Cumplimiento de la norma del azúcar |
-| **Ampliar el alcance** de una norma vigente | Todos los derivados del trigo |
-| **Revisar el nivel** normativo | Nivel recomendado por la OMS |
-| **Legislar de nuevo** | Incorporación del arroz |
+| Ninguna. Situación actual | Norma vigente sobre harina de trigo y pan |
+| **Fiscalización.** Norma vigente desde 2004 | Cumplimiento de la norma del azúcar |
+| **Ampliación del alcance** de una norma vigente | Extensión a todos los derivados del trigo |
+| **Revisión del nivel** normativo | Adopción del nivel recomendado por la OMS |
+| **Norma nueva** | Incorporación del arroz |
 :::
 
 ::: {style="font-size:0.88em; margin-top:0.6em;"}
-La primera fila que exige acción —fiscalizar el azúcar— **no requiere legislar
-nada**. Es la que menos cuesta poner en marcha.
+De las cuatro acciones posibles, **tres operan sobre normas que ya existen**.
+Una sola requiere legislación nueva.
 :::
 
 ::: {.notes}
@@ -422,20 +441,21 @@ que la pregunta previa es cuanto del suministro cumple hoy la norma, porque
 todas estas cifras suponen cumplimiento pleno.
 :::
 
-# Límites y siguientes pasos {background-color="#2c5364"}
+# Alcance del análisis {background-color="#2c5364"}
 
-## Lo que este estudio no dice
+## Alcance y límites del análisis
 
 ::: {style="font-size:0.95em;"}
-- **No mide deficiencia.** Mide lo que el hogar adquiere, no lo que la persona
-  absorbe. Es riesgo de ingesta inadecuada, no prevalencia de deficiencia.
-- **Supone cumplimiento pleno.** Todas las cifras de fortificación suponen que
-  la totalidad del vehículo cumple la norma. La encuesta no mide qué proporción
-  del suministro está efectivamente fortificada.
-- **Los valores de referencia son provisionales.** Un cambio de referencia
-  mueve todas las proporciones de riesgo.
-- **No sostiene comparaciones entre provincias.** La provincia no es dominio de
-  estimación de la encuesta.
+- **El análisis no mide deficiencia.** Estima el aporte de los alimentos que el
+  hogar adquiere. No mide el estado nutricional de las personas ni sustituye una
+  encuesta con biomarcadores.
+- **Todas las cifras de fortificación suponen cumplimiento pleno de la norma**
+  en la totalidad del vehículo. La encuesta no mide qué proporción del
+  suministro está efectivamente fortificada.
+- **Los valores de referencia están pendientes de confirmación.** Un cambio de
+  referencia modifica todas las proporciones estimadas.
+- **El análisis no sostiene comparaciones entre provincias.** La provincia no es
+  dominio de estimación de esta encuesta.
 :::
 
 ::: {.notes}
@@ -443,23 +463,24 @@ Esta lamina protege. Decirla entera y sin apuro. Si alguien cita una cifra
 fuera de contexto, esta es la lamina que se le recuerda.
 :::
 
-## Lo que haría falta para cerrar
+## Información requerida para completar el análisis
 
 ::: {style="font-size:0.95em;"}
-| Qué falta | Qué desbloquea |
+| Información pendiente | Efecto sobre el análisis |
 |---|---|
-| Valores de referencia definitivos | Vuelve citables todas las cifras de riesgo |
-| Supuesto de biodisponibilidad del hierro | Fija la posición del hierro en la lista |
+| Valores de referencia definitivos | Las estimaciones de riesgo pasan de provisionales a definitivas |
+| Supuesto de biodisponibilidad del hierro | Determina la posición del hierro entre los micronutrientes |
 | Documento normativo del arroz | Convierte ese escenario de propuesta en norma modelada |
-| **Datos de cumplimiento en el suministro** | Es el supuesto que gobierna todas las cifras de esta presentación |
+| **Nivel de cumplimiento de las normas vigentes** | Es el supuesto sobre el que descansan todas las cifras presentadas |
 :::
 
 ::: {style="font-size:0.88em; margin-top:0.6em;"}
-La última es la de mayor consecuencia, y es la única que no se resuelve con
-esta encuesta: **requiere medición en el punto de producción o de venta.**
+La última no se obtiene de esta encuesta. **Requiere medición en punto de
+producción o de venta**, y determina en qué medida las estimaciones
+presentadas describen la situación real.
 :::
 
-## De dónde sale esto {.smaller}
+## Productos de la consultoría {.smaller}
 
 ```{r}
 #| label: tbl-entregables
