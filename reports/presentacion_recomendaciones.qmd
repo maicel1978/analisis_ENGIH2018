@@ -160,6 +160,79 @@ v_con <- veh |> slice_max(mediana_consumidores, n = 1)
 n_mayoria <- sum(veh$pct_hogares >= 50)
 ```
 
+## Qué es la fortificación de alimentos a gran escala
+
+```{r}
+#| label: fig-concepto
+#| fig-width: 12.2
+#| fig-height: 4.6
+# Lamina conceptual, sin datos. Se dibuja con el mismo codigo y la misma paleta
+# que el resto para que no desentone con las laminas de resultados.
+paso <- tibble::tibble(
+  i = 1:4,
+  titulo = c("Vitaminas y minerales",
+             "No se fabrican",
+             "La carencia no se ve",
+             "Fortificación"),
+  texto = c("El cuerpo los necesita\ntodos los días, en\ncantidades muy pequeñas",
+            "El cuerpo no los produce.\nEntran únicamente con\nlos alimentos",
+            "Si la alimentación diaria\nno los aporta, la carencia\nse instala sin síntomas",
+            "Se añaden en la planta\nde producción a un alimento\nde consumo masivo")
+)
+
+ANCHO <- 0.86; ALTO <- 1.5
+ggplot(paso) +
+  geom_rect(aes(xmin = i - ANCHO/2, xmax = i + ANCHO/2,
+                ymin = -ALTO/2, ymax = ALTO/2,
+                fill = i == 4), colour = NA) +
+  geom_segment(data = tibble::tibble(x = (1:3) + ANCHO/2 + 0.02),
+               aes(x = x, xend = x + 0.1, y = 0, yend = 0),
+               inherit.aes = FALSE, colour = AZUL_C, linewidth = 1.1,
+               arrow = arrow(length = unit(0.16, "cm"), type = "closed")) +
+  geom_text(aes(i, 0.52, label = titulo, colour = i == 4),
+            fontface = "bold", size = 5, show.legend = FALSE) +
+  geom_text(aes(i, -0.12, label = texto, colour = i == 4),
+            size = 4.1, lineheight = 1.15, show.legend = FALSE) +
+  scale_fill_manual(values = c(`FALSE` = "#eef2f4", `TRUE` = AZUL)) +
+  scale_colour_manual(values = c(`FALSE` = "#1a3a4a", `TRUE` = "white")) +
+  coord_cartesian(xlim = c(0.45, 4.55), ylim = c(-1.35, 0.95)) +
+  annotate("rect", xmin = 0.45, xmax = 4.55, ymin = -1.3, ymax = -0.92,
+           fill = "#eef2f4", colour = NA) +
+  annotate("text", x = 2.5, y = -1.11,
+           label = paste("A gran escala: lo ejecuta la industria por mandato de una norma,",
+                         "en todo el país,\nsin que las personas modifiquen lo que comen."),
+           size = 4.3, lineheight = 1.2, colour = "#1a3a4a", fontface = "bold") +
+  theme_void() + theme(legend.position = "none")
+```
+
+::: {style="font-size:0.88em; margin-top:0.3em;"}
+En la República Dominicana los alimentos usados o considerados como vehículo son
+**la harina de trigo, el arroz, el azúcar y la sal**.
+:::
+
+::: {.notes}
+Lamina de entrada, para situar a quien no trabaja el tema. Treinta segundos.
+
+Guion sugerido:
+
+"El cuerpo necesita vitaminas y minerales todos los dias, pero en cantidades
+muy pequenas: miligramos, a veces microgramos. No los fabrica. Entran
+unicamente con la comida.
+
+Cuando la comida de cada dia no los aporta en cantidad suficiente, la carencia
+se instala, y lo caracteristico es que no se ve: no hay sintoma, y sin embargo
+hay efecto.
+
+La fortificacion consiste en anadir esos nutrientes en la planta de produccion,
+a un alimento que la poblacion ya compra. Que sea a gran escala significa dos
+cosas: que lo hace la industria obligada por una norma, y que nadie tiene que
+cambiar lo que come. Esa es la razon por la que es una de las intervenciones
+mas costo-efectivas que existen.
+
+Lo que presento hoy estima cuanto de estos nutrientes esta llegando hoy a los
+hogares dominicanos, y cuanto llegaria bajo distintas normas."
+:::
+
 ## Objeto del análisis
 
 ::: {style="font-size:1em;"}
