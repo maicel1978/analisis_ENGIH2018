@@ -160,6 +160,8 @@ v_con <- veh |> slice_max(mediana_consumidores, n = 1)
 n_mayoria <- sum(veh$pct_hogares >= 50)
 ```
 
+# Introducción {background-color="#2c5364"}
+
 ## Qué es la fortificación de alimentos a gran escala
 
 ```{r}
@@ -206,6 +208,15 @@ ggplot(paso) +
 ```
 
 ::: {style="font-size:0.88em; margin-top:0.3em;"}
+**Fortificación de alimentos:** adición de vitaminas o minerales a un alimento
+de consumo habitual, durante su producción industrial, para aumentar su aporte
+de micronutrientes sin modificar el alimento ni su uso.
+
+**A gran escala** significa que se aplica por norma a todo el suministro de ese
+alimento en el país. Es una **intervención poblacional**: actúa sobre el
+alimento, no sobre la conducta de las personas, que no tienen que hacer nada
+distinto de lo que ya hacen.
+
 En la República Dominicana los alimentos usados o considerados como vehículo son
 **la harina de trigo, el arroz, el azúcar y la sal**.
 :::
@@ -233,32 +244,114 @@ Lo que presento hoy estima cuanto de estos nutrientes esta llegando hoy a los
 hogares dominicanos, y cuanto llegaria bajo distintas normas."
 :::
 
-## Objeto del análisis
+## De la encuesta de gastos al aporte de micronutrientes
 
-::: {style="font-size:1em;"}
-Fuente: Encuesta Nacional de Gastos e Ingresos de los Hogares, 2018, Banco
-Central de la República Dominicana. Muestra analítica: **`r fmt(n_analitico(), 0)`
-hogares**, con el diseño muestral completo de la encuesta.
+::: {style="font-size:0.95em;"}
+Medir directamente la ingesta de micronutrientes exige encuestas de consumo
+individual y análisis de laboratorio: son costosas y se levantan rara vez. Las
+**encuestas de gastos e ingresos de los hogares**, en cambio, se levantan
+periódicamente con fines económicos y registran **todos los alimentos que el
+hogar adquirió**.
+:::
 
-A partir de los alimentos que cada hogar declaró adquirir se estima el aporte de
-micronutrientes de esa canasta, y el aporte que resultaría bajo distintas normas
-de fortificación.
+```{r}
+#| label: fig-cadena
+#| fig-width: 11.4
+#| fig-height: 1.75
+eslabon <- tibble::tibble(
+  i = 1:3,
+  texto = c("Alimentos que el hogar\ndeclaró adquirir",
+            "Tabla de composición\nde alimentos",
+            "Aporte estimado de\nmicronutrientes")
+)
+AN <- 2.3
+ggplot(eslabon) +
+  geom_rect(aes(xmin = i*3 - AN/2, xmax = i*3 + AN/2, ymin = -0.5, ymax = 0.5,
+                fill = i == 3), colour = NA) +
+  geom_segment(data = tibble::tibble(x = c(3, 6) + AN/2 + 0.08),
+               aes(x = x, xend = x + 0.45, y = 0, yend = 0), inherit.aes = FALSE,
+               colour = AZUL_C, linewidth = 1.1,
+               arrow = arrow(length = unit(0.16, "cm"), type = "closed")) +
+  geom_text(aes(i*3, 0, label = texto, colour = i == 3),
+            size = 4.3, lineheight = 1.15, show.legend = FALSE) +
+  scale_fill_manual(values = c(`FALSE` = "#eef2f4", `TRUE` = AZUL)) +
+  scale_colour_manual(values = c(`FALSE` = "#1a3a4a", `TRUE` = "white")) +
+  coord_cartesian(xlim = c(1.6, 10.4), ylim = c(-0.62, 0.62)) +
+  theme_void() + theme(legend.position = "none")
+```
 
-El análisis responde tres preguntas:
-
-1. Qué proporción de hogares adquiere cada alimento susceptible de fortificarse.
-2. Qué proporción de hogares queda por debajo del requerimiento de cada
-   micronutriente en la situación actual.
-3. Qué efecto tendría cada norma alternativa, y qué acción institucional exige.
+::: {style="font-size:0.95em;"}
+**Fuente:** Encuesta Nacional de Gastos e Ingresos de los Hogares, 2018, Banco
+Central de la República Dominicana. **Muestra analítica:**
+`r fmt(n_analitico(), 0)` hogares, con el diseño muestral completo de la
+encuesta.
 :::
 
 ::: {.notapie}
-**NOTA:** El análisis estima el aporte de la canasta adquirida. No mide el estado nutricional de las personas.
+**NOTA:** El procedimiento sigue un método publicado para estimar el aporte de la fortificación a partir de encuestas de consumo y gasto de los hogares (Tang et al., 2022). El análisis estima el aporte de la canasta adquirida; no mide el estado nutricional de las personas.
 :::
 
 ::: {.notes}
-Treinta segundos. El punto de la lamina es acotar: esto no mide deficiencia en
-sangre, mide lo que entra al hogar. Pasar rapido.
+El engarce. La idea que debe quedar: el pais ya levanta esta encuesta por
+razones economicas, para la canasta y el indice de precios. Nadie la levanto
+para nutricion. Lo que hace este trabajo es leerla con fines nutricionales.
+
+Si preguntan por que una encuesta de 2018: la siguiente lamina lo responde.
+:::
+
+## Por qué este análisis es nuevo
+
+::: {style="font-size:0.95em;"}
+**La ENGIH 2018 no se diseñó con fines nutricionales.** Se levantó para
+construir la canasta de consumo y el índice de precios. Este análisis la
+reutiliza para una finalidad distinta de aquella para la que se recogió.
+
+De ahí se derivan tres cosas que el país no tenía:
+
+1. Una estimación del aporte de micronutrientes de la canasta efectivamente
+   adquirida por los hogares dominicanos.
+2. La cuantificación de lo que la norma vigente de fortificación está logrando,
+   y de lo que no.
+3. Un instrumento para estimar, antes de decidir, el efecto de cada norma
+   alternativa.
+:::
+
+::: {style="font-size:0.88em; margin-top:0.5em;"}
+**Sobre la fecha de los datos.** Los patrones de consumo y el marco normativo
+cambian despacio, y esta es la encuesta de su tipo más reciente disponible. El
+procedimiento quedó construido de modo que **una encuesta nueva sustituye al
+archivo de entrada y el análisis vuelve a correr completo**: el instrumento
+sobrevive al dato.
+:::
+
+::: {.notes}
+Esta lamina responde por anticipado la objecion de "los datos son de 2018".
+Tres argumentos, en este orden: los patrones cambian despacio; es la mas
+reciente disponible; y el aparato se reutiliza con la siguiente.
+
+El tercero es el que importa para quien decide un presupuesto: lo que se pago
+no fue un informe, fue un procedimiento que sirve la proxima vez.
+
+COMPROBAR antes de presentar: que no exista una ENGIH posterior a 2018. Si la
+hubiera, cambiar "mas reciente disponible" por la formula que corresponda.
+:::
+
+## Preguntas del análisis
+
+::: {style="font-size:1.05em;"}
+1. **Cobertura.** Qué proporción de hogares adquiere cada alimento susceptible
+   de fortificarse.
+
+2. **Situación actual.** Qué proporción de hogares queda por debajo del
+   requerimiento de cada micronutriente con la norma vigente.
+
+3. **Opciones.** Qué efecto tendría cada norma alternativa, y qué acción
+   institucional exige cada una.
+:::
+
+::: {.notes}
+Las tres preguntas en el orden en que se responden. Decirlas y pasar: son el
+indice de lo que sigue.
 :::
 
 # Resultados {background-color="#2c5364"}
