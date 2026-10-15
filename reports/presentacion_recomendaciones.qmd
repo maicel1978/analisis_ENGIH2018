@@ -364,17 +364,17 @@ que nadie entienda que el azucar resuelve el folato.
 
 ```{r}
 #| label: tbl-opciones
-#| tbl-cap: "Efecto de cada acción adicional sobre el riesgo de ingesta inadecuada, frente a la situación inmediatamente anterior. República Dominicana, 2018"
+#| tbl-cap: "Efecto de cada acción adicional sobre el riesgo de ingesta inadecuada, frente a la situación inmediatamente anterior, en orden creciente de exigencia institucional. República Dominicana, 2018"
 tibble::tribble(
   ~Acción, ~desde, ~hasta, ~`Qué exige`,
-  "Ampliar la norma a todos los derivados del trigo", E_BASE, E_TODOS,
-    "Ampliar el alcance de una norma vigente",
   "Hacer cumplir la norma del azúcar", E_TODOS, E_AZUC,
     "Fiscalizar. La norma existe desde 2004",
+  "Ampliar la norma a todos los derivados del trigo", E_BASE, E_TODOS,
+    "Ampliar el alcance de una norma vigente",
   "Elevar la harina y sus derivados al nivel de la OMS", E_TODOS, E_OMS,
     "Revisar el nivel normativo",
   "Incorporar el arroz", E_TODOS, E_ARROZ,
-    "Norma nueva. Ya se comercializa fortificado"
+    "Legislar una norma nueva. Ya se comercializa fortificado"
 ) |>
   mutate(`Qué mueve` = vapply(seq_along(Acción),
                               function(i) mueve(desde[i], hasta[i]), character(1))) |>
