@@ -49,6 +49,14 @@ queda cerrado con ella. Si pasa de un punto, hay que rehacer 04 a 07 sin la
 exclusión y comparar: eso es un brote aparte y hay que decidirlo.
 
 ```
+quarto render reports/presentacion_recomendaciones.qmd
+```
+Presentación operativa de resultados y opciones, escrita el 2026-10-15. Diez
+láminas, sin metodología. **Ninguna cifra está escrita a mano**: todas se leen
+de los archivos al compilar, de modo que no puede divergir del informe. Es el
+primer documento que conviene compilar, porque es el que tiene fecha de hoy.
+
+```
 quarto render reports/INFORME_final.qmd
 ```
 ```

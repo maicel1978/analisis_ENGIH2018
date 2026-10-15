@@ -1,0 +1,433 @@
+---
+title: "Fortificación de alimentos en la República Dominicana"
+subtitle: "Resultados y opciones de intervención · ENGIH 2018"
+author: "Maicel E. Monzón, PhD — Consultor internacional"
+date: last-modified
+date-format: "D [de] MMMM [de] YYYY"
+lang: es
+format:
+  revealjs:
+    theme: [default, custom.scss]
+    slide-number: true
+    show-slide-number: all
+    code-fold: true
+    embed-resources: true
+    transition: none
+    width: 1330
+    height: 780
+    fig-align: center
+crossref:
+  tbl-title: "Tabla"
+  fig-title: "Figura"
+  title-delim: "."
+execute:
+  warning: false
+  message: false
+  echo: false
+---
+
+```{r}
+#| label: setup
+# Presentacion operativa, para quien decide y no para quien revisa el metodo.
+# Es un documento vivo: se sobrescribe, no se duplica.
+#
+# No comparte contenido con presentacion_cierre.qmd: aquella discute el metodo
+# y los hallazgos ante pares; esta responde que se puede hacer con el resultado.
+# Las dos leen los mismos archivos, de modo que no pueden divergir en cifras.
+ruta_comun <- c(here::here("reports", "_comun.R"),
+                here::here("scripts", "_comun.R"))
+source(ruta_comun[file.exists(ruta_comun)][1])
+library(ggplot2); library(tidyr)
+
+AZUL <- "#2c5364"; AZUL_C <- "#7ba3bd"; GRIS <- "#c9d3da"; ACENTO <- "#c0623c"
+
+tema <- function(base = 16) {
+  theme_minimal(base_size = base) +
+    theme(panel.grid.minor   = element_blank(),
+          panel.grid.major.x = element_blank(),
+          panel.grid.major.y = element_line(colour = "#eef2f4"),
+          axis.title  = element_text(colour = "#5a6b76", size = rel(0.85)),
+          plot.title  = element_text(face = "bold", colour = "#1a3a4a",
+                                     size = rel(0.95)),
+          legend.position = "none")
+}
+
+leer_clean <- function(archivo, script) {
+  f <- file.path(RUTA_CLEAN, archivo)
+  exigir_archivo(f, script)
+  leer_limpio(f)
+}
+
+rie  <- leer_clean("riesgo_inadecuacion.csv",        "07_riesgo_inadecuacion.R")
+esc  <- leer_clean("escenarios_resumen.csv",         "06_escenarios_fortificacion.R")
+veh  <- leer_clean("escenarios_consumo_vehiculos.csv","06_escenarios_fortificacion.R")
+gnut <- leer_clean("grupos_micronutrientes.csv",     "08_grupos_alimentos.R")
+refs <- leer_limpio(file.path(RUTA_RAW, "valores_referencia.csv"))
+entregables <- leer_limpio(file.path(RUTA_RAW, "entregables_estado.csv")) |>
+  arrange(orden)
+
+E_SIN   <- "0. Sin fortificación"
+E_BASE  <- "1a. Norma nacional: harina y pan"
+E_TODOS <- "1b. Norma nacional: harina y todos los derivados"
+E_AZUC  <- "1c. Norma nacional y azúcar"
+E_OMS   <- "2b. OMS: harina y derivados, consumo de 75 a 149 g"
+E_ARROZ <- "3. Norma nacional y arroz (propuesta nacional)"
+faltan <- setdiff(c(E_SIN, E_BASE, E_TODOS, E_AZUC, E_OMS, E_ARROZ),
+                  unique(esc$escenario))
+if (length(faltan) > 0) {
+  stop("Escenarios ausentes en escenarios_resumen.csv: ",
+       paste(faltan, collapse = "; "), call. = FALSE)
+}
+
+ROTULOS <- tibble::tribble(
+  ~escenario, ~corto,
+  E_SIN,   "Sin\nfortificar",
+  E_BASE,  "Hoy:\nharina y pan",
+  E_TODOS, "Todos los\nderivados",
+  E_AZUC,  "Con\nazúcar",
+  "2a. OMS: harina y derivados, consumo menor de 75 g", "OMS\n(<75 g)",
+  E_OMS,   "Nivel\nOMS",
+  E_ARROZ, "Con\narroz"
+)
+corto <- function(x) ROTULOS$corto[match(x, ROTULOS$escenario)]
+
+metodo_de <- function(nutriente_) {
+  m <- rie |>
+    filter(nutriente == nutriente_, metodo != "Probabilidad, biodisponibilidad 18%") |>
+    distinct(metodo) |> pull()
+  if (length(m) != 1) stop("Metodo no identificado para ", nutriente_, ".", call. = FALSE)
+  m
+}
+
+riesgo_nac <- function(escenario_, nutriente_) {
+  v <- rie |>
+    filter(dominio == "Nacional", hogares == "Todos", escenario == escenario_,
+           nutriente == nutriente_, metodo == metodo_de(nutriente_)) |>
+    pull(pct_inadecuado)
+  if (length(v) != 1) stop("Riesgo no identificado: ", escenario_, " / ",
+                           nutriente_, ".", call. = FALSE)
+  v
+}
+
+riesgo_ic <- function(escenario_, nutriente_) {
+  r <- rie |>
+    filter(dominio == "Nacional", hogares == "Todos", escenario == escenario_,
+           nutriente == nutriente_, metodo == metodo_de(nutriente_))
+  if (nrow(r) != 1) stop("Riesgo sin IC: ", escenario_, " / ", nutriente_, ".",
+                         call. = FALSE)
+  paste0(fmt(r$pct_inadecuado), "% (IC 95%: ", fmt(r$pct_inadecuado_low),
+         "–", fmt(r$pct_inadecuado_upp), ")")
+}
+
+n_analitico <- function() {
+  v <- rie |> filter(dominio == "Nacional", hogares == "Todos") |>
+    distinct(n) |> pull()
+  if (length(v) != 1) stop("Tamano analitico no identificado.", call. = FALSE)
+  v
+}
+
+ETIQ_NUT <- c(folato_mcg_dfe = "Folato", hierro_mg = "Hierro",
+              vitamina_a_mcg_rae = "Vitamina A", zinc_mg = "Zinc",
+              vitamina_b12_mcg = "Vitamina B12")
+
+# Superlativas calculadas del mismo archivo que alimenta cada figura, para que
+# el texto y la figura no puedan contradecirse.
+v_cob <- veh |> slice_max(pct_hogares, n = 1)
+v_con <- veh |> slice_max(mediana_consumidores, n = 1)
+n_mayoria <- sum(veh$pct_hogares >= 50)
+```
+
+## De qué trata esto
+
+::: {style="font-size:1em;"}
+La Encuesta Nacional de Gastos e Ingresos de los Hogares de 2018 registra lo que
+adquirieron **`r fmt(n_analitico(), 0)` hogares**. A partir de esas
+adquisiciones se estima cuánto micronutriente llega hoy a la mesa, y cuánto
+llegaría bajo distintas normas de fortificación.
+
+Tres preguntas, en este orden:
+
+1. ¿A cuántos hogares llegan los vehículos que podrían fortificarse?
+2. ¿Dónde está hoy el déficit, y en qué nutrientes?
+3. ¿Qué compra cada opción de intervención, y qué exige a cambio?
+:::
+
+::: {.notes}
+Treinta segundos. El punto de la lamina es acotar: esto no mide deficiencia en
+sangre, mide lo que entra al hogar. Pasar rapido.
+:::
+
+# Resultados {background-color="#2c5364"}
+
+## El alcance no es el problema
+
+::: {style="font-size:1em;"}
+**Los vehículos candidatos llegan a la gran mayoría de los hogares del país.**
+De los `r nrow(veh)` grupos evaluados, `r n_mayoria` alcanzan al menos a la
+mitad de los hogares.
+
+La consecuencia operativa es directa: **la palanca no es llegar a más hogares,
+es qué lleva adentro lo que ya llega.**
+:::
+
+```{r}
+#| label: fig-vehiculos
+#| fig-cap: "Hogares que adquieren cada vehículo y consumo mediano entre quienes lo adquieren, por Equivalente de Mujer Adulta y día. República Dominicana, 2018"
+#| fig-width: 10.5
+#| fig-height: 2.9
+veh |>
+  mutate(grupo = reorder(grupo, pct_hogares)) |>
+  ggplot(aes(pct_hogares, grupo)) +
+  geom_segment(aes(x = 0, xend = pct_hogares, yend = grupo),
+               colour = GRIS, linewidth = 1.6) +
+  geom_point(colour = AZUL, size = 4.4) +
+  geom_text(aes(label = paste0(fmt(pct_hogares), "%  ·  ",
+                               fmt(mediana_consumidores, 0), " g")),
+            hjust = -0.2, size = 4, colour = "#44555f") +
+  scale_x_continuous(limits = c(0, 130), breaks = seq(0, 100, 25),
+                     labels = function(x) paste0(x, "%")) +
+  labs(x = "Hogares que lo adquieren (%)", y = NULL) +
+  tema()
+```
+
+::: {.notapie}
+**NOTA:** Cobertura y consumo mediano entre quienes adquieren. El trigo se expresa en equivalentes de harina, con factores de contenido provisionales.
+:::
+
+## El déficit no es parejo entre nutrientes
+
+::: {style="font-size:1em;"}
+Con la norma que rige hoy —harina de trigo— la proporción de hogares por debajo
+del requerimiento es **`r riesgo_ic(E_BASE, "folato_mcg_dfe")`** en folato y
+**`r riesgo_ic(E_BASE, "hierro_mg")`** en hierro.
+
+**Dónde se actúa no es indiferente: cada nutriente parte de un punto distinto.**
+:::
+
+```{r}
+#| label: fig-riesgo-base
+#| fig-cap: "Hogares con ingesta aparente por Equivalente de Mujer Adulta inferior al requerimiento, por nutriente. Situación con la norma vigente. República Dominicana, 2018"
+#| fig-width: 9.6
+#| fig-height: 3.1
+base_nut <- rie |>
+  filter(dominio == "Nacional", hogares == "Todos", escenario == E_BASE,
+         nutriente %in% names(ETIQ_NUT),
+         metodo %in% c("Punto de corte", "Probabilidad, biodisponibilidad 10%")) |>
+  mutate(nut = reorder(ETIQ_NUT[nutriente], pct_inadecuado))
+
+ggplot(base_nut, aes(pct_inadecuado, nut)) +
+  geom_segment(aes(x = pct_inadecuado_low, xend = pct_inadecuado_upp,
+                   y = nut, yend = nut), colour = GRIS, linewidth = 1.4) +
+  geom_point(colour = AZUL, size = 4.2) +
+  geom_text(aes(label = paste0(fmt(pct_inadecuado), "%")),
+            hjust = -0.35, size = 4.1, colour = "#44555f") +
+  scale_x_continuous(limits = c(0, 108), breaks = seq(0, 100, 25),
+                     labels = function(x) paste0(x, "%")) +
+  labs(x = "Hogares bajo el requerimiento (%)", y = NULL) +
+  tema()
+```
+
+::: {.notapie}
+**NOTA:** **Valores de referencia provisionales.** Barra: intervalo de confianza al 95%. Riesgo estimado a nivel de hogar, no prevalencia de deficiencia.
+:::
+
+## La norma vigente consigue algo, y deja margen
+
+::: {style="font-size:1em;"}
+**La fortificación de la harina de trigo ya está evitando una parte del déficit,
+y la parte que no cubre sigue siendo grande.**
+:::
+
+```{r}
+#| label: fig-norma
+#| fig-cap: "Hogares bajo el requerimiento sin fortificación y con la norma vigente de harina de trigo, por nutriente. República Dominicana, 2018"
+#| fig-width: 9.8
+#| fig-height: 3.4
+par_nut <- rie |>
+  filter(dominio == "Nacional", hogares == "Todos",
+         escenario %in% c(E_SIN, E_BASE), nutriente %in% names(ETIQ_NUT),
+         metodo %in% c("Punto de corte", "Probabilidad, biodisponibilidad 10%")) |>
+  select(escenario, nutriente, pct_inadecuado) |>
+  pivot_wider(names_from = escenario, values_from = pct_inadecuado) |>
+  mutate(nut = ETIQ_NUT[nutriente],
+         evita = .data[[E_SIN]] - .data[[E_BASE]]) |>
+  arrange(desc(evita)) |>
+  mutate(nut = factor(nut, levels = rev(nut)))
+
+ggplot(par_nut, aes(y = nut)) +
+  geom_segment(aes(x = .data[[E_BASE]], xend = .data[[E_SIN]], yend = nut),
+               colour = GRIS, linewidth = 1.6) +
+  geom_point(aes(x = .data[[E_SIN]]), colour = ACENTO, size = 4) +
+  geom_point(aes(x = .data[[E_BASE]]), colour = AZUL, size = 4) +
+  geom_text(aes(x = .data[[E_BASE]],
+                label = if_else(evita >= 0.5,
+                                paste0("−", fmt(evita), " pp"), "")),
+            hjust = 1.25, size = 3.9, colour = "#44555f") +
+  scale_x_continuous(limits = c(0, 100), labels = function(x) paste0(x, "%")) +
+  labs(x = "Hogares bajo el requerimiento (%)", y = NULL) +
+  tema()
+```
+
+::: {.notapie}
+**NOTA:** Naranja: sin fortificación. Azul: con la norma vigente. La distancia entre los dos puntos es lo que la norma evita. **Supone cumplimiento pleno de la norma en todo el vehículo.**
+:::
+
+## Un cereal no mueve lo que un cereal no aporta
+
+::: {style="font-size:1em;"}
+**El aporte de cada micronutriente está concentrado en pocos grupos de
+alimentos, y eso limita qué puede corregir cada vehículo.** Fortificar un
+cereal no desplaza un nutriente que el cereal no transporta, cualquiera que sea
+el nivel de adición.
+
+Es la razón por la que el zinc, la vitamina B12 y la vitamina A apenas se mueven
+entre los escenarios de la norma nacional.
+:::
+
+```{r}
+#| label: fig-grupos
+#| fig-cap: "Aporte de cada grupo de alimentos al total de cada micronutriente, en por ciento. República Dominicana, 2018"
+#| fig-width: 10.5
+#| fig-height: 4.1
+largo <- gnut |>
+  pivot_longer(any_of(names(ETIQ_NUT)), names_to = "n", values_to = "pct") |>
+  filter(!is.na(pct)) |>
+  mutate(Grupo = sub("^[0-9]{2} ", "", grupo_mddw),
+         Nutriente = factor(ETIQ_NUT[n], levels = ETIQ_NUT))
+orden <- largo |> filter(n == "folato_mcg_dfe") |> arrange(pct) |> pull(Grupo)
+
+largo |> mutate(Grupo = factor(Grupo, levels = orden)) |>
+  ggplot(aes(Nutriente, Grupo, fill = pct)) +
+  geom_tile(colour = "white", linewidth = 0.6) +
+  geom_text(aes(label = if_else(pct >= 5, fmt(pct, 0), ""),
+                colour = pct >= 25), size = 3.4, show.legend = FALSE) +
+  scale_fill_gradient(low = "#eef2f4", high = AZUL) +
+  scale_colour_manual(values = c(`TRUE` = "white", `FALSE` = "#44555f")) +
+  labs(x = NULL, y = NULL) +
+  tema(13) + theme(panel.grid.major.y = element_blank())
+```
+
+::: {.notapie}
+**NOTA:** Por ciento del total de cada micronutriente aportado por cada grupo. Se rotulan los valores de 5% o más. Clasificación de grupos de la diversidad alimentaria mínima en mujeres, aplicada a adquisiciones del hogar.
+:::
+
+# Opciones {background-color="#2c5364"}
+
+## Qué compra cada opción y qué exige a cambio {.smaller}
+
+```{r}
+#| label: tbl-opciones
+#| tbl-cap: "Opciones de intervención: acción institucional que exige cada una y riesgo de ingesta inadecuada de folato que resulta. República Dominicana, 2018"
+base_fol <- riesgo_nac(E_BASE, "folato_mcg_dfe")
+
+opciones <- tibble::tribble(
+  ~Opción, ~escenario, ~`Qué exige`,
+  "Hacer cumplir la norma del azúcar", E_AZUC,
+    "Fiscalización. La norma existe desde 2004",
+  "Ampliar la norma a todos los derivados del trigo", E_TODOS,
+    "Ampliar el alcance de una norma vigente",
+  "Elevar la harina al nivel recomendado por la OMS", E_OMS,
+    "Revisar el nivel normativo",
+  "Incorporar el arroz", E_ARROZ,
+    "Norma nueva. Ya se comercializa fortificado"
+)
+
+opciones |>
+  mutate(fol = vapply(escenario, function(e) riesgo_nac(e, "folato_mcg_dfe"),
+                      numeric(1)),
+         `Folato inadecuado (%)` = fmt(fol, 1),
+         `Cambio frente a hoy` = paste0(if_else(fol < base_fol, "−", "+"),
+                                        fmt(abs(fol - base_fol), 1), " pp"),
+         ul = vapply(escenario, function(e) {
+           v <- esc |> filter(escenario == e) |> distinct(pct_folico_sobre_ul) |> pull()
+           if (length(v) != 1) NA_real_ else v }, numeric(1)),
+         `Sobre el límite de ácido fólico (%)` = if_else(is.na(ul), "—", fmt(ul, 1))) |>
+  select(Opción, `Qué exige`, `Folato inadecuado (%)`, `Cambio frente a hoy`,
+         `Sobre el límite de ácido fólico (%)`) |>
+  tabla(fuente = "Fuente: ENGIH 2018, Banco Central de la República Dominicana.",
+        notas = c(paste0("Situación de referencia: norma vigente de harina de trigo, con ",
+                         fmt(base_fol, 1), "% de hogares bajo el requerimiento de folato."),
+                  paste("El límite superior aplica al ácido fólico sintético añadido,",
+                        "no al folato total: la proporción es una cota máxima."),
+                  paste("Todas las cifras suponen cumplimiento pleno de la norma en la",
+                        "totalidad del vehículo. La proporción del suministro",
+                        "efectivamente fortificada no se mide con esta encuesta."),
+                  "Valores de referencia provisionales."))
+```
+
+::: {style="font-size:0.88em;"}
+**El análisis ordena las opciones; no elige.** De las cuatro, solo la primera
+opera sobre una norma que ya existe.
+:::
+
+## Lo mismo, ordenado por lo que cuesta institucionalmente
+
+::: {style="font-size:0.95em;"}
+| Qué exige | Opción |
+|---|---|
+| **Nada: ya es la situación de hoy** | Norma vigente sobre harina y pan |
+| **Fiscalizar.** La norma existe desde 2004 | Cumplimiento de la norma del azúcar |
+| **Ampliar el alcance** de una norma vigente | Todos los derivados del trigo |
+| **Revisar el nivel** normativo | Nivel recomendado por la OMS |
+| **Legislar de nuevo** | Incorporación del arroz |
+:::
+
+::: {style="font-size:0.88em; margin-top:0.6em;"}
+La primera fila que exige acción —fiscalizar el azúcar— **no requiere legislar
+nada**. Es la que menos cuesta poner en marcha.
+:::
+
+::: {.notes}
+Aqui no recomendar. Decir: el analisis ordena por rendimiento y por costo
+institucional, la decision es del pais. Si preguntan cual haria yo, responder
+que la pregunta previa es cuanto del suministro cumple hoy la norma, porque
+todas estas cifras suponen cumplimiento pleno.
+:::
+
+# Límites y siguientes pasos {background-color="#2c5364"}
+
+## Lo que este estudio no dice
+
+::: {style="font-size:0.95em;"}
+- **No mide deficiencia.** Mide lo que el hogar adquiere, no lo que la persona
+  absorbe. Es riesgo de ingesta inadecuada, no prevalencia de deficiencia.
+- **Supone cumplimiento pleno.** Todas las cifras de fortificación suponen que
+  la totalidad del vehículo cumple la norma. La encuesta no mide qué proporción
+  del suministro está efectivamente fortificada.
+- **Los valores de referencia son provisionales.** Un cambio de referencia
+  mueve todas las proporciones de riesgo.
+- **No sostiene comparaciones entre provincias.** La provincia no es dominio de
+  estimación de la encuesta.
+:::
+
+::: {.notes}
+Esta lamina protege. Decirla entera y sin apuro. Si alguien cita una cifra
+fuera de contexto, esta es la lamina que se le recuerda.
+:::
+
+## Lo que haría falta para cerrar
+
+::: {style="font-size:0.95em;"}
+| Qué falta | Qué desbloquea |
+|---|---|
+| Valores de referencia definitivos | Vuelve citables todas las cifras de riesgo |
+| Supuesto de biodisponibilidad del hierro | Fija la posición del hierro en la lista |
+| Documento normativo del arroz | Convierte ese escenario de propuesta en norma modelada |
+| **Datos de cumplimiento en el suministro** | Es el supuesto que gobierna todas las cifras de esta presentación |
+:::
+
+::: {style="font-size:0.88em; margin-top:0.6em;"}
+La última es la de mayor consecuencia, y es la única que no se resuelve con
+esta encuesta: **requiere medición en el punto de producción o de venta.**
+:::
+
+## De dónde sale esto {.smaller}
+
+```{r}
+#| label: tbl-entregables
+#| tbl-cap: "Situación de los productos comprometidos en los términos de referencia. Consultoría ENGIH 2018"
+entregables |>
+  transmute(`Producto` = entregable, `TdR` = tdr, `Situación` = situacion) |>
+  tabla(fuente = "Fuente: registro de avance del repositorio del proyecto.",
+        notas = "El detalle metodológico está en el informe analítico y en el manual técnico.")
+```
