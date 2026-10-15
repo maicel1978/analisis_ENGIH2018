@@ -149,12 +149,49 @@ mueve <- function(desde, hasta, umbral = 0.5) {
   d <- d[abs(d) >= umbral]
   if (length(d) == 0) return("Ninguno de los evaluados")
   d <- sort(d)
+  # Cada cambio con su intervalo de confianza: un cambio en puntos
+  # porcentuales sin intervalo no es citable.
+  ic <- vapply(names(d), function(n) {
+    m <- metodo_de(n)
+    r <- dif |> filter(escenario_desde == desde, escenario_hasta == hasta,
+                       nutriente == n, metodo == m)
+    if (nrow(r) != 1) stop("Diferencia no identificada para ", n, ".", call. = FALSE)
+    paste0("(", fmt(r$dif_pp_low), " a ", fmt(r$dif_pp_upp), ")")
+  }, character(1))
   paste(paste0(ETIQ_NUT[names(d)], " ", if_else(d < 0, "−", "+"),
-               fmt(abs(d)), " pp"), collapse = " · ")
+               fmt(abs(d)), " pp ", ic), collapse = "<br>")
+}
+
+# Diferencias pareadas entre escenarios, con su intervalo. Los dos escenarios se
+# estiman sobre los mismos hogares: el intervalo de la diferencia no se obtiene
+# restando los extremos de los dos intervalos marginales.
+dif <- leer_clean("diferencias_escenarios.csv", "07_riesgo_inadecuacion.R")
+
+dif_ic <- function(desde, hasta, nutriente_) {
+  m <- metodo_de(nutriente_)
+  r <- dif |> filter(escenario_desde == desde, escenario_hasta == hasta,
+                     nutriente == nutriente_, metodo == m)
+  if (nrow(r) != 1) stop("Diferencia no identificada: ", desde, " -> ", hasta,
+                         " / ", nutriente_, ".", call. = FALSE)
+  paste0(if_else(r$dif_pp < 0, "−", "+"), fmt(abs(r$dif_pp)),
+         " pp (IC 95%: ", fmt(r$dif_pp_low), " a ", fmt(r$dif_pp_upp), ")")
 }
 
 # Superlativas calculadas del mismo archivo que alimenta cada figura, para que
 # el texto y la figura no puedan contradecirse.
+# Grupo principal de cada micronutriente, del mismo archivo que alimenta la
+# figura de grupos.
+top_grupo <- gnut |>
+  pivot_longer(any_of(names(ETIQ_NUT)), names_to = "n", values_to = "pct") |>
+  filter(!is.na(pct)) |>
+  group_by(n) |> slice_max(pct, n = 1) |> ungroup() |>
+  mutate(Grupo = sub("^[0-9]{2} ", "", grupo_mddw))
+fol_top <- top_grupo |> filter(n == "folato_mcg_dfe")
+b12_top <- top_grupo |> filter(n == "vitamina_b12_mcg")
+if (nrow(fol_top) != 1 || nrow(b12_top) != 1) {
+  stop("Grupo principal no identificado para folato o vitamina B12.", call. = FALSE)
+}
+
 v_cob <- veh |> slice_max(pct_hogares, n = 1)
 v_con <- veh |> slice_max(mediana_consumidores, n = 1)
 n_mayoria <- sum(veh$pct_hogares >= 50)
@@ -401,8 +438,24 @@ veh |>
   tema()
 ```
 
+
+::: {style="font-size:0.8em; margin-top:0.4em;"}
+**Cómo se lee.** Cada fila es un alimento. El punto marca la proporción de
+hogares que lo adquiere; la etiqueta repite esa proporción y añade el consumo
+mediano entre quienes lo adquieren, en gramos por Equivalente de Mujer Adulta y
+día.
+
+**Lo que describen los datos.** El alimento de mayor cobertura es
+`r tolower(v_cob$grupo)`, con `r fmt(v_cob$pct_hogares)`% de los hogares. El de
+mayor consumo mediano entre consumidores es `r tolower(v_con$grupo)`, con
+`r fmt(v_con$mediana_consumidores, 0)` g por día. `r n_mayoria` de los
+`r nrow(veh)` alimentos superan el 50% de cobertura.
+
+Estimaciones ponderadas con el diseño muestral complejo de la encuesta —estratos, unidades primarias de muestreo y factor de expansión—, con linealización de Taylor para la varianza. n = `r fmt(n_analitico(), 0)` hogares.
+:::
+
 ::: {.notapie}
-**NOTA:** Cobertura y consumo mediano entre quienes adquieren. El trigo se expresa en equivalentes de harina, con factores de contenido provisionales.
+**NOTA:** El Equivalente de Mujer Adulta normaliza el consumo del hogar por su composición demográfica. El trigo se expresa en equivalentes de harina, con factores de contenido provisionales.
 :::
 
 ## A muchos hogares no les llega suficiente {background-color="#eef2f4"}
@@ -452,8 +505,25 @@ ggplot(base_nut, aes(pct_inadecuado, nut)) +
   tema()
 ```
 
+
+::: {style="font-size:0.8em; margin-top:0.4em;"}
+**Cómo se lee.** Cada fila es un micronutriente. El punto es la proporción
+estimada de hogares por debajo del requerimiento; la barra gris es su intervalo
+de confianza al 95%. Los intervalos no se solapan entre los extremos de la
+escala: el ordenamiento entre micronutrientes no es atribuible al azar del
+muestreo.
+
+**Lo que describen los datos.** Folato `r riesgo_ic(E_BASE, "folato_mcg_dfe")`;
+hierro `r riesgo_ic(E_BASE, "hierro_mg")`; vitamina A
+`r riesgo_ic(E_BASE, "vitamina_a_mcg_rae")`; vitamina B12
+`r riesgo_ic(E_BASE, "vitamina_b12_mcg")`; zinc
+`r riesgo_ic(E_BASE, "zinc_mg")`.
+
+Estimaciones ponderadas con el diseño muestral complejo de la encuesta —estratos, unidades primarias de muestreo y factor de expansión—, con linealización de Taylor para la varianza. n = `r fmt(n_analitico(), 0)` hogares.
+:::
+
 ::: {.notapie}
-**NOTA:** **Valores de referencia provisionales.** Barra: intervalo de confianza al 95%. Riesgo estimado a nivel de hogar, no prevalencia de deficiencia.
+**NOTA:** Método del punto de corte del Requerimiento Promedio Estimado, salvo en hierro, donde se aplica el enfoque de probabilidad con la distribución del requerimiento y un supuesto de 10% de biodisponibilidad. **Valores de referencia pendientes de confirmación.** Riesgo de ingesta inadecuada estimado a nivel de hogar; no es prevalencia de deficiencia.
 :::
 
 ## Lo que ya se hace ayuda, pero no alcanza {background-color="#eef2f4"}
@@ -508,8 +578,27 @@ ggplot(par_nut, aes(y = nut)) +
   tema()
 ```
 
+
+::: {style="font-size:0.8em; margin-top:0.4em;"}
+**Cómo se lee.** Cada fila es un micronutriente. El punto naranja es la
+situación sin fortificación; el azul, la situación con la norma vigente. La
+distancia entre ambos es la reducción atribuible a la norma, y la etiqueta la
+expresa en puntos porcentuales.
+
+**Lo que describen los datos.** La reducción es
+`r dif_ic(E_SIN, E_BASE, "folato_mcg_dfe")` en folato y
+`r dif_ic(E_SIN, E_BASE, "hierro_mg")` en hierro. En vitamina A, vitamina B12 y
+zinc la diferencia es nula: la norma no actúa sobre ellos.
+
+**Los intervalos son de la diferencia pareada**, estimada sobre los mismos
+hogares bajo los dos escenarios, y no de la resta de dos estimaciones
+independientes.
+
+Estimaciones ponderadas con el diseño muestral complejo de la encuesta —estratos, unidades primarias de muestreo y factor de expansión—, con linealización de Taylor para la varianza. n = `r fmt(n_analitico(), 0)` hogares.
+:::
+
 ::: {.notapie}
-**NOTA:** Naranja: sin fortificación. Azul: con la norma vigente. La distancia entre los dos puntos es lo que la norma evita. **Supone cumplimiento pleno de la norma en todo el vehículo.**
+**NOTA:** Supone cumplimiento pleno de la norma en la totalidad del vehículo. La encuesta no mide qué proporción del suministro está efectivamente fortificada. Valores de referencia pendientes de confirmación.
 :::
 
 ## Cada alimento trae unas vitaminas y no otras {background-color="#eef2f4"}
@@ -562,8 +651,21 @@ largo |> mutate(Grupo = factor(Grupo, levels = orden)) |>
   tema(13) + theme(panel.grid.major.y = element_blank())
 ```
 
+
+::: {style="font-size:0.8em; margin-top:0.4em;"}
+**Cómo se lee.** Cada columna es un micronutriente y cada fila un grupo de
+alimentos. La intensidad del azul y la cifra indican qué porcentaje del total de
+ese micronutriente aporta ese grupo. Las columnas suman 100%. Se rotulan los
+valores de 5% o más.
+
+**Lo que describen los datos.** En folato, el grupo principal es
+`r tolower(fol_top$Grupo)`, con `r fmt(fol_top$pct)`% del total; en vitamina
+B12, `r tolower(b12_top$Grupo)`, con `r fmt(b12_top$pct)`%. La concentración por
+columna es lo que limita qué puede corregir cada vehículo.
+:::
+
 ::: {.notapie}
-**NOTA:** Por ciento del total de cada micronutriente aportado por cada grupo. Se rotulan los valores de 5% o más. Clasificación de grupos de la diversidad alimentaria mínima en mujeres, aplicada a adquisiciones del hogar.
+**NOTA:** Clasificación de grupos de la diversidad alimentaria mínima en mujeres (FAO, 2021), aplicada a las adquisiciones del hogar. No constituye el indicador de diversidad alimentaria mínima, que se mide sobre el consumo individual de mujeres en 24 horas.
 :::
 
 # Opciones de intervención {background-color="#2c5364"}
@@ -601,8 +703,20 @@ modifica el aporte de los demás micronutrientes. Ninguna norma construida sobre
 la harina de trigo la mueve.
 :::
 
+::: {style="font-size:0.8em; margin-top:0.4em;"}
+**Lo que dice la estadística.** La diferencia pareada entre la situación con
+todos los derivados del trigo fortificados y esa misma situación con la norma
+del azúcar cumplida es de
+**`r dif_ic(E_TODOS, E_AZUC, "vitamina_a_mcg_rae")`** en vitamina A. El
+intervalo no incluye el cero. En los demás micronutrientes evaluados la
+diferencia es nula.
+
+Estimaciones ponderadas con el diseño muestral complejo de la encuesta, con
+linealización de Taylor para la varianza. n = `r fmt(n_analitico(), 0)` hogares.
+:::
+
 ::: {.notapie}
-**NOTA:** Supone cumplimiento pleno de la norma en la totalidad del azúcar. La encuesta no mide qué proporción del suministro está efectivamente fortificada. Valores de referencia provisionales.
+**NOTA:** Supone cumplimiento pleno de la norma en la totalidad del azúcar. La encuesta no mide qué proporción del suministro está efectivamente fortificada. Valores de referencia pendientes de confirmación.
 :::
 
 ::: {.notes}

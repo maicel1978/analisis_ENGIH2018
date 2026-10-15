@@ -210,4 +210,75 @@ print(as.data.frame(
               semiamplitud_max = round(max(semiamplitud_ic, na.rm = TRUE), 1))
 ))
 
+# --- Diferencias entre escenarios, pareadas por hogar ------------------------
+# Un cambio expresado en puntos porcentuales sin intervalo no es citable. Y el
+# intervalo NO se obtiene restando los extremos de los dos intervalos
+# marginales: los dos escenarios se estiman sobre LOS MISMOS hogares, de modo
+# que la comparacion es pareada y su varianza es menor que la de la diferencia
+# de dos estimaciones independientes.
+#
+# El procedimiento: se construye por hogar la diferencia entre el indicador de
+# un escenario y el del otro, y se estima la media de esa diferencia con el
+# diseno completo. Es la contrapartida, para un diseno complejo, de la prueba
+# para proporciones pareadas.
+#
+# Se calculan todos los pares ordenados. Cada documento toma el que necesita y
+# declara contra que compara.
+ind <- bind_rows(
+  largo |>
+    filter(metodo == "punto_de_corte") |>
+    transmute(id_hogar_unico, escenario, nutriente, valor = bajo_ear,
+              metodo = "Punto de corte"),
+  lapply(BIODISPONIBILIDAD_HIERRO, function(b) {
+    largo |>
+      filter(nutriente == "hierro_mg") |>
+      transmute(id_hogar_unico, escenario, nutriente,
+                valor = prob_inadecuacion_hierro(ingesta, b),
+                metodo = paste0("Probabilidad, biodisponibilidad ", 100 * b, "%"))
+  }) |> bind_rows()
+)
+
+escenarios_todos <- sort(unique(ind$escenario))
+pares <- expand.grid(desde = escenarios_todos, hasta = escenarios_todos,
+                     stringsAsFactors = FALSE) |>
+  filter(desde != hasta)
+
+diferencias <- lapply(split(ind, list(ind$nutriente, ind$metodo), drop = TRUE),
+                      function(z) {
+  ancho <- z |>
+    select(id_hogar_unico, escenario, valor) |>
+    pivot_wider(names_from = escenario, values_from = valor) |>
+    inner_join(diseno_hogar, by = "id_hogar_unico")
+
+  disponibles <- intersect(escenarios_todos, names(ancho))
+  d_w <- ancho |>
+    as_survey_design(ids = upm, strata = estrato, weights = factor_expansion,
+                     nest = TRUE)
+
+  pp <- pares |> filter(desde %in% disponibles, hasta %in% disponibles)
+
+  lapply(seq_len(nrow(pp)), function(k) {
+    a <- pp$desde[k]; b <- pp$hasta[k]
+    d_w |>
+      mutate(d_par = !!rlang::sym(b) - !!rlang::sym(a)) |>
+      summarise(n = unweighted(n()),
+                dif = 100 * survey_mean(d_par, vartype = "ci")) |>
+      mutate(nutriente = z$nutriente[1], metodo = z$metodo[1],
+             escenario_desde = a, escenario_hasta = b, .before = 1)
+  }) |> bind_rows()
+}) |> bind_rows() |>
+  transmute(escenario_desde, escenario_hasta, nutriente, metodo, n,
+            dif_pp = dif, dif_pp_low = dif_low, dif_pp_upp = dif_upp,
+            significativa = (dif_low > 0) | (dif_upp < 0)) |>
+  arrange(nutriente, metodo, escenario_desde, escenario_hasta)
+
+message("\nDiferencias pareadas frente a la linea base (puntos porcentuales):")
+print(as.data.frame(
+  diferencias |>
+    filter(escenario_desde == ESCENARIO_BASE,
+           metodo != "Probabilidad, biodisponibilidad 18%") |>
+    select(escenario_hasta, nutriente, dif_pp, dif_pp_low, dif_pp_upp)
+), digits = 3)
+
 write_delim(riesgo, here("data", "clean", "riesgo_inadecuacion.csv"), delim = ";")
+write_delim(diferencias, here("data", "clean", "diferencias_escenarios.csv"), delim = ";")
