@@ -136,41 +136,7 @@ ETIQ_NUT <- c(folato_mcg_dfe = "Folato", hierro_mg = "Hierro",
 # Los escenarios estan ANIDADOS: 1c y 3 incluyen 1b, que incluye 1a. Comparar
 # cualquiera de ellos contra 1a atribuye a la accion que lo distingue una
 # mejora que pertenece al escalon anterior. Cada accion se compara por tanto
-# contra su predecesor inmediato, declarado en la tabla.
-delta <- function(desde, hasta, nutriente_) {
-  riesgo_nac(hasta, nutriente_) - riesgo_nac(desde, nutriente_)
-}
-
-# Nutrientes que una accion mueve, con su cambio. Se omiten los que no se
-# mueven: una accion sobre un vehiculo no desplaza lo que ese vehiculo no
-# transporta, y listarlos con un cero no informa.
-mueve <- function(desde, hasta, umbral = 0.5) {
-  d <- vapply(names(ETIQ_NUT), function(n) delta(desde, hasta, n), numeric(1))
-  d <- d[abs(d) >= umbral]
-  if (length(d) == 0) return("Ninguno de los evaluados")
-  d <- sort(d)
-  # Cada cambio con su intervalo de confianza: un cambio en puntos
-  # porcentuales sin intervalo no es citable.
-  #
-  # El nombre de la variable del bucle NO puede ser `n`: diferencias_escenarios
-  # tiene una columna `n` (hogares), y dentro de filter() la columna enmascara
-  # a la variable, de modo que la comparacion se hace contra 8.778 y no contra
-  # el nutriente. Se usa nut_ y se cualifica con .env para que no vuelva a
-  # ocurrir si el archivo gana columnas.
-  ic <- vapply(names(d), function(nut_) {
-    m_ <- metodo_de(nut_)
-    r <- dif |> filter(escenario_desde == .env$desde,
-                       escenario_hasta == .env$hasta,
-                       nutriente == .env$nut_, metodo == .env$m_)
-    if (nrow(r) != 1) {
-      stop("Diferencia no identificada para ", nut_, " (", nrow(r), " filas).",
-           call. = FALSE)
-    }
-    paste0("(", fmt(r$dif_pp_low), " a ", fmt(r$dif_pp_upp), ")")
-  }, character(1))
-  paste(paste0(ETIQ_NUT[names(d)], " ", if_else(d < 0, "−", "+"),
-               fmt(abs(d)), " pp ", ic), collapse = "<br>")
-}
+# contra su predecesor inmediato, declarado en la figura.
 
 # Diferencias pareadas entre escenarios, con su intervalo. Los dos escenarios se
 # estiman sobre los mismos hogares: el intervalo de la diferencia no se obtiene
@@ -255,22 +221,20 @@ ggplot(paso) +
   theme_void() + theme(legend.position = "none")
 ```
 
-::: {style="font-size:0.88em; margin-top:0.3em;"}
-**Fortificación de alimentos:** adición de vitaminas o minerales a un alimento
-de consumo habitual, durante su producción industrial, para aumentar su aporte
-de micronutrientes sin modificar el alimento ni su uso.
-
-**A gran escala** significa que se aplica por norma a todo el suministro de ese
-alimento en el país. Es una **intervención poblacional**: actúa sobre el
-alimento, no sobre la conducta de las personas, que no tienen que hacer nada
-distinto de lo que ya hacen.
-
-En la República Dominicana los alimentos usados o considerados como vehículo son
-**la harina de trigo, el arroz, el azúcar y la sal**.
+::: {style="font-size:0.95em; margin-top:0.4em;"}
+Vehículos usados o considerados en la República Dominicana:
+**harina de trigo, arroz, azúcar y sal**.
 :::
 
 ::: {.notes}
 Lamina de entrada, para situar a quien no trabaja el tema. Treinta segundos.
+
+DEFINICION, por si hace falta darla: la fortificacion es la adicion de vitaminas
+o minerales a un alimento de consumo habitual, durante su produccion industrial,
+para aumentar su aporte de micronutrientes sin modificar el alimento ni su uso.
+A gran escala significa que se aplica por norma a todo el suministro de ese
+alimento en el pais. Es una intervencion poblacional: actua sobre el alimento y
+no sobre la conducta de las personas.
 
 Guion sugerido:
 
@@ -295,11 +259,8 @@ hogares dominicanos, y cuanto llegaria bajo distintas normas."
 ## De la encuesta de gastos al aporte de micronutrientes
 
 ::: {style="font-size:0.95em;"}
-Medir directamente la ingesta de micronutrientes exige encuestas de consumo
-individual y análisis de laboratorio: son costosas y se levantan rara vez. Las
-**encuestas de gastos e ingresos de los hogares**, en cambio, se levantan
-periódicamente con fines económicos y registran **todos los alimentos que el
-hogar adquirió**.
+Las encuestas de gastos e ingresos de los hogares se levantan periódicamente
+con fines económicos y registran **todos los alimentos que el hogar adquirió**.
 :::
 
 ```{r}
@@ -329,59 +290,55 @@ ggplot(eslabon) +
 ```
 
 ::: {style="font-size:0.95em;"}
-**Fuente:** Encuesta Nacional de Gastos e Ingresos de los Hogares, 2018, Banco
-Central de la República Dominicana. **Muestra analítica:**
-`r fmt(n_analitico(), 0)` hogares, con el diseño muestral completo de la
-encuesta.
+ENGIH 2018, Banco Central de la República Dominicana.
+`r fmt(n_analitico(), 0)` hogares, con el diseño muestral completo.
 :::
 
 ::: {.notapie}
-**NOTA:** El procedimiento sigue un método publicado para estimar el aporte de la fortificación a partir de encuestas de consumo y gasto de los hogares (Tang et al., 2022). El análisis estima el aporte de la canasta adquirida; no mide el estado nutricional de las personas.
+**NOTA:** Método publicado para estimar el aporte de la fortificación a partir de encuestas de consumo y gasto de los hogares (Tang et al., 2022).
 :::
 
 ::: {.notes}
-El engarce. La idea que debe quedar: el pais ya levanta esta encuesta por
-razones economicas, para la canasta y el indice de precios. Nadie la levanto
-para nutricion. Lo que hace este trabajo es leerla con fines nutricionales.
+EL ENGARCE. Medir la ingesta directamente exige encuestas de consumo individual
+y analisis de laboratorio: son costosas y se levantan rara vez. Las encuestas de
+gastos, en cambio, se levantan periodicamente por razones economicas -la canasta
+de consumo, el indice de precios- y registran todo lo que el hogar adquirio.
 
-Si preguntan por que una encuesta de 2018: la siguiente lamina lo responde.
+LA IDEA QUE DEBE QUEDAR. El pais ya levanta esta encuesta. Nadie la levanto para
+nutricion. Lo que hace este trabajo es leerla con fines nutricionales.
+
+SALVEDAD. El analisis estima el aporte de la canasta adquirida; no mide el
+estado nutricional de las personas.
+
+Si preguntan por que una encuesta de 2018: la lamina siguiente lo responde.
 :::
 
 ## Por qué este análisis es nuevo
 
-::: {style="font-size:0.95em;"}
-**La ENGIH 2018 no se diseñó con fines nutricionales.** Se levantó para
-construir la canasta de consumo y el índice de precios. Este análisis la
-reutiliza para una finalidad distinta de aquella para la que se recogió.
+::: {style="font-size:1em;"}
+**La ENGIH 2018 no se diseñó con fines nutricionales.** De leerla con ese fin
+se derivan tres cosas que el país no tenía:
 
-De ahí se derivan tres cosas que el país no tenía:
-
-1. Una estimación del aporte de micronutrientes de la canasta efectivamente
-   adquirida por los hogares dominicanos.
-2. La cuantificación de lo que la norma vigente de fortificación está logrando,
-   y de lo que no.
-3. Un instrumento para estimar, antes de decidir, el efecto de cada norma
-   alternativa.
-:::
-
-::: {style="font-size:0.88em; margin-top:0.5em;"}
-**Sobre la fecha de los datos.** Los patrones de consumo y el marco normativo
-cambian despacio, y esta es la encuesta de su tipo más reciente disponible. El
-procedimiento quedó construido de modo que **una encuesta nueva sustituye al
-archivo de entrada y el análisis vuelve a correr completo**: el instrumento
-sobrevive al dato.
+1. El aporte de micronutrientes de la canasta que los hogares adquieren.
+2. Lo que la norma vigente está logrando, y lo que no.
+3. Un instrumento para estimar el efecto de cada norma **antes** de decidirla.
 :::
 
 ::: {.notes}
-Esta lamina responde por anticipado la objecion de "los datos son de 2018".
-Tres argumentos, en este orden: los patrones cambian despacio; es la mas
-reciente disponible; y el aparato se reutiliza con la siguiente.
+QUE DECIR. La encuesta se levanto para construir la canasta de consumo y el
+indice de precios. Este analisis la reutiliza para una finalidad distinta de
+aquella para la que se recogio.
 
-El tercero es el que importa para quien decide un presupuesto: lo que se pago
-no fue un informe, fue un procedimiento que sirve la proxima vez.
+SI OBJETAN LA FECHA -y lo haran-. Tres argumentos, en este orden: los patrones
+de consumo y el marco normativo cambian despacio; es la encuesta de su tipo mas
+reciente disponible; y el procedimiento quedo construido de modo que una
+encuesta nueva sustituye al archivo de entrada y el analisis vuelve a correr
+completo. El instrumento sobrevive al dato.
 
-COMPROBAR antes de presentar: que no exista una ENGIH posterior a 2018. Si la
-hubiera, cambiar "mas reciente disponible" por la formula que corresponda.
+El tercer argumento es el que importa para quien decide un presupuesto: lo que
+se pago no fue un informe, fue un procedimiento que sirve la proxima vez.
+
+COMPROBAR ANTES DE PRESENTAR: que no exista una ENGIH posterior a 2018.
 :::
 
 ## Preguntas del análisis
@@ -450,25 +407,24 @@ veh |>
 ```
 
 
-::: {style="font-size:0.8em; margin-top:0.4em;"}
-**Cómo se lee.** Cada fila es un alimento. El punto marca la proporción de
-hogares que lo adquiere; la etiqueta repite esa proporción y añade el consumo
-mediano entre quienes lo adquieren, en gramos por Equivalente de Mujer Adulta y
-día.
-
-**Lo que describen los datos.** El alimento de mayor cobertura es
-`r tolower(v_cob$grupo)`, con `r fmt(v_cob$pct_hogares)`% de los hogares. El de
-mayor consumo mediano entre consumidores es `r tolower(v_con$grupo)`, con
-`r fmt(v_con$mediana_consumidores, 0)` g por día. `r n_mayoria` de los
-`r nrow(veh)` alimentos superan el 50% de cobertura.
-
-Estimaciones ponderadas con el diseño muestral complejo de la encuesta —estratos, unidades primarias de muestreo y factor de expansión—, con linealización de Taylor para la varianza. n = `r fmt(n_analitico(), 0)` hogares.
-:::
-
 ::: {.notapie}
-**NOTA:** El Equivalente de Mujer Adulta normaliza el consumo del hogar por su composición demográfica. El trigo se expresa en equivalentes de harina, con factores de contenido provisionales.
+**NOTA:** Cobertura y consumo mediano entre quienes lo adquieren, por Equivalente de Mujer Adulta y día. Estimaciones ponderadas con el diseño muestral complejo de la encuesta.
 :::
 
+::: {.notes}
+COMO SE LEE. Cada fila es un alimento. El punto marca la proporcion de hogares
+que lo adquiere. La etiqueta repite esa proporcion y anade el consumo mediano
+entre quienes lo adquieren, en gramos por Equivalente de Mujer Adulta y dia.
+
+LO QUE DICEN LOS DATOS. El alimento de mayor cobertura es `r tolower(v_cob$grupo)`,
+con `r fmt(v_cob$pct_hogares)`% de los hogares. El de mayor consumo mediano entre
+consumidores es `r tolower(v_con$grupo)`, con `r fmt(v_con$mediana_consumidores, 0)` g
+por dia. `r n_mayoria` de los `r nrow(veh)` alimentos superan el 50% de cobertura.
+
+El Equivalente de Mujer Adulta normaliza el consumo del hogar por su composicion
+demografica. El trigo va en equivalentes de harina, con factores de contenido
+provisionales.
+:::
 ## A muchos hogares no les llega suficiente {background-color="#eef2f4"}
 
 ::: {style="font-size:1.15em; margin-top:1.2em;"}
@@ -517,24 +473,26 @@ ggplot(base_nut, aes(pct_inadecuado, nut)) +
 ```
 
 
-::: {style="font-size:0.8em; margin-top:0.4em;"}
-**Cómo se lee.** Cada fila es un micronutriente. El punto es la proporción
-estimada de hogares por debajo del requerimiento; la barra gris es su intervalo
-de confianza al 95%. Los intervalos no se solapan entre los extremos de la
-escala: el ordenamiento entre micronutrientes no es atribuible al azar del
-muestreo.
-
-**Lo que describen los datos.** Folato `r riesgo_ic(E_BASE, "folato_mcg_dfe")`;
-hierro `r riesgo_ic(E_BASE, "hierro_mg")`; vitamina A
-`r riesgo_ic(E_BASE, "vitamina_a_mcg_rae")`; vitamina B12
-`r riesgo_ic(E_BASE, "vitamina_b12_mcg")`; zinc
-`r riesgo_ic(E_BASE, "zinc_mg")`.
-
-Estimaciones ponderadas con el diseño muestral complejo de la encuesta —estratos, unidades primarias de muestreo y factor de expansión—, con linealización de Taylor para la varianza. n = `r fmt(n_analitico(), 0)` hogares.
+::: {.notapie}
+**NOTA:** Punto: proporción estimada. Barra: intervalo de confianza al 95%. **Valores de referencia pendientes de confirmación.** No es prevalencia de deficiencia.
 :::
 
-::: {.notapie}
-**NOTA:** Método del punto de corte del Requerimiento Promedio Estimado, salvo en hierro, donde se aplica el enfoque de probabilidad con la distribución del requerimiento y un supuesto de 10% de biodisponibilidad. **Valores de referencia pendientes de confirmación.** Riesgo de ingesta inadecuada estimado a nivel de hogar; no es prevalencia de deficiencia.
+::: {.notes}
+COMO SE LEE. Cada fila es un micronutriente. El punto es la proporcion estimada
+de hogares por debajo del requerimiento; la barra es su intervalo de confianza
+al 95%. Los intervalos no se solapan entre los extremos de la escala: el
+ordenamiento entre micronutrientes no es atribuible al azar del muestreo.
+
+LO QUE DICEN LOS DATOS. Folato `r riesgo_ic(E_BASE, "folato_mcg_dfe")`; hierro
+`r riesgo_ic(E_BASE, "hierro_mg")`; vitamina A
+`r riesgo_ic(E_BASE, "vitamina_a_mcg_rae")`; vitamina B12
+`r riesgo_ic(E_BASE, "vitamina_b12_mcg")`; zinc `r riesgo_ic(E_BASE, "zinc_mg")`.
+
+METODO. Punto de corte del Requerimiento Promedio Estimado, salvo en hierro,
+donde se aplica el enfoque de probabilidad con la distribucion del requerimiento
+y un supuesto de 10% de biodisponibilidad. Con 18% la cifra del hierro baja a
+40,0%: es la decision que sigue abierta. Estimaciones ponderadas con el diseno
+complejo y linealizacion de Taylor. n = `r fmt(n_analitico(), 0)` hogares.
 :::
 
 ## Lo que ya se hace ayuda, pero no alcanza {background-color="#eef2f4"}
@@ -590,26 +548,22 @@ ggplot(par_nut, aes(y = nut)) +
 ```
 
 
-::: {style="font-size:0.8em; margin-top:0.4em;"}
-**Cómo se lee.** Cada fila es un micronutriente. El punto naranja es la
-situación sin fortificación; el azul, la situación con la norma vigente. La
-distancia entre ambos es la reducción atribuible a la norma, y la etiqueta la
-expresa en puntos porcentuales.
-
-**Lo que describen los datos.** La reducción es
-`r dif_ic(E_SIN, E_BASE, "folato_mcg_dfe")` en folato y
-`r dif_ic(E_SIN, E_BASE, "hierro_mg")` en hierro. En vitamina A, vitamina B12 y
-zinc la diferencia es nula: la norma no actúa sobre ellos.
-
-**Los intervalos son de la diferencia pareada**, estimada sobre los mismos
-hogares bajo los dos escenarios, y no de la resta de dos estimaciones
-independientes.
-
-Estimaciones ponderadas con el diseño muestral complejo de la encuesta —estratos, unidades primarias de muestreo y factor de expansión—, con linealización de Taylor para la varianza. n = `r fmt(n_analitico(), 0)` hogares.
+::: {.notapie}
+**NOTA:** Naranja: sin fortificación. Azul: con la norma vigente. Supone cumplimiento pleno de la norma en todo el vehículo.
 :::
 
-::: {.notapie}
-**NOTA:** Supone cumplimiento pleno de la norma en la totalidad del vehículo. La encuesta no mide qué proporción del suministro está efectivamente fortificada. Valores de referencia pendientes de confirmación.
+::: {.notes}
+COMO SE LEE. Cada fila es un micronutriente. El punto naranja es la situacion
+sin fortificacion; el azul, la situacion con la norma vigente. La distancia
+entre ambos es la reduccion atribuible a la norma.
+
+LO QUE DICEN LOS DATOS. La reduccion es `r dif_ic(E_SIN, E_BASE, "folato_mcg_dfe")`
+en folato y `r dif_ic(E_SIN, E_BASE, "hierro_mg")` en hierro. En vitamina A,
+vitamina B12 y zinc la diferencia es nula: la norma no actua sobre ellos.
+
+SI PREGUNTAN POR EL INTERVALO. Es el de la diferencia pareada, estimada sobre
+los mismos hogares bajo los dos escenarios. No es la resta de dos estimaciones
+independientes, y por eso es mas estrecho.
 :::
 
 ## Cada alimento trae unas vitaminas y no otras {background-color="#eef2f4"}
@@ -629,14 +583,8 @@ ella, los resultados de los escenarios parecen arbitrarios.
 ## Origen del aporte de cada micronutriente
 
 ::: {style="font-size:1em;"}
-**El aporte de cada micronutriente se concentra en un número reducido de grupos
-de alimentos.** Esta distribución determina qué micronutriente puede corregir
-cada vehículo: una norma sobre un cereal no modifica el aporte de un
-micronutriente que ese cereal no contiene, con independencia del nivel de
-adición que se fije.
-
-Explica que el zinc, la vitamina B12 y la vitamina A no varíen entre los
-escenarios construidos sobre la norma nacional de harina de trigo.
+**El aporte de cada micronutriente se concentra en pocos grupos de alimentos.**
+Esa distribución determina qué puede corregir cada vehículo.
 :::
 
 ```{r}
@@ -663,20 +611,23 @@ largo |> mutate(Grupo = factor(Grupo, levels = orden)) |>
 ```
 
 
-::: {style="font-size:0.8em; margin-top:0.4em;"}
-**Cómo se lee.** Cada columna es un micronutriente y cada fila un grupo de
-alimentos. La intensidad del azul y la cifra indican qué porcentaje del total de
-ese micronutriente aporta ese grupo. Las columnas suman 100%. Se rotulan los
-valores de 5% o más.
-
-**Lo que describen los datos.** En folato, el grupo principal es
-`r tolower(fol_top$Grupo)`, con `r fmt(fol_top$pct)`% del total; en vitamina
-B12, `r tolower(b12_top$Grupo)`, con `r fmt(b12_top$pct)`%. La concentración por
-columna es lo que limita qué puede corregir cada vehículo.
+::: {.notapie}
+**NOTA:** Porcentaje del total de cada micronutriente aportado por cada grupo. Las columnas suman 100%. Se rotulan los valores de 5% o más.
 :::
 
-::: {.notapie}
-**NOTA:** Clasificación de grupos de la diversidad alimentaria mínima en mujeres (FAO, 2021), aplicada a las adquisiciones del hogar. No constituye el indicador de diversidad alimentaria mínima, que se mide sobre el consumo individual de mujeres en 24 horas.
+::: {.notes}
+COMO SE LEE. Cada columna es un micronutriente y cada fila un grupo de
+alimentos. La intensidad del azul y la cifra indican que porcentaje del total de
+ese micronutriente aporta ese grupo. Las columnas suman 100%.
+
+LO QUE DICEN LOS DATOS. En folato el grupo principal es `r tolower(fol_top$Grupo)`,
+con `r fmt(fol_top$pct)`% del total; en vitamina B12, `r tolower(b12_top$Grupo)`,
+con `r fmt(b12_top$pct)`%. Esa concentracion por columna es lo que limita que
+puede corregir cada vehiculo.
+
+SALVEDAD. Clasificacion de grupos de la diversidad alimentaria minima en mujeres
+(FAO, 2021), aplicada a adquisiciones del hogar. No es el indicador de
+diversidad alimentaria minima, que se mide sobre consumo individual en 24 horas.
 :::
 
 # Opciones de intervención {background-color="#2c5364"}
@@ -697,96 +648,127 @@ Si alguien se lleva una sola frase a casa, que sea esta.
 
 ## Cumplimiento de la norma del azúcar: efecto estimado
 
-::: {style="font-size:1em;"}
-La NORDOM 602 obliga desde 2004 a fortificar el azúcar con vitamina A. Su
-aplicación no está verificada: la etiqueta registrada en punto de venta no
-declara vitamina A.
+```{r}
+#| label: fig-azucar
+#| fig-width: 11
+#| fig-height: 4
+a_antes <- riesgo_nac(E_TODOS, "vitamina_a_mcg_rae")
+a_desp  <- riesgo_nac(E_AZUC,  "vitamina_a_mcg_rae")
 
-Bajo cumplimiento pleno de esa norma, la proporción de hogares por debajo del
-requerimiento de vitamina A pasa de
-**`r fmt(riesgo_nac(E_TODOS, "vitamina_a_mcg_rae"))`%** a
-**`r fmt(riesgo_nac(E_AZUC, "vitamina_a_mcg_rae"))`%**, es decir
-**`r fmt(abs(delta(E_TODOS, E_AZUC, "vitamina_a_mcg_rae")))` puntos
-porcentuales**.
+tibble::tibble(x = c(1, 2),
+               v = c(a_antes, a_desp),
+               et = c("Hoy\nNorma no aplicada", "Norma cumplida")) |>
+  ggplot(aes(x, v)) +
+  geom_segment(aes(x = 1, xend = 2, y = a_antes, yend = a_desp),
+               colour = GRIS, linewidth = 1.6) +
+  geom_point(size = 11, colour = c(ACENTO, AZUL)) +
+  geom_text(aes(label = paste0(fmt(v, 1), "%")), vjust = -1.9,
+            size = 7.5, fontface = "bold", colour = "#1a3a4a") +
+  geom_text(aes(y = 0, label = et), vjust = 1.1, size = 4.6,
+            lineheight = 1.1, colour = "#5a6b76") +
+  scale_x_continuous(limits = c(0.65, 2.35)) +
+  scale_y_continuous(limits = c(0, 92)) +
+  labs(x = NULL, y = NULL) +
+  theme_void() +
+  theme(plot.margin = margin(14, 10, 24, 10))
+```
 
-**El azúcar es el único vehículo evaluado que desplaza la vitamina A**, y no
-modifica el aporte de los demás micronutrientes. Ninguna norma construida sobre
-la harina de trigo la mueve.
-:::
-
-::: {style="font-size:0.8em; margin-top:0.4em;"}
-**Lo que dice la estadística.** La diferencia pareada entre la situación con
-todos los derivados del trigo fortificados y esa misma situación con la norma
-del azúcar cumplida es de
-**`r dif_ic(E_TODOS, E_AZUC, "vitamina_a_mcg_rae")`** en vitamina A. El
-intervalo no incluye el cero. En los demás micronutrientes evaluados la
-diferencia es nula.
-
-Estimaciones ponderadas con el diseño muestral complejo de la encuesta, con
-linealización de Taylor para la varianza. n = `r fmt(n_analitico(), 0)` hogares.
+::: {style="font-size:1em; text-align:center; margin-top:-0.4em;"}
+**Hogares por debajo del requerimiento de vitamina A.**
+Diferencia: `r dif_ic(E_TODOS, E_AZUC, "vitamina_a_mcg_rae")`.
 :::
 
 ::: {.notapie}
-**NOTA:** Supone cumplimiento pleno de la norma en la totalidad del azúcar. La encuesta no mide qué proporción del suministro está efectivamente fortificada. Valores de referencia pendientes de confirmación.
+**NOTA:** Supone cumplimiento pleno de la NORDOM 602 en la totalidad del azúcar. La encuesta no mide qué proporción del suministro está efectivamente fortificada.
 :::
 
 ::: {.notes}
-Este es el punto de la presentacion. Si solo se recuerda una lamina, esta.
-El azucar no mueve ningun otro nutriente: solo lleva vitamina A. Decirlo, para
-que nadie entienda que el azucar resuelve el folato.
+LA LAMINA MAS IMPORTANTE. Decirla despacio.
+
+QUE ES. La NORDOM 602 obliga desde 2004 a fortificar el azucar con vitamina A.
+Su aplicacion no esta verificada: la etiqueta registrada en punto de venta no
+declara vitamina A.
+
+LO QUE DICEN LOS DATOS. Bajo cumplimiento pleno, la proporcion de hogares por
+debajo del requerimiento de vitamina A pasa de `r fmt(a_antes)`% a
+`r fmt(a_desp)`%. La diferencia pareada es
+`r dif_ic(E_TODOS, E_AZUC, "vitamina_a_mcg_rae")`: el intervalo no incluye el
+cero.
+
+LO QUE HAY QUE ANADIR. El azucar es el unico vehiculo evaluado que desplaza la
+vitamina A, y no modifica ningun otro micronutriente. Ninguna norma construida
+sobre la harina de trigo la mueve.
+
+SI PREGUNTAN QUE FALTA. Medir que proporcion del azucar en el mercado cumple
+hoy la norma. Eso no sale de esta encuesta: requiere muestreo en punto de
+produccion o de venta.
 :::
 
-## Efecto estimado de cada acción adicional {.smaller}
+## Efecto estimado de cada acción adicional
 
 ```{r}
-#| label: tbl-opciones
-#| tbl-cap: "Efecto de cada acción adicional sobre el riesgo de ingesta inadecuada, frente a la situación inmediatamente anterior, en orden creciente de exigencia institucional. República Dominicana, 2018"
-tibble::tribble(
-  ~Acción, ~desde, ~hasta, ~`Qué exige`,
-  "Hacer cumplir la norma del azúcar", E_TODOS, E_AZUC,
-    "Fiscalizar. La norma existe desde 2004",
-  "Ampliar la norma a todos los derivados del trigo", E_BASE, E_TODOS,
-    "Ampliar el alcance de una norma vigente",
-  "Elevar la harina y sus derivados al nivel de la OMS", E_TODOS, E_OMS,
-    "Revisar el nivel normativo",
-  "Incorporar el arroz", E_TODOS, E_ARROZ,
-    "Legislar una norma nueva. Ya se comercializa fortificado"
-) |>
-  mutate(
-    `Qué mueve` = vapply(seq_along(Acción),
-                         function(i) mueve(desde[i], hasta[i]), character(1)),
-    # Contrapartida: acido folico sintetico anadido por encima del limite
-    # superior tolerable. Omitirla dejaria la tabla de un solo lado.
-    ul = vapply(hasta, function(e) {
-      v <- esc |> filter(escenario == e) |> distinct(pct_folico_sobre_ul) |> pull()
-      if (length(v) != 1) NA_real_ else v }, numeric(1)),
-    `Hogares sobre el límite de ácido fólico (%)` =
-      if_else(is.na(ul), "—", fmt(ul, 1))) |>
-  select(Acción, `Qué exige`, `Qué mueve`,
-         `Hogares sobre el límite de ácido fólico (%)`) |>
-  tabla(fuente = "Fuente: ENGIH 2018, Banco Central de la República Dominicana.",
-        notas = c(paste("Los escenarios están anidados. Cada acción se compara",
-                        "contra la situación inmediatamente anterior, no contra",
-                        "la norma vigente: comparar contra esta última le",
-                        "atribuiría a cada acción la mejora del escalón previo."),
-                  paste("Se omiten los nutrientes que la acción no desplaza. Un",
-                        "vehículo no mueve un nutriente que no transporta,",
-                        "cualquiera que sea el nivel de adición."),
-                  paste("Entre paréntesis, el intervalo de confianza al 95% de",
-                        "la diferencia, estimada sobre los mismos hogares bajo",
-                        "ambos escenarios."),
-                  paste("El límite superior aplica al ácido fólico sintético",
-                        "añadido, no al folato total, y la proporción se calcula",
-                        "sobre la fracción añadida: es una cota máxima."),
-                  paste("Todas las cifras suponen cumplimiento pleno de la norma",
-                        "en la totalidad del vehículo. La proporción del",
-                        "suministro efectivamente fortificada no se mide con esta",
-                        "encuesta."),
-                  "Valores de referencia provisionales. pp: puntos porcentuales."))
+#| label: fig-acciones
+#| fig-width: 12
+#| fig-height: 4.9
+acciones <- tibble::tribble(
+  ~orden, ~accion,                                  ~desde,  ~hasta,
+  1, "Cumplir la norma del azúcar",                 E_TODOS, E_AZUC,
+  2, "Ampliar a todos los derivados del trigo",     E_BASE,  E_TODOS,
+  3, "Elevar al nivel de la OMS",                   E_TODOS, E_OMS,
+  4, "Incorporar el arroz",                         E_TODOS, E_ARROZ
+)
+
+metodos_principales <- c("Punto de corte", "Probabilidad, biodisponibilidad 10%")
+
+datos <- acciones |>
+  inner_join(dif |> filter(metodo %in% metodos_principales,
+                           nutriente %in% names(ETIQ_NUT)),
+             by = c("desde" = "escenario_desde", "hasta" = "escenario_hasta"),
+             relationship = "one-to-many") |>
+  filter(abs(dif_pp) >= 0.5) |>
+  mutate(accion = factor(accion, levels = rev(acciones$accion)),
+         nut = ETIQ_NUT[nutriente])
+
+ggplot(datos, aes(dif_pp, accion)) +
+  geom_vline(xintercept = 0, colour = "#c9d3da", linewidth = 0.7) +
+  geom_segment(aes(x = dif_pp_low, xend = dif_pp_upp, y = accion, yend = accion),
+               colour = GRIS, linewidth = 1.2) +
+  geom_point(colour = AZUL, size = 3.4) +
+  geom_text(aes(label = nut), vjust = -1.1, size = 3.5, colour = "#5a6b76") +
+  scale_x_continuous(limits = c(-52, 6),
+                     labels = function(x) paste0(x, " pp")) +
+  labs(x = "Cambio en la proporción de hogares bajo el requerimiento", y = NULL) +
+  tema(14)
 ```
 
-::: {style="font-size:0.88em;"}
-**El análisis ordena las acciones; no elige.** De las cuatro, **solo el arroz exige legislar una norma nueva**. Las otras tres operan sobre normas que ya existen, y una de ellas —el azúcar— no exige cambio normativo alguno: solo que se cumpla.
+::: {.notapie}
+**NOTA:** Punto: diferencia estimada frente a la situación inmediatamente anterior. Barra: intervalo de confianza al 95% de la diferencia pareada. Solo se muestran los micronutrientes que la acción desplaza.
+:::
+
+::: {.notes}
+COMO SE LEE. Cada fila es una accion. Cada punto es un micronutriente que esa
+accion desplaza, con su intervalo de confianza. A la izquierda del cero,
+reduccion del riesgo. Lo que no aparece es lo que la accion no mueve.
+
+EL ORDEN DE LAS FILAS ES EL MENSAJE: de arriba abajo, de lo que solo exige
+fiscalizar a lo que exige legislar.
+
+LO QUE HAY QUE DECIR DE CADA UNA.
+Azucar: solo vitamina A, pero es el mayor desplazamiento de un solo nutriente
+y no requiere norma nueva.
+Derivados del trigo: folato y hierro, ampliando el alcance de una norma que ya
+existe.
+Nivel OMS: mueve cuatro micronutrientes a la vez, porque la recomendacion
+incluye zinc, B12 y vitamina A ademas de hierro y folato.
+Arroz: el mayor rendimiento global, y el unico que exige legislar.
+
+LA CONTRAPARTIDA DEL ARROZ, si preguntan: pone al
+`r fmt(esc |> filter(escenario == E_ARROZ) |> distinct(pct_folico_sobre_ul) |> pull(), 1)`%
+de los hogares por encima del limite superior de acido folico anadido. En los
+demas escenarios esa proporcion es menor al 2%. Esta en la lamina de limites.
+
+COMPARACIONES PAREADAS: cada diferencia se estima sobre los mismos hogares bajo
+los dos escenarios, con el diseno muestral completo.
 :::
 
 ## Acciones según la exigencia institucional
@@ -818,21 +800,27 @@ todas estas cifras suponen cumplimiento pleno.
 ## Alcance y límites del análisis
 
 ::: {style="font-size:0.95em;"}
-- **El análisis no mide deficiencia.** Estima el aporte de los alimentos que el
-  hogar adquiere. No mide el estado nutricional de las personas ni sustituye una
-  encuesta con biomarcadores.
-- **Todas las cifras de fortificación suponen cumplimiento pleno de la norma**
-  en la totalidad del vehículo. La encuesta no mide qué proporción del
-  suministro está efectivamente fortificada.
-- **Los valores de referencia están pendientes de confirmación.** Un cambio de
-  referencia modifica todas las proporciones estimadas.
-- **El análisis no sostiene comparaciones entre provincias.** La provincia no es
-  dominio de estimación de esta encuesta.
+- **No mide deficiencia.** Mide el aporte de lo que el hogar adquiere.
+- **Supone cumplimiento pleno de la norma** en todo el vehículo.
+- **Valores de referencia pendientes de confirmación.**
+- **No sostiene comparaciones entre provincias.**
 :::
 
 ::: {.notes}
-Esta lamina protege. Decirla entera y sin apuro. Si alguien cita una cifra
-fuera de contexto, esta es la lamina que se le recuerda.
+ESTA LAMINA PROTEGE. Decirla entera y sin apuro. Si alguien cita una cifra fuera
+de contexto, esta es la lamina que se le recuerda.
+
+QUE ANADIR A CADA PUNTO.
+No mide deficiencia: no sustituye una encuesta con biomarcadores.
+Cumplimiento pleno: la encuesta no mide que proporcion del suministro esta
+efectivamente fortificada. Es el supuesto que gobierna todas las cifras.
+Valores de referencia: un cambio de referencia modifica todas las proporciones.
+Provincias: la provincia no es dominio de estimacion de esta encuesta; 56 de
+256 celdas provinciales quedan con precision insuficiente.
+
+LA CONTRAPARTIDA DEL ARROZ va aqui si no salio antes: pone al
+`r fmt(esc |> filter(escenario == E_ARROZ) |> distinct(pct_folico_sobre_ul) |> pull(), 1)`%
+de los hogares por encima del limite superior de acido folico anadido.
 :::
 
 ## Información requerida para completar el análisis
@@ -847,9 +835,8 @@ fuera de contexto, esta es la lamina que se le recuerda.
 :::
 
 ::: {style="font-size:0.88em; margin-top:0.6em;"}
-La última no se obtiene de esta encuesta. **Requiere medición en punto de
-producción o de venta**, y determina en qué medida las estimaciones
-presentadas describen la situación real.
+La última no se obtiene de esta encuesta: **requiere medición en punto de
+producción o de venta**.
 :::
 
 ## Productos de la consultoría {.smaller}
