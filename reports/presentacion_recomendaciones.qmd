@@ -130,6 +130,26 @@ ETIQ_NUT <- c(folato_mcg_dfe = "Folato", hierro_mg = "Hierro",
               vitamina_a_mcg_rae = "Vitamina A", zinc_mg = "Zinc",
               vitamina_b12_mcg = "Vitamina B12")
 
+# Los escenarios estan ANIDADOS: 1c y 3 incluyen 1b, que incluye 1a. Comparar
+# cualquiera de ellos contra 1a atribuye a la accion que lo distingue una
+# mejora que pertenece al escalon anterior. Cada accion se compara por tanto
+# contra su predecesor inmediato, declarado en la tabla.
+delta <- function(desde, hasta, nutriente_) {
+  riesgo_nac(hasta, nutriente_) - riesgo_nac(desde, nutriente_)
+}
+
+# Nutrientes que una accion mueve, con su cambio. Se omiten los que no se
+# mueven: una accion sobre un vehiculo no desplaza lo que ese vehiculo no
+# transporta, y listarlos con un cero no informa.
+mueve <- function(desde, hasta, umbral = 0.5) {
+  d <- vapply(names(ETIQ_NUT), function(n) delta(desde, hasta, n), numeric(1))
+  d <- d[abs(d) >= umbral]
+  if (length(d) == 0) return("Ninguno de los evaluados")
+  d <- sort(d)
+  paste(paste0(ETIQ_NUT[names(d)], " ", if_else(d < 0, "−", "+"),
+               fmt(abs(d)), " pp"), collapse = " · ")
+}
+
 # Superlativas calculadas del mismo archivo que alimenta cada figura, para que
 # el texto y la figura no puedan contradecirse.
 v_cob <- veh |> slice_max(pct_hogares, n = 1)
@@ -313,51 +333,69 @@ largo |> mutate(Grupo = factor(Grupo, levels = orden)) |>
 
 # Opciones {background-color="#2c5364"}
 
-## Qué compra cada opción y qué exige a cambio {.smaller}
+## La acción de mayor rendimiento no exige legislar nada
+
+::: {style="font-size:1em;"}
+**La norma que obliga a fortificar el azúcar con vitamina A existe desde 2004 y
+su aplicación no está verificada.** La etiqueta observada en punto de venta no
+declara vitamina A.
+
+Si esa norma se cumpliera en todo el azúcar, la proporción de hogares por debajo
+del requerimiento de vitamina A pasaría de
+**`r fmt(riesgo_nac(E_TODOS, "vitamina_a_mcg_rae"))`%** a
+**`r fmt(riesgo_nac(E_AZUC, "vitamina_a_mcg_rae"))`%**:
+**`r fmt(abs(delta(E_TODOS, E_AZUC, "vitamina_a_mcg_rae")))` puntos
+porcentuales con una norma que ya está escrita.**
+
+Ninguna otra acción de esta lista consigue tanto sin legislar.
+:::
+
+::: {.notapie}
+**NOTA:** Supone cumplimiento pleno de la norma en la totalidad del azúcar. La encuesta no mide qué proporción del suministro está efectivamente fortificada. Valores de referencia provisionales.
+:::
+
+::: {.notes}
+Este es el punto de la presentacion. Si solo se recuerda una lamina, esta.
+El azucar no mueve ningun otro nutriente: solo lleva vitamina A. Decirlo, para
+que nadie entienda que el azucar resuelve el folato.
+:::
+
+## Qué mueve cada acción adicional {.smaller}
 
 ```{r}
 #| label: tbl-opciones
-#| tbl-cap: "Opciones de intervención: acción institucional que exige cada una y riesgo de ingesta inadecuada de folato que resulta. República Dominicana, 2018"
-base_fol <- riesgo_nac(E_BASE, "folato_mcg_dfe")
-
-opciones <- tibble::tribble(
-  ~Opción, ~escenario, ~`Qué exige`,
-  "Hacer cumplir la norma del azúcar", E_AZUC,
-    "Fiscalización. La norma existe desde 2004",
-  "Ampliar la norma a todos los derivados del trigo", E_TODOS,
+#| tbl-cap: "Efecto de cada acción adicional sobre el riesgo de ingesta inadecuada, frente a la situación inmediatamente anterior. República Dominicana, 2018"
+tibble::tribble(
+  ~Acción, ~desde, ~hasta, ~`Qué exige`,
+  "Ampliar la norma a todos los derivados del trigo", E_BASE, E_TODOS,
     "Ampliar el alcance de una norma vigente",
-  "Elevar la harina al nivel recomendado por la OMS", E_OMS,
+  "Hacer cumplir la norma del azúcar", E_TODOS, E_AZUC,
+    "Fiscalizar. La norma existe desde 2004",
+  "Elevar la harina y sus derivados al nivel de la OMS", E_TODOS, E_OMS,
     "Revisar el nivel normativo",
-  "Incorporar el arroz", E_ARROZ,
+  "Incorporar el arroz", E_TODOS, E_ARROZ,
     "Norma nueva. Ya se comercializa fortificado"
-)
-
-opciones |>
-  mutate(fol = vapply(escenario, function(e) riesgo_nac(e, "folato_mcg_dfe"),
-                      numeric(1)),
-         `Folato inadecuado (%)` = fmt(fol, 1),
-         `Cambio frente a hoy` = paste0(if_else(fol < base_fol, "−", "+"),
-                                        fmt(abs(fol - base_fol), 1), " pp"),
-         ul = vapply(escenario, function(e) {
-           v <- esc |> filter(escenario == e) |> distinct(pct_folico_sobre_ul) |> pull()
-           if (length(v) != 1) NA_real_ else v }, numeric(1)),
-         `Sobre el límite de ácido fólico (%)` = if_else(is.na(ul), "—", fmt(ul, 1))) |>
-  select(Opción, `Qué exige`, `Folato inadecuado (%)`, `Cambio frente a hoy`,
-         `Sobre el límite de ácido fólico (%)`) |>
+) |>
+  mutate(`Qué mueve` = vapply(seq_along(Acción),
+                              function(i) mueve(desde[i], hasta[i]), character(1))) |>
+  select(Acción, `Qué exige`, `Qué mueve`) |>
   tabla(fuente = "Fuente: ENGIH 2018, Banco Central de la República Dominicana.",
-        notas = c(paste0("Situación de referencia: norma vigente de harina de trigo, con ",
-                         fmt(base_fol, 1), "% de hogares bajo el requerimiento de folato."),
-                  paste("El límite superior aplica al ácido fólico sintético añadido,",
-                        "no al folato total: la proporción es una cota máxima."),
-                  paste("Todas las cifras suponen cumplimiento pleno de la norma en la",
-                        "totalidad del vehículo. La proporción del suministro",
-                        "efectivamente fortificada no se mide con esta encuesta."),
-                  "Valores de referencia provisionales."))
+        notas = c(paste("Los escenarios están anidados. Cada acción se compara",
+                        "contra la situación inmediatamente anterior, no contra",
+                        "la norma vigente: comparar contra esta última le",
+                        "atribuiría a cada acción la mejora del escalón previo."),
+                  paste("Se omiten los nutrientes que la acción no desplaza. Un",
+                        "vehículo no mueve un nutriente que no transporta,",
+                        "cualquiera que sea el nivel de adición."),
+                  paste("Todas las cifras suponen cumplimiento pleno de la norma",
+                        "en la totalidad del vehículo. La proporción del",
+                        "suministro efectivamente fortificada no se mide con esta",
+                        "encuesta."),
+                  "Valores de referencia provisionales. pp: puntos porcentuales."))
 ```
 
 ::: {style="font-size:0.88em;"}
-**El análisis ordena las opciones; no elige.** De las cuatro, solo la primera
-opera sobre una norma que ya existe.
+**El análisis ordena las acciones; no elige.** De las cuatro, **solo el arroz exige legislar una norma nueva**. Las otras tres operan sobre normas que ya existen, y una de ellas —el azúcar— no exige cambio normativo alguno: solo que se cumpla.
 :::
 
 ## Lo mismo, ordenado por lo que cuesta institucionalmente

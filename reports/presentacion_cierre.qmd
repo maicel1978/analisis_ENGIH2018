@@ -851,49 +851,71 @@ toda norma vigente. Ese escenario no es hipotético.
 
 ```{r}
 #| label: tbl-intervenciones
-#| tbl-cap: "Opciones de intervención sobre los vehículos de fortificación: acción institucional que exige cada una y riesgo de ingesta inadecuada de folato que resulta. República Dominicana, 2018"
-base_fol <- riesgo_nac(E_BASE, "folato_mcg_dfe")
-opciones <- tibble::tribble(
-  ~Intervención, ~escenario, ~`Acción institucional`,
-  "Hacer cumplir la norma del azúcar", "1c. Norma nacional y azúcar",
-    "Fiscalización. La norma existe desde 2004",
-  "Ampliar la norma a todos los derivados del trigo", E_TODOS,
-    "Ampliar alcance de una norma vigente",
-  "Elevar al nivel recomendado por la OMS",
-    "2b. OMS: harina y derivados, consumo de 75 a 149 g",
-    "Revisar el nivel normativo",
-  "Incorporar el arroz", E_ARROZ,
-    "Norma nueva. Ya se comercializa fortificado")
+#| tbl-cap: "Efecto de cada acción adicional sobre el riesgo de ingesta inadecuada, frente a la situación inmediatamente anterior. República Dominicana, 2018"
+# Los escenarios estan ANIDADOS: 1c y 3 incluyen 1b, que incluye 1a. Comparar
+# cualquiera contra 1a le atribuye a la accion que lo distingue una mejora que
+# pertenece al escalon anterior. El azucar, por ejemplo, solo lleva vitamina A:
+# el folato que mejoraba en esa fila venia de los derivados del trigo.
+E_AZUC <- "1c. Norma nacional y azúcar"
+E_OMS  <- "2b. OMS: harina y derivados, consumo de 75 a 149 g"
 
-opciones |>
-  mutate(fol = vapply(escenario, function(e) riesgo_nac(e, "folato_mcg_dfe"),
-                      numeric(1)),
-         `Folato inadecuado (%)` = fmt(fol, 1),
-         `Cambio frente a hoy` = paste0(if_else(fol < base_fol, "−", "+"),
-                                        fmt(abs(fol - base_fol), 1), " pp"),
-         ul = vapply(escenario, function(e) {
-           v <- esc |> filter(escenario == e) |> distinct(pct_folico_sobre_ul) |> pull()
-           if (length(v) != 1) NA_real_ else v }, numeric(1)),
-         `Sobre el límite de ácido fólico (%)` = if_else(is.na(ul), "—",
-                                                         fmt(ul, 1))) |>
-  select(Intervención, `Acción institucional`, `Folato inadecuado (%)`,
-         `Cambio frente a hoy`, `Sobre el límite de ácido fólico (%)`) |>
+delta_esc <- function(desde, hasta, nutriente_) {
+  riesgo_nac(hasta, nutriente_) - riesgo_nac(desde, nutriente_)
+}
+
+mueve <- function(desde, hasta, umbral = 0.5) {
+  nutr <- c(folato_mcg_dfe = "Folato", hierro_mg = "Hierro",
+            vitamina_a_mcg_rae = "Vitamina A", zinc_mg = "Zinc",
+            vitamina_b12_mcg = "Vitamina B12")
+  d <- vapply(names(nutr), function(n) delta_esc(desde, hasta, n), numeric(1))
+  d <- d[abs(d) >= umbral]
+  if (length(d) == 0) return("Ninguno de los evaluados")
+  d <- sort(d)
+  paste(paste0(nutr[names(d)], " ", if_else(d < 0, "−", "+"), fmt(abs(d)), " pp"),
+        collapse = " · ")
+}
+
+tibble::tribble(
+  ~Intervención, ~desde, ~hasta, ~`Acción institucional`,
+  "Ampliar la norma a todos los derivados del trigo", E_BASE, E_TODOS,
+    "Ampliar el alcance de una norma vigente",
+  "Hacer cumplir la norma del azúcar", E_TODOS, E_AZUC,
+    "Fiscalización. La norma existe desde 2004",
+  "Elevar al nivel recomendado por la OMS", E_TODOS, E_OMS,
+    "Revisar el nivel normativo",
+  "Incorporar el arroz", E_TODOS, E_ARROZ,
+    "Norma nueva. Ya se comercializa fortificado"
+) |>
+  mutate(
+    `Qué mueve` = vapply(seq_along(Intervención),
+                         function(i) mueve(desde[i], hasta[i]), character(1)),
+    ul = vapply(hasta, function(e) {
+      v <- esc |> filter(escenario == e) |> distinct(pct_folico_sobre_ul) |> pull()
+      if (length(v) != 1) NA_real_ else v }, numeric(1)),
+    `Sobre el límite de ácido fólico (%)` = if_else(is.na(ul), "—", fmt(ul, 1))) |>
+  select(Intervención, `Acción institucional`, `Qué mueve`,
+         `Sobre el límite de ácido fólico (%)`) |>
   tabla(fuente = "Fuente: ENGIH 2018, Banco Central de la República Dominicana.",
-        notas = c(paste0("Situación de referencia: norma vigente de harina de ",
-                         "trigo aplicada a harina y pan, con ", fmt(base_fol, 1),
-                         "% de hogares bajo el requerimiento de folato."),
+        notas = c(paste("Los escenarios están anidados. Cada intervención se",
+                        "compara contra la situación inmediatamente anterior y",
+                        "no contra la norma vigente: comparar contra esta última",
+                        "le atribuiría a cada acción la mejora del escalón previo."),
+                  paste("Se omiten los nutrientes que la intervención no",
+                        "desplaza. Un vehículo no mueve un nutriente que no",
+                        "transporta, cualquiera que sea el nivel de adición."),
                   paste("El límite superior aplica al ácido fólico sintético",
                         "añadido, no al folato total, y la proporción se calcula",
                         "sobre la fracción añadida: es una cota máxima."),
                   paste("Todas las cifras suponen cumplimiento pleno de la norma",
-                        "en la totalidad del vehículo. La proporción del suministro",
-                        "efectivamente fortificada no se mide con esta encuesta."),
+                        "en la totalidad del vehículo. La proporción del",
+                        "suministro efectivamente fortificada no se mide con esta",
+                        "encuesta."),
                   paste("Estimaciones puntuales. Los intervalos de confianza al",
                         "95% de cada escenario figuran en el informe analítico."),
-                  "Valores de referencia provisionales."))
+                  "Valores de referencia provisionales. pp: puntos porcentuales."))
 ```
 
-El análisis ordena las opciones por rendimiento y por la acción que requieren; no sustituye la decisión. De las cuatro, solo la primera opera sobre una norma ya existente.
+El análisis ordena las opciones por rendimiento y por la acción que requieren; no sustituye la decisión. De las cuatro, **solo el arroz exige legislar una norma nueva**. Las otras tres operan sobre normas que ya existen, y una de ellas —el azúcar— no exige cambio normativo alguno: solo que se cumpla.
 
 ::: {.notes}
 Carta de opciones con su costo institucional y su rendimiento al lado. No se presenta como recomendacion.
