@@ -212,4 +212,4 @@ Reglas de trabajo, no aspiraciones. Aplican a cualquier persona o herramienta qu
 5. Antes de reportar una cifra agregada importante, se contrasta su orden de magnitud contra una referencia externa. Aplicado: estructura de la dieta contra el análisis del IDIAF (2021) sobre la misma encuesta, e ingesta energética contra las hojas de balance de FAO. Si no cuadra, se investiga antes de publicar.
 6. Cualquier corrección a un dato existente conserva el valor original (columna aparte o historial de git) junto con la justificación y la fuente del cambio.
 7. Citas de literatura (Tang et al., Imhoff-Kunsch, guía MIMI/WFP, ENM) se usan solo verificadas contra el documento primario — nunca una síntesis sin bibliografía comprobable.
-8. No se guardan en el repositorio transcripciones de conversaciones con asistentes de IA ni borradores sin fuente verificable. Si algo de valor sale de esas conversaciones, se reescribe como decisión propia, verificada, e incorporada al documento correspondiente.
+8. No se guardan en el repositorio borradores sin fuente verificable.

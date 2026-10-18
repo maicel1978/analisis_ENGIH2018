@@ -1,6 +1,6 @@
 # diagnostico_densidad_critica.R
 #
-# Decision E1 de docs/hoja-de-ruta.md: densidad de nutrientes frente a ingesta
+# Decision metodologica: densidad de nutrientes frente a ingesta
 # absoluta para comparacion geografica. Este script aporta la evidencia y
 # cuantifica la diferencia entre los dos criterios.
 #

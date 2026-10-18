@@ -65,7 +65,7 @@ for (i in seq_len(nrow(fuentes))) {
          "  registrado: ", f$md5, "\n",
          "  descargado: ", resumen, "\n",
          "La fuente pudo republicar una version corregida. Antes de seguir, ",
-         "comparar las cifras de control de docs/hoja-de-ruta.md.", call. = FALSE)
+         "comparar las cifras de control del manual técnico.", call. = FALSE)
   } else {
     message("  resumen verificado.")
   }

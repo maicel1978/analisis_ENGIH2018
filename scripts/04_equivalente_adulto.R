@@ -5,8 +5,7 @@
 # entre hogares de distinta composición demográfica (Weisell & Dop, 2012).
 #
 # Formula (documento metodologico "Modelo de Base - Equivalente de Mujer
-# Adulta (EMA)", agosto 2026, docs/20260903 Modelo de Base - Equivalente
-# de Mujer Adulta (EMA).pdf):
+# Adulta (EMA)", agosto 2026):
 #
 #   Ingesta_aparente_m = Sum(cantidad_consumida x composicion_micronutrientes) / EMA_hogar
 #

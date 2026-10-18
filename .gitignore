@@ -42,6 +42,9 @@ data/raw/Sociodemograficas_e_ingresos.xlsx
 data/raw/data_raw_sec2.csv
 data/raw/data_raw_sec3a.csv
 
+# Documentos de referencia de terceros: se consultan en local, no se redistribuyen.
+referencias/
+
 
 # Salidas automaticas de 02_eda.R (regenerables, no requieren juicio manual
 # como si lo requieren otros archivos de data/diagnosticos/ ej. FC_propuesto_*.csv)

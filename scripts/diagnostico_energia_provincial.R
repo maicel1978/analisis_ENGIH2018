@@ -1,6 +1,6 @@
 # diagnostico_energia_provincial.R
 #
-# Evidencia del hallazgo registrado en docs/hoja-de-ruta.md el 2026-10-10:
+# Evidencia del hallazgo documentado en el manual tecnico:
 # el patron geografico del riesgo de ingesta inadecuada esta gobernado por la
 # energia registrada, y no por diferencias en la composicion de la dieta.
 #

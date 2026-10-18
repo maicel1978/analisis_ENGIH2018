@@ -31,7 +31,7 @@
 #   ejemplo de estimación ponderada de este script declara el diseño completo
 #   (strata, ids, weights), no solo los pesos.
 #
-#   Ver docs/hoja-de-ruta.md para el estado de las decisiones abiertas.
+#   Las decisiones metodológicas se documentan en el manual técnico.
 
 # Configuración general ---------------------------------------------------
 rm(list = ls())
@@ -170,8 +170,9 @@ message(
 # guardados en data/clean/data_sec{2,3a}_consumo.csv, más un ejemplo de
 # agregado ponderado correcto (cobertura de un alimento).
 #
-# PENDIENTE (no acá, ver docs/hoja-de-ruta.md):
-#   - Disponibilidad neta Sec 2 + Sec 3A para alimentos almacenables.
+# Fuera del alcance de este script:
+#   - Solapamiento Sec 2 + Sec 3A: se resuelve en 04_equivalente_adulto.R con
+#     la regla de agotamiento.
 #   - Control de outliers a nivel de hogar. La detección opera por alimento,
 #     de modo que un hogar puede acumular varios valores altos sin que ninguno
 #     sea individualmente extremo.

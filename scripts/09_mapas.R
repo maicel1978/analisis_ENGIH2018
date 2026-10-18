@@ -303,7 +303,7 @@ ggsave(here("media", "mapas", "mapa_riesgo_folato.png"),
 # Decision E1: para comparacion geografica se prefiere la densidad de
 # nutrientes a la ingesta absoluta, porque un factor de sobrerregistro comun a
 # todos los alimentos del hogar se cancela en el cociente y no en el nivel
-# (hallazgo del 2026-10-10 en docs/hoja-de-ruta.md).
+# (véase el manual técnico, capítulo de densidad de nutrientes).
 #
 # El umbral no es un supuesto nuevo. El denominador del EMA son 2.291 kcal, el
 # requerimiento de la mujer adulta de referencia (FAO/WHO/UNU 2004), y los RPE

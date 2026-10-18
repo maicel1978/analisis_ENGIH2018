@@ -1,11 +1,11 @@
 orden;entregable;tdr;situacion;situacion_previa;fecha_compromiso;falta;avance_pct
-1;Análisis preliminar de las Secciones 2 y 3A;4.1 a 4.3;Entregado;Entregado;;Incorporar la respuesta a los comentarios de revisión;100
+1;Análisis preliminar de las Secciones 2 y 3A;4.1 a 4.3;Entregado;Entregado;;;100
 2;Código R del análisis preliminar;7;Entregado;Entregado;;;100
 3;Análisis demográfico y socioeconómico con Equivalente de Mujer Adulta;8.2;Entregado;Entregado;;;100
-4;Cobertura y consumo de alimentos fortificables;8.1;Completo, en revisión;En revisión;2026-10-16;Revisión de redacción y figuras;100
-5;Ingesta de micronutrientes y riesgo de ingesta inadecuada;8.3;Completo, en revisión;En revisión;2026-10-16;Valores de referencia definitivos y supuesto de biodisponibilidad del hierro;95
+4;Cobertura y consumo de alimentos fortificables;8.1;Completo;Completo, en revisión;;;100
+5;Ingesta de micronutrientes y riesgo de ingesta inadecuada;8.3;Completo;Completo, en revisión;;;100
 6;Análisis por grupos de alimentos;8.4;Completo;Completo;;;100
-7;Mapas y visualizaciones;8.5;Completo;Completo;;Regenerar las imágenes con la numeración de provincias;95
-8;Informe analítico final;7 y 8;Borrador completo, sin verificar;Borrador completo;2026-10-21;Corrida de verificación y revisión de las ocho figuras;90
-9;Manual técnico de metodología y procedimientos;18;Borrador completo, sin compilar;Borrador completo;2026-10-22;Compilación y medición de extensión contra las 20 a 30 páginas;85
-10;Módulos de capacitación y plataforma e-learning;9 a 17;En revisión;En revisión;2026-10-23;Fusionar la corrección del módulo 24 y las unidades de R aplicado;80
+7;Mapas y visualizaciones;8.5;Completo;Completo;;;100
+8;Informe analítico final;7 y 8;Completo, en revisión final;Borrador completo, sin verificar;2026-10-23;Revisión final del consultor;95
+9;Manual técnico de metodología y procedimientos;18;Completo, en revisión final;Borrador completo, sin compilar;2026-10-23;Revisión final del consultor;95
+10;Módulos de capacitación y plataforma e-learning;9 a 17;Completo, en revisión final;En revisión;2026-10-23;Video-lecciones de los módulos 15, 16 y 24 a 30;90
