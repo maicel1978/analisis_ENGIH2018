@@ -39,9 +39,7 @@ cob_baja_arroz <- cob_baja_arroz |>
 
 ### Distribución territorial de la cobertura y el consumo de los vehículos
 
-Un vehículo de fortificación sirve en la medida en que reúne dos condiciones a
-la vez: que lo adquiera una proporción alta de hogares y que se consuma en
-cantidad suficiente para transportar el fortificante. Las dos se examinan
+Las dos condiciones de un vehículo, cobertura y cantidad consumida, se examinan
 juntas en la @fig-bivariado, con los mismos cortes fijos en ambos ejes y en los
 dos vehículos, de modo que los mapas sean comparables entre sí.
 
@@ -78,8 +76,7 @@ vehículos comparten la clase de cobertura alta, pero no la de consumo: el arroz
 se sitúa en la banda superior, con medianas provinciales de
 `r fmt(arroz$con_min, 0)` a `r fmt(arroz$con_max, 0)` gramos por EMA y día,
 mientras el trigo en equivalentes de harina ocupa la banda inferior, de
-`r fmt(trigo$con_min, 0)` a `r fmt(trigo$con_max, 0)` gramos. La diferencia es
-de naturaleza y no de hábito: el arroz se adquiere como grano y se consume
+`r fmt(trigo$con_min, 0)` a `r fmt(trigo$con_max, 0)` gramos. El arroz se adquiere como grano y se consume
 entero, mientras del pan, las pastas y las galletas solo una fracción es harina,
 y es esa fracción la que transporta el fortificante.
 

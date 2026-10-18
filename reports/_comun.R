@@ -232,7 +232,7 @@ NOTA_DISENO <- paste(
   "(8 estratos, 933 unidades primarias de muestreo, factor de expansión por",
   "hogar); intervalos de confianza por linealización de Taylor."
 )
-NOTA_EMA <- "EMA: Equivalente de Mujer Adulta. IC: intervalo de confianza."
+NOTA_EMA <- "EMA: Equivalente de Mujer Adulta."
 
 # Devuelve gt en HTML y flextable en Word, con la nota al pie dentro del objeto.
 #

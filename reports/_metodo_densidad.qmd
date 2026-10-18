@@ -103,9 +103,11 @@ ref_d |>
   filter(metodo == "punto_de_corte") |>
   transmute(Nutriente,
             `RPE` = fmt(ear, 1),
-            Unidad = unidad,
+            Unidad = sub("^ug", "µg", unidad),
             `Densidad crítica (por 1.000 kcal)` = fmt(densidad_critica, 2)) |>
-  tabla(notas = c(
+  tabla(fuente = paste("Fuentes: Institute of Medicine, valores de referencia;",
+                       "FAO/WHO/UNU (2004), requerimiento energético."),
+        notas = c(
     paste0("Densidad crítica = RPE / ", fmt(KCAL_EMA, 0), " × 1.000, donde ",
            fmt(KCAL_EMA, 0), " kcal es el requerimiento energético de la mujer ",
            "adulta de referencia (FAO/WHO/UNU 2004) y el denominador del EMA."),
@@ -243,8 +245,8 @@ nivel de registro, y la dispersión entre provincias baja de
 `r fmt(diff(range(prov$pct_ing_comp)), 1)` a
 `r fmt(diff(range(prov$pct_densidad)), 1)` puntos de rango.
 
-La @fig-mapas-criterios compara las dos lecturas.
-El contraste entre las dos figuras es la magnitud del problema: el mismo
+El contraste entre los mapas de las dos lecturas, que se presentan en los
+resultados, es la magnitud del problema: el mismo
 nutriente, el mismo escenario y los mismos hogares producen ordenamientos
 territoriales distintos según se mida el nivel absoluto o la composición.
 

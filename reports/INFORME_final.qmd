@@ -172,38 +172,10 @@ requiere.
 ## Contexto: la fortificación de alimentos en la República Dominicana
 
 El país tiene programas de fortificación obligatoria de distinta antigüedad y
-distinto grado de aplicación efectiva. La @tbl-normas resume los instrumentos
-vigentes y en propuesta para los nutrientes que este análisis modela.
+distinto grado de aplicación efectiva. La @tbl-normas, en la sección de métodos, resume
+los instrumentos vigentes y en propuesta para los nutrientes que este análisis modela.
 
-```{r}
-#| label: tbl-normas
-#| tbl-cap: "Instrumentos de fortificación de alimentos vigentes y en propuesta, para los nutrientes modelados. República Dominicana"
-normas <- read_delim(here("data", "raw", "parametros_normativos.csv"),
-                     delim = ";", show_col_types = FALSE,
-                     locale = locale(decimal_mark = "."))
-
-NUT_MODELADOS <- c("hierro", "acido_folico", "vitamina_a", "zinc", "vitamina_b12")
-ETIQUETA_NUT <- c(hierro = "Hierro", acido_folico = "Ácido fólico",
-                  vitamina_a = "Vitamina A", zinc = "Zinc",
-                  vitamina_b12 = "Vitamina B12", yodo = "Yodo")
-
-normas |>
-  filter(nutriente %in% NUT_MODELADOS, estado != "descartada") |>
-  transmute(`Vehículo` = vehiculo,
-            Nutriente = ETIQUETA_NUT[nutriente],
-            Nivel = paste(num(nivel_min, 2),
-                          if_else(unidad == "por_confirmar",
-                                  "(unidad por confirmar)", unidad)),
-            Instrumento = instrumento,
-            `Obligatorio` = recode(obligatorio, si = "Sí", no = "No",
-                                   propuesta = "Propuesta",
-                                   por_confirmar = "Por confirmar"),
-            `Vigente en 2018` = recode(vigente_2018, si = "Sí", no = "No",
-                                       por_confirmar = "Por confirmar")) |>
-  kable(align = "llrlll")
-```
-
-Tres rasgos de ese cuadro condicionan la lectura de todo lo que sigue.
+Tres rasgos de esos instrumentos condicionan la lectura de todo lo que sigue.
 
 **La harina de trigo es el único vehículo con fortificación obligatoria,
 vigente en 2018 y verificada, entre los que aportan los nutrientes de interés
@@ -223,8 +195,7 @@ técnico, cuyos niveles son concordantes con la etiqueta del arroz fortificado
 que ya se encuentra en el mercado. El escenario correspondiente modela esa
 propuesta, no una norma en vigor.
 
-La distinción entre norma, aplicación y verificación no es un matiz
-administrativo: determina qué escenario describe la realidad de 2018 y cuáles
+La distinción entre norma, aplicación y verificación determina qué escenario describe la realidad de 2018 y cuáles
 describen decisiones posibles. El escenario de línea base de este informe es la
 norma de harina de trigo aplicada a la harina y al pan.
 
@@ -355,6 +326,40 @@ Los escenarios se construyen **por adición**: se parte del alimento sin
 fortificar y se suma el nivel que el escenario añade, en miligramos por
 kilogramo de vehículo, que es como se expresa una norma.
 
+Los niveles de adición proceden de los instrumentos normativos de la
+@tbl-normas.
+
+```{r}
+#| label: tbl-normas
+#| tbl-cap: "Instrumentos de fortificación de alimentos vigentes y en propuesta, para los nutrientes modelados. República Dominicana"
+normas <- read_delim(here("data", "raw", "parametros_normativos.csv"),
+                     delim = ";", show_col_types = FALSE,
+                     locale = locale(decimal_mark = "."))
+
+NUT_MODELADOS <- c("hierro", "acido_folico", "vitamina_a", "zinc", "vitamina_b12")
+ETIQUETA_NUT <- c(hierro = "Hierro", acido_folico = "Ácido fólico",
+                  vitamina_a = "Vitamina A", zinc = "Zinc",
+                  vitamina_b12 = "Vitamina B12", yodo = "Yodo")
+
+normas |>
+  filter(nutriente %in% NUT_MODELADOS, estado != "descartada") |>
+  transmute(`Vehículo` = vehiculo,
+            Nutriente = ETIQUETA_NUT[nutriente],
+            Nivel = if_else(is.na(nivel_min), "—",
+                            paste(format(nivel_min, big.mark = ".", decimal.mark = ",",
+                                         drop0trailing = TRUE, trim = TRUE,
+                                         scientific = FALSE),
+                                  if_else(unidad == "por_confirmar",
+                                          "(unidad por confirmar)", unidad))),
+            Instrumento = instrumento,
+            `Obligatorio` = recode(obligatorio, si = "Sí", no = "No",
+                                   propuesta = "Propuesta",
+                                   por_confirmar = "Por confirmar"),
+            `Vigente en 2018` = recode(vigente_2018, si = "Sí", no = "No",
+                                       por_confirmar = "Por confirmar")) |>
+  kable(align = "llrlll")
+```
+
 Los derivados del trigo exigen un tratamiento particular. La tabla de
 composición los trae ya elaborados con harina enriquecida, de modo que partir de
 ellos contaría la fortificación dos veces; su hierro y su folato se sustituyen
@@ -411,65 +416,6 @@ semana.
 
 ## Factibilidad y cobertura de los datos
 
-La inadecuación no se reparte por igual entre nutrientes. La @fig-riesgo los
-ordena de mayor a menor, y el rango cubre casi toda la escala: hay nutrientes
-cuya ingesta aparente queda por debajo del requerimiento en la inmensa mayoría
-de los hogares y otros donde el déficit alcanza a menos de la mitad.
-
-Tres advertencias condicionan la lectura, y ninguna es menor.
-
-**Los valores de referencia son el Requerimiento Promedio Estimado del
-Institute of Medicine** para mujeres de 19 a 30 años. La proporción bajo el
-requerimiento escala con el requerimiento empleado, de modo que otro conjunto
-de referencia reescalaría todas las cifras de esta sección.
-
-**El hierro se presenta con una biodisponibilidad del 10%, valor adoptado para
-la consultoría; el 18% se reporta como análisis de sensibilidad.** Con el
-18%, propio de dietas con mayor presencia de carne y de
-potenciadores de la absorción, el requerimiento se reduce en proporción y la
-cifra baja aproximadamente a la mitad. La elección no es un detalle técnico:
-cambia la posición del hierro dentro de este cuadro.
-
-**Las vitaminas D y E dependen de la cobertura de la tabla de composición más
-que el resto**, de modo que su cifra es la más próxima a un piso. En la
-vitamina D se añade que la inadecuación dietética no equivale a deficiencia,
-porque la síntesis cutánea no se contabiliza.
-
-
-## Riesgo de ingesta inadecuada
-
-```{r}
-#| label: fig-riesgo
-#| fig-cap: "Hogares con ingesta aparente por debajo del requerimiento, por nutriente. Escenario de línea base. El segmento indica el intervalo de confianza al 95%."
-#| fig-width: 7
-#| fig-height: 3.6
-nac_base |>
-  ggplot(aes(x = pct_inadecuado, y = reorder(nutriente, pct_inadecuado))) +
-  geom_segment(aes(x = pct_inadecuado_low, xend = pct_inadecuado_upp,
-                   yend = reorder(nutriente, pct_inadecuado)),
-               colour = GRIS, linewidth = 0.6) +
-  geom_point(size = 3.2, colour = AZUL) +
-  geom_text(aes(label = num(pct_inadecuado)), hjust = -0.5, size = 3.1,
-            colour = GRIS) +
-  scale_x_continuous(limits = c(0, 112), breaks = seq(0, 100, 25),
-                     labels = function(x) paste0(x, "%")) +
-  labs(x = "Hogares bajo el requerimiento (% del total de hogares)", y = NULL) +
-  tema_informe
-```
-
-```{r}
-#| label: tbl-riesgo
-#| tbl-cap: "Hogares con ingesta aparente por debajo del requerimiento, según nutriente. Línea base. República Dominicana, 2018"
-principal |>
-  filter(dominio == "Nacional", escenario == ESCENARIO_BASE) |>
-  arrange(desc(pct_inadecuado)) |>
-  transmute(Nutriente = nutriente,
-            `Hogares bajo el requerimiento (%)` = num(pct_inadecuado),
-            `IC 95%` = paste0(num(pct_inadecuado_low), " – ", num(pct_inadecuado_upp)),
-            `Densidad mediana por 1.000 kcal` = num(densidad_mediana, 2)) |>
-  kable(align = "lrrr")
-```
-
 La ENGIH 2018 permite estimar consumo aparente e ingesta de micronutrientes, y
 la respuesta a la primera pregunta de este informe es afirmativa con una
 condición: que el resultado se lea junto a su cobertura.
@@ -514,6 +460,64 @@ cobertura por sección del cuestionario, las pérdidas de registros por motivo y
 la validación externa de las cantidades. Este informe no la repite: parte de
 ella.
 
+
+## Riesgo de ingesta inadecuada
+
+La inadecuación no se reparte por igual entre nutrientes. La @fig-riesgo los
+ordena de mayor a menor, y el rango cubre casi toda la escala: hay nutrientes
+cuya ingesta aparente queda por debajo del requerimiento en la inmensa mayoría
+de los hogares y otros donde el déficit alcanza a menos de la mitad.
+
+Tres salvedades condicionan su lectura.
+
+**Los valores de referencia son el Requerimiento Promedio Estimado del
+Institute of Medicine** para mujeres de 19 a 30 años. La proporción bajo el
+requerimiento escala con el requerimiento empleado, de modo que otro conjunto
+de referencia reescalaría todas las cifras de esta sección.
+
+**El hierro se presenta con una biodisponibilidad del 10%, valor adoptado para
+la consultoría; el 18% se reporta como análisis de sensibilidad.** Con el
+18%, propio de dietas con mayor presencia de carne y de
+potenciadores de la absorción, el requerimiento se reduce en proporción y la
+cifra baja aproximadamente a la mitad. La elección
+cambia la posición del hierro en esa jerarquía.
+
+**Las vitaminas D y E dependen de la cobertura de la tabla de composición más
+que el resto**, de modo que su cifra es la más próxima a un piso. En la
+vitamina D se añade que la inadecuación dietética no equivale a deficiencia,
+porque la síntesis cutánea no se contabiliza.
+
+```{r}
+#| label: fig-riesgo
+#| fig-cap: "Hogares con ingesta aparente por debajo del requerimiento, por nutriente. Escenario de línea base. El segmento indica el intervalo de confianza al 95%."
+#| fig-width: 7
+#| fig-height: 3.6
+nac_base |>
+  ggplot(aes(x = pct_inadecuado, y = reorder(nutriente, pct_inadecuado))) +
+  geom_segment(aes(x = pct_inadecuado_low, xend = pct_inadecuado_upp,
+                   yend = reorder(nutriente, pct_inadecuado)),
+               colour = GRIS, linewidth = 0.6) +
+  geom_point(size = 3.2, colour = AZUL) +
+  geom_text(aes(label = num(pct_inadecuado)), hjust = -0.5, size = 3.1,
+            colour = GRIS) +
+  scale_x_continuous(limits = c(0, 112), breaks = seq(0, 100, 25),
+                     labels = function(x) paste0(x, "%")) +
+  labs(x = "Hogares bajo el requerimiento (% del total de hogares)", y = NULL) +
+  tema_informe
+```
+
+```{r}
+#| label: tbl-riesgo
+#| tbl-cap: "Hogares con ingesta aparente por debajo del requerimiento, según nutriente. Línea base. República Dominicana, 2018"
+principal |>
+  filter(dominio == "Nacional", escenario == ESCENARIO_BASE) |>
+  arrange(desc(pct_inadecuado)) |>
+  transmute(Nutriente = nutriente,
+            `Hogares bajo el requerimiento (%)` = num(pct_inadecuado),
+            `IC 95%` = paste0(num(pct_inadecuado_low), " – ", num(pct_inadecuado_upp)),
+            `Densidad mediana por 1.000 kcal` = num(densidad_mediana, 2)) |>
+  kable(align = "lrrr")
+```
 
 ## Composición de la dieta por grupos de alimentos
 
@@ -562,8 +566,7 @@ grupos |>
   kable(align = "lrr")
 ```
 
-La @fig-grupos-nutrientes es la figura con más consecuencias para la decisión
-de política de todo el informe, porque explica **por qué un escenario de
+La @fig-grupos-nutrientes explica **por qué un escenario de
 fortificación mueve unos nutrientes y no otros**.
 
 Los grupos de cereales, raíces y plátanos concentran el aporte de los
@@ -574,9 +577,9 @@ columna donde ese grupo concentra el aporte; un nutriente cuyo aporte proviene
 casi enteramente de carnes y lácteos no puede moverse, por mucho que se
 fortifique el cereal.
 
-Dicho de otro modo: **la elección del vehículo no determina solo a cuánta gente
-se llega, sino qué nutrientes es posible corregir.** Esa restricción es
-estructural y ningún nivel de fortificación la salva.
+**La elección del vehículo determina, además de a cuántos hogares se llega,
+qué nutrientes es posible corregir**, con independencia del nivel de
+fortificación.
 
 Dos notas sobre la clasificación. Es la agrupación de la diversidad alimentaria
 mínima en mujeres (FAO, 2021) más las categorías que esa guía deja fuera, y
@@ -602,8 +605,8 @@ vehiculos |>
 
 Un vehículo sirve en la medida en que reúne dos condiciones a la vez:
 alcanzar a una proporción alta de hogares y consumirse en cantidad suficiente
-para transportar el fortificante. La tabla anterior las separa; el apartado
-siguiente las examina juntas y por territorio.
+para transportar el fortificante. La tabla anterior las separa; el apartado de
+distribución territorial las examina juntas.
 
 ### Alcance de una estrategia sobre varios vehículos
 
@@ -685,20 +688,17 @@ El gradiente socioeconómico del folato existe y es del signo esperado cuando se
 mide sobre la ingesta absoluta: el déficit es mayor en los hogares de menor
 gasto. Medido sobre la densidad de nutrientes, **el gradiente se invierte**.
 
-La inversión no es un resultado sobre bienestar. El
-criterio de densidad corrige el nivel de adquisición registrada, y esa
-corrección solo procede donde la variación de ese nivel es artefactual. Entre
-quintiles la variación es plausiblemente real, porque responde a diferencias
-efectivas de acceso a alimentos: dividir por la energía allí no elimina ruido,
-elimina señal. **El gradiente socioeconómico de este informe se reporta sobre
-ingesta absoluta.**
-
-Lo que la densidad sí describe entre quintiles, y es un hallazgo por derecho
-propio, es la **composición** de la dieta: las canastas de mayor gasto llevan
-menos folato por unidad de energía, que es el patrón clásico de transición
-alimentaria. Describe la calidad de la dieta, no la prevalencia de riesgo.
+Entre quintiles la variación de la energía registrada es plausiblemente real,
+de modo que la corrección por densidad no procede como medida de riesgo
+(sección de métodos). **El gradiente socioeconómico de este informe se reporta
+sobre ingesta absoluta.** Lo que la densidad describe entre quintiles es la
+composición de la dieta: las canastas de mayor gasto llevan menos folato por
+unidad de energía.
 
 ### Distribución territorial
+
+La @fig-mapas-criterios presenta el riesgo de folato por provincia bajo los
+dos criterios.
 
 ::: {#fig-mapas-criterios layout-ncol=1}
 
@@ -814,11 +814,11 @@ qué productos se alcanzan sino en cuánta harina transporta cada uno.
 **Los niveles recomendados internacionalmente rinden más sobre los mismos
 alimentos.** Los escenarios construidos con los niveles de la Organización
 Mundial de la Salud operan sobre el mismo vehículo y el mismo alcance
-poblacional, y producen un desplazamiento mayor. La diferencia no es de
-cobertura: es de dosis. Eso sitúa la revisión del nivel normativo como una
+poblacional, y producen un desplazamiento mayor. La ganancia
+procede de la dosis. Eso sitúa la revisión del nivel normativo como una
 decisión con rendimiento propio, independiente de incorporar vehículos nuevos.
 
-**Los nutrientes que ningún escenario de harina mueve, no se mueven.** El zinc,
+**Zinc, vitamina B12 y vitamina A no responden a los escenarios de harina.** El zinc,
 la vitamina B12 y la vitamina A permanecen prácticamente invariables a lo largo
 de todos los escenarios de la norma nacional, por la razón que muestra la
 @fig-grupos-nutrientes: la norma añade hierro y ácido fólico, y esos nutrientes
@@ -839,9 +839,8 @@ prácticamente a la unidad: la ingesta de folato deja de depender del gasto del
 hogar. Los escenarios que operan sobre la harina de trigo, cuyo consumo es
 desigual entre estratos, conservan el gradiente aunque eleven el nivel medio.
 
-El hallazgo tiene una consecuencia de política que no es evidente de antemano:
-**elevar la ingesta media y cerrar la brecha social no son el mismo objetivo, y
-no se consiguen con la misma decisión.** Subir el nivel normativo sobre un
+La consecuencia de política es que **elevar la ingesta media y cerrar la brecha
+social son objetivos distintos, que no se consiguen con la misma decisión.** Subir el nivel normativo sobre un
 vehículo desigual mejora el promedio y mantiene la desigualdad; cambiar a un
 vehículo transversal cierra la brecha. Qué se prioriza es una decisión política,
 y se toma sobre dos decisiones distintas, no sobre una.
@@ -870,11 +869,9 @@ explícita de su mayor rendimiento.
 La ENGIH 2018 permite estimar consumo aparente e ingesta de micronutrientes con
 calidad suficiente para orientar decisiones de fortificación, siempre que cada
 estimación se lea junto a su cobertura de composición y se declare como un
-límite inferior. Esa condición no es una salvedad de cortesía: es lo que separa
-una cifra utilizable de una cifra engañosa.
+límite inferior.
 
-Sobre esa base, el análisis establece tres cosas que no eran evidentes antes de
-hacerlo.
+Sobre esa base, el análisis establece tres resultados.
 
 **La elección del vehículo determina qué nutrientes es posible corregir, no
 solo a cuánta gente se llega.** El aporte de cada grupo de alimentos a cada
@@ -955,8 +952,8 @@ solapamiento entre el inventario de despensa y las adquisiciones diarias, el
 período de observación variable por hogar, y la verificación en punto de venta
 de los factores de conversión y de la aplicación efectiva de las normas.
 
-Esa última verificación produjo un hallazgo que ningún análisis de gabinete
-habría encontrado: **el azúcar en venta no declara vitamina A en su etiqueta**,
+Esa verificación mostró que **el azúcar en venta no declara vitamina A en su
+etiqueta**,
 pese a existir norma obligatoria desde 2004. La distinción entre norma vigente,
 aplicación efectiva y verificación en el mercado resultó determinante para
 decidir qué escenario describe la realidad de 2018 y cuáles describen
@@ -973,9 +970,8 @@ declarada. Fortificar un vehículo cuyo nutriente proviene de grupos de
 alimentos distintos es la única vía para los nutrientes que ningún escenario de
 cereales mueve.
 
-Para el trabajo técnico subsiguiente, tres asuntos quedan planteados: confirmar
-los valores de referencia y el supuesto de biodisponibilidad, que reescalan
-todas las cifras de riesgo; obtener el texto de los instrumentos normativos que
+Para el trabajo técnico subsiguiente, dos asuntos quedan planteados: obtener el
+texto de los instrumentos normativos que
 aquí se usaron a partir de fuentes secundarias concordantes; y examinar los
 factores de conversión de unidades no estándar como posible origen del patrón
 geográfico que este informe documenta sin explicar.
@@ -1073,7 +1069,7 @@ Nutrition Bulletin*, 33(3 Suppl.), S157–S162.
 <https://doi.org/10.1177/15648265120333S203>
 
 **Instrumentos normativos.** Los niveles de adición de cada vehículo proceden
-de los instrumentos recogidos en la tabla de la Introducción, con su numeral y
+de los instrumentos recogidos en la @tbl-normas, con su numeral y
 su estado de vigencia: NORDOM 14 para la sal, NORDOM 602 para el azúcar, RTD
 616 para la harina de trigo y la propuesta nacional de reglamento para el
 arroz.
