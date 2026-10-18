@@ -457,8 +457,7 @@ moverse.
 
 # Representación de resultados
 
-Las normas de figuras y tablas de este análisis están en
-`docs/normas-figuras-y-tablas.md` y se resumen en un principio: **la figura y
+Las figuras y tablas de este análisis siguen un principio: **la figura y
 su leyenda deben bastar para interpretarla sin leer el cuerpo del texto.**
 
 En la práctica eso exige que toda figura declare la cantidad con su unidad y su

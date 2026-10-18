@@ -50,7 +50,7 @@ cat(sprintf("Solo Sec 3A:  %d hogares\n", length(setdiff(hh_sec3a, hh_sec2))))
 # (p.ej. "unidad" de plátano != "unidad" de huevo).
 # "unidad_a_convertir" es un CODIGO NUMERICO -- se compara contra los codigos
 # de diccionario_conversion que tienen FC poblado (esos SON los universales,
-# por definicion, ya confirmado en la auditoria de FC de esta semana).
+# por definicion).
 dic_conversion <- read_excel(here("data", "raw", "data_raw_unidades.xlsx"), sheet = "diccionario_conversion")
 codigos_universales <- dic_conversion |> filter(!is.na(FC)) |> pull(id_unidad_medida_presentacion)
 

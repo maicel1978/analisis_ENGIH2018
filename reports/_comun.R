@@ -49,7 +49,7 @@ TRIGO_EXCLUIR <- paste0(
 # Nutrientes incluidos en esta etapa del analisis.
 NUTRIENTES_INICIALES <- c("Energia", "Hierro", "Acido folico", "Vitamina A")
 
-# Escenarios de fortificacion: ya NO se definen aqui.
+# Escenarios de fortificacion: no se definen aqui.
 #
 # La definicion vigente son los siete escenarios de
 # data/raw/escenarios_fortificacion.csv, construidos por ADICION del nivel
@@ -334,10 +334,10 @@ ic <- function(lo, hi, dec = 1) paste0(fmt(lo, dec), " – ", fmt(hi, dec))
 
 # Porcentaje formateado. Vectorizado: se usa dentro de mutate() sobre columnas.
 pct <- function(x, n, dec = 1) {
-  # OJO: no usar ifelse() con la condicion sobre `n`. ifelse() devuelve un
+  # Nota: no usar ifelse() con la condicion sobre `n`. ifelse() devuelve un
   # resultado del largo de la CONDICION, asi que si `n` es un escalar (un total
   # de hogares, por ejemplo) el resultado se colapsa a un solo valor y todas las
-  # filas muestran el mismo porcentaje. Bug real, detectado en R3 el 2026-09-12.
+  # filas muestran el mismo porcentaje.
   v <- 100 * x / n
   v[!is.finite(v)] <- NA_real_
   out <- paste0(round(v, dec), "%")

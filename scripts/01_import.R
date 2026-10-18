@@ -89,7 +89,7 @@ PM    <- 7  # Alimentos en existencia el día 1 y 8 de la entrevista (inventario
 sec2_data_raw <- read_excel(ruta_ENGIH2018, sheet = hoja_sec2) |>
   clean_names()
 #  $ vivienda                       <dbl>
-#  $ hogar                          <dbl>  -- OJO: se repite entre viviendas
+#  $ hogar                          <dbl>  -- se repite entre viviendas
 #  $ variedad                       <dbl>
 #  $ descripcion                    <chr>
 #  $ id_unidad_medida_presentacion  <dbl>
@@ -145,8 +145,7 @@ sec3a_data_raw <- read_excel(
   clean_names()
 
 # Paso 2: Factores de conversión (FC) -------------------------------------
-# Descubierto al probar contra Registros_Cuestionario_B.xlsx real: NO es un
-# join simple. Hay tres piezas:
+# La conversion no es una union simple. Hay tres piezas:
 #
 #   a) diccionario_conversion: unidades FISICAMENTE exactas (Libra, Onza,
 #      Gramos, Litro, Galón, Kilogramos, Quintal, Botellón, cc...), con FC
@@ -160,12 +159,12 @@ sec3a_data_raw <- read_excel(
 #      en la unidad base (`ID_UNIDAD_MEDIDA`) y no hay capa de "presentación"
 #      que convertir. Hay que usar esa columna como respaldo.
 #
-# OJO -- 15 filas de la hoja Sec 2 (Galón, Litro, Botellón, Libra, Quintal
+# Nota: 15 filas de la hoja Sec 2 (Galón, Litro, Botellón, Libra, Quintal
 # por alimento) están 1000x infladas respecto a diccionario_conversion
 # (ej. Galón: 3785.41 vs 3,785,410 para ACEITE). Al priorizar la tabla
 # universal esas filas nunca se usan.
 #
-# OJO -- la union por alimento en Sec 3A es por texto (`descripcion`), no
+# Nota: la union por alimento en Sec 3A es por texto (`descripcion`), no
 # por ID: cualquier diferencia de tildes/mayúsculas rompe el match sin
 # avisar. Además, ~168 de las 718 filas de esa hoja tienen texto con
 # problemas de codificación (ej. "SazÃ³n" en vez de "Sazón") -- .
@@ -279,7 +278,7 @@ resolver_unidad <- function(df) {
 }
 
 # Paso 3: Puente a tablas de composición (enhance_id) + validación --------
-# OJO -- en crosswalk_tablas_composicion.xlsx, la pestaña de Sec 2 usa la
+# Nota: en crosswalk_tablas_composicion.xlsx, la pestaña de Sec 2 usa la
 # columna `variedad`, mientras que la de Sec 3A usa `id_variedad`. Se armoniza acá
 # con rename() para poder tratar ambas secciones de forma consistente
 # de aquí en adelante. Convendría corregir el nombre de columna en el
@@ -312,7 +311,7 @@ sec2_pc <- read_excel(ruta_tabla_PC, sheet = hoja_sec2) |>
   select(enhance_id, edible) |>
   mutate(
     enhance_id = as.numeric(enhance_id),
-    # OJO: en food_factors.xlsx, hoja Sec2, EDIBLE esta guardado como TEXTO
+    # Nota: en food_factors.xlsx, hoja Sec2, EDIBLE esta guardado como TEXTO
     
     edible = as.numeric(gsub(",", ".", as.character(edible)))
   )
@@ -324,10 +323,10 @@ sec3a_pc <- read_excel(ruta_tabla_PC, sheet = hoja_sec3a) |>
     id_variedad = as.character(id_variedad),
     edible = as.numeric(gsub(",", ".", as.character(edible)))
   )
-# OJO -- CONFIRMADO CONTRA DATOS REALES: no se puede unir por enhance_id
+# Nota: no se puede unir por enhance_id
 # aca. El enhance_id 70211088 (Guandu, grano verde) aparece en DOS
 # id_variedad distintos (374 "en cascara" y 376 "desgranados") con edible
-# DISTINTO (0.48 vs 1.00, ver bitacora QC) -- unir por enhance_id le hace
+# DISTINTO (0.48 frente a 1.00) -- unir por enhance_id le hace
 # many-to-many fan-out exactamente a esas 1349 filas del crudo (374+376),
 # duplicandolas. id_variedad es unico en esta tabla, asi que se une por ahi.
 
@@ -370,7 +369,7 @@ sec2_data <- sec2_data_raw |>
   transmute(
     id_vivienda    = vivienda,
     id_hogar       = hogar,
-    id_hogar_unico = paste(vivienda, hogar, sep = "_"),  # ojo: hogar se repite entre viviendas
+    id_hogar_unico = paste(vivienda, hogar, sep = "_"),  # hogar se repite entre viviendas
     id_variedad    = variedad,
     descripcion,
     id_unidad_medida_presentacion,
@@ -431,8 +430,8 @@ sec3a_data <- sec3a_data_raw |>
   left_join(sec3a_pc, by = "id_variedad") |>
   mutate(PM = PM )
 
-# Días distintos con registro por hogar (confirmado: mediana 7, min 1, max 8).
-# lo dejo calculado y listo para 03_transform.R.
+# Dias distintos con registro por hogar (mediana 7, minimo 1, maximo 8);
+# 03_transform.R los usa como divisor.
 dias_por_hogar <- sec3a_data |>
   group_by(id_hogar_unico) |>
   summarise(dias_observados_hogar = n_distinct(dia), .groups = "drop")
@@ -471,47 +470,22 @@ write_delim(
 )
 
 
-# Resumen y siguientes pasos -------------------------------------------------
-# Este script deja, por cada registro de Sec 2 y Sec 3A, las columnas:
-#   Q, fc, enhance_id, edible (PC), PM (y dias_observados_hogar en Sec 3A)
-# listas para aplicar en 03_transform.R:
-#   Consumo diario (gramos comestibles) = Q * fc * edible / PM
+# Resumen ----------------------------------------------------------------------
+# Este script deja, por cada registro de Sec 2 y Sec 3A, las columnas Q, fc,
+# enhance_id, edible (PC) y PM, mas dias_observados_hogar en Sec 3A. El consumo
+# diario (Q * fc * edible / PM) se calcula en 03_transform.R, con
+# dias_observados_hogar como divisor en Sec 3A.
 #
-# PENDIENTE PARA 03_transform.R (no acá):
-#   - Aplicar la fórmula y generar Consumo_diario_g -- usando
-#     dias_observados_hogar en vez de la constante PM =1 (ver abajo)
-#   - Control de calidad de outliers (Paso 7 de la guía MIMI/WFP)
-#   - Disponibilidad neta para alimentos almacenables compartidos entre
-#     Sec 2 y Sec 3A (inventario_inicial + adquisiciones - inventario_final)
-#
-# CONFIRMADO CONTRA Registros_Cuestionario_B.xlsx REAL (ya probado, no es
-# especulación):
-#   1. PM  = 1 está mal. Por hogar hay una mediana de 7 días distintos
-#      con registros en Sec 3A (min 1, max 8) -- no es un recordatorio de un
-#      solo día. Con PM=1 fijo, el consumo diario aparente saldría inflado
-#      ~6-7x. Usá `dias_observados_hogar` (ya calculado arriba) como
-#      divisor en 03_transform.R.
-#   2. El join de FC no era un simple left_join por unidad -- hacía falta la
-#      lógica de 3 niveles ya implementada en el Paso 2 (universal exacta >
-#      específica por alimento, con `id_unidad_medida` como respaldo cuando
-#      no hay `id_unidad_medida_presentacion`). Con esa lógica: Sec 2
-#      resuelve FC en 46.7% de las filas via tabla universal, 0% via
-#      específica (porque las únicas filas específicas ya rellenadas están
-#      mal escaladas, ver más abajo) y queda 53.3% pendiente. Sec 3A resuelve
-#      31.3% via universal y queda 68.7% pendiente -- ambos números son
-#      trabajo de investigación de factores por alimento que ya sabías que
-#      faltaba, no un error del script.
-#   3. Bug de escala real en data_raw_unidades.xlsx: las 15 filas de la hoja
-#      Sec 2 que tienen FC específico relleno (Galón, Litro, Botellón,
-#      Libra, Quintal por alimento) están 1000x infladas respecto a
-#      diccionario_conversion (ej. Galón: 3785.41 vs 3,785,410 para ACEITE).
-#      Como la tabla universal tiene prioridad, hoy no te afecta, pero
-#      convendría borrarlas o corregirlas en la fuente.
-#   4. ~168 de las 718 filas de la hoja Sec 3A tienen texto con problemas de
-#      codificación (ej. "SazÃ³n" en vez de "Sazón") -- te va a estorbar
-#      cuando empieces a rellenar esos factores, porque el texto no va a
-#      coincidir con `DESCRIPCION` del crudo aunque el FC ya esté puesto.
-#   5. 16 códigos de VARIEDAD que aparecen en el crudo de Sec 2 (ej. 31, 32,
-#      33, 45, 56, 63, 89...) no están en tu crosswalk de 30 alimentos --
-#      afecta solo 62 de 47,837 filas (0.13%), así que es menor, pero quedan
-#      sin enhance_id hasta que decidas si vale la pena cubrirlos.
+# Hallazgos sobre las tablas de referencia, verificados contra los microdatos:
+#   - El periodo de Sec 3A no es de un dia: mediana de 7 dias distintos con
+#     registro por hogar (minimo 1, maximo 8). Un divisor fijo inflaria el
+#     consumo diario.
+#   - Las 15 filas con FC especifico de la hoja Sec 2 de data_raw_unidades.xlsx
+#     (galon, litro, botellon, libra, quintal) estan escaladas por 1.000
+#     respecto de diccionario_conversion. La tabla universal tiene prioridad,
+#     de modo que no se aplican.
+#   - Unas 168 de las 718 filas de la hoja Sec 3A tienen problemas de
+#     codificacion en el texto (p. ej. "SazÃ³n"); la union por descripcion falla
+#     en ellas.
+#   - 16 codigos de variedad de Sec 2 no tienen correspondencia en la tabla de
+#     composicion: 62 de 47.837 filas (0,13%).

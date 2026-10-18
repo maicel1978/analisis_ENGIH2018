@@ -54,7 +54,6 @@ data/raw/     parámetros del análisis: valores de referencia, normas,
 data/auditoria/     registro de cambios y verificaciones
 data/diagnosticos/  salidas de los diagnósticos que sustentan decisiones
 media/        mapas y fotografías de la verificación en punto de venta
-docs/         normas de figuras, tablas y redacción; marco del análisis
 ```
 
 Los parámetros se editan en `data/raw/` sin tocar el código; al recompilar,

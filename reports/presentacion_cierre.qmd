@@ -325,7 +325,7 @@ la OMS se conserva como contraste.
 Esta lamina se adelanta a la primera pregunta de cualquiera que conozca
 programas de fortificacion: y el cumplimiento industrial. La respuesta honesta
 es que no se mide con una encuesta de gasto y que hace falta muestreo del
-producto. Decirlo antes de que lo pregunten vale mas que responderlo despues.
+producto.
 :::
 
 # Hallazgos {background-color="#2c5364"}
@@ -1150,7 +1150,7 @@ Correlación de rangos de **`r sprintf("%.2f", rho_crit)`** entre los dos ordena
 :::
 
 ::: {.notes}
-La correlacion de rangos es la cifra que decide. Si alguien va a hacer una afirmacion subnacional, tiene que ver esta lamina antes.
+La correlacion de rangos condiciona cualquier afirmacion subnacional.
 :::
 
 ## Derivación de la densidad crítica

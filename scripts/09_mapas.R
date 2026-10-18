@@ -78,7 +78,7 @@ if (file.exists(nombres_f)) {
 }
 
 # --- 1b. Presentacion: proyeccion, numeracion y clave ------------------------
-# Normas de figuras y tablas, docs/normas-figuras-y-tablas.md:
+# Criterios de presentacion:
 #
 #   - Proyeccion declarada. Las coordenadas geograficas deforman las areas en
 #     un coropletico. Se proyecta a UTM 19N (EPSG:32619), que es la zona que

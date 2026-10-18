@@ -220,14 +220,9 @@ write_delim(ema_hogar, here("data", "clean", "data_ema_hogar.csv"), delim = ";")
 
 # Paso 6: Unir con consumo diario (03_transform.R) y calcular gramos por EMA
 # ----------------------------------------------------------------------
-# OJO: esto da "gramos de alimento consumidos por EMA por dia", TODAVIA NO
-# la "ingesta aparente de micronutrientes por EMA" completa de la formula
-# del documento metodologico -- para eso falta multiplicar por la composicion nutricional
-# (INCAP/FNDDS), que es 05_ingesta_micronutrientes.R, dejado pendiente a
-# proposito por la complejidad de armonizar los esquemas de columnas de
-# INCAP y FNDDS (ver HOJA_DE_RUTA). Esta pieza intermedia sí se puede
-# construir ya sin esa complejidad, y deja 05 mas simple despues (solo
-# tendra que multiplicar esto por nutriente/gramo, no reconstruir todo).
+# Resultado de esta etapa: gramos de alimento por EMA y dia. La ingesta de
+# micronutrientes se obtiene en 05_ingesta_micronutrientes.R, que multiplica
+# estos gramos por la composicion por gramo.
 
 consumo_sec2  <- read_delim(here("data", "clean", "data_sec2_consumo.csv"),  delim = ";", show_col_types = FALSE)
 consumo_sec3a <- read_delim(here("data", "clean", "data_sec3a_consumo.csv"), delim = ";", show_col_types = FALSE)
