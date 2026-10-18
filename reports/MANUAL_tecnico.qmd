@@ -361,7 +361,8 @@ El requerimiento de hierro depende además de la **biodisponibilidad** de la
 dieta. La distribución de referencia corresponde a una biodisponibilidad
 determinada y se reescala para otras. La elección del supuesto de
 biodisponibilidad cambia la cifra resultante de manera sustantiva y, por tanto,
-debe declararse junto al resultado y no en una nota.
+debe declararse junto al resultado y no en una nota. En este análisis se
+emplea el 10%, y el 18% se reporta como análisis de sensibilidad.
 
 ## El límite superior
 
@@ -393,7 +394,7 @@ leer_limpio(file.path(RUTA_RAW, "valores_referencia.csv")) |>
   tabla(fuente = "Fuente: data/raw/valores_referencia.csv.",
         notas = c(
           "El límite superior aplica a la forma añadida, no al nutriente total.",
-          "Un estado provisional indica que la fuente de referencia está pendiente de confirmación."))
+          "Requerimiento Promedio Estimado del Institute of Medicine para mujeres de 19 a 30 años; la edición de cada nutriente figura en la columna Fuente y en las referencias."))
 ```
 
 # Densidad de nutrientes como criterio complementario
@@ -722,9 +723,25 @@ measurement: from collection to action*. Roma.
 FAO/WHO/UNU. 2004. *Human energy requirements: Report of a Joint FAO/WHO/UNU
 Expert Consultation*. Roma, 17–24 de octubre de 2001.
 
+Institute of Medicine. 1998. *Dietary Reference Intakes for Thiamin,
+Riboflavin, Niacin, Vitamin B6, Folate, Vitamin B12, Pantothenic Acid, Biotin,
+and Choline*. Washington, D. C.: National Academy Press.
+
 Institute of Medicine. 2000. *Dietary Reference Intakes: Applications in
 Dietary Assessment*. Washington, D. C.: The National Academies Press.
 doi:10.17226/9956.
+
+Institute of Medicine. 2000. *Dietary Reference Intakes for Vitamin C, Vitamin
+E, Selenium, and Carotenoids*. Washington, D. C.: National Academy Press.
+
+Institute of Medicine. 2001. *Dietary Reference Intakes for Vitamin A, Vitamin
+K, Arsenic, Boron, Chromium, Copper, Iodine, Iron, Manganese, Molybdenum,
+Nickel, Silicon, Vanadium, and Zinc*. Washington, D. C.: National Academy
+Press.
+
+Institute of Medicine. 2011. *Dietary Reference Intakes for Calcium and
+Vitamin D*. Washington, D. C.: The National Academies Press.
+doi:10.17226/13050.
 
 Tang, K., Adams, K. P., Ferguson, E. L., Woldt, M., Kalimbira, A. A., Likoswe,
 B., Yourkavitch, J., Chrisinger, B., Pedersen, S., Segovia De La Revilla, L.,

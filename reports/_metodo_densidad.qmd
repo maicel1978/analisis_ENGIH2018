@@ -109,7 +109,6 @@ ref_d |>
     paste0("Densidad crítica = RPE / ", fmt(KCAL_EMA, 0), " × 1.000, donde ",
            fmt(KCAL_EMA, 0), " kcal es el requerimiento energético de la mujer ",
            "adulta de referencia (FAO/WHO/UNU 2004) y el denominador del EMA."),
-    "Valores de referencia provisionales.",
     NOTA_EMA))
 ```
 
@@ -277,8 +276,7 @@ garantía adicional.
 
 Dos límites más. El hierro queda fuera de esta comparación, por evaluarse
 mediante el enfoque de probabilidad sobre la distribución del requerimiento. Y
-los valores de referencia empleados son provisionales: la densidad crítica es
-proporcional al Requerimiento Promedio Estimado, de modo que una sustitución de
-los valores de referencia reescala todas las cifras de esta sección en la misma
+la densidad crítica es proporcional al Requerimiento Promedio Estimado, de
+modo que una sustitución de los valores de referencia reescala todas las cifras de esta sección en la misma
 proporción, sin alterar las conclusiones sobre acoplamiento ni sobre la
 comparación entre criterios.

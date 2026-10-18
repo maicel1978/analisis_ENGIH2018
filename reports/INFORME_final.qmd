@@ -113,8 +113,9 @@ escenarios alternativos de fortificación.
    inferior. Las adaptaciones metodológicas que ello exige están documentadas.
 
 2. *¿Qué micronutrientes presentan mayor riesgo?* El riesgo es muy desigual
-   entre nutrientes. Su jerarquía depende de dos supuestos declarados: los
-   valores de referencia, provisionales, y la biodisponibilidad del hierro.
+   entre nutrientes. Su jerarquía depende de dos elecciones declaradas: el
+   Requerimiento Promedio Estimado del Institute of Medicine como referencia y
+   la biodisponibilidad del hierro, 10% con 18% como análisis de sensibilidad.
 
 3. *¿Qué alimentos aportan la mayor proporción de la dieta?* El aporte está
    concentrado y es distinto para cada nutriente: los cereales y las raíces
@@ -417,12 +418,14 @@ de los hogares y otros donde el déficit alcanza a menos de la mitad.
 
 Tres advertencias condicionan la lectura, y ninguna es menor.
 
-**Los valores de referencia son provisionales.** La proporción bajo el
-requerimiento escala con el requerimiento empleado, de modo que una sustitución
-del conjunto de referencia reescala todas las cifras de esta sección.
+**Los valores de referencia son el Requerimiento Promedio Estimado del
+Institute of Medicine** para mujeres de 19 a 30 años. La proporción bajo el
+requerimiento escala con el requerimiento empleado, de modo que otro conjunto
+de referencia reescalaría todas las cifras de esta sección.
 
-**El hierro se presenta con un supuesto de biodisponibilidad del 10%.** Con un
-supuesto del 18%, propio de dietas con mayor presencia de carne y de
+**El hierro se presenta con una biodisponibilidad del 10%, valor adoptado para
+la consultoría; el 18% se reporta como análisis de sensibilidad.** Con el
+18%, propio de dietas con mayor presencia de carne y de
 potenciadores de la absorción, el requerimiento se reduce en proporción y la
 cifra baja aproximadamente a la mitad. La elección no es un detalle técnico:
 cambia la posición del hierro dentro de este cuadro.
@@ -720,8 +723,7 @@ correspondencia figura a la derecha de cada mapa. Proyección UTM zona 19N
 Nacional de Gastos e Ingresos de los Hogares 2018, Banco Central de la
 República Dominicana; límites provinciales del geoportal del IDERD y la
 División Territorial 2021 de la Oficina Nacional de Estadística. La provincia
-no es dominio de estimación de la encuesta. Valores de referencia
-provisionales.
+no es dominio de estimación de la encuesta.
 
 :::
 
@@ -918,9 +920,10 @@ nutriente. El criterio reduce sustancialmente la dependencia del nivel de
 registro en la comparación geográfica, pero no la elimina, y el residuo queda
 sin explicar.
 
-Los valores de referencia son provisionales y las estimaciones de riesgo
-escalan con ellos. El supuesto de biodisponibilidad del hierro cambia su cifra
-de forma sustantiva. Y la cadena de cálculo no incorpora la procedencia ni el
+Las estimaciones de riesgo escalan con los valores de referencia: otro
+conjunto de referencia las reescalaría. El supuesto de biodisponibilidad del
+hierro cambia su cifra de forma sustantiva, y por eso se reporta también con
+18%. Y la cadena de cálculo no incorpora la procedencia ni el
 destino declarado de la adquisición, aunque la encuesta los registre: es un
 supuesto implícito que aquí queda explícito.
 
@@ -986,8 +989,9 @@ geográfico que este informe documenta sin explicar.
    junto a su cobertura de composición y se declare como límite inferior.
 
 2. **El riesgo de inadecuación es desigual entre nutrientes** y su jerarquía
-   depende de supuestos declarados: los valores de referencia, provisionales, y
-   la biodisponibilidad del hierro.
+   depende de elecciones declaradas: el Requerimiento Promedio Estimado del
+   Institute of Medicine como referencia y la biodisponibilidad del hierro, 10%
+   con 18% como análisis de sensibilidad.
 
 3. **El aporte de nutrientes está concentrado por grupo de alimentos**, de modo
    que la elección del vehículo determina qué nutrientes es posible corregir.
@@ -1028,15 +1032,26 @@ Expert Consultation, Rome, 17–24 October 2001*. Roma: Organización de las
 Naciones Unidas para la Alimentación y la Agricultura.
 <https://www.fao.org/4/y5686e/y5686e00.htm>
 
+Institute of Medicine. 1998. *Dietary Reference Intakes for thiamin,
+riboflavin, niacin, vitamin B6, folate, vitamin B12, pantothenic acid, biotin,
+and choline*. Washington, D.C.: National Academy Press. Folato y vitamina B12.
+
 Institute of Medicine. 2000. *Dietary Reference Intakes: applications in dietary
 assessment*. Washington, D.C.: National Academies Press.
 <https://doi.org/10.17226/9956> — fuente del método del punto de corte.
 
-Institute of Medicine. *Dietary Reference Intakes*. Washington, D.C.: National
-Academies Press. Los requerimientos promedio estimados y los límites superiores
-tolerables empleados proceden de esta serie. La edición correspondiente a cada
-nutriente está pendiente de confirmación y los valores se declaran
-provisionales en todo el documento.
+Institute of Medicine. 2000. *Dietary Reference Intakes for vitamin C, vitamin
+E, selenium, and carotenoids*. Washington, D.C.: National Academy Press.
+Vitamina E.
+
+Institute of Medicine. 2001. *Dietary Reference Intakes for vitamin A, vitamin
+K, arsenic, boron, chromium, copper, iodine, iron, manganese, molybdenum,
+nickel, silicon, vanadium, and zinc*. Washington, D.C.: National Academy
+Press. Hierro, zinc y vitamina A.
+
+Institute of Medicine. 2011. *Dietary Reference Intakes for calcium and
+vitamin D*. Washington, D.C.: National Academies Press.
+<https://doi.org/10.17226/13050> — vitamina D.
 
 Oficina Nacional de Estadística. 2021. *División Territorial 2021*. Santo
 Domingo. Identificador provincial empleado en la numeración de los mapas.

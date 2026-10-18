@@ -538,7 +538,7 @@ ggplot(pend, aes(escenario, pct_inadecuado, group = nut)) +
 ```
 
 ::: {.notapie}
-**NOTA:** **Valores de referencia provisionales: no citables.** Riesgo de ingesta inadecuada estimado a nivel de hogar, no prevalencia de deficiencia.
+**NOTA:** Valores de referencia: Requerimiento Promedio Estimado del Institute of Medicine. Riesgo de ingesta inadecuada estimado a nivel de hogar, no prevalencia de deficiencia.
 :::
 
 ::: {.notes}
@@ -912,7 +912,7 @@ tibble::tribble(
                         "encuesta."),
                   paste("Estimaciones puntuales. Los intervalos de confianza al",
                         "95% de cada escenario figuran en el informe analítico."),
-                  "Valores de referencia provisionales. pp: puntos porcentuales."))
+                  "pp: puntos porcentuales."))
 ```
 
 El análisis ordena las opciones por rendimiento y por la acción que requieren; no sustituye la decisión. De las cuatro, **solo el arroz exige legislar una norma nueva**. Las otras tres operan sobre normas que ya existen, y una de ellas —el azúcar— no exige cambio normativo alguno: solo que se cumpla.
@@ -1021,7 +1021,7 @@ ggplot(dom, aes(pct_inadecuado, reorder(nivel, pct_inadecuado))) +
 ```
 
 ::: {.notapie}
-**NOTA:** Escenario de línea base. Barras: intervalo de confianza del 95%. Región y zona son dominios de estimación de la encuesta; la provincia no lo es. **Valores de referencia provisionales.**
+**NOTA:** Escenario de línea base. Barras: intervalo de confianza del 95%. Región y zona son dominios de estimación de la encuesta; la provincia no lo es.
 :::
 
 # Patrón geográfico del riesgo
@@ -1227,7 +1227,7 @@ La densidad **corrige el sobrerregistro**, y solo procede donde la variación de
 refs |> transmute(Nutriente = NOMBRE[nutriente], RPE = ear, Unidad = unidad,
                   Estado = estado) |>
   tabla(fuente = "Fuente: data/raw/valores_referencia.csv.",
-        notas = "El estado provisional indica que la fuente está pendiente de confirmación.")
+        notas = "Requerimiento Promedio Estimado del Institute of Medicine, mujeres de 19 a 30 años.")
 ```
 
 **Propuesta: reportar ambos como análisis de sensibilidad.** El criterio de elección no puede ser cuál produce más discriminación, porque eso lo hace dependiente del resultado. Si uno representa mejor a la población dominicana, ese es el principal y la razón se declara; el otro acompaña.
