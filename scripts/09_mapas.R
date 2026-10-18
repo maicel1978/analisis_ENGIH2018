@@ -293,7 +293,7 @@ g_riesgo <- ggplot(mapa_riesgo) +
     na.value = "grey85",
     name = "Hogares bajo el\nrequerimiento de folato") +
   theme_void(base_size = 11) +
-  theme(legend.position = "right")
+  theme(legend.position = "right", legend.title = element_text(lineheight = 1))
 
 ggsave(here("media", "mapas", "mapa_riesgo_folato.png"),
        con_clave(escala_y_norte(numerar(g_riesgo))),
@@ -341,12 +341,12 @@ g_dens <- ggplot(mapa_dens) +
   geom_sf(aes(fill = razon), colour = "white", linewidth = 0.18) +
   scale_fill_gradient2(
     low = "#F21A00", mid = "#EBCC2A", high = "#3B9AB2", midpoint = 1,
-    labels = function(x) ifelse(is.na(x), "", sprintf("%.1fx", x)),
+    labels = function(x) ifelse(is.na(x), "", sub(".", ",", sprintf("%.1f×", x), fixed = TRUE)),
     na.value = "grey85",
     name = paste0("Densidad mediana de folato\nsobre la densidad crítica\n(",
-                  round(dens_critica, 1), " µg DFE/1.000 kcal)")) +
+                  format(round(dens_critica, 1), decimal.mark = ","), " µg DFE/1.000 kcal)")) +
   theme_void(base_size = 11) +
-  theme(legend.position = "right")
+  theme(legend.position = "right", legend.title = element_text(lineheight = 1))
 
 ggsave(here("media", "mapas", "mapa_densidad_folato.png"),
        con_clave(escala_y_norte(numerar(g_dens))),

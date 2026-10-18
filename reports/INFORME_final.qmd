@@ -680,7 +680,7 @@ sens |>
   scale_colour_manual(values = c(Ingesta = AZUL, Densidad = "#F21A00")) +
   scale_y_continuous(labels = function(x) paste0(x, "%")) +
   labs(x = "Quintil de gasto del hogar (1 = menor gasto)",
-       y = "Hogares bajo el requerimiento de folato (%)", colour = NULL) +
+       y = "Hogares bajo el\nrequerimiento (%)", colour = NULL) +
   tema_informe
 ```
 
@@ -740,7 +740,7 @@ sección de métodos.
 
 ```{r}
 #| label: fig-escenarios
-#| fig-cap: "Hogares bajo el requerimiento, por escenario de fortificación y nutriente. Los escenarios están ordenados de menor a mayor alcance; el punto de partida es la dieta sin fortificar."
+#| fig-cap: "Hogares bajo el requerimiento, por escenario de fortificación y nutriente. Los escenarios están ordenados de menor a mayor alcance; el punto de partida es la dieta sin fortificar. Escenarios: 0, sin fortificación; 1a, norma nacional en harina y pan; 1b, norma nacional en harina y todos los derivados; 1c, norma nacional y azúcar; 2a y 2b, niveles de la OMS para consumos de harina menores de 75 g y de 75 a 149 g; 3, norma nacional y arroz según la propuesta nacional."
 #| fig-width: 7.5
 #| fig-height: 4.4
 principal |>
@@ -751,6 +751,9 @@ principal |>
              group = nutriente)) +
   geom_line(linewidth = 0.8) +
   geom_point(size = 2.4) +
+  scale_colour_manual(values = c(Folato = "#0072B2", Hierro = "#D55E00",
+                                 Zinc = "#009E73", `Vitamina B12` = "#CC79A7",
+                                 `Vitamina A` = "#E69F00")) +
   scale_y_continuous(limits = c(0, 100), breaks = seq(0, 100, 25),
                      labels = function(x) paste0(x, "%")) +
   labs(x = "Escenario", colour = NULL,
@@ -761,7 +764,7 @@ principal |>
 
 ```{r}
 #| label: fig-equidad-escenarios
-#| fig-cap: "Razón entre la ingesta de folato del quintil de mayor gasto y la del quintil de menor gasto, por escenario. Un valor de 1 indica ingesta equivalente entre los extremos de la distribución del gasto."
+#| fig-cap: "Razón entre la ingesta de folato del quintil de mayor gasto y la del quintil de menor gasto, por escenario. Un valor de 1 indica ingesta equivalente entre los extremos de la distribución del gasto. Escenarios: 0, sin fortificación; 1a, norma nacional en harina y pan; 1b, norma nacional en harina y todos los derivados; 1c, norma nacional y azúcar; 2a y 2b, niveles de la OMS para consumos de harina menores de 75 g y de 75 a 149 g; 3, norma nacional y arroz según la propuesta nacional."
 #| fig-width: 7
 #| fig-height: 3.4
 escenarios |>
@@ -774,6 +777,8 @@ escenarios |>
   geom_point(size = 3.4, colour = AZUL) +
   geom_text(aes(label = num(razon_q5_q1, 2)), hjust = -0.5, size = 3.1,
             colour = GRIS) +
+  scale_y_continuous(expand = expansion(mult = c(0.02, 0.12)),
+                     labels = function(x) format(x, nsmall = 2, decimal.mark = ",")) +
   coord_flip() +
   labs(x = "Escenario", y = "Razón entre quintiles extremos (Q5 / Q1)") +
   tema_informe
