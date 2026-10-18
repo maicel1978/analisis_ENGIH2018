@@ -97,150 +97,183 @@ sens       <- leer("sensibilidad_densidad_critica.csv")
 nac_base   <- principal |> filter(dominio == "Nacional", escenario == ESCENARIO_BASE)
 ```
 
+```{r}
+#| label: cifras-texto
+#| include: false
+# Cifras citadas en el texto, leidas de los mismos archivos que tablas y figuras.
+uno <- function(x) { stopifnot(length(x) == 1); x }
+E0  <- "0. Sin fortificación"; E1B <- "1b. Norma nacional: harina y todos los derivados"
+E1C <- "1c. Norma nacional y azúcar"
+E2A <- "2a. OMS: harina y derivados, consumo menor de 75 g"
+E2B <- "2b. OMS: harina y derivados, consumo de 75 a 149 g"
+E3  <- "3. Norma nacional y arroz (propuesta nacional)"
+r_nac <- function(esc, nut) principal |>
+  filter(dominio == "Nacional", escenario == esc, nutriente == nut) |>
+  pull(pct_inadecuado) |> uno() |> num()
+r_dom <- function(dom, niv, nut) principal |>
+  filter(dominio == dom, as.character(nivel) == niv, escenario == ESCENARIO_BASE,
+         nutriente == nut) |> pull(pct_inadecuado) |> uno() |> num()
+n_hog   <- num(uno(unique(nac_base$n)), 0)
+r_max   <- nac_base |> slice_max(pct_inadecuado, n = 1)
+r_min   <- nac_base |> slice_min(pct_inadecuado, n = 1)
+fe18    <- riesgo |> filter(dominio == "Nacional", hogares == "Todos",
+                            escenario == ESCENARIO_BASE, nutriente == "hierro_mg",
+                            metodo == "Probabilidad, biodisponibilidad 18%") |>
+  pull(pct_inadecuado) |> uno() |> num()
+cob_mic <- cobertura |> filter(nutriente != "energia_kcal")
+veh <- function(patron, col) vehiculos |> filter(grepl(patron, grupo)) |>
+  pull({{ col }}) |> uno()
+fol_esc <- escenarios |> filter(nutriente == "folato_mcg_dfe")
+razon   <- function(esc) fol_esc |> filter(escenario == esc) |> pull(razon_q5_q1) |> uno()
+ul      <- function(esc) fol_esc |> filter(escenario == esc) |> pull(pct_folico_sobre_ul) |> uno()
+cereal  <- grupos_nut |> filter(grepl("^01", grupo_mddw))
+stopifnot(nrow(cereal) == 1)
+```
+
 # Resumen {.unnumbered}
 
-**Contexto.** La República Dominicana no dispone de una encuesta nacional de
-consumo individual de alimentos. Este informe utiliza la Encuesta Nacional de
-Gastos e Ingresos de los Hogares 2018 —diseñada para medir gasto, no
-nutrición— para estimar la cobertura y el consumo de los alimentos
-fortificables, su contribución a la ingesta de micronutrientes y el efecto de
-escenarios alternativos de fortificación.
+**Antecedentes.** La República Dominicana no dispone de una encuesta nacional
+de consumo individual de alimentos. La Encuesta Nacional de Gastos e Ingresos
+de los Hogares (ENGIH) 2018 registra las adquisiciones de alimentos de los
+hogares con fines económicos.
 
-**Una respuesta por pregunta.**
+**Objetivo.** Evaluar la factibilidad de estimar con la ENGIH 2018 la cobertura
+y el consumo de los vehículos de fortificación y su contribución a la ingesta
+aparente de micronutrientes, y estimar el efecto de escenarios alternativos de
+fortificación sobre la proporción de hogares con ingesta inferior al
+requerimiento.
 
-1. *¿Sirve la encuesta?* Sí, con la condición de que cada estimación de ingesta
-   se lea junto a su cobertura de composición y se declare como límite
-   inferior. Las adaptaciones metodológicas que ello exige están documentadas.
+**Métodos.** Se combinaron el inventario de despensa (Sección 2) y el diario de
+adquisiciones (Sección 3A) de `r n_hog` hogares. Las cantidades declaradas se
+convirtieron a gramos comestibles por equivalente de mujer adulta (EMA) y día,
+y a nutrientes mediante dos tablas de composición. La proporción de hogares con
+ingesta aparente inferior al Requerimiento Promedio Estimado (RPE) del
+Institute of Medicine se estimó por el método del punto de corte y, para el
+hierro, por el enfoque de probabilidad con 10% de biodisponibilidad, con 18%
+como análisis de sensibilidad. Se modelaron siete escenarios de fortificación
+por adición sobre una línea base sin fortificar. Las estimaciones incorporan el
+diseño muestral complejo de la encuesta.
 
-2. *¿Qué micronutrientes presentan mayor riesgo?* El riesgo es muy desigual
-   entre nutrientes. Su jerarquía depende de dos elecciones declaradas: el
-   Requerimiento Promedio Estimado del Institute of Medicine como referencia y
-   la biodisponibilidad del hierro, 10% con 18% como análisis de sensibilidad.
+**Resultados.** Con la norma vigente, que fortifica la harina de trigo y el
+pan, la proporción de hogares con ingesta aparente inferior al RPE fue de
+`r r_nac(ESCENARIO_BASE, "Folato")`% para el folato y de
+`r r_nac(ESCENARIO_BASE, "Hierro")`% para el hierro, y varió entre
+`r num(r_min$pct_inadecuado)`% (`r tolower(r_min$nutriente)`) y
+`r num(r_max$pct_inadecuado)`% (`r tolower(r_max$nutriente)`) entre los
+micronutrientes evaluados. La harina de trigo y el arroz fueron adquiridos por
+`r num(veh("Trigo", pct_hogares))`% y `r num(veh("Arroz", pct_hogares))`% de
+los hogares, con consumos medianos de `r num(veh("Trigo", mediana_consumidores), 0)` g
+y `r num(veh("Arroz", mediana_consumidores), 0)` g por EMA y día entre quienes los
+adquieren. La extensión de la norma a todos los derivados del trigo redujo la
+proporción para el folato a `r r_nac(E1B, "Folato")`%, y la incorporación del
+arroz según la propuesta nacional, a `r r_nac(E3, "Folato")`%, con
+`r num(ul(E3))`% de los hogares por encima del nivel máximo de ingesta tolerable
+de ácido fólico añadido. La razón entre la ingesta mediana de folato del quinto
+y del primer quintil fue de `r num(razon(ESCENARIO_BASE), 2)` con la norma
+vigente y de `r num(razon(E3), 2)` con la incorporación del arroz.
 
-3. *¿Qué alimentos aportan la mayor proporción de la dieta?* El aporte está
-   concentrado y es distinto para cada nutriente: los cereales y las raíces
-   dominan unos y son irrelevantes para otros, que provienen de alimentos de
-   origen animal.
-
-4. *¿Qué cobertura tienen los vehículos?* Los principales alcanzan a casi todo
-   el país, sin zonas desatendidas. Difieren en la cantidad que transportan:
-   cobertura y consumo son condiciones distintas.
-
-5. *¿Qué grupos quedan fuera del alcance?* El riesgo sigue un gradiente por
-   gasto del hogar. El patrón geográfico, en cambio, está gobernado por el
-   nivel de adquisición registrada y no por diferencias en la dieta.
-
-6. *¿Qué aportarían otros escenarios?* La norma vigente reduce el riesgo de
-   folato sin resolverlo. Los niveles recomendados internacionalmente rinden
-   más sobre el mismo vehículo; incorporar un vehículo adicional rinde más aún,
-   con el exceso de ácido fólico como contrapartida.
-
-7. *¿Reduce el gradiente social un vehículo transversal?* Sí. Y la consecuencia
-   es que **elevar la ingesta media y cerrar la brecha social son objetivos
-   distintos que no se consiguen con la misma decisión.**
-
+**Conclusiones.** La ENGIH 2018 permite estimar la ingesta aparente de
+micronutrientes de los hogares, con la condición de interpretar cada estimación
+como límite inferior según la cobertura de la tabla de composición. El vehículo
+determina qué micronutrientes pueden modificarse y si se reduce la diferencia
+entre quintiles; el aumento del nivel de adición sobre la harina eleva la
+ingesta sin modificar esa diferencia.
 
 # Introducción
 
 ## Problema
 
-Decidir sobre fortificación de alimentos exige responder tres preguntas
-cuantitativas: qué proporción de la población consume el vehículo candidato, en
-qué cantidad lo consume, y cuánto se reduciría el déficit de un nutriente si se
-fortificara. Las tres requieren datos de consumo a nivel de hogar.
+La formulación y la evaluación de un programa de fortificación requieren tres
+magnitudes: la proporción de hogares que adquiere el alimento vehículo, la
+cantidad que consume y el efecto de la fortificación sobre la proporción de
+hogares con ingesta inferior al requerimiento.
 
 La República Dominicana no dispone de una encuesta nacional de consumo
-individual de alimentos. Lo que sí tiene es la Encuesta Nacional de Gastos e
-Ingresos de los Hogares 2018, diseñada para medir gasto, no nutrición. Una
-encuesta de gasto no produce de forma directa ninguna de las tres cantidades
-anteriores: registra adquisiciones en unidades de compra y montos, no gramos
-consumidos ni nutrientes ingeridos.
+individual de alimentos. La ENGIH 2018 registra adquisiciones en unidades de
+compra y montos, no gramos consumidos ni nutrientes ingeridos, de modo que
+ninguna de esas magnitudes se obtiene de forma directa.
 
-El paso de una cosa a la otra no es automático. Exige convertir unidades de
-presentación a gramos, descontar la porción no comestible, repartir la
-adquisición en el período de observación, enlazar cada alimento con una tabla
-de composición, normalizar entre hogares de distinta composición demográfica y
-contrastar el resultado con requerimientos de referencia. Cada uno de esos
-pasos introduce supuestos, y el valor de un análisis de este tipo depende menos
-de la sofisticación del método que de que esos supuestos estén declarados y
-sean auditables.
-
-Este informe documenta ese recorrido sobre la ENGIH 2018 y responde, con los
-datos reales de la encuesta, las preguntas que la decisión de política
-requiere.
+Su estimación exige convertir las unidades declaradas a gramos, descontar la
+porción no comestible, distribuir la adquisición en el período de registro,
+asignar la composición nutricional de cada alimento, normalizar por la
+composición demográfica del hogar y comparar el resultado con requerimientos
+de referencia. Cada paso introduce supuestos, que este informe declara junto
+con su efecto sobre las estimaciones.
 
 ## Contexto: la fortificación de alimentos en la República Dominicana
 
-El país tiene programas de fortificación obligatoria de distinta antigüedad y
-distinto grado de aplicación efectiva. La @tbl-normas, en la sección de métodos, resume
-los instrumentos vigentes y en propuesta para los nutrientes que este análisis modela.
+El país mantiene programas de fortificación obligatoria de distinta antigüedad
+y grado de aplicación. La @tbl-normas, en la sección de métodos, recoge los
+instrumentos vigentes y en propuesta para los nutrientes modelados. Tres
+características de esos instrumentos condicionan la interpretación de los
+resultados.
 
-Tres rasgos de esos instrumentos condicionan la lectura de todo lo que sigue.
+La harina de trigo es el único vehículo con fortificación obligatoria, vigente
+en 2018 y de aplicación verificada entre los que aportan los nutrientes
+evaluados. Su norma establece la adición de hierro, ácido fólico y vitaminas
+del complejo B. La yodación de la sal es anterior y está consolidada; el yodo
+queda fuera del alcance de este análisis.
 
-**La harina de trigo es el único vehículo con fortificación obligatoria,
-vigente en 2018 y verificada, entre los que aportan los nutrientes de interés
-de este análisis.** Su norma añade hierro y ácido fólico, además de vitaminas
-del complejo B. La sal yodada es anterior y está consolidada, pero el yodo
-queda fuera del alcance de este trabajo.
+La fortificación del azúcar con vitamina A es obligatoria desde 2004, pero su
+aplicación no es verificable: el azúcar no figura en la lista de alimentos
+fortificados del ministerio y la etiqueta del producto en venta no declara
+vitamina A, según la verificación en punto de venta realizada para este
+análisis. El escenario que incorpora el azúcar se modela, por tanto, como
+opción de política y no como situación vigente.
 
-**El azúcar tiene norma y no tiene aplicación verificable.** La fortificación
-con vitamina A fue oficializada como obligatoria en 2004, pero el azúcar no
-figura en la lista de alimentos fortificados del ministerio y **el producto en
-venta no declara vitamina A en su etiqueta**, según verificación en punto de
-venta realizada para este trabajo. Por eso el escenario que incorpora azúcar se
-modela como hipótesis de política y no como situación vigente.
+El arroz no se fortificaba en 2018. Existe una propuesta de reglamento técnico
+cuyos niveles coinciden con los declarados en la etiqueta del arroz fortificado
+disponible en el mercado. El escenario correspondiente modela esa propuesta.
 
-**El arroz no se fortificaba en 2018.** Existe una propuesta de reglamento
-técnico, cuyos niveles son concordantes con la etiqueta del arroz fortificado
-que ya se encuentra en el mercado. El escenario correspondiente modela esa
-propuesta, no una norma en vigor.
-
-La distinción entre norma, aplicación y verificación determina qué escenario describe la realidad de 2018 y cuáles
-describen decisiones posibles. El escenario de línea base de este informe es la
-norma de harina de trigo aplicada a la harina y al pan.
+En consecuencia, el escenario de referencia de este informe es la norma de
+fortificación de la harina de trigo aplicada a la harina y al pan.
 
 ## Preguntas
 
-1. ¿Permite la ENGIH 2018 estimar el consumo aparente y la ingesta de micronutrientes con cobertura y calidad suficientes?
-2. ¿Qué micronutrientes presentan mayor riesgo de ingesta inadecuada?
-3. ¿Qué alimentos aportan la mayor proporción de la dieta?
-4. ¿Qué cobertura tienen los principales vehículos de fortificación?
-5. ¿Qué grupos poblacionales son más vulnerables y cuáles quedan fuera del alcance de las intervenciones actuales?
-6. ¿Cuál sería la contribución potencial de diferentes escenarios de fortificación?
-7. ¿Reduce el gradiente social de la ingesta un vehículo de consumo transversal, es decir, adquirido por una proporción alta de hogares en todos los estratos y consumido en cantidades comparables entre ellos?
+1. ¿Permite la ENGIH 2018 estimar el consumo aparente de alimentos y la ingesta
+   aparente de micronutrientes con cobertura y calidad suficientes?
+2. ¿Qué proporción de hogares tiene una ingesta aparente inferior al
+   requerimiento de cada micronutriente evaluado?
+3. ¿Qué grupos de alimentos aportan cada micronutriente?
+4. ¿Qué proporción de hogares adquiere cada vehículo de fortificación y en qué
+   cantidad?
+5. ¿Cómo varía la proporción de hogares con ingesta inferior al requerimiento
+   según quintil, zona y región?
+6. ¿Qué efecto tendrían escenarios alternativos de fortificación sobre esa
+   proporción?
+7. ¿Reduce un vehículo de consumo homogéneo —adquirido por una proporción alta
+   de hogares en todos los quintiles y en cantidades comparables entre ellos—
+   la diferencia de ingesta entre quintiles?
 
-La séptima pregunta se formuló como conjetura **antes de examinar los datos**,
-con una dirección esperada: que un vehículo de consumo transversal reduzca el
-gradiente, y que uno de consumo desigual lo conserve o lo acentúe. Se contrasta
-en la sección de escenarios comparando la razón entre quintiles extremos bajo
-cada uno. Las demás regularidades de este informe surgieron del análisis y se
-presentan como hallazgos; la distinción se mantiene de forma explícita en la
-discusión.
-
+La séptima pregunta se formuló antes del análisis de los datos, con una
+dirección esperada: que un vehículo de consumo homogéneo reduzca la diferencia
+entre quintiles y que uno de consumo desigual la mantenga o la amplíe. Se
+contrasta mediante la razón entre la ingesta de los quintiles extremos en cada
+escenario. Las demás regularidades descritas se identificaron durante el
+análisis y se presentan como hallazgos.
 
 ## Objetivos
 
-**Objetivo general.** Evaluar, con datos de la ENGIH 2018, la cobertura y el
-consumo de los alimentos fortificables y fortificados en la República
-Dominicana, y estimar su contribución a la ingesta de micronutrientes y al
-riesgo de ingesta inadecuada.
+**Objetivo general.** Estimar, con la ENGIH 2018, la cobertura y el consumo de
+los vehículos de fortificación, su contribución a la ingesta aparente de
+micronutrientes y el efecto de escenarios de fortificación sobre la proporción
+de hogares con ingesta inferior al requerimiento.
 
 **Objetivos específicos.**
 
-1. Determinar si la encuesta permite estimar consumo aparente e ingesta de
-   micronutrientes con cobertura y calidad suficientes, y documentar las
-   adaptaciones metodológicas que ello exige.
-2. Estimar el riesgo de ingesta inadecuada de los micronutrientes evaluables,
-   a nivel nacional y por dominio de estimación.
-3. Describir la composición de la dieta adquirida por grupos de alimentos y el
-   aporte de cada grupo a la energía y a cada micronutriente.
-4. Estimar la cobertura y el consumo de los principales vehículos de
-   fortificación.
-5. Identificar los grupos de población con mayor riesgo y los que quedan fuera
-   del alcance de las intervenciones vigentes.
-6. Cuantificar la contribución potencial de escenarios alternativos de
-   fortificación, incluidos los niveles recomendados internacionalmente y las
-   propuestas nacionales en discusión.
+1. Evaluar la factibilidad de estimar el consumo aparente y la ingesta aparente
+   de micronutrientes con la ENGIH 2018, y documentar las adaptaciones
+   metodológicas requeridas.
+2. Estimar la proporción de hogares con ingesta aparente inferior al
+   requerimiento de cada micronutriente, a nivel nacional y por dominio de
+   estimación.
+3. Estimar el aporte de cada grupo de alimentos a la energía y a cada
+   micronutriente.
+4. Estimar la cobertura y el consumo de los vehículos de fortificación.
+5. Describir las diferencias por quintil, zona y región.
+6. Estimar el efecto de escenarios alternativos de fortificación, incluidos los
+   niveles recomendados por la Organización Mundial de la Salud y la propuesta
+   nacional para el arroz.
 
 # Métodos
 
@@ -269,17 +302,17 @@ $$\text{Consumo diario (g)} = \frac{Q \times FC \times PC}{PM}$$
 
 donde $Q$ es la cantidad declarada, $FC$ el factor de conversión de la unidad de
 presentación a gramos, $PC$ la porción comestible y $PM$ el período en días. Para
-la Sección 3A, $PM$ es el número de días distintos con registro **en ese hogar**,
+la Sección 3A, $PM$ es el número de días distintos con registro en ese hogar,
 que no es constante entre hogares.
 
 Los factores de conversión de las presentaciones más frecuentes se verificaron
 en punto de venta, con registro fotográfico, de modo que las equivalencias no
 dependen únicamente de tablas externas.
 
-Los valores atípicos se detectan **por alimento**: entre los alimentos con al
+Los valores atípicos se detectan por alimento: entre los alimentos con al
 menos veinte observaciones, se marca la fila cuyo consumo diario supera cinco
 veces el percentil 99,5 de ese alimento o queda por debajo de la quinta parte
-de su percentil 0,5. Las filas marcadas **se excluyen** de la estimación
+de su percentil 0,5. Las filas marcadas se excluyen de la estimación
 principal. No se sustituyen por un valor imputado ni se recortan a un máximo:
 la fila se retira y la marca queda en los archivos intermedios, de modo que la
 exclusión es trazable y reversible. La regla opera por alimento, de modo que un
@@ -290,10 +323,10 @@ Un filtro de plausibilidad energética se emplea solo como análisis de
 sensibilidad, porque los hogares que lo exceden se concentran en los quintiles
 altos y excluirlos sesgaría las comparaciones entre grupos.
 
-Un alimento almacenable puede figurar en las dos secciones. Se reporta la
-**suma** como estimación principal, por ser la única plausible, y el
-solapamiento se declara con su magnitud como limitación; el tratamiento
-específico emplea una regla de agotamiento.
+Un alimento almacenable puede figurar en las dos secciones. La estimación
+principal suma ambas fuentes y aplica una regla de agotamiento, que descuenta lo
+adquirido durante la semana que el hogar conserva al final del período; la
+variante sin la regla se reporta como análisis de sensibilidad.
 
 ## Normalización por Equivalente de Mujer Adulta
 
@@ -304,25 +337,25 @@ entre su requerimiento energético y las 2.291 kcal de la mujer adulta de
 referencia de 18 a 30 años (FAO/WHO/UNU, 2004), y el hogar es la suma de esas
 razones.
 
-La normalización supone que los alimentos se reparten **en proporción al
-requerimiento energético de cada miembro**. Es un supuesto: la encuesta no
+La normalización supone que los alimentos se reparten en proporción al
+requerimiento energético de cada miembro. Es un supuesto: la encuesta no
 observa el reparto dentro del hogar. Donde el reparto real se aparta de esa
 proporción, la ingesta por EMA sobrestima la de quienes reciben menos.
 
 ## Composición de alimentos
 
 El contenido de nutrientes proviene de dos tablas de composición, enlazadas con
-las variedades de la encuesta mediante un crosswalk construido y validado
-alimento por alimento. Solo las correspondencias validadas entran al cálculo.
+las variedades de la encuesta mediante una tabla de correspondencia construida y
+validada alimento por alimento. Solo las correspondencias validadas entran al cálculo.
 
-Los alimentos sin correspondencia aportan **cero**, no un valor faltante. En
-consecuencia, **la ingesta estimada es un piso y no una estimación centrada**, y
+Los alimentos sin correspondencia aportan cero, no un valor faltante. En
+consecuencia, la ingesta estimada es un límite inferior, y
 la cobertura del emparejamiento, ponderada por gramos, acompaña a los
 resultados.
 
 ## Escenarios de fortificación
 
-Los escenarios se construyen **por adición**: se parte del alimento sin
+Los escenarios se construyen por adición: se parte del alimento sin
 fortificar y se suma el nivel que el escenario añade, en miligramos por
 kilogramo de vehículo, que es como se expresa una norma.
 
@@ -366,39 +399,41 @@ ellos contaría la fortificación dos veces; su hierro y su folato se sustituyen
 por los de la harina sin enriquecer, en proporción a la harina que contienen. Lo
 que un escenario añade a un derivado es su nivel multiplicado por esa fracción.
 
-No se descuentan pérdidas por almacenamiento ni por cocción: **los aportes
-calculados son un máximo**, y el folato es particularmente sensible a este
+No se descuentan pérdidas por almacenamiento ni por cocción: los aportes
+calculados son un máximo, y el folato es particularmente sensible a este
 supuesto.
 
 ## Riesgo de ingesta inadecuada
 
-La proporción de hogares con ingesta inadecuada se estima por el **método del
-punto de corte**, comparando la ingesta por EMA y día contra el Requerimiento
+La proporción de hogares con ingesta inadecuada se estima por el método del
+punto de corte, comparando la ingesta por EMA y día contra el Requerimiento
 Promedio Estimado. El método supone una distribución simétrica del
 requerimiento, independencia entre ingesta y requerimiento, y que la
 distribución utilizada es la de la ingesta habitual; esta última condición es la
 que una encuesta de gasto satisface peor.
 
-El **hierro** no se evalúa por punto de corte, porque la distribución de su
+El hierro no se evalúa por punto de corte, porque la distribución de su
 requerimiento es marcadamente asimétrica en mujeres en edad fértil. Se emplea el
 enfoque de probabilidad sobre la distribución del requerimiento, que depende del
 supuesto de biodisponibilidad de la dieta; el supuesto empleado se declara junto
 a cada cifra.
 
-El **límite superior** no se aplica al nutriente total sino a la forma a la que
+El límite superior no se aplica al nutriente total sino a la forma a la que
 corresponde: al ácido fólico sintético añadido y al retinol preformado añadido.
 Las proporciones sobre el límite se calculan sobre la fracción añadida y se
 declaran como cota máxima.
 
-Los valores de referencia se leen de un archivo de parámetros y su estado se
-declara en la tabla correspondiente.
+Los valores de referencia son los Requerimientos Promedio Estimados y los
+niveles máximos de ingesta tolerable del Institute of Medicine para mujeres de
+19 a 30 años; la edición correspondiente a cada nutriente figura en las
+referencias.
 
 {{< include _metodo_densidad.qmd >}}
 
 ## Dominios de estimación y precisión
 
 Se estima a nivel nacional, por región, por zona y por quintil, que son dominios
-de estimación de la encuesta, y por provincia, **que no lo es**. Las
+de estimación de la encuesta, y por provincia, que no lo es. Las
 estimaciones provinciales se publican con marca explícita de precisión
 insuficiente cuando no alcanzan un mínimo de hogares o cuando la semiamplitud de
 su intervalo excede el umbral fijado; en los mapas, esas unidades no se pintan
@@ -408,7 +443,7 @@ con su valor.
 
 Los alimentos se clasifican en los grupos de la diversidad alimentaria mínima en
 mujeres (MDD-W, FAO 2021) más las categorías que esa guía deja fuera y que aquí
-importan. **La clasificación no es el indicador MDD-W**, que mide consumo
+importan. La clasificación no es el indicador MDD-W, que mide consumo
 individual en 24 horas; aquí se clasifican adquisiciones del hogar durante una
 semana.
 
@@ -416,15 +451,15 @@ semana.
 
 ## Factibilidad y cobertura de los datos
 
-La ENGIH 2018 permite estimar consumo aparente e ingesta de micronutrientes, y
-la respuesta a la primera pregunta de este informe es afirmativa con una
-condición: que el resultado se lea junto a su cobertura.
+La proporción de los gramos adquiridos con dato de composición varió entre
+`r num(min(cob_mic$pct_gramos_cubiertos))`% y
+`r num(max(cob_mic$pct_gramos_cubiertos))`% según el micronutriente
+(@fig-cobertura).
 
 La cadena de cálculo enlaza cada alimento de la encuesta con una tabla de
 composición. Los alimentos que no encuentran correspondencia **aportan cero, no
 un valor faltante**, de modo que la ingesta estimada subestima por construcción.
-La magnitud de esa subestimación es distinta para cada nutriente y la
-@fig-cobertura la cuantifica.
+La magnitud de esa subestimación difiere entre nutrientes.
 
 ```{r}
 #| label: fig-cobertura
@@ -445,47 +480,18 @@ cobertura |>
   tema_informe
 ```
 
-La lectura práctica es que **los nutrientes de cobertura alta admiten una
-interpretación directa y los de cobertura menor deben leerse como un piso**. Es
-también la razón por la que las vitaminas D y E, que son las de cobertura más
-baja, aparecen con las proporciones de inadecuación más altas: parte de esa
-cifra es déficit real y parte es ausencia de dato.
+Las estimaciones de los micronutrientes con cobertura alta admiten una
+interpretación directa; las de cobertura menor, como límite inferior. Las
+vitaminas D y E, con la cobertura más baja, presentan también las proporciones
+más altas de hogares bajo el requerimiento, de modo que una parte de esas
+proporciones refleja la ausencia de dato de composición.
 
-Esta cifra acompaña a todo resultado de ingesta de este informe. Sin ella, una
-estimación de ingesta se lee como si fuera completa cuando en realidad es un
-límite inferior.
-
-El análisis preliminar de factibilidad, entregado por separado, documenta la
-cobertura por sección del cuestionario, las pérdidas de registros por motivo y
-la validación externa de las cantidades. Este informe no la repite: parte de
-ella.
+El informe de factibilidad, entregado por separado, documenta la cobertura por
+sección del cuestionario, las pérdidas de registros por motivo y la validación
+externa de las cantidades.
 
 
 ## Riesgo de ingesta inadecuada
-
-La inadecuación no se reparte por igual entre nutrientes. La @fig-riesgo los
-ordena de mayor a menor, y el rango cubre casi toda la escala: hay nutrientes
-cuya ingesta aparente queda por debajo del requerimiento en la inmensa mayoría
-de los hogares y otros donde el déficit alcanza a menos de la mitad.
-
-Tres salvedades condicionan su lectura.
-
-**Los valores de referencia son el Requerimiento Promedio Estimado del
-Institute of Medicine** para mujeres de 19 a 30 años. La proporción bajo el
-requerimiento escala con el requerimiento empleado, de modo que otro conjunto
-de referencia reescalaría todas las cifras de esta sección.
-
-**El hierro se presenta con una biodisponibilidad del 10%, valor adoptado para
-la consultoría; el 18% se reporta como análisis de sensibilidad.** Con el
-18%, propio de dietas con mayor presencia de carne y de
-potenciadores de la absorción, el requerimiento se reduce en proporción y la
-cifra baja aproximadamente a la mitad. La elección
-cambia la posición del hierro en esa jerarquía.
-
-**Las vitaminas D y E dependen de la cobertura de la tabla de composición más
-que el resto**, de modo que su cifra es la más próxima a un piso. En la
-vitamina D se añade que la inadecuación dietética no equivale a deficiencia,
-porque la síntesis cutánea no se contabiliza.
 
 ```{r}
 #| label: fig-riesgo
@@ -518,6 +524,29 @@ principal |>
             `Densidad mediana por 1.000 kcal` = num(densidad_mediana, 2)) |>
   kable(align = "lrrr")
 ```
+
+Con la norma vigente, la proporción de hogares con ingesta aparente inferior al
+requerimiento varió entre `r num(r_min$pct_inadecuado)`%
+(`r tolower(r_min$nutriente)`) y `r num(r_max$pct_inadecuado)`%
+(`r tolower(r_max$nutriente)`) (@fig-riesgo, @tbl-riesgo). Tres
+consideraciones condicionan su interpretación.
+
+Los valores de referencia son el Requerimiento Promedio Estimado del Institute
+of Medicine para mujeres de 19 a 30 años. La proporción bajo el requerimiento
+depende del valor de referencia adoptado, de modo que otro conjunto de
+referencia modificaría todas las estimaciones de esta sección.
+
+Para el hierro se adoptó una biodisponibilidad del 10%. Con el 18%, valor
+propio de dietas con mayor aporte de carne y de potenciadores de la absorción,
+la proporción de hogares bajo el requerimiento desciende de
+`r r_nac(ESCENARIO_BASE, "Hierro")`% a `r fe18`%.
+
+Las estimaciones de las vitaminas D y E dependen en mayor medida de la
+cobertura de la tabla de composición y constituyen el límite inferior más
+alejado del valor real. En la vitamina D, además, la ingesta dietética
+inferior al requerimiento no equivale a deficiencia, porque no se contabiliza
+la síntesis cutánea.
+
 
 ## Composición de la dieta por grupos de alimentos
 
@@ -566,27 +595,19 @@ grupos |>
   kable(align = "lrr")
 ```
 
-La @fig-grupos-nutrientes explica **por qué un escenario de
-fortificación mueve unos nutrientes y no otros**.
+El aporte de cada micronutriente se concentra en pocos grupos de alimentos
+(@fig-grupos-nutrientes).
 
-Los grupos de cereales, raíces y plátanos concentran el aporte de los
-nutrientes que la fortificación de harinas y granos puede alcanzar, y son
-prácticamente irrelevantes para los que provienen de alimentos de origen
-animal. Un escenario que añade hierro y ácido fólico a un cereal opera sobre la
-columna donde ese grupo concentra el aporte; un nutriente cuyo aporte proviene
-casi enteramente de carnes y lácteos no puede moverse, por mucho que se
-fortifique el cereal.
+Los cereales, raíces, tubérculos y plátanos aportan
+`r num(cereal$folato_mcg_dfe)`% del folato y `r num(cereal$hierro_mg)`% del
+hierro, y `r num(cereal$vitamina_b12_mcg)`% de la vitamina B12, que procede
+principalmente de carnes, aves y pescado, y de lácteos. En consecuencia, la
+fortificación de cereales modifica la ingesta de los micronutrientes que estos
+aportan y no la de los que proceden de alimentos de origen animal, cualquiera
+que sea el nivel de adición.
 
-**La elección del vehículo determina, además de a cuántos hogares se llega,
-qué nutrientes es posible corregir**, con independencia del nivel de
-fortificación.
-
-Dos notas sobre la clasificación. Es la agrupación de la diversidad alimentaria
-mínima en mujeres (FAO, 2021) más las categorías que esa guía deja fuera, y
-**no es el indicador MDD-W**: aquí se clasifican adquisiciones del hogar
-durante una semana, no consumo individual en 24 horas. El reparto está
-calculado sobre el escenario sin fortificación, de modo que describe la dieta y
-no el efecto de la norma vigente.
+El aporte se calcula sobre el escenario sin fortificación, de modo que describe
+la dieta adquirida y no el efecto de la norma vigente.
 
 
 ## Cobertura y consumo de los vehículos de fortificación
@@ -603,18 +624,21 @@ vehiculos |>
   kable(align = "lrrr")
 ```
 
-Un vehículo sirve en la medida en que reúne dos condiciones a la vez:
-alcanzar a una proporción alta de hogares y consumirse en cantidad suficiente
-para transportar el fortificante. La tabla anterior las separa; el apartado de
-distribución territorial las examina juntas.
+La harina de trigo, expresada en equivalentes de harina, fue adquirida por
+`r num(veh("Trigo", pct_hogares))`% de los hogares, el arroz por
+`r num(veh("Arroz", pct_hogares))`% y el azúcar por
+`r num(veh("Azúcar", pct_hogares))`% (@tbl-vehiculos). Entre los hogares que los
+adquieren, el consumo mediano fue de `r num(veh("Arroz", mediana_consumidores), 0)` g
+de arroz, `r num(veh("Trigo", mediana_consumidores), 0)` g de harina de trigo y
+`r num(veh("Azúcar", mediana_consumidores), 0)` g de azúcar por EMA y día. Un
+vehículo eficaz requiere a la vez cobertura alta y un consumo suficiente para
+transportar el fortificante.
 
-### Alcance de una estrategia sobre varios vehículos
+### Cobertura de las combinaciones de vehículos
 
-Una estrategia puede apoyarse en un vehículo o en un conjunto. Para el diseño
-importa menos la cobertura de cada uno por separado que la del conjunto: qué
-proporción de hogares queda alcanzada por **al menos uno**. La diferencia entre
-una cifra y otra es la superposición entre vehículos, que no se deduce de las
-coberturas individuales.
+La proporción de hogares que adquiere al menos uno de los vehículos de una
+combinación depende de la superposición entre ellos, que no se deduce de las
+coberturas individuales (@tbl-alcance-combinado, @tbl-reparto-vehiculos).
 
 ```{r}
 #| label: tbl-alcance-combinado
@@ -641,10 +665,12 @@ leer("escenarios_reparto_vehiculos.csv") |>
   kable(align = "lrrr")
 ```
 
-La lectura operativa de las dos tablas es la misma: una norma sobre un solo
-vehículo deja fuera a los hogares que no lo adquieren, y la pregunta de diseño
-es si la combinación cierra ese hueco o si los mismos hogares adquieren todos
-los vehículos y la combinación no añade alcance.
+El trigo alcanzó por sí solo al
+`r num(uno(alcance$pct_hogares[alcance$combinacion == "Trigo"]))`% de los
+hogares y la combinación de trigo y arroz al
+`r num(uno(alcance$pct_hogares[alcance$combinacion == "Trigo o Arroz"]))`%: la
+mayoría de los hogares adquiere ambos vehículos, de modo que el segundo amplía
+poco la cobertura.
 
 {{< include _mapas_cobertura.qmd >}}
 
@@ -684,21 +710,25 @@ sens |>
   tema_informe
 ```
 
-El gradiente socioeconómico del folato existe y es del signo esperado cuando se
-mide sobre la ingesta absoluta: el déficit es mayor en los hogares de menor
-gasto. Medido sobre la densidad de nutrientes, **el gradiente se invierte**.
+Con el criterio de ingesta absoluta, la proporción de hogares con ingesta de
+folato inferior al requerimiento descendió de `r r_dom("Quintil", "1", "Folato")`%
+en el primer quintil a `r r_dom("Quintil", "5", "Folato")`% en el quinto
+(@tbl-dominios, @fig-quintiles); con el criterio de densidad, el gradiente se
+invierte. Entre zona urbana y rural la proporción fue similar
+(`r r_dom("Zona", "Urbano", "Folato")`% y `r r_dom("Zona", "Rural", "Folato")`%).
 
-Entre quintiles la variación de la energía registrada es plausiblemente real,
-de modo que la corrección por densidad no procede como medida de riesgo
-(sección de métodos). **El gradiente socioeconómico de este informe se reporta
-sobre ingesta absoluta.** Lo que la densidad describe entre quintiles es la
-composición de la dieta: las canastas de mayor gasto llevan menos folato por
-unidad de energía.
+Entre quintiles, la variación de la energía registrada refleja probablemente
+diferencias reales de acceso a alimentos, de modo que la corrección por
+densidad no procede para estimar la proporción bajo el requerimiento (sección
+de métodos); el gradiente socioeconómico se reporta sobre la ingesta absoluta.
+La densidad describe la composición de la dieta: las canastas de los quintiles
+superiores contienen menos folato por unidad de energía.
 
 ### Distribución territorial
 
-La @fig-mapas-criterios presenta el riesgo de folato por provincia bajo los
-dos criterios.
+La @fig-mapas-criterios presenta, por provincia, la proporción de hogares con
+ingesta de folato inferior al requerimiento y la razón entre la densidad
+mediana de folato y la densidad crítica.
 
 ::: {#fig-mapas-criterios layout-ncol=1}
 
@@ -706,8 +736,7 @@ dos criterios.
 
 ![Criterio de densidad](../media/mapas/mapa_densidad_folato.png){#fig-mapa-densidad fig-alt="Mapa coroplético de la República Dominicana por provincia, con la razón entre la densidad mediana de folato y la densidad crítica en escala divergente centrada en uno."}
 
-Riesgo de ingesta inadecuada de folato por provincia, bajo cada uno de los dos
-criterios, escenario de línea base. El mapa de la izquierda expresa la
+Ingesta de folato por provincia según dos criterios. Escenario de línea base. El mapa de la izquierda expresa la
 proporción de hogares cuya ingesta aparente es inferior al Requerimiento
 Promedio Estimado; el de la derecha, la razón entre la densidad mediana
 observada y la densidad crítica, centrada en 1. Las provincias sin color no
@@ -727,13 +756,10 @@ no es dominio de estimación de la encuesta.
 
 :::
 
-La provincia **no es dominio de estimación** de la encuesta, y las unidades que
-no alcanzan el criterio de precisión se dejan sin color en lugar de pintarse
-con un valor que no es comparable. El mapa de la izquierda, construido sobre la
-ingesta absoluta, refleja la adquisición registrada antes que la adecuación de
-la dieta; el de la derecha, construido sobre la densidad, es invariante al
-nivel de registro. El criterio y su condición de validez se desarrollan en la
-sección de métodos.
+Las provincias que no alcanzan el criterio de precisión se presentan sin color.
+El mapa basado en la ingesta absoluta refleja el nivel de adquisición
+registrada además de la adecuación de la dieta; el basado en la densidad es
+invariante a ese nivel (sección de métodos).
 
 
 ## Escenarios de fortificación
@@ -806,216 +832,194 @@ principal |>
   kable(align = "lrrrrrrrr")
 ```
 
-La @fig-escenarios ordena los escenarios por alcance y muestra qué le ocurre a
-cada nutriente. Tres lecturas, en orden de consecuencia para la decisión.
+La @fig-escenarios y la @tbl-escenarios presentan la proporción de hogares con
+ingesta inferior al requerimiento en cada escenario.
 
-**La norma vigente reduce el riesgo de folato y no lo resuelve.** La
-fortificación de la harina de trigo y el pan desplaza la proporción de hogares
-bajo el requerimiento, pero la deja todavía en el entorno de la mitad. Extender
-la norma a todos los derivados del trigo —pastas, galletas, repostería, hoy de
-fortificación voluntaria— añade un desplazamiento menor: el límite no está en
-qué productos se alcanzan sino en cuánta harina transporta cada uno.
+La norma vigente reduce la proporción de hogares con ingesta de folato inferior
+al requerimiento de `r r_nac(E0, "Folato")`% sin fortificación a
+`r r_nac(ESCENARIO_BASE, "Folato")`%. Su extensión a todos los derivados del
+trigo —pastas, galletas y repostería, de fortificación voluntaria— la reduce a
+`r r_nac(E1B, "Folato")`%; el efecto está limitado por la fracción de harina de
+cada derivado más que por el número de productos alcanzados.
 
-**Los niveles recomendados internacionalmente rinden más sobre los mismos
-alimentos.** Los escenarios construidos con los niveles de la Organización
-Mundial de la Salud operan sobre el mismo vehículo y el mismo alcance
-poblacional, y producen un desplazamiento mayor. La ganancia
-procede de la dosis. Eso sitúa la revisión del nivel normativo como una
-decisión con rendimiento propio, independiente de incorporar vehículos nuevos.
+Los niveles recomendados por la Organización Mundial de la Salud, aplicados a
+los mismos vehículos y con el mismo alcance, reducen la proporción a
+`r r_nac(E2A, "Folato")`% o `r r_nac(E2B, "Folato")`%, según el consumo de
+harina considerado. La diferencia respecto de la norma nacional procede del
+nivel de adición, de modo que su revisión tiene un efecto propio,
+independiente de la incorporación de vehículos.
 
-**Zinc, vitamina B12 y vitamina A no responden a los escenarios de harina.** El zinc,
-la vitamina B12 y la vitamina A permanecen prácticamente invariables a lo largo
-de todos los escenarios de la norma nacional, por la razón que muestra la
-@fig-grupos-nutrientes: la norma añade hierro y ácido fólico, y esos nutrientes
-provienen de grupos de alimentos que el vehículo no toca. Solo la propuesta que
-incorpora arroz, cuyos niveles incluyen zinc y vitamina B12, los desplaza.
+Con los escenarios de la norma nacional, las proporciones correspondientes al
+zinc, la vitamina B12 y la vitamina A no se modifican, porque la norma añade
+únicamente hierro y ácido fólico. El cumplimiento de la norma del azúcar
+reduce la proporción para la vitamina A de `r r_nac(E1B, "Vitamina A")`% a
+`r r_nac(E1C, "Vitamina A")`%. La incorporación del arroz según la propuesta
+nacional, que incluye zinc y vitamina B12, reduce la proporción para el folato
+a `r r_nac(E3, "Folato")`%, para el hierro a `r r_nac(E3, "Hierro")`%, para el
+zinc a `r r_nac(E3, "Zinc")`% y para la vitamina B12 a
+`r r_nac(E3, "Vitamina B12")`%.
 
-### Equidad: la pregunta 7
+### Diferencias entre quintiles según el vehículo
 
-La @fig-equidad-escenarios contrasta la conjetura formulada antes de examinar
-los datos. La razón entre la ingesta de folato del quintil de mayor gasto y la
-del quintil de menor gasto mide cuánto se aparta de la equidad el reparto del
-nutriente.
+La @fig-equidad-escenarios presenta, para cada escenario, la razón entre la
+ingesta mediana de folato del quinto y del primer quintil, que contrasta la
+hipótesis formulada antes del análisis (pregunta 7).
 
-El resultado respalda la conjetura y además la precisa. El arroz, que es el
-vehículo de consumo más transversal —cobertura alta en todas las provincias y
-cantidades comparables entre ellas, según la @fig-bivariado— lleva la razón
-prácticamente a la unidad: la ingesta de folato deja de depender del gasto del
-hogar. Los escenarios que operan sobre la harina de trigo, cuyo consumo es
-desigual entre estratos, conservan el gradiente aunque eleven el nivel medio.
+Con la norma vigente la razón fue de `r num(razon(ESCENARIO_BASE), 2)`. Con la
+incorporación del arroz, el vehículo de consumo más homogéneo entre quintiles y
+provincias (@fig-bivariado), descendió a `r num(razon(E3), 2)`. Los escenarios
+basados en la harina de trigo, de consumo más desigual, mantuvieron razones
+entre `r num(min(fol_esc$razon_q5_q1[!fol_esc$escenario %in% c(E0, E3)]), 2)` y
+`r num(max(fol_esc$razon_q5_q1[!fol_esc$escenario %in% c(E0, E3)]), 2)`, aun cuando
+elevaron la ingesta mediana. El resultado es congruente con la hipótesis.
 
-La consecuencia de política es que **elevar la ingesta media y cerrar la brecha
-social son objetivos distintos, que no se consiguen con la misma decisión.** Subir el nivel normativo sobre un
-vehículo desigual mejora el promedio y mantiene la desigualdad; cambiar a un
-vehículo transversal cierra la brecha. Qué se prioriza es una decisión política,
-y se toma sobre dos decisiones distintas, no sobre una.
+En consecuencia, el aumento de la ingesta mediana y la reducción de la
+diferencia entre quintiles son objetivos distintos: el primero se obtiene
+elevando el nivel de adición sobre un vehículo existente; el segundo requiere
+un vehículo de consumo homogéneo.
 
-### El límite superior
+### Ácido fólico por encima del nivel máximo tolerable
 
-La propuesta que incorpora arroz deja a una fracción de hogares por encima del
-límite superior de ingesta tolerable de ácido fólico. Esa cifra debe leerse con
-dos precisiones.
+Con la incorporación del arroz, el `r num(ul(E3))`% de los hogares supera el
+nivel máximo de ingesta tolerable de ácido fólico; en los demás escenarios la
+proporción no supera el `r num(max(fol_esc$pct_folico_sobre_ul[!fol_esc$escenario %in% c(E0, E3)]))`%.
+Dos precisiones condicionan la lectura de esa cifra.
 
-La primera es que **el límite aplica al ácido fólico sintético añadido**, no al
-folato total de la dieta, y el cálculo de este informe se hace sobre la fracción
-añadida, de modo que es una **cota máxima**. La segunda es que la cifra se
-refiere a hogares y no a personas: la ingesta está expresada por Equivalente de
-Mujer Adulta, y el reparto real dentro del hogar no se observa.
-
-Aun con esas precisiones, es el único escenario donde la cuestión del exceso se
-plantea, y acompaña a la decisión sobre el arroz como una contrapartida
-explícita de su mayor rendimiento.
-
+El nivel máximo se aplica al ácido fólico sintético añadido y no al folato
+total de la dieta, y el cálculo se realiza sobre la fracción añadida, de modo
+que la proporción es una cota máxima. Además, la cifra se refiere a hogares y
+no a personas: la ingesta está expresada por EMA y la distribución dentro del
+hogar no se observa.
 
 # Discusión
 
-## Lo que el análisis establece
+## Principales hallazgos
 
-La ENGIH 2018 permite estimar consumo aparente e ingesta de micronutrientes con
-calidad suficiente para orientar decisiones de fortificación, siempre que cada
-estimación se lea junto a su cobertura de composición y se declare como un
-límite inferior.
+La ENGIH 2018 permite estimar la ingesta aparente de micronutrientes con una
+calidad suficiente para comparar escenarios de fortificación, siempre que cada
+estimación se interprete como límite inferior en función de la cobertura de la
+tabla de composición. Tres resultados tienen implicaciones directas para el
+diseño de la política de fortificación.
 
-Sobre esa base, el análisis establece tres resultados.
+Primero, el aporte de cada micronutriente se concentra en pocos grupos de
+alimentos. La fortificación de cereales modifica la ingesta de folato y de
+hierro, que estos aportan mayoritariamente, y no la de vitamina B12 o
+vitamina D, procedentes en su mayor parte de alimentos de origen animal. La elección
+del vehículo restringe así el conjunto de micronutrientes sobre los que puede
+actuarse, con independencia del nivel de adición.
 
-**La elección del vehículo determina qué nutrientes es posible corregir, no
-solo a cuánta gente se llega.** El aporte de cada grupo de alimentos a cada
-micronutriente está fuertemente concentrado: los cereales y las raíces
-dominan unos nutrientes y son irrelevantes para otros, que provienen casi
-enteramente de alimentos de origen animal. Un escenario que fortifica un cereal
-no puede mover un nutriente que el cereal no aporta, por alto que sea el nivel
-de adición. La restricción es estructural y precede a cualquier discusión sobre
-dosis.
+Segundo, el aumento del nivel de adición sobre la harina de trigo eleva la
+ingesta de folato sin modificar la razón entre quintiles extremos, mientras que
+la incorporación de un vehículo de consumo homogéneo, como el arroz, la
+aproxima a la unidad. El resultado es congruente con la hipótesis formulada
+antes del análisis.
 
-**Elevar la ingesta media y cerrar la brecha social son objetivos distintos.**
-Subir el nivel normativo sobre un vehículo de consumo desigual mejora el
-promedio y conserva el gradiente; cambiar a un vehículo de consumo transversal
-cierra el gradiente. Las dos decisiones son defendibles y no son
-intercambiables. Este resultado contrasta la conjetura formulada antes de
-examinar los datos y la respalda.
+Tercero, la norma vigente reduce la proporción de hogares con ingesta de folato
+inferior al requerimiento, pero más de la mitad de los hogares permanece por
+debajo de él. La reducción adicional puede obtenerse elevando el nivel de
+adición sobre los vehículos existentes, sin infraestructura nueva, o
+incorporando un vehículo adicional, con mayor efecto y con un aumento de la
+proporción de hogares por encima del nivel máximo tolerable de ácido fólico.
 
-**La norma vigente deja margen y el margen tiene dos vías distintas.** La
-fortificación actual de la harina de trigo reduce el riesgo de inadecuación de
-folato sin resolverlo. Ese margen puede cerrarse elevando el nivel sobre el
-mismo vehículo —los niveles recomendados internacionalmente rinden más sobre
-los mismos alimentos y el mismo alcance— o incorporando un vehículo adicional.
-La primera vía es normativa y no exige infraestructura nueva; la segunda tiene
-mayor rendimiento y una contrapartida explícita en el límite superior.
+## Limitaciones
 
-## Lo que el análisis no puede establecer
+La encuesta registra adquisiciones, no ingesta. Entre ambas median el
+desperdicio, el almacenamiento, la distribución dentro del hogar y el consumo
+fuera de él; por ello, todas las estimaciones se denominan aparentes.
 
-La encuesta mide **adquisición**, no ingesta. Entre una y otra median el
-desperdicio, el almacenamiento, el reparto desigual dentro del hogar y el
-consumo fuera de él. Ninguna técnica elimina esa distancia, y por eso toda
-cifra de este informe se denomina *aparente*.
+La normalización por EMA supone que los alimentos se distribuyen dentro del
+hogar en proporción al requerimiento energético de cada miembro. Cuando la
+distribución real se aparta de esa proporción, la ingesta por EMA sobrestima la
+de los miembros que reciben menos.
 
-La normalización por Equivalente de Mujer Adulta supone que los alimentos se
-reparten en proporción al requerimiento energético de cada miembro. La encuesta
-no observa ese reparto. Donde el reparto real se aparta de esa proporción —y la
-literatura documenta que a menudo lo hace en perjuicio de mujeres y niñas— la
-ingesta por EMA sobrestima la de quienes reciben menos.
+El nivel de adquisición registrada varía entre provincias por razones no
+atribuibles al consumo. El criterio de densidad reduce esa dependencia en la
+comparación geográfica sin eliminarla, y la variación residual no se explica
+con los datos disponibles.
 
-El nivel de adquisición registrada **varía entre territorios por razones que no
-son de consumo**. Este informe lo documenta y adopta un criterio complementario
-que es invariante a ese nivel, con su dominio de validez declarado por
-nutriente. El criterio reduce sustancialmente la dependencia del nivel de
-registro en la comparación geográfica, pero no la elimina, y el residuo queda
-sin explicar.
+Las proporciones de hogares bajo el requerimiento dependen de los valores de
+referencia adoptados y, en el hierro, del supuesto de biodisponibilidad, por lo
+que se reportan también con el 18%. Los escenarios suponen cumplimiento pleno
+de la norma en todo el vehículo y no descuentan pérdidas por almacenamiento ni
+por cocción, de modo que estiman el efecto máximo. El cálculo no incorpora la
+procedencia ni el destino declarado de las adquisiciones.
 
-Las estimaciones de riesgo escalan con los valores de referencia: otro
-conjunto de referencia las reescalaría. El supuesto de biodisponibilidad del
-hierro cambia su cifra de forma sustantiva, y por eso se reporta también con
-18%. Y la cadena de cálculo no incorpora la procedencia ni el
-destino declarado de la adquisición, aunque la encuesta los registre: es un
-supuesto implícito que aquí queda explícito.
+## Explicaciones examinadas y descartadas
 
-## Lo que se examinó y no se sostuvo
-
-Documentar las hipótesis que no prosperaron delimita el alcance de la
-verificación y evita que se vuelvan a ensayar.
-
-El patrón geográfico del riesgo no se explica por la composición de la dieta,
-ni por el reparto entre las dos secciones del cuestionario, ni por la regla de
-agotamiento, ni por los días observados, ni por el tamaño del hogar, ni por la
-inestabilidad de los dominios con pocos conglomerados, ni por la procedencia de
-la adquisición. Este último caso merece mención propia porque ilustra un riesgo
-de inferencia: **entre provincias**, la participación de la producción propia
-correlaciona de forma apreciable con la energía registrada; **entre hogares**,
-no correlaciona en absoluto, y los hogares sin nada de producción propia en las
-provincias afectadas presentan el mismo exceso. Es una falacia ecológica con
-datos reales, y de no haberse examinado a nivel de hogar habría producido una
-conclusión equivocada y plausible.
+Se examinaron y descartaron siete explicaciones de la variación geográfica: la
+composición de la dieta, la distribución entre las dos secciones del
+cuestionario, la regla de agotamiento, el número de días con registro, el
+tamaño del hogar, la inestabilidad de los dominios con pocos conglomerados y la
+procedencia de la adquisición. En el último caso, la proporción de producción
+propia se correlacionó con la energía registrada entre provincias, pero no
+entre hogares, y los hogares sin producción propia de las provincias afectadas
+presentaron el mismo exceso; la asociación provincial constituye una falacia
+ecológica.
 
 ## Relación con el enfoque de referencia
 
-El procedimiento sigue la línea de los análisis de modelación de la
-contribución de la fortificación a los requerimientos de micronutrientes a
-partir de encuestas de consumo y gasto de los hogares (Tang et al., 2022), con
-las adaptaciones que la estructura de la ENGIH 2018 exige y que el manual
-técnico documenta una a una. Las principales son el tratamiento del
-solapamiento entre el inventario de despensa y las adquisiciones diarias, el
-período de observación variable por hogar, y la verificación en punto de venta
-de los factores de conversión y de la aplicación efectiva de las normas.
-
-Esa verificación mostró que **el azúcar en venta no declara vitamina A en su
-etiqueta**,
-pese a existir norma obligatoria desde 2004. La distinción entre norma vigente,
-aplicación efectiva y verificación en el mercado resultó determinante para
-decidir qué escenario describe la realidad de 2018 y cuáles describen
-decisiones posibles.
+El procedimiento sigue los análisis de modelación de la contribución de la
+fortificación a partir de encuestas de consumo y gasto de los hogares (Tang et
+al., 2022), con las adaptaciones que exige la estructura de la ENGIH 2018,
+documentadas en el manual técnico: el tratamiento del solapamiento entre el
+inventario de despensa y las adquisiciones diarias, el período de registro
+variable por hogar y la verificación en punto de venta de los factores de
+conversión y del cumplimiento de las normas. Esta última mostró que el azúcar
+en venta no declara vitamina A en su etiqueta, pese a la obligatoriedad de la
+norma desde 2004.
 
 ## Implicaciones
 
-Para la decisión de política, el análisis ordena las opciones por rendimiento y
-por contrapartida, y no sustituye la decisión. Elevar el nivel normativo sobre
-el vehículo vigente es la opción de menor costo institucional. Incorporar un
-vehículo de consumo transversal es la de mayor rendimiento y la única que
-cierra la brecha social, con el exceso de ácido fólico como contrapartida
-declarada. Fortificar un vehículo cuyo nutriente proviene de grupos de
-alimentos distintos es la única vía para los nutrientes que ningún escenario de
-cereales mueve.
+Los resultados ordenan las opciones de política según su efecto estimado y su
+exigencia institucional. La extensión de la norma vigente a todos los
+derivados del trigo y la adopción de los niveles de la Organización Mundial de
+la Salud actúan sobre vehículos ya regulados. El cumplimiento de la norma del
+azúcar es la única opción evaluada que modifica la ingesta de vitamina A. La
+incorporación del arroz produce el mayor efecto sobre folato, hierro, zinc y
+vitamina B12 y reduce la diferencia entre quintiles, con la contrapartida del
+ácido fólico por encima del nivel máximo tolerable. Todas las estimaciones
+suponen cumplimiento pleno; la proporción del suministro efectivamente
+fortificado requiere medición en punto de producción o de venta.
 
-Para el trabajo técnico subsiguiente, dos asuntos quedan planteados: obtener el
-texto de los instrumentos normativos que
-aquí se usaron a partir de fuentes secundarias concordantes; y examinar los
-factores de conversión de unidades no estándar como posible origen del patrón
-geográfico que este informe documenta sin explicar.
-
+Para el trabajo técnico posterior quedan dos líneas: obtener el texto oficial
+de los instrumentos normativos empleados, que aquí proceden de fuentes
+secundarias concordantes, y examinar los factores de conversión de unidades no
+estándar como posible origen de la variación geográfica no explicada.
 
 # Conclusiones
 
-1. **La encuesta sirve.** La ENGIH 2018 permite estimar consumo aparente e
-   ingesta de micronutrientes con cobertura y calidad suficientes para orientar
-   decisiones de fortificación, con la condición de que cada estimación se lea
-   junto a su cobertura de composición y se declare como límite inferior.
+1. La ENGIH 2018 permite estimar la ingesta aparente de micronutrientes de los
+   hogares; cada estimación debe interpretarse como límite inferior en función
+   de la cobertura de la tabla de composición.
 
-2. **El riesgo de inadecuación es desigual entre nutrientes** y su jerarquía
-   depende de elecciones declaradas: el Requerimiento Promedio Estimado del
-   Institute of Medicine como referencia y la biodisponibilidad del hierro, 10%
-   con 18% como análisis de sensibilidad.
+2. Con la norma vigente, la proporción de hogares con ingesta aparente inferior
+   al requerimiento varió entre `r num(r_min$pct_inadecuado)`% y
+   `r num(r_max$pct_inadecuado)`% según el micronutriente; fue de
+   `r r_nac(ESCENARIO_BASE, "Folato")`% para el folato y de
+   `r r_nac(ESCENARIO_BASE, "Hierro")`% para el hierro, con 10% de
+   biodisponibilidad.
 
-3. **El aporte de nutrientes está concentrado por grupo de alimentos**, de modo
-   que la elección del vehículo determina qué nutrientes es posible corregir.
+3. El aporte de cada micronutriente se concentra en pocos grupos de alimentos,
+   de modo que el vehículo determina qué micronutrientes pueden modificarse.
 
-4. **Los principales vehículos alcanzan a casi todo el país**, sin zonas
-   desatendidas, pero difieren en la cantidad que transportan: cobertura y
-   consumo son condiciones distintas y solo una parte de los vehículos cumple
-   las dos.
+4. La harina de trigo y el arroz son adquiridos por la mayoría de los hogares
+   en todas las provincias y difieren en la cantidad consumida, mayor en el
+   arroz.
 
-5. **El gradiente social existe y depende del vehículo.** Un vehículo de
-   consumo transversal lo cierra; uno de consumo desigual lo conserva aunque se
-   eleve el nivel. La conjetura formulada antes de examinar los datos queda
-   respaldada.
+5. La proporción de hogares con ingesta de folato inferior al requerimiento
+   disminuye del primer al quinto quintil. La incorporación de un vehículo de
+   consumo homogéneo reduce esa diferencia; el aumento del nivel de adición
+   sobre la harina no la modifica.
 
-6. **La norma vigente deja margen, y el margen tiene dos vías.** Elevar el
-   nivel sobre el vehículo actual, de menor costo institucional; o incorporar
-   un vehículo adicional, de mayor rendimiento y con el exceso de ácido fólico
-   como contrapartida.
+6. La extensión de la norma a todos los derivados del trigo, la adopción de los
+   niveles de la Organización Mundial de la Salud y la incorporación del arroz
+   reducen progresivamente la proporción de hogares con ingesta de folato
+   inferior al requerimiento; la última aumenta la proporción de hogares por
+   encima del nivel máximo tolerable de ácido fólico.
 
-7. **El patrón geográfico del riesgo está gobernado por el nivel de
-   adquisición registrada y no por la dieta.** Siete mecanismos alternativos
-   fueron examinados y descartados. El criterio de densidad reduce esa
-   dependencia pero no la agota, y el residuo queda abierto.
+7. La variación geográfica de las estimaciones refleja en mayor medida el nivel
+   de adquisición registrada que diferencias en la dieta; siete explicaciones
+   alternativas fueron examinadas y descartadas.
 
 # Referencias {.unnumbered}
 
