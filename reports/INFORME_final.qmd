@@ -137,22 +137,22 @@ de consumo individual de alimentos. La Encuesta Nacional de Gastos e Ingresos
 de los Hogares (ENGIH) 2018 registra las adquisiciones de alimentos de los
 hogares con fines económicos.
 
-**Objetivo.** Evaluar la factibilidad de estimar con la ENGIH 2018 la cobertura
+**Objetivo.** Evaluar la factibilidad de la encuesta ENGIH 2018 para estimar la cobertura
 y el consumo de los vehículos de fortificación y su contribución a la ingesta
-aparente de micronutrientes, y estimar el efecto de escenarios alternativos de
+aparente de micronutrientes, así como identificar el efecto de escenarios alternativos de
 fortificación sobre la proporción de hogares con ingesta inferior al
 requerimiento.
 
 **Métodos.** Se combinaron el inventario de despensa (Sección 2) y el diario de
 adquisiciones (Sección 3A) de `r n_hog` hogares. Las cantidades declaradas se
 convirtieron a gramos comestibles por equivalente de mujer adulta (EMA) y día,
-y a nutrientes mediante dos tablas de composición. La proporción de hogares con
+y a nutrientes mediante dos tablas de composición de alimentos. La proporción de hogares con
 ingesta aparente inferior al Requerimiento Promedio Estimado (RPE) del
 Institute of Medicine se estimó por el método del punto de corte y, para el
 hierro, por el enfoque de probabilidad con 10% de biodisponibilidad, con 18%
 como análisis de sensibilidad. Se modelaron siete escenarios de fortificación
 por adición sobre una línea base sin fortificar. Las estimaciones incorporan el
-diseño muestral complejo de la encuesta.
+diseño muestral complejo del estudio.
 
 **Resultados.** Con la norma vigente, que fortifica la harina de trigo y el
 pan, la proporción de hogares con ingesta aparente inferior al RPE fue de
@@ -181,8 +181,6 @@ ingesta sin modificar esa diferencia.
 
 # Introducción
 
-## Problema
-
 La formulación y la evaluación de un programa de fortificación requieren tres
 magnitudes: la proporción de hogares que adquiere el alimento vehículo, la
 cantidad que consume y el efecto de la fortificación sobre la proporción de
@@ -200,10 +198,9 @@ composición demográfica del hogar y comparar el resultado con requerimientos
 de referencia. Cada paso introduce supuestos, que este informe declara junto
 con su efecto sobre las estimaciones.
 
-## Contexto: la fortificación de alimentos en la República Dominicana
 
-El país mantiene programas de fortificación obligatoria de distinta antigüedad
-y grado de aplicación. La @tbl-normas, en la sección de métodos, recoge los
+La República Dominicana mantiene programas de fortificación obligatoria de antigüedad
+y grado de aplicación variable. La @tbl-normas, en la sección de métodos, recoge los
 instrumentos vigentes y en propuesta para los nutrientes modelados. Tres
 características de esos instrumentos condicionan la interpretación de los
 resultados.
@@ -228,12 +225,12 @@ disponible en el mercado. El escenario correspondiente modela esa propuesta.
 En consecuencia, el escenario de referencia de este informe es la norma de
 fortificación de la harina de trigo aplicada a la harina y al pan.
 
-## Preguntas
+## Preguntas científicas
 
 1. ¿Permite la ENGIH 2018 estimar el consumo aparente de alimentos y la ingesta
    aparente de micronutrientes con cobertura y calidad suficientes?
 2. ¿Qué proporción de hogares tiene una ingesta aparente inferior al
-   requerimiento de cada micronutriente evaluado?
+   requerimiento de cada micronutriente seleccionado?
 3. ¿Qué grupos de alimentos aportan cada micronutriente?
 4. ¿Qué proporción de hogares adquiere cada vehículo de fortificación y en qué
    cantidad?
@@ -254,39 +251,38 @@ análisis y se presentan como hallazgos.
 
 ## Objetivos
 
-**Objetivo general.** Estimar, con la ENGIH 2018, la cobertura y el consumo de
+**Objetivo general.** Estimar la cobertura y el consumo de
 los vehículos de fortificación, su contribución a la ingesta aparente de
 micronutrientes y el efecto de escenarios de fortificación sobre la proporción
 de hogares con ingesta inferior al requerimiento.
 
 **Objetivos específicos.**
 
-1. Evaluar la factibilidad de estimar el consumo aparente y la ingesta aparente
-   de micronutrientes con la ENGIH 2018, y documentar las adaptaciones
-   metodológicas requeridas.
+1. Estimar el consumo aparente y la ingesta aparente
+   de micronutrientes.
 2. Estimar la proporción de hogares con ingesta aparente inferior al
    requerimiento de cada micronutriente, a nivel nacional y por dominio de
    estimación.
-3. Estimar el aporte de cada grupo de alimentos a la energía y a cada
+3. Identificar el aporte de cada grupo de alimentos a la energía y a cada
    micronutriente.
 4. Estimar la cobertura y el consumo de los vehículos de fortificación.
-5. Describir las diferencias por quintil, zona y región.
+5. Identificar las diferencias por quintil, zona y región.
 6. Estimar el efecto de escenarios alternativos de fortificación, incluidos los
    niveles recomendados por la Organización Mundial de la Salud y la propuesta
    nacional para el arroz.
 
 # Métodos
 
-Esta sección expone la cadena de cálculo y las decisiones que la gobiernan. El
+Esta sección expone las técnicas y procedimientos  empleados para dar salida a los objetivos de la investigación. El
 desarrollo completo, con la justificación de cada decisión y la tabla de
-supuestos, está en el manual técnico que acompaña a este informe.
+supuestos, se documenta en el manual técnico adjunto a este informe.
 
-## Fuente y diseño
+## Contexto y clasificación del estudio
 
-Se utilizan las Secciones 2 y 3A del Cuestionario B de la ENGIH 2018. La
+Se realizo un estudio descriptivo transversal dónde se utilizan las Secciones 2 y 3A del Cuestionario B de la ENGIH 2018. La
 Sección 2 es el inventario de despensa de alimentos almacenables, con cantidad
 inicial y final; la Sección 3A registra las adquisiciones diarias durante el
-período de observación y es la fuente principal.
+período de observación y costituye la fuente principal de la investigación.
 
 Todas las estimaciones son ponderadas y la varianza se calcula con el diseño
 complejo de la encuesta —estratos, unidades primarias de muestreo anidadas y
@@ -294,9 +290,9 @@ factor de expansión por hogar— mediante linealización de Taylor. Los interva
 de confianza emplean la distribución *t* con los grados de libertad del
 subdiseño correspondiente.
 
-## De cantidad adquirida a gramos consumidos
+## Técnicas y procedimientos
 
-El consumo diario de cada alimento se obtiene como
+El consumo diario de cada alimento se define como
 
 $$\text{Consumo diario (g)} = \frac{Q \times FC \times PC}{PM}$$
 
@@ -310,7 +306,7 @@ en punto de venta, con registro fotográfico, de modo que las equivalencias no
 dependen únicamente de tablas externas.
 
 Los valores atípicos se detectan por alimento: entre los alimentos con al
-menos veinte observaciones, se marca la fila cuyo consumo diario supera cinco
+menos veinte observaciones, se identificó la fila cuyo consumo diario supera cinco
 veces el percentil 99,5 de ese alimento o queda por debajo de la quinta parte
 de su percentil 0,5. Las filas marcadas se excluyen de la estimación
 principal. No se sustituyen por un valor imputado ni se recortan a un máximo:
@@ -406,11 +402,11 @@ supuesto.
 ## Riesgo de ingesta inadecuada
 
 La proporción de hogares con ingesta inadecuada se estima por el método del
-punto de corte, comparando la ingesta por EMA y día contra el Requerimiento
+punto de corte, se compara la ingesta por EMA y día contra el Requerimiento
 Promedio Estimado. El método supone una distribución simétrica del
 requerimiento, independencia entre ingesta y requerimiento, y que la
 distribución utilizada es la de la ingesta habitual; esta última condición es la
-que una encuesta de gasto satisface peor.
+que una encuesta de gasto satisface al peor escenario.
 
 El hierro no se evalúa por punto de corte, porque la distribución de su
 requerimiento es marcadamente asimétrica en mujeres en edad fértil. Se emplea el
@@ -433,23 +429,22 @@ referencias.
 ## Dominios de estimación y precisión
 
 Se estima a nivel nacional, por región, por zona y por quintil, que son dominios
-de estimación de la encuesta, y por provincia, que no lo es. Las
+de estimación de la encuesta, y ademas por provincia. Las
 estimaciones provinciales se publican con marca explícita de precisión
 insuficiente cuando no alcanzan un mínimo de hogares o cuando la semiamplitud de
-su intervalo excede el umbral fijado; en los mapas, esas unidades no se pintan
-con su valor.
+su intervalo excede el umbral fijado; en los mapas, esas unidades no se plotean
+con su valor correspondiente.
 
 ## Agrupación de alimentos
 
-Los alimentos se clasifican en los grupos de la diversidad alimentaria mínima en
-mujeres (MDD-W, FAO 2021) más las categorías que esa guía deja fuera y que aquí
-importan. La clasificación no es el indicador MDD-W, que mide consumo
-individual en 24 horas; aquí se clasifican adquisiciones del hogar durante una
+Los alimentos se clasifican según los grupos de la diversidad alimentaria mínima en
+mujeres (MDD-W, FAO 2021) más las categorías que esa guía deja fuera. La clasificación no es el indicador MDD-W, que mide consumo
+individual en 24 horas; en el presente trabajo se clasifican adquisiciones del hogar durante una
 semana.
 
 # Resultados
 
-## Factibilidad y cobertura de los datos
+## Factibilidad y cobertura
 
 La proporción de los gramos adquiridos con dato de composición varió entre
 `r num(min(cob_mic$pct_gramos_cubiertos))`% y
@@ -463,7 +458,7 @@ La magnitud de esa subestimación difiere entre nutrientes.
 
 ```{r}
 #| label: fig-cobertura
-#| fig-cap: "Proporción de los gramos consumidos que cuenta con dato de composición, por nutriente. Los gramos sin dato aportan cero a la ingesta, de modo que el complemento de esta barra es la subestimación por construcción."
+#| fig-cap: "Proporción de los gramos consumidos que cuenta con dato de composición, por nutriente."
 #| fig-width: 7
 #| fig-height: 3.4
 ETIQ_COB <- c(NUTRIENTE, energia_kcal = "Energía")
@@ -495,7 +490,7 @@ externa de las cantidades.
 
 ```{r}
 #| label: fig-riesgo
-#| fig-cap: "Hogares con ingesta aparente por debajo del requerimiento, por nutriente. Escenario de línea base. El segmento indica el intervalo de confianza al 95%."
+#| fig-cap: "Hogares con ingesta aparente por debajo del requerimiento, por nutriente. Escenario de línea base."
 #| fig-width: 7
 #| fig-height: 3.6
 nac_base |>
@@ -1085,11 +1080,9 @@ arroz.
 
 # Anexos {.unnumbered}
 
-## Anexo A. Variables utilizadas, variables no disponibles y adaptaciones {.unnumbered}
+## Anexo A. Variables utilizadas, variables no disponibles y modificaciones {.unnumbered}
 
-Responde al punto 4.2 de los términos de referencia: qué variables de la ENGIH
-2018 pueden utilizarse, cuáles no están disponibles y qué adaptaciones
-metodológicas se requieren.
+La siguiente tabla muestra las variables utilizadas en el estudio y qué adaptaciones metodológicas fueron necesarias implementar.
 
 ### A.1 Variables que entran en la cadena de cálculo {.unnumbered}
 
@@ -1111,7 +1104,9 @@ tibble::tribble(
 ) |> kable()
 ```
 
-### A.2 Lo que la encuesta no registra {.unnumbered}
+### A.2 Datos ausentes {.unnumbered}
+
+La siguiente tabla muestra las variables disponibles en la encuesta ENGIH 2018 y su efecto sobre las estimaciones.  
 
 ```{r}
 #| label: tbl-anexo-ausentes
@@ -1138,6 +1133,8 @@ tibble::tribble(
 ```
 
 ### A.3 Adaptaciones metodológicas aplicadas {.unnumbered}
+
+Se muestran las adaptaciones aplicadas al método de referencia y su argumentación.
 
 ```{r}
 #| label: tbl-anexo-adaptaciones
@@ -1199,40 +1196,9 @@ las marca sin retirarlas. La consecuencia de que la cobertura de composición se
 inferior al total es que toda estimación de ingesta es un **límite inferior**, y
 así se declara en los resultados.
 
-## Anexo C. Respuesta a los comentarios de revisión {.unnumbered}
 
-Cada comentario se recoge con su origen, la respuesta y el lugar del documento
-donde se resolvió. Los comentarios que afectan al informe de factibilidad ya
-entregado se tratan por separado, porque ese documento está entregado y su
-corrección es una decisión distinta de la de este informe.
 
-```{r}
-#| label: tbl-anexo-revision
-#| tbl-cap: "Comentarios de revisión sobre el informe analítico, respuesta y ubicación"
-tibble::tribble(
-  ~Comentario, ~Respuesta, ~Ubicación,
-  "Falta el contexto de país y de las políticas de fortificación",
-    "Se incorpora un apartado propio, con la tabla de instrumentos normativos leída del archivo de parámetros y no transcrita",
-    "Introducción",
-  "Falta de rigor en la presentación de resultados estadísticos",
-    "Los recuentos se presentan con la convención de frecuencia y porcentaje. Las proporciones de riesgo llevan intervalo de confianza de diseño complejo",
-    "Resultados",
-  "El registro del texto no corresponde al de un documento científico",
-    "Se retiran las construcciones exhortativas y los gerundios de enlace. El criterio queda fijado en las normas de redacción del proyecto",
-    "Todo el documento",
-  "Las figuras deben ser autoexplicativas",
-    "Cada figura lleva título descriptivo, los dos ejes rotulados con su unidad y su denominador, y la leyenda al pie con fuente, regla de precisión y estado de los valores de referencia",
-    "Todas las figuras",
-  "Los mapas no permiten identificar la provincia a quien no conoce la geografía",
-    "Los mapas provinciales llevan el número de la División Territorial sobre cada polígono y la clave de nombres como panel adjunto",
-    "Resultados y anexo cartográfico",
-  "La fuente de elaboración propia no se declara como fuente",
-    "La fuente de las figuras y tablas es la encuesta, con el script que produce la cifra",
-    "Todas las figuras y tablas"
-) |> kable()
-```
-
-## Anexo D. Reproducibilidad {.unnumbered}
+## Anexo C. Reproducibilidad {.unnumbered}
 
 El análisis se reproduce corriendo los scripts en orden. Cada uno escribe sus
 salidas en `data/clean/` y el siguiente las lee; ninguno depende del estado de
