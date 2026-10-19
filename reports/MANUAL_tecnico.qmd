@@ -40,19 +40,10 @@ library(dplyr)
 # Propósito y alcance
 
 Este manual documenta **cómo** se produjeron los resultados del análisis de la
-ENGIH 2018, no **cuáles** son. Los resultados están en el informe analítico;
-aquí se describen la cadena de cálculo, los supuestos que la sostienen y las
+ENGIH 2018. Los resultados están en el informe analítico;
+en lo adelante se describen la cadena de cálculo, los supuestos que la sostienen y las
 decisiones metodológicas que se tomaron en cada bifurcación, con su
 justificación y su fuente.
-
-Está escrito para que un analista con formación estadística pueda reproducir el
-análisis, auditarlo y adaptarlo. Esa última palabra merece una advertencia que
-se repite en los módulos de capacitación y queda fijada desde aquí: **el
-código desarrollado para la ENGIH 2018 no se traslada directamente a otra
-encuesta ni a otro país.** Las encuestas de gasto y consumo de los hogares
-difieren en estructura, en variables, en sistemas de clasificación de alimentos
-y en diseño muestral. Lo que se traslada es el razonamiento; el código exige
-adaptación en cada uno de esos cuatro frentes.
 
 El documento sigue el orden del cálculo. Cada capítulo responde a tres
 preguntas: qué hace esta etapa, qué supone, y qué deliberadamente no hace.
@@ -73,10 +64,9 @@ y el consumo fuera de él. Por eso la literatura denomina a la magnitud
 resultante **consumo aparente** o **ingesta aparente**, y por eso ninguna cifra
 de este análisis debe leerse como ingesta individual observada.
 
-## Las dos secciones utilizadas
+## Datos del cuestionario
 
-El análisis emplea dos secciones del Cuestionario B, conforme a los términos de
-referencia.
+El análisis emplea dos secciones del Cuestionario B.
 
 **Sección 2 — inventario de despensa.** Registra las existencias de alimentos
 almacenables del hogar al inicio y al final del período, con una cantidad
@@ -88,7 +78,7 @@ durante los días de observación, con su cantidad, su unidad de presentación y
 su valor. Es la fuente principal: concentra el grueso de los registros y es la
 que sostiene la estimación.
 
-Las dos se suman en la estimación principal. La decisión y su justificación
+Las dos se usan en la estimación principal. La decisión y su justificación
 están en el capítulo de solapamiento.
 
 ## Diseño muestral
@@ -125,29 +115,27 @@ con destino declarado a un negocio son una fracción menor del total— pero el
 supuesto existe y aquí queda declarado. La opción de incorporarlas se evaluó y
 se documenta en el capítulo de hipótesis evaluadas.
 
-# De cantidad declarada a gramos consumidos
+# Procedimientos para convertir de cantidad declarada a gramos consumidos
 
 ## La fórmula
 
-El consumo diario en gramos de cada alimento, por hogar, se obtiene como
+El consumo diario en gramos de cada alimento, por hogar, se define como
 
 $$\text{Consumo diario (g)} = \frac{Q \times FC \times PC}{PM}$$
 
 donde $Q$ es la cantidad declarada en la unidad de presentación, $FC$ el factor
 de conversión de esa unidad a gramos, $PC$ la porción comestible del alimento, y
-$PM$ el período de memoria o de observación expresado en días.
+$PM$ el período de observación expresado en días.
 
 Para la Sección 3A, $PM$ se reemplaza por el **número de días distintos con
-registro en ese hogar**, que no es constante: la mediana es de siete días, con
-casos de uno y de ocho. Usar un denominador fijo cuando el denominador real
+registro en ese hogar**, que no es constante: la mediana es de siete días. Usar un denominador fijo cuando el denominador real
 varía produciría un sesgo sistemático en los hogares con menos días
 observados.
 
 ## Factores de conversión
 
-El paso de unidad de presentación a gramos es el eslabón más frágil de la
-cadena, porque las unidades de la encuesta incluyen presentaciones comerciales
-y unidades locales cuya equivalencia en gramos no es universal.
+El paso de unidad de presentación a gramos es el procedimiento de mayor riesgo de la
+ecuación de cálculo, porque las unidades de la encuesta incluyen presentaciones comerciales y unidades locales cuya equivalencia en gramos no es universal.
 
 La conversión se resuelve en tres piezas, por orden de prioridad: un
 diccionario universal de unidades, una tabla específica por alimento cuando la
@@ -169,7 +157,7 @@ dos veces el mismo alimento; tomar solo una de ellas descartaría consumo real.
 
 La decisión adoptada es **reportar la suma como estimación principal**, por ser
 la única plausible, y **declarar el solapamiento con su magnitud** como
-limitación. El tratamiento específico de los almacenables emplea una regla de
+limitación. El tratamiento específico de los alimentos almacenables emplea una regla de
 agotamiento que se aplica en la etapa de normalización, no en la de
 transformación.
 
@@ -177,7 +165,7 @@ transformación.
 
 El tratamiento se separa en dos pasos deliberadamente, y esa separación es lo
 que se traslada a otra encuesta: **detectar** y **decidir qué hacer con lo
-detectado** son decisiones distintas y viven en scripts distintos.
+detectado** son decisiones distintas y se encuentran en scripts distintos.
 
 **Detección**, en `03_transform.R`. Opera por alimento, no por hogar ni sobre
 el conjunto. Entre los alimentos con al menos veinte observaciones, se marca el
@@ -220,7 +208,7 @@ las comparaciones entre grupos.
 
 # Normalización: el Equivalente de Mujer Adulta
 
-## Qué problema resuelve
+## Enfoque
 
 Dos hogares que adquieren la misma cantidad de alimentos no tienen la misma
 ingesta por persona si uno tiene dos adultos y el otro, dos adultos y cuatro
@@ -239,7 +227,7 @@ actividad física moderada (PAL = 1,76), no embarazada y no lactando, según
 FAO/WHO/UNU (2004). Los requerimientos por edad y sexo se tomaron de las tablas
 4.2, 4.3 y 5.2 de esa fuente primaria.
 
-## Qué supone y qué no hace
+## Supuestos
 
 La normalización por EMA supone que los alimentos del hogar se reparten entre
 sus miembros **en proporción a su requerimiento energético**. Es un supuesto, no
@@ -255,16 +243,15 @@ los hogares con mujeres embarazadas o lactando.
 
 # Composición de alimentos
 
-## Las tablas y el emparejamiento
+## Las tablas de composición y su integración al cálculo
 
 El contenido de nutrientes de cada alimento proviene de dos tablas de
-composición, articuladas mediante un crosswalk que asocia cada variedad de la
-encuesta con un alimento de la tabla. El crosswalk se construyó alimento por
+composición, articuladas mediante un puente (crosswalk)  que asocia cada variedad de la encuesta con un alimento de la tabla. El crosswalk se construyó alimento por
 alimento y su validación está registrada; solo las correspondencias marcadas
 como validadas entran al cálculo.
 
 La equivalencia entre columnas de las dos tablas se verificó una a una. Dos
-detalles son fuente clásica de error: una de las tablas
+detalles incrementan el riesgo de error: una de las tablas
 trae **cuatro columnas de folato** y solo la expresada en equivalentes
 dietéticos corresponde a la otra; y varios encabezados contienen saltos de
 línea internos, de modo que las columnas se resuelven **por patrón** y no por
@@ -409,23 +396,20 @@ archivo propio; mientras tanto, una sola fuente.
 
 # Dominios de estimación y precisión
 
-## Qué es un dominio
-
 Una encuesta se diseña para producir estimaciones de precisión conocida en un
-conjunto determinado de dominios. Fuera de ese conjunto la encuesta sigue
-produciendo números, pero sin la garantía de precisión que su diseño ofrece.
+conjunto determinado de dominios. Fuera de ese conjunto las estimaciones  a partir de la  encuesta producen estimaciones, pero sin precisión.
 
 En este análisis se estima a nivel nacional, por región, por zona urbana o
 rural, por quintil y por provincia. Los cuatro primeros son dominios de
 estimación de la encuesta. **La provincia no lo es**, y el tamaño muestral
 provincial lo refleja: va de unas decenas de hogares a más de mil.
 
-## La regla de precisión
+## Regla de precisión
 
 Las estimaciones provinciales se publican con marca explícita de precisión
 insuficiente cuando el dominio no alcanza un mínimo de hogares o cuando la
 semiamplitud de su intervalo de confianza excede un umbral declarado. En los
-mapas, las unidades que no superan la regla **no se pintan con su valor**: se
+mapas, las unidades que no superan la regla **no se plotean con su valor**: se
 dejan sin color y la leyenda explica por qué.
 
 El fundamento de esta decisión es que un mapa coroplético sin esa marca
@@ -455,16 +439,6 @@ fortificación mueve unos nutrientes y no otros: un nutriente cuyo aporte
 proviene casi enteramente de un grupo que el escenario no toca no puede
 moverse.
 
-# Representación de resultados
-
-Las figuras y tablas de este análisis siguen un principio: **la figura y
-su leyenda deben bastar para interpretarla sin leer el cuerpo del texto.**
-
-En la práctica eso exige que toda figura declare la cantidad con su unidad y su
-denominador, el escenario, la población, la fuente de los datos, el método de
-clasificación con sus cortes, la regla de precisión y qué significa el color
-ausente. En los mapas se añaden la proyección, la fuente de la geometría con su
-fecha y licencia, y la advertencia de dominio.
 
 ## Cartografía
 
@@ -501,14 +475,13 @@ coincidir con la geometría, el script se detiene e imprime las filas que no
 empatan. La tabla se genera sola la primera vez; después, cualquier divergencia
 es un error que hay que mirar.
 
-### Cuándo un mapa es el recurso equivocado
+### Algunas recomendación sobre el empleo de los mapas en el estudio
 
-Dos lecciones del análisis, que valen más que las normas de formato.
 
-La primera: **un mapa sirve cuando la posición importa**. Si el hallazgo es que
+La primera: **un mapa sirve cuando la posición es relevante**. Si el hallazgo es que
 la posición no importa —que las provincias no difieren, o que difieren por un
 artefacto del registro y no por la dieta— el mapa lo oculta en lugar de
-mostrarlo, porque cualquier coroplético produce manchas y el ojo las lee como
+mostrarlo, porque cualquier coroplético produce manchas y el lector las lee como
 patrón. Para mostrar ausencia de variación sirve mejor una dispersión de los
 valores provinciales con el nacional marcado.
 
@@ -539,11 +512,7 @@ uno responde a una limitación de la fuente o a una decisión declarada.
 
 # Hipótesis evaluadas y descartadas
 
-Un manual técnico que solo documente lo que se hizo deja fuera la parte más
-costosa del trabajo analítico, que es lo que se probó y no funcionó. Las
-hipótesis siguientes se evaluaron con los datos y se descartaron; dejarlas
-registradas evita que se vuelvan a ensayar y muestra el alcance de la
-verificación.
+Las hipótesis siguientes se contrastaron  con los datos y se descartaron en este estudio.
 
 **Inestabilidad de los dominios pequeños.** Se propuso añadir un mínimo de
 conglomerados a la regla de precisión. La descomposición de la dispersión
@@ -590,20 +559,6 @@ introducir un cambio se declara el efecto esperado sobre esas cifras; si la
 corrida no coincide con lo declarado, el trabajo se detiene en lugar de
 continuar.
 
-## Guardas
-
-Varios scripts incorporan verificaciones que detienen la ejecución cuando una
-condición necesaria no se cumple, en lugar de producir un resultado plausible y
-equivocado. Entre ellas: que la asignación de vehículos reproduzca el agregado
-nacional antes de desagregar por provincia; que el reparto por grupo de
-alimentos sume cien por ciento; que toda provincia del archivo de riesgo se
-identifique con la geometría; y que un criterio alternativo reproduzca
-exactamente al criterio establecido en las celdas comparables antes de
-interpretarse.
-
-El criterio de diseño es que **una guarda que se relaja la primera vez que suena
-no sirve para nada.** Cuando una guarda se activa, se corrige el diseño o se
-corrige la expectativa, no la tolerancia.
 
 ## Emparejamientos
 
