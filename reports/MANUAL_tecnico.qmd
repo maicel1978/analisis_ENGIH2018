@@ -514,13 +514,6 @@ uno responde a una limitación de la fuente o a una decisión declarada.
 
 Las hipótesis siguientes se contrastaron con los datos y se descartaron en este estudio.
 
-**Inestabilidad de los dominios pequeños.** Se propuso añadir un mínimo de
-conglomerados a la regla de precisión. La descomposición de la dispersión
-mostró que el ruido de muestreo explica una fracción menor de la variación en
-los dominios con pocos grados de libertad, y que los factores de encogimiento
-de los dominios más pequeños están próximos a uno: las estimaciones directas ya
-están donde las situaría un modelo de áreas pequeñas. La regla no se modificó.
-
 **Tamaño del hogar como explicación del patrón geográfico.** No se sostiene: la
 correlación entre el EMA del hogar y el riesgo es prácticamente nula.
 
