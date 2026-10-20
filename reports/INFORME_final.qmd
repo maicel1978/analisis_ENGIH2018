@@ -433,7 +433,10 @@ de estimación de la encuesta, y además por provincia, que no lo es. Las
 estimaciones provinciales se publican con marca explícita de precisión
 insuficiente cuando no alcanzan un mínimo de hogares o cuando la semiamplitud de
 su intervalo excede el umbral fijado; en los mapas, esas unidades se presentan
-sin color.
+sin color. El quintil corresponde a la variable `QUINTIL` del módulo
+sociodemográfico y de ingresos de la ENGIH 2018, incluida en la base por la
+fuente; el diccionario de variables no documenta la variable sobre la que se
+ordenó a los hogares.
 
 ## Agrupación de alimentos
 
@@ -688,7 +691,7 @@ principal |>
 
 ```{r}
 #| label: fig-quintiles
-#| fig-cap: "Hogares bajo el requerimiento de folato por quintil de gasto, según se mida sobre la ingesta absoluta o sobre la densidad de nutrientes. Escenario de línea base."
+#| fig-cap: "Hogares bajo el requerimiento de folato por quintil, según se mida sobre la ingesta absoluta o sobre la densidad de nutrientes. Escenario de línea base."
 #| fig-width: 7
 #| fig-height: 3.8
 sens |>
@@ -700,7 +703,7 @@ sens |>
   geom_point(size = 2.8) +
   scale_colour_manual(values = c(Ingesta = AZUL, Densidad = "#F21A00")) +
   scale_y_continuous(labels = function(x) paste0(x, "%")) +
-  labs(x = "Quintil de gasto del hogar (1 = menor gasto)",
+  labs(x = "Quintil del hogar (variable QUINTIL de la encuesta)",
        y = "Hogares bajo el\nrequerimiento (%)", colour = NULL) +
   tema_informe
 ```
@@ -785,7 +788,7 @@ principal |>
 
 ```{r}
 #| label: fig-equidad-escenarios
-#| fig-cap: "Razón entre la ingesta de folato del quintil de mayor gasto y la del quintil de menor gasto, por escenario. Un valor de 1 indica ingesta equivalente entre los extremos de la distribución del gasto. Escenarios: 0, sin fortificación; 1a, norma nacional en harina y pan; 1b, norma nacional en harina y todos los derivados; 1c, norma nacional y azúcar; 2a y 2b, niveles de la OMS para consumos de harina menores de 75 g y de 75 a 149 g; 3, norma nacional y arroz según la propuesta nacional."
+#| fig-cap: "Razón entre la ingesta de folato del quinto y del primer quintil, por escenario. Un valor de 1 indica ingesta equivalente entre los extremos de la distribución del gasto. Escenarios: 0, sin fortificación; 1a, norma nacional en harina y pan; 1b, norma nacional en harina y todos los derivados; 1c, norma nacional y azúcar; 2a y 2b, niveles de la OMS para consumos de harina menores de 75 g y de 75 a 149 g; 3, norma nacional y arroz según la propuesta nacional."
 #| fig-width: 7
 #| fig-height: 3.4
 escenarios |>
@@ -1097,7 +1100,7 @@ tibble::tribble(
     "Cantidad, conversión a gramos y período de medición por hogar",
   "Existencias (Sección 2)", "Inventario inicial; consumo del inventario; inventario final; identificador de variedad",
     "Disponibilidad neta de alimentos almacenables y regla de agotamiento",
-  "Sociodemografía", "Edad; sexo; parentesco; región; zona; provincia; quintil de gasto",
+  "Sociodemografía", "Edad; sexo; parentesco; región; zona; provincia; quintil (variable `QUINTIL`)",
     "Equivalente de Mujer Adulta y dominios de desagregación",
   "Auxiliares del proyecto", "Factor de conversión por unidad; porción comestible; equivalencia a tabla de composición",
     "Paso de unidad declarada a gramos de porción comestible y a nutrientes"

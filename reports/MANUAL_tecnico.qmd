@@ -203,7 +203,7 @@ entre detectar y decidir.
 Como control complementario se aplica un filtro de **plausibilidad energética**
 —un rango admisible de energía por EMA y día— que **no** se usa para la
 estimación principal sino como análisis de sensibilidad, porque los hogares que
-lo exceden se concentran en los quintiles de mayor gasto y excluirlos sesgaría
+lo exceden se concentran en los quintiles superiores y excluirlos sesgaría
 las comparaciones entre grupos.
 
 # Normalización: el Equivalente de Mujer Adulta
@@ -404,7 +404,9 @@ garantizada por el diseño.
 En este análisis se estima a nivel nacional, por región, por zona urbana o
 rural, por quintil y por provincia. Los cuatro primeros son dominios de
 estimación de la encuesta. **La provincia no lo es**, y el tamaño muestral
-provincial lo refleja: va de unas decenas de hogares a más de mil.
+provincial lo refleja: va de unas decenas de hogares a más de mil. El quintil
+es la variable `QUINTIL` provista en la base; el diccionario de variables no
+documenta la variable de ordenamiento.
 
 ## Regla de precisión
 
