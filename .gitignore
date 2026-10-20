@@ -42,3 +42,5 @@ data/diagnosticos/top_atipicos_sec3a.csv
 data/diagnosticos/*.html
 data/diagnosticos/solapamiento_*.csv
 data/diagnosticos/hogares_extremos_*.csv
+
+/.quarto/
