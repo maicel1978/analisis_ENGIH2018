@@ -309,3 +309,7 @@ producción o de venta**.
 #| tbl-cap: "Situación de los productos comprometidos en los términos de referencia. Consultoría ENGIH 2018"
 tabla_entregables
 ```
+
+::: {.notapie}
+**Repositorios:** análisis, informe y manual en github.com/maicel1978/analisis_ENGIH2018; módulos de capacitación en github.com/maicel1978/fortificacion, publicados en fortificacion.netlify.app.
+:::

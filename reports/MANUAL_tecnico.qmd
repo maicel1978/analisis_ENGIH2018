@@ -545,6 +545,15 @@ no correlaciona en absoluto. Es un caso de falacia ecológica con datos reales.
 
 # Reproducibilidad
 
+## Repositorio
+
+El código, los archivos de parámetros, las salidas de diagnóstico y el
+historial de cambios están en el repositorio <https://github.com/maicel1978/analisis_ENGIH2018>.
+Su archivo `README.md` indica cómo obtener los microdatos y el orden de
+ejecución. Los módulos de capacitación están en
+<https://github.com/maicel1978/fortificacion> y se publican en
+<https://fortificacion.netlify.app>.
+
 ## Orden de ejecución
 
 Los scripts se ejecutan en orden numérico y cada uno declara en su encabezado

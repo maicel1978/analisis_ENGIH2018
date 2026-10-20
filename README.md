@@ -8,14 +8,24 @@ fortificación. Desarrollada en la consultoría del Programa Mundial de Alimento
 sobre módulos e-learning de cobertura, consumo y contribución de alimentos
 fortificados y fortificables.
 
+Los módulos de capacitación derivados de este análisis están en
+<https://github.com/maicel1978/fortificacion> y se publican en
+<https://fortificacion.netlify.app>.
+
 ## Entregables
 
 | Documento | Fuente | Términos de referencia |
 |---|---|---|
-| Informe de factibilidad | `reports/INFORME_factibilidad.qmd` | 4.1–4.3, 7 |
+| Informe de factibilidad (primera fase, entregado) | `reports/INFORME_factibilidad.qmd` | 4.1–4.3, 7 |
 | Informe analítico final | `reports/INFORME_final.qmd` | 7, 8.1–8.5 |
 | Manual técnico | `reports/MANUAL_tecnico.qmd` | 18 |
-| Presentación de resultados | `reports/presentacion_cierre.qmd` | — |
+| Presentación de resultados y opciones de intervención | `reports/presentacion_recomendaciones.qmd` | 8.5 |
+
+Los archivos que empiezan por guion bajo (`_comun.R`, `_metodo_densidad.qmd`,
+`_mapas_cobertura.qmd`, `_figuras_recomendaciones.R`) son fragmentos que los
+documentos anteriores incluyen; no se compilan por separado. El estado de los
+entregables que muestra la presentación se edita en
+`data/raw/entregables_estado.csv`.
 
 Cada documento es el código que lo genera: ninguna cifra está escrita a mano.
 Se compilan en `output/`, que no se versiona.
@@ -32,12 +42,19 @@ Se compilan en `output/`, que no se versiona.
 ```r
 for (s in c("01_import", "02_eda", "03_transform", "04_equivalente_adulto",
             "05_ingesta_micronutrientes", "06_escenarios_fortificacion",
-            "07_riesgo_inadecuacion", "08_grupos_alimentos", "09_mapas")) {
+            "07_riesgo_inadecuacion", "08_grupos_alimentos", "09_mapas",
+            "diagnostico_densidad_critica")) {
   source(here::here("scripts", paste0(s, ".R")))
 }
-quarto::quarto_render(here::here("reports", "INFORME_final.qmd"))
-quarto::quarto_render(here::here("reports", "MANUAL_tecnico.qmd"))
+for (d in c("INFORME_final", "MANUAL_tecnico", "presentacion_recomendaciones")) {
+  quarto::quarto_render(here::here("reports", paste0(d, ".qmd")))
+}
 ```
+
+`diagnostico_densidad_critica.R` produce dos tablas que el informe requiere. Los
+demás diagnósticos (`diagnostico_*.R`) no alimentan los documentos: cada uno
+contrasta una hipótesis o una decisión que el informe o el manual describen, y
+se ejecutan cuando se quiere revisar esa evidencia.
 
 Cifras de control de una corrida correcta: 36.840 registros de la Sección 3A
 sin correspondencia de composición, 328.173 registros de consumo con gramos por
@@ -46,13 +63,15 @@ equivalente de mujer adulta y 8.778 hogares con ingesta estimada.
 ## Estructura
 
 ```
-scripts/      cadena de cálculo, 00 a 09, y diagnósticos de un solo uso
+scripts/      cadena de cálculo, 00 a 09, y diagnósticos
 reports/      informes, manual y presentación (Quarto)
 data/raw/     parámetros del análisis: valores de referencia, normas,
               escenarios, agrupación de alimentos, tablas de composición,
               factores de conversión y geometría provincial
-data/auditoria/     registro de cambios y verificaciones
-data/diagnosticos/  salidas de los diagnósticos que sustentan decisiones
+data/auditoria/     registro de las correspondencias con las tablas de
+                    composición, de la porción comestible y de la
+                    verificación en punto de venta
+data/diagnosticos/  alimentos sin composición y valores atípicos
 media/        mapas y fotografías de la verificación en punto de venta
 ```
 

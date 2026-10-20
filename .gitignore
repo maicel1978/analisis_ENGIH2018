@@ -1,72 +1,44 @@
-# RStudio
+# R / RStudio
 .Rproj.user/
 .Rhistory
 .RData
 .Ruserdata
-.RDataTmp
+.RDataTmp*
 
-# Quarto
+# Quarto y salidas renderizadas: se regeneran con quarto::quarto_render()
 .quarto/
+**/*.quarto_ipynb
+output/
+*.html
+*_files/
+*.knit.md
+_cache*
 
-# Archivos temporales
+# Sistema
+Thumbs.db
+De*ktop.ini
 *.tmp
 *.log
 
-# Windows
-Thumbs.db
-De*ktop.ini
-
-# Salidas de R
-.Rproj.us*r
-.Rhistory
-.RData
-analisis_ENGIH2018.Rproj
-
-# Cache
-_cache*
-_cache
-
+# Datos intermedios, regenerables con la cadena 01 a 09
 data/clean/
 
-# Microdatos de la encuesta: NO se versionan. Se descargan con
-# scripts/00_descargar_datos.R desde la direccion registrada en
-# data/raw/fuentes_datos.csv, y el script comprueba que son los mismos
-# archivos con los que se hizo el analisis.
-#
-# El resto de data/raw/ SI se versiona: son los parametros del analisis
-# -escenarios, valores de referencia, vehiculos, agrupacion de alimentos,
-# normas, geometria- y las tablas de composicion. Sin ellos el repositorio
-# no vale nada.
+# Microdatos de la encuesta: no se versionan. Se obtienen con
+# scripts/00_descargar_datos.R desde la dirección registrada en
+# data/raw/fuentes_datos.csv. El resto de data/raw/ se versiona: son los
+# parámetros del análisis y las tablas de composición.
 data/raw/Registros_Cuestionario_B.xlsx
 data/raw/Sociodemograficas_e_ingresos.xlsx
 data/raw/data_raw_sec2.csv
 data/raw/data_raw_sec3a.csv
 
-# Documentos de referencia de terceros: se consultan en local, no se redistribuyen.
+# Documentos de referencia de terceros: se consultan en local, no se redistribuyen
 referencias/
 
-
-# Salidas automaticas de 02_eda.R (regenerables, no requieren juicio manual
-# como si lo requieren otros archivos de data/diagnosticos/ ej. FC_propuesto_*.csv)
+# Salidas regenerables de 02_eda.R y de los diagnósticos
 data/diagnosticos/cobertura_dias_sec3a.csv
 data/diagnosticos/ranking_unidades_no_estandar.csv
 data/diagnosticos/top_atipicos_sec3a.csv
-
-# Reportes renderizados (regenerables con quarto_render)
-output/
-*.html
-*_files/
-*.knit.md
-
-# Temporales de RStudio (la regla anterior no los atrapaba: faltaba el comodin)
-.RDataTmp*
-
-/.quarto/
-**/*.quarto_ipynb
-
-# Reporte HTML de dlookr (regenerable con 02_eda.R)
 data/diagnosticos/*.html
-
-# Salidas de scripts/diagnostico_*.R (regenerables)
 data/diagnosticos/solapamiento_*.csv
 data/diagnosticos/hogares_extremos_*.csv

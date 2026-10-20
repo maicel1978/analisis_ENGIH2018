@@ -1200,6 +1200,13 @@ así se declara en los resultados.
 
 ## Anexo C. Reproducibilidad {.unnumbered}
 
+El código, los archivos de parámetros y el historial de cambios del análisis
+están en el repositorio <https://github.com/maicel1978/analisis_ENGIH2018>. Los
+microdatos no forman parte del repositorio; se solicitan a la Oficina Nacional
+de Estadística. Los módulos de capacitación derivados de este análisis están
+publicados en <https://fortificacion.netlify.app> y su código fuente en
+<https://github.com/maicel1978/fortificacion>.
+
 El análisis se reproduce corriendo los scripts en orden. Cada uno escribe sus
 salidas en `data/clean/` y el siguiente las lee; ninguno depende del estado de
 la sesión anterior.
@@ -1218,7 +1225,7 @@ tibble::tribble(
   "`07_riesgo_inadecuacion.R`", "Riesgo de ingesta inadecuada por nutriente, escenario y dominio",
   "`08_grupos_alimentos.R`", "Aporte de cada grupo de alimentos a cada nutriente",
   "`09_mapas.R`", "Cartografía provincial",
-  "`diagnostico_*.R`", "Contrastes de hipótesis sobre el patrón geográfico y sobre el criterio de densidad"
+  "`diagnostico_*.R`", "Contrastes de hipótesis sobre el patrón geográfico, la procedencia de la adquisición, los valores atípicos, el solapamiento entre secciones y el criterio de densidad"
 ) |> kable()
 ```
 
@@ -1226,9 +1233,8 @@ tibble::tribble(
 cumplirse: cuando cambia la base energética del equivalente, cuando el archivo
 de nombres de provincia deja de corresponder con la geometría, cuando un
 vehículo o un nutriente del archivo de escenarios no está definido, o cuando el
-número de registros de la sección no coincide con el esperado. El criterio del
-proyecto es que **una guarda que se relaja la primera vez que suena no cumple
-ninguna función**: cuando una guarda se dispara, se revisa el supuesto, no la
+número de registros de la sección no coincide con el esperado. Cuando una
+guarda se dispara, se revisa el supuesto que la motiva y no la condición de la
 guarda.
 
 **Parámetros editables sin tocar el código.** Los valores de referencia, el
