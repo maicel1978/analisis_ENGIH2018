@@ -41,7 +41,7 @@ library(dplyr)
 
 Este manual documenta **cómo** se produjeron los resultados del análisis de la
 ENGIH 2018. Los resultados están en el informe analítico;
-en lo adelante se describen la cadena de cálculo, los supuestos que la sostienen y las
+a continuación se describen la cadena de cálculo, los supuestos que la sostienen y las
 decisiones metodológicas que se tomaron en cada bifurcación, con su
 justificación y su fuente.
 
@@ -155,11 +155,11 @@ Un alimento almacenable puede aparecer en las dos secciones: en el inventario
 de despensa y en las adquisiciones del período. Sumarlas sin criterio contaría
 dos veces el mismo alimento; tomar solo una de ellas descartaría consumo real.
 
-La decisión adoptada es **reportar la suma como estimación principal**, por ser
-la única plausible, y **declarar el solapamiento con su magnitud** como
-limitación. El tratamiento específico de los alimentos almacenables emplea una regla de
-agotamiento que se aplica en la etapa de normalización, no en la de
-transformación.
+La estimación principal suma las dos secciones y aplica una regla de
+agotamiento, que descuenta lo adquirido durante la semana que el hogar conserva
+al final del período. La regla se aplica en la etapa de normalización
+(`04_equivalente_adulto.R`), y la variante sin la regla se reporta como análisis
+de sensibilidad.
 
 ## Valores atípicos
 
@@ -246,7 +246,8 @@ los hogares con mujeres embarazadas o lactando.
 ## Las tablas de composición y su integración al cálculo
 
 El contenido de nutrientes de cada alimento proviene de dos tablas de
-composición, articuladas mediante un puente (crosswalk)  que asocia cada variedad de la encuesta con un alimento de la tabla. El crosswalk se construyó alimento por
+composición, articuladas mediante una tabla de correspondencia que asocia cada variedad de
+la encuesta con un alimento de la tabla. La correspondencia se construyó alimento por
 alimento y su validación está registrada; solo las correspondencias marcadas
 como validadas entran al cálculo.
 
@@ -397,7 +398,8 @@ archivo propio; mientras tanto, una sola fuente.
 # Dominios de estimación y precisión
 
 Una encuesta se diseña para producir estimaciones de precisión conocida en un
-conjunto determinado de dominios. Fuera de ese conjunto las estimaciones  a partir de la  encuesta producen estimaciones, pero sin precisión.
+conjunto determinado de dominios. Fuera de ese conjunto la encuesta produce estimaciones cuya precisión no está
+garantizada por el diseño.
 
 En este análisis se estima a nivel nacional, por región, por zona urbana o
 rural, por quintil y por provincia. Los cuatro primeros son dominios de
@@ -409,8 +411,8 @@ provincial lo refleja: va de unas decenas de hogares a más de mil.
 Las estimaciones provinciales se publican con marca explícita de precisión
 insuficiente cuando el dominio no alcanza un mínimo de hogares o cuando la
 semiamplitud de su intervalo de confianza excede un umbral declarado. En los
-mapas, las unidades que no superan la regla **no se plotean con su valor**: se
-dejan sin color y la leyenda explica por qué.
+mapas, las unidades que no superan la regla **se presentan sin color**: la
+leyenda explica el motivo.
 
 El fundamento de esta decisión es que un mapa coroplético sin esa marca
 presenta como comparables unidades que no lo son, y el lector no tiene manera
@@ -439,8 +441,7 @@ fortificación mueve unos nutrientes y no otros: un nutriente cuyo aporte
 proviene casi enteramente de un grupo que el escenario no toca no puede
 moverse.
 
-
-## Cartografía
+# Cartografía
 
 Los mapas se producen en `09_mapas.R` y obedecen a cuatro decisiones que no son
 estéticas.
@@ -475,10 +476,9 @@ coincidir con la geometría, el script se detiene e imprime las filas que no
 empatan. La tabla se genera sola la primera vez; después, cualquier divergencia
 es un error que hay que mirar.
 
-### Algunas recomendación sobre el empleo de los mapas en el estudio
+## Uso de los mapas
 
-
-La primera: **un mapa sirve cuando la posición es relevante**. Si el hallazgo es que
+Dos criterios orientaron el uso de los mapas. El primero: **un mapa sirve cuando la posición es relevante**. Si el hallazgo es que
 la posición no importa —que las provincias no difieren, o que difieren por un
 artefacto del registro y no por la dieta— el mapa lo oculta en lugar de
 mostrarlo, porque cualquier coroplético produce manchas y el lector las lee como
@@ -512,7 +512,7 @@ uno responde a una limitación de la fuente o a una decisión declarada.
 
 # Hipótesis evaluadas y descartadas
 
-Las hipótesis siguientes se contrastaron  con los datos y se descartaron en este estudio.
+Las hipótesis siguientes se contrastaron con los datos y se descartaron en este estudio.
 
 **Inestabilidad de los dominios pequeños.** Se propuso añadir un mínimo de
 conglomerados a la regla de precisión. La descomposición de la dispersión
@@ -571,9 +571,9 @@ emparejamiento por texto las habría perdido sin aviso.
 # Adaptación a otra encuesta y a otro país
 
 **El código de este proyecto no se traslada directamente a otra encuesta ni a
-otro país.** La advertencia del primer capítulo se desarrolla aquí, porque es
-la pregunta que se hará quien reciba este material: qué se puede reutilizar y
-qué hay que rehacer.
+otro país.** Las encuestas de gasto y consumo de los hogares difieren en
+estructura, variables, sistemas de clasificación de alimentos y diseño
+muestral. Este capítulo indica qué puede reutilizarse y qué debe rehacerse.
 
 ## Lo que cambia
 

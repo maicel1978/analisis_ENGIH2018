@@ -139,7 +139,7 @@ hogares con fines económicos.
 
 **Objetivo.** Evaluar la factibilidad de la encuesta ENGIH 2018 para estimar la cobertura
 y el consumo de los vehículos de fortificación y su contribución a la ingesta
-aparente de micronutrientes, así como identificar el efecto de escenarios alternativos de
+aparente de micronutrientes, y estimar el efecto de escenarios alternativos de
 fortificación sobre la proporción de hogares con ingesta inferior al
 requerimiento.
 
@@ -152,7 +152,7 @@ Institute of Medicine se estimó por el método del punto de corte y, para el
 hierro, por el enfoque de probabilidad con 10% de biodisponibilidad, con 18%
 como análisis de sensibilidad. Se modelaron siete escenarios de fortificación
 por adición sobre una línea base sin fortificar. Las estimaciones incorporan el
-diseño muestral complejo del estudio.
+diseño muestral complejo de la encuesta.
 
 **Resultados.** Con la norma vigente, que fortifica la harina de trigo y el
 pan, la proporción de hogares con ingesta aparente inferior al RPE fue de
@@ -258,8 +258,8 @@ de hogares con ingesta inferior al requerimiento.
 
 **Objetivos específicos.**
 
-1. Estimar el consumo aparente y la ingesta aparente
-   de micronutrientes.
+1. Evaluar la factibilidad de estimar el consumo aparente y la ingesta aparente
+   de micronutrientes con la ENGIH 2018.
 2. Estimar la proporción de hogares con ingesta aparente inferior al
    requerimiento de cada micronutriente, a nivel nacional y por dominio de
    estimación.
@@ -273,16 +273,16 @@ de hogares con ingesta inferior al requerimiento.
 
 # Métodos
 
-Esta sección expone las técnicas y procedimientos  empleados para dar salida a los objetivos de la investigación. El
+Esta sección expone las técnicas y los procedimientos empleados para cumplir los objetivos. El
 desarrollo completo, con la justificación de cada decisión y la tabla de
 supuestos, se documenta en el manual técnico adjunto a este informe.
 
 ## Contexto y clasificación del estudio
 
-Se realizo un estudio descriptivo transversal dónde se utilizan las Secciones 2 y 3A del Cuestionario B de la ENGIH 2018. La
+Se realizó un estudio descriptivo transversal con las Secciones 2 y 3A del Cuestionario B de la ENGIH 2018. La
 Sección 2 es el inventario de despensa de alimentos almacenables, con cantidad
 inicial y final; la Sección 3A registra las adquisiciones diarias durante el
-período de observación y costituye la fuente principal de la investigación.
+período de observación y constituye la fuente principal.
 
 Todas las estimaciones son ponderadas y la varianza se calcula con el diseño
 complejo de la encuesta —estratos, unidades primarias de muestreo anidadas y
@@ -306,9 +306,9 @@ en punto de venta, con registro fotográfico, de modo que las equivalencias no
 dependen únicamente de tablas externas.
 
 Los valores atípicos se detectan por alimento: entre los alimentos con al
-menos veinte observaciones, se identificó la fila cuyo consumo diario supera cinco
-veces el percentil 99,5 de ese alimento o queda por debajo de la quinta parte
-de su percentil 0,5. Las filas marcadas se excluyen de la estimación
+menos veinte observaciones, se identificaron las filas cuyo consumo diario superaba
+cinco veces el percentil 99,5 de ese alimento o quedaba por debajo de la quinta
+parte de su percentil 0,5. Las filas identificadas se excluyeron de la estimación
 principal. No se sustituyen por un valor imputado ni se recortan a un máximo:
 la fila se retira y la marca queda en los archivos intermedios, de modo que la
 exclusión es trazable y reversible. La regla opera por alimento, de modo que un
@@ -402,11 +402,11 @@ supuesto.
 ## Riesgo de ingesta inadecuada
 
 La proporción de hogares con ingesta inadecuada se estima por el método del
-punto de corte, se compara la ingesta por EMA y día contra el Requerimiento
-Promedio Estimado. El método supone una distribución simétrica del
+punto de corte, mediante la comparación de la ingesta por EMA y día con el
+Requerimiento Promedio Estimado. El método supone una distribución simétrica del
 requerimiento, independencia entre ingesta y requerimiento, y que la
-distribución utilizada es la de la ingesta habitual; esta última condición es la
-que una encuesta de gasto satisface al peor escenario.
+distribución utilizada es la de la ingesta habitual; esta última es la condición
+que una encuesta de gasto cumple en menor medida.
 
 El hierro no se evalúa por punto de corte, porque la distribución de su
 requerimiento es marcadamente asimétrica en mujeres en edad fértil. Se emplea el
@@ -429,11 +429,11 @@ referencias.
 ## Dominios de estimación y precisión
 
 Se estima a nivel nacional, por región, por zona y por quintil, que son dominios
-de estimación de la encuesta, y ademas por provincia. Las
+de estimación de la encuesta, y además por provincia, que no lo es. Las
 estimaciones provinciales se publican con marca explícita de precisión
 insuficiente cuando no alcanzan un mínimo de hogares o cuando la semiamplitud de
-su intervalo excede el umbral fijado; en los mapas, esas unidades no se plotean
-con su valor correspondiente.
+su intervalo excede el umbral fijado; en los mapas, esas unidades se presentan
+sin color.
 
 ## Agrupación de alimentos
 
@@ -490,7 +490,7 @@ externa de las cantidades.
 
 ```{r}
 #| label: fig-riesgo
-#| fig-cap: "Hogares con ingesta aparente por debajo del requerimiento, por nutriente. Escenario de línea base."
+#| fig-cap: "Hogares con ingesta aparente por debajo del requerimiento, por nutriente. Escenario de línea base. El segmento indica el intervalo de confianza al 95%."
 #| fig-width: 7
 #| fig-height: 3.6
 nac_base |>
@@ -1082,7 +1082,7 @@ arroz.
 
 ## Anexo A. Variables utilizadas, variables no disponibles y modificaciones {.unnumbered}
 
-La siguiente tabla muestra las variables utilizadas en el estudio y qué adaptaciones metodológicas fueron necesarias implementar.
+Las tablas siguientes presentan las variables utilizadas, las no disponibles y las adaptaciones metodológicas que fue necesario introducir.
 
 ### A.1 Variables que entran en la cadena de cálculo {.unnumbered}
 
@@ -1106,7 +1106,7 @@ tibble::tribble(
 
 ### A.2 Datos ausentes {.unnumbered}
 
-La siguiente tabla muestra las variables disponibles en la encuesta ENGIH 2018 y su efecto sobre las estimaciones.  
+La tabla siguiente presenta las variables que la ENGIH 2018 no registra y el efecto de su ausencia sobre las estimaciones.
 
 ```{r}
 #| label: tbl-anexo-ausentes

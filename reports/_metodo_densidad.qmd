@@ -197,42 +197,32 @@ empujado a un extremo distinto según de qué lado del umbral cae su densidad
 casi constante. El mecanismo es de composición de la dieta: los aceites
 concentran el aporte de vitamina E y su consumo escala con el consumo total de
 alimentos, mientras el folato depende de un vehículo fortificado de cobertura
-desigual y varía por su cuenta. En consecuencia, **el criterio de densidad se
-reporta en este informe para los nutrientes de acoplamiento moderado, y para
-los demás se señala la degeneración en lugar de presentar la cifra como una
-estimación alternativa.**
+desigual y varía por su cuenta. En consecuencia, el criterio de densidad se
+reporta para los nutrientes de acoplamiento moderado; para los demás no se
+presenta como estimación alternativa.
 
-### Los dos usos de la densidad, que no son el mismo
+### Ámbito de aplicación del criterio de densidad
 
-La densidad admite dos lecturas que no deben mezclarse, porque su validez no
-es la misma.
+La densidad de nutrientes se emplea con dos finalidades de validez distinta.
+Como descriptor de la composición de la dieta adquirida, es aplicable a
+cualquier comparación. Como sustituto de la ingesta para estimar la proporción
+de hogares bajo el requerimiento, corrige el sobrerregistro y solo procede
+cuando la variación de la energía registrada entre grupos es artefactual.
 
-**Como descripción de la calidad de la dieta** es válida en cualquier
-comparación: expresa cuánto de un nutriente acompaña a cada unidad de energía
-de la canasta adquirida, y es una característica de la dieta, no del nivel de
-registro.
+Entre quintiles, la energía registrada aumenta de `r fmt(q1$energia, 0)` kcal
+por EMA y día en el primero a `r fmt(q5$energia, 0)` en el quinto (razón
+`r fmt(q5$energia / q1$energia, 2)`), variación compatible con diferencias
+reales de acceso a alimentos. Con el criterio de ingesta absoluta, la
+proporción de hogares con ingesta de folato inferior al requerimiento desciende
+de `r fmt(q1$pct_ing_comp, 1)`% a `r fmt(q5$pct_ing_comp, 1)`%; con el de
+densidad, aumenta de `r fmt(q1$pct_densidad, 1)`% a
+`r fmt(q5$pct_densidad, 1)`%. La inversión resulta de aplicar la corrección a
+una variación que no es artefactual.
 
-**Como sustituto de la ingesta para estimar riesgo** es una corrección contra
-el sobrerregistro, y vale solo donde la variación de energía entre grupos es
-artefactual. Donde esa variación es real, dividir por la energía no elimina
-ruido: elimina señal.
-
-El gradiente socioeconómico lo muestra. La energía registrada crece de
-`r fmt(q1$energia, 0)` kcal por EMA y día en el primer quintil a
-`r fmt(q5$energia, 0)` en el quinto, un rango de `r fmt(q5$energia / q1$energia, 2)`
-veces, compatible con diferencias efectivas de acceso a alimentos. Bajo el
-criterio de ingesta absoluta la proporción de hogares bajo el requerimiento de
-folato pasa de `r fmt(q1$pct_ing_comp, 1)`% a `r fmt(q5$pct_ing_comp, 1)`%;
-bajo el de densidad, de `r fmt(q1$pct_densidad, 1)`% a
-`r fmt(q5$pct_densidad, 1)`%. El gradiente se invierte, y la inversión no es un
-resultado sobre bienestar: es lo que ocurre al aplicar una corrección donde no
-hay nada que corregir.
-
-**Regla de aplicación adoptada.** El gradiente socioeconómico se reporta sobre
-ingesta absoluta. La densidad entra en esa sección como descripción de la
-composición de la dieta —que las canastas de mayor gasto lleven menos folato por
-unidad de energía es un hallazgo sobre la dieta, consistente con el patrón de
-transición alimentaria— y nunca como proporción de hogares en riesgo.
+En consecuencia, el gradiente socioeconómico se reporta sobre la ingesta
+absoluta, y entre quintiles la densidad se presenta solo como descriptor de la
+composición de la dieta: los quintiles superiores adquieren menos folato por
+unidad de energía, patrón congruente con la transición alimentaria.
 
 ### Salvedad de los mapas provinciales {#sec-salvedad-mapas}
 
