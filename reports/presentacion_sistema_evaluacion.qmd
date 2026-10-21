@@ -104,14 +104,30 @@ if (any(is.na(mapa_reg$pct_inadecuado))) {
 }
 reg_min <- fmt(min(reg$pct_inadecuado)); reg_max <- fmt(max(reg$pct_inadecuado))
 
+nac_fol <- fmt(riesgo_nac(E_BASE, FOL))
+lim_mapa <- c(floor(min(reg$pct_inadecuado) / 5) * 5, ceiling(max(reg$pct_inadecuado) / 5) * 5)
 fig_mapa_region <- ggplot(mapa_reg) +
-  geom_sf(aes(fill = pct_inadecuado), colour = "white", linewidth = 0.6) +
-  geom_sf_text(aes(label = paste0(grupo_region, "\n", fmt(pct_inadecuado), "%",
-                                  if_else(precision_baja, "*", ""))),
-               size = 4.2, colour = "#1a3a4a", lineheight = 0.95,
-               fun.geometry = sf::st_point_on_surface) +
-  scale_fill_gradient(low = "#eef2f4", high = AZUL_C, limits = c(0, 100), guide = "none") +
-  theme_void()
+  geom_sf(aes(fill = pct_inadecuado), colour = "white", linewidth = 0.8) +
+  geom_sf_label(aes(label = paste0(grupo_region, "\n", fmt(pct_inadecuado), "%",
+                                   if_else(precision_baja, "*", ""))),
+                size = 3.9, colour = "#1a3a4a", lineheight = 0.95,
+                fill = alpha("white", 0.85), label.size = 0, label.r = unit(0.15, "lines"),
+                fun.geometry = sf::st_point_on_surface) +
+  scale_fill_gradient(low = "#fbe3c4", high = ACENTO, limits = lim_mapa,
+                      name = "Hogares bajo el\nrequerimiento (%)",
+                      guide = guide_colourbar(barheight = unit(5, "cm"), barwidth = unit(0.5, "cm"),
+                                              ticks.colour = "white")) +
+  theme_void(base_size = 14) +
+  theme(legend.position = "right",
+        legend.title = element_text(colour = "#1a3a4a", size = 12),
+        legend.text  = element_text(colour = "#44555f"))
+if (requireNamespace("ggspatial", quietly = TRUE)) {
+  fig_mapa_region <- fig_mapa_region +
+    ggspatial::annotation_scale(location = "bl", width_hint = 0.2, text_cex = 0.8) +
+    ggspatial::annotation_north_arrow(location = "tr", height = unit(1, "cm"),
+                                      width = unit(0.8, "cm"),
+                                      style = ggspatial::north_arrow_minimal())
+}
 reg_baja <- sum(reg$precision_baja)
 
 # Pregunta 5: razón entre la ingesta mediana de folato del quinto y del primer quintil
@@ -135,14 +151,17 @@ fig_equidad <- ggplot(equidad, aes(x = reorder(et, razon_q5_q1), y = razon_q5_q1
   tema()
 ```
 
-## Preguntas
+## Preguntas de investigación
 
-::: {style="font-size:1.05em;"}
-1. ¿Permite la ENGIH 2018 estimar el consumo y la ingesta aparente de micronutrientes con calidad suficiente?
-2. ¿Qué proporción de hogares adquiere cada vehículo de fortificación, y en qué cantidad?
-3. ¿Qué proporción de hogares tiene una ingesta aparente inferior al requerimiento?
-4. ¿Qué efecto tendrían escenarios alternativos de fortificación sobre esa proporción?
-5. ¿Reduce un vehículo de consumo homogéneo la diferencia entre quintiles? *(hipótesis formulada antes del análisis)*
+::: {style="font-size:1em;"}
+1. ¿Permite la ENGIH 2018 estimar la ingesta aparente de micronutrientes con validez y precisión suficientes?
+2. ¿Qué proporción de hogares adquiere cada vehículo de fortificación y en qué cantidad?
+3. ¿Qué proporción de hogares tiene una ingesta aparente inferior al requerimiento promedio estimado?
+4. ¿Cuánto cambiaría esa proporción bajo escenarios alternativos de fortificación?
+
+**Hipótesis, formulada antes del análisis:** un vehículo de consumo homogéneo
+reduce la diferencia de ingesta entre el quinto y el primer quintil; elevar el
+nivel de adición de un vehículo de consumo desigual, no.
 :::
 
 ## Diseño del estudio
@@ -213,7 +232,7 @@ fig_mapa_region
 ```
 
 ::: {.notapie}
-Estimaciones ponderadas. Regiones con precisión insuficiente (*: menos de 50 hogares o semiamplitud del IC 95% mayor de 10 puntos): `r reg_baja`. Límites: IDERD y ONE. Fuente: elaboración propia con microdatos de la ENGIH 2018.
+Promedio nacional: `r nac_fol`%. Estimaciones ponderadas. Escala de color ajustada al rango observado. Regiones con precisión insuficiente (*: menos de 50 hogares o semiamplitud del IC 95% mayor de 10 puntos): `r reg_baja`. Límites: IDERD y ONE. Fuente: elaboración propia con microdatos de la ENGIH 2018.
 :::
 
 ## La harina fortificada reduce el riesgo de folato y hierro, no el de los demás micronutrientes
@@ -267,6 +286,19 @@ Razón de `r razon_base` con la norma vigente y de `r razon_arroz` con el arroz.
 2. La correspondencia con la tabla de composición se reporta con su cobertura.
 3. La contribución se lee como potencial hasta disponer del cumplimiento medido.
 4. El resultado se lee como ingesta aparente del hogar, no como deficiencia.
+:::
+
+## Lo que esta evidencia no puede responder sola
+
+::: {style="font-size:1.05em;"}
+1. ¿Qué proporción del vehículo cumple hoy la norma, y cómo se incorpora ese dato a la estimación?
+2. ¿Con qué fuente se valida la ingesta aparente: consumo individual o biomarcadores?
+3. ¿Qué ronda de la encuesta permitiría medir el cambio desde 2018?
+4. ¿Quién mantiene y actualiza la estimación en el país?
+:::
+
+::: {style="font-size:0.95em; margin-top:0.8em; color:#5a6b76;"}
+Cada una requiere datos o capacidades que este análisis no tiene.
 :::
 
 ## Disponible
