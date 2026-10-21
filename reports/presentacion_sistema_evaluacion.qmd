@@ -92,8 +92,6 @@ fig_equidad <- ggplot(equidad, aes(x = reorder(et, razon_q5_q1), y = razon_q5_q1
 5. ¿Reduce un vehículo de consumo homogéneo la diferencia entre quintiles? *(hipótesis formulada antes del análisis)*
 :::
 
-# Métodos {background-color="#2c5364"}
-
 ## Diseño del estudio
 
 ::: {style="font-size:0.95em;"}
@@ -102,8 +100,6 @@ fig_equidad <- ggplot(equidad, aes(x = reorder(et, razon_q5_q1), y = razon_q5_q1
 | Tipo de estudio | Descriptivo transversal; análisis secundario de una encuesta poblacional |
 | Muestra | `r n_hogares` hogares; probabilística, estratificada y por conglomerados (`r n_estratos` estratos, `r n_upm` unidades primarias) |
 | Estimador | Proporción de hogares con ingesta aparente por equivalente de mujer adulta inferior al requerimiento |
-| Escenarios | Simulación *ex ante*; diferencia pareada con el escenario precedente |
-| Inferencia | Ponderación; linealización de Taylor; intervalos *t* con los grados de libertad del diseño |
 :::
 
 ## Procesamiento y control de calidad
@@ -121,8 +117,6 @@ fig_cadena
 ![](../media/fotos_investigacion_mercado/platano_verde02.jpg){height="500px"}
 :::
 ::::
-
-# Resultados {background-color="#2c5364"}
 
 ## `r n_mayoria` de los `r n_vehiculos` vehículos llegan a la mitad de los hogares o más
 
@@ -190,48 +184,6 @@ fig_equidad
 Razón de `r razon_base` con la norma vigente y de `r razon_arroz` con el arroz. Estimación puntual de medianas ponderadas. Congruente con la hipótesis formulada antes del análisis.
 :::
 
-## El patrón territorial sigue a la energía registrada, no a la dieta
-
-::: {style="font-size:0.95em;"}
-| Explicación alternativa | Resultado |
-|---|---|
-| Tamaño del hogar | Descartada |
-| Reparto entre secciones, regla de agotamiento, días observados | Descartadas |
-| Producción propia | Descartada: correlaciona entre provincias, no entre hogares (**falacia ecológica**) |
-| Energía registrada | Sostenida |
-:::
-
-# Discusión {background-color="#2c5364"}
-
-## Los sesgos tienen dirección conocida {.smaller}
-
-| Fuente de error | Efecto sobre el riesgo estimado | Control |
-|---|---|---|
-| Unidades de medida no estándar | Indeterminado | Factores por alimento, verificados en campo |
-| Doble registro entre despensa y adquisiciones | Lo subestima | Regla de agotamiento; sensibilidad sin ella |
-| Registros extremos | Lo subestima | Detección por alimento; exclusión trazable |
-| Alimentos sin composición | Lo sobrestima | Cobertura reportada por nutriente |
-| Consumo fuera del hogar | Lo sobrestima | Declarado |
-| Adquirido no equivale a consumido | Lo subestima | Declarado |
-| Ingesta aparente frente a habitual | Depende de la posición del EAR | Declarado |
-| Cumplimiento pleno de la norma | Lo subestima en los escenarios | Requiere el dato de cumplimiento |
-
-::: {style="font-size:1.1em; margin-top:0.4em;"}
-La comparación entre escenarios es más robusta que el nivel absoluto.
-:::
-
-## El cumplimiento medido convierte la contribución potencial en esperada
-
-::: {style="font-size:1em;"}
-| Monitoreo de la calidad | Análisis de la encuesta de gasto |
-|---|---|
-| ¿El alimento contiene el nivel de la norma? | ¿El nivel de la norma cubre la brecha? |
-| Muestras en producción y en venta | Adquisiciones de los hogares |
-| Proporción de cumplimiento | Contribución y riesgo de ingesta inadecuada |
-:::
-
-# Conclusiones {background-color="#2c5364"}
-
 ## ¿Permite una encuesta de gasto evaluar el diseño de un programa de fortificación?
 
 ::: {style="font-size:1.05em;"}
@@ -258,6 +210,45 @@ Adaptable a otra encuesta de gasto rehaciendo tres tablas: conversión a gramos,
 porción comestible y correspondencia con la tabla de composición.
 :::
 
+# Anexo {background-color="#2c5364"}
+
+## Los sesgos tienen dirección conocida {.smaller}
+
+| Fuente de error | Efecto sobre el riesgo estimado | Control |
+|---|---|---|
+| Unidades de medida no estándar | Indeterminado | Factores por alimento, verificados en campo |
+| Doble registro entre despensa y adquisiciones | Lo subestima | Regla de agotamiento; sensibilidad sin ella |
+| Registros extremos | Lo subestima | Detección por alimento; exclusión trazable |
+| Alimentos sin composición | Lo sobrestima | Cobertura reportada por nutriente |
+| Consumo fuera del hogar | Lo sobrestima | Declarado |
+| Adquirido no equivale a consumido | Lo subestima | Declarado |
+| Ingesta aparente frente a habitual | Depende de la posición del EAR | Declarado |
+| Cumplimiento pleno de la norma | Lo subestima en los escenarios | Requiere el dato de cumplimiento |
+
+::: {style="font-size:1.1em; margin-top:0.4em;"}
+La comparación entre escenarios es más robusta que el nivel absoluto.
+:::
+
+## El patrón territorial sigue a la energía registrada, no a la dieta
+
+::: {style="font-size:0.95em;"}
+| Explicación alternativa | Resultado |
+|---|---|
+| Tamaño del hogar | Descartada |
+| Reparto entre secciones, regla de agotamiento, días observados | Descartadas |
+| Producción propia | Descartada: correlaciona entre provincias, no entre hogares (**falacia ecológica**) |
+| Energía registrada | Sostenida |
+:::
+
+## Origen del aporte de cada micronutriente
+
+```{r}
+#| label: fig-grupos
+#| fig-width: 10.5
+#| fig-height: 4.1
+fig_grupos
+```
+
 ## Referencias {.smaller}
 
 ::: {style="font-size:0.8em;"}
@@ -279,13 +270,3 @@ assessment*. Washington, D.C.: National Academies Press.
 <https://doi.org/10.17226/9956>
 :::
 
-# Anexo {background-color="#2c5364"}
-
-## Origen del aporte de cada micronutriente
-
-```{r}
-#| label: fig-grupos
-#| fig-width: 10.5
-#| fig-height: 4.1
-fig_grupos
-```
