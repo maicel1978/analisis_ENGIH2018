@@ -53,6 +53,31 @@ Presentar el problema: la encuesta no se diseñó para nutrición. El aporte es
 mostrar qué sostiene y qué no.
 :::
 
+## Verificación en punto de venta
+
+```{r}
+#| label: campo
+verif <- leer_limpio(here::here("data", "auditoria", "verificacion_punto_venta_2026-10-04.csv"))
+n_etiq <- sum(verif$tipo == "etiqueta"); n_pes <- sum(verif$tipo == "pesaje")
+```
+
+::: {style="font-size:0.95em;"}
+Los factores de conversión de las unidades más frecuentes y las etiquetas de
+los vehículos se verificaron en un establecimiento de venta:
+`r n_pes` alimentos pesados y `r n_etiq` etiquetas registradas, con fotografía.
+
+- El azúcar en venta **no declara vitamina A**, aunque la norma la exige desde 2004.
+- El arroz fortificado en venta declara los niveles de la propuesta de reglamento.
+
+Es una verificación de un establecimiento y un día: detecta errores gruesos de
+conversión y el estado del etiquetado, no estima cumplimiento.
+:::
+
+::: notes
+Decir explícitamente el alcance: un establecimiento, un día, balanza en libras.
+Sirve para detectar errores gruesos de conversión y el estado de las etiquetas.
+:::
+
 ## Método
 
 ::: {style="font-size:0.92em;"}
@@ -156,27 +181,26 @@ fig_acciones
 - La provincia no es dominio de estimación de la encuesta.
 :::
 
-# Integración en el sistema de evaluación {background-color="#2c5364"}
-
-## Complemento del control externo de calidad
+## Relación con el monitoreo de la fortificación
 
 ::: {style="font-size:0.95em;"}
-| Control externo de calidad | Análisis de la encuesta de gasto |
+| Monitoreo de la calidad | Análisis de la encuesta de gasto |
 |---|---|
 | ¿El alimento contiene el nivel de la norma? | ¿El nivel de la norma cubre la brecha de la población? |
-| Muestras compuestas en producción y venta | Consumo aparente de los hogares |
-| Cumplimiento medido | Contribución esperada y riesgo de ingesta inadecuada |
+| Muestras en producción y en venta | Adquisiciones declaradas por los hogares |
+| Proporción de cumplimiento | Contribución potencial y riesgo de ingesta inadecuada |
 :::
 
 ::: {style="font-size:0.9em; margin-top:0.6em;"}
-El supuesto de cumplimiento pleno es el punto de unión: la proporción de
-cumplimiento medida en el control de calidad sustituye al supuesto en los
-escenarios, y la contribución estimada pasa a ser la contribución observable.
+Todas las contribuciones de este análisis suponen cumplimiento pleno de la
+norma. La proporción de cumplimiento que mide el monitoreo es el parámetro que
+convierte la contribución potencial en contribución esperada.
 :::
 
 ::: notes
-Este es el mensaje técnico central para el sistema de evaluación: las dos
-líneas de trabajo se conectan por un parámetro del archivo de escenarios.
+Si preguntan por el arroz: en 2018 no se fortificaba; el escenario modela la
+propuesta de reglamento. Confirmar antes qué norma de arroz se usa en el
+monitoreo actual.
 :::
 
 ## Lo que queda disponible
@@ -193,23 +217,6 @@ líneas de trabajo se conectan por un parámetro del archivo de escenarios.
 El código está escrito para la estructura de la ENGIH 2018. Otra encuesta exige
 rehacer la conversión a gramos, la porción comestible y la correspondencia con
 la tabla de composición; la arquitectura y los procedimientos se reutilizan.
-:::
-
-## Continuidad propuesta
-
-::: {style="font-size:0.95em;"}
-| Línea | Contenido |
-|---|---|
-| Capacidad nacional | Formación de un equipo con los módulos y la cadena de análisis; demostración con datos reales |
-| Cumplimiento medido | Incorporación de los resultados del control externo de calidad a los escenarios |
-| Actualización | Aplicación a la siguiente ronda de la encuesta de gasto y comparación con 2018 |
-| Región | Adaptación a encuestas de otros países de América Latina y el Caribe |
-| Publicación | Artículo con la aplicación a la República Dominicana |
-:::
-
-::: notes
-Proponer, no pedir. Cerrar con la pregunta de qué línea es prioritaria para el
-sistema de evaluación de 2027.
 :::
 
 ## Referencias {.smaller}

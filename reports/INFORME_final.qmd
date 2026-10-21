@@ -788,7 +788,7 @@ principal |>
 
 ```{r}
 #| label: fig-equidad-escenarios
-#| fig-cap: "Razón entre la ingesta de folato del quinto y del primer quintil, por escenario. Un valor de 1 indica ingesta equivalente entre los extremos de la distribución del gasto. Escenarios: 0, sin fortificación; 1a, norma nacional en harina y pan; 1b, norma nacional en harina y todos los derivados; 1c, norma nacional y azúcar; 2a y 2b, niveles de la OMS para consumos de harina menores de 75 g y de 75 a 149 g; 3, norma nacional y arroz según la propuesta nacional."
+#| fig-cap: "Razón entre la ingesta de folato del quinto y del primer quintil, por escenario. Un valor de 1 indica ingesta equivalente entre el primer y el quinto quintil. Escenarios: 0, sin fortificación; 1a, norma nacional en harina y pan; 1b, norma nacional en harina y todos los derivados; 1c, norma nacional y azúcar; 2a y 2b, niveles de la OMS para consumos de harina menores de 75 g y de 75 a 149 g; 3, norma nacional y arroz según la propuesta nacional."
 #| fig-width: 7
 #| fig-height: 3.4
 escenarios |>
