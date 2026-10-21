@@ -10,6 +10,7 @@ format:
     theme: [default, custom.scss, tecnica.scss]
     fig-cap-location: top
     tbl-cap-location: top
+    navigation-mode: linear
     slide-number: true
     show-slide-number: all
     embed-resources: true
@@ -133,10 +134,44 @@ reg_baja <- sum(reg$precision_baja)
 # Pregunta 5: razón entre la ingesta mediana de folato del quinto y del primer quintil
 equidad <- esc |>
   filter(nutriente == FOL) |>
-  mutate(et = gsub("\n", " ", corto(escenario)))
+  mutate(cod = sub("^([0-9]+[a-c]?)\\..*$", "\\1", escenario),
+         et = paste0(cod, ". ", c(`0` = "Sin fortificación", `1a` = "Norma vigente: harina y pan",
+                                  `1b` = "1a + todos los derivados", `1c` = "1b + azúcar",
+                                  `2a` = "Harina y derivados, OMS (< 75 g)",
+                                  `2b` = "Harina y derivados, OMS (75–149 g)",
+                                  `3` = "1b + arroz")[cod]))
+if (any(is.na(equidad$et))) stop("Escenario sin etiqueta en la figura de quintiles.", call. = FALSE)
 razon_base  <- fmt(equidad$razon_q5_q1[equidad$escenario == E_BASE], 2)
 razon_arroz <- fmt(equidad$razon_q5_q1[equidad$escenario == E_ARROZ], 2)
 razon_oms   <- fmt(equidad$razon_q5_q1[equidad$escenario == E_OMS], 2)
+
+# Acciones: un panel por acción, sin rótulos superpuestos
+acciones <- tibble::tribble(
+  ~accion,                                  ~desde,  ~hasta,
+  "Cumplir la norma del azúcar",             E_TODOS, E_AZUC,
+  "Ampliar a todos los derivados del trigo", E_BASE,  E_TODOS,
+  "Elevar la harina al nivel de la OMS",     E_TODOS, E_OMS,
+  "Incorporar el arroz",                     E_TODOS, E_ARROZ)
+acc <- acciones |>
+  inner_join(dif |> filter(metodo %in% METODOS, nutriente %in% names(ETIQ_NUT)),
+             by = c("desde" = "escenario_desde", "hasta" = "escenario_hasta"),
+             relationship = "one-to-many") |>
+  filter(abs(dif_pp) >= 0.5) |>
+  mutate(accion = factor(accion, levels = acciones$accion),
+         nut = ETIQ_NUT[nutriente])
+fig_acc <- ggplot(acc, aes(dif_pp, nut)) +
+  geom_vline(xintercept = 0, colour = GRIS, linewidth = 0.7) +
+  geom_errorbarh(aes(xmin = dif_pp_low, xmax = dif_pp_upp), height = 0.3,
+                 colour = "#44555f", linewidth = 0.6) +
+  geom_point(colour = AZUL, size = 3.4) +
+  geom_text(aes(label = fmt(dif_pp)), vjust = -0.9, size = 3.4, colour = "#44555f") +
+  facet_grid(accion ~ ., scales = "free_y", space = "free_y",
+             labeller = label_wrap_gen(22)) +
+  labs(x = "Cambio en la proporción de hogares bajo el requerimiento (puntos porcentuales)",
+       y = "Micronutriente") +
+  tema(13) +
+  theme(strip.text.y = element_text(angle = 0, hjust = 0, face = "bold", colour = "#1a3a4a"),
+        panel.spacing = unit(0.5, "lines"))
 
 # Implicaciones: reducción atribuible a la norma vigente de harina (puntos)
 red_harina <- function(n) fmt(riesgo_nac(E_SIN, n) - riesgo_nac(E_BASE, n))
@@ -145,6 +180,7 @@ red_fol <- red_harina(FOL); red_fe <- red_harina("hierro_mg")
 # Otros hallazgos
 ul_arroz <- fmt(equidad$pct_folico_sobre_ul[equidad$escenario == E_ARROZ])
 hierro_10 <- fmt(riesgo_nac(E_BASE, "hierro_mg"))
+if (as.character(top$nut) != "Vitamina A") stop("La conclusión supone que la vitamina A es el mayor riesgo; revisar el texto.", call. = FALSE)
 
 fig_equidad <- ggplot(equidad, aes(x = reorder(et, razon_q5_q1), y = razon_q5_q1)) +
   geom_hline(yintercept = 1, linetype = "dashed", colour = GRIS) +
@@ -175,7 +211,7 @@ nivel de adición de un vehículo de consumo desigual, no.
 
 ## Diseño del estudio
 
-::: {style="font-size:0.95em;"}
+::: {style="font-size:1.35em;"}
 | | |
 |---|---|
 | Tipo de estudio | Descriptivo transversal; análisis secundario de una encuesta poblacional |
@@ -192,7 +228,8 @@ nivel de adición de un vehículo de consumo desigual, no.
 ```{r}
 #| label: fig-cadena
 #| fig-cap: "Cadena de procesamiento: de la cantidad declarada a la ingesta aparente por equivalente de mujer adulta"
-#| fig-width: 8.4
+#| fig-cap-location: top
+#| fig-width: 6.6
 #| fig-height: 1.9
 fig_cadena
 ```
@@ -207,6 +244,7 @@ fig_cadena
 ```{r}
 #| label: fig-vehiculos
 #| fig-cap: "Hogares que adquieren cada vehículo de fortificación y consumo mediano entre quienes lo adquieren, en gramos por equivalente de mujer adulta y día. República Dominicana, 2018"
+#| fig-cap-location: top
 #| fig-width: 10.5
 #| fig-height: 3.2
 fig_veh_ic
@@ -221,6 +259,7 @@ Punto: estimación ponderada; barra y paréntesis: IC 95%; gramos: mediana entre
 ```{r}
 #| label: fig-riesgo
 #| fig-cap: "Hogares con ingesta aparente inferior al requerimiento, por micronutriente, con la norma vigente de harina de trigo. República Dominicana, 2018"
+#| fig-cap-location: top
 #| fig-width: 9.6
 #| fig-height: 3.4
 fig_riesgo_ic
@@ -235,6 +274,7 @@ Punto: estimación ponderada; barra y paréntesis: IC 95%. Punto de corte del EA
 ```{r}
 #| label: fig-mapa-region
 #| fig-cap: "Hogares con ingesta aparente de folato inferior al requerimiento, por región, con la norma vigente de harina de trigo. República Dominicana, 2018"
+#| fig-cap-location: top
 #| fig-width: 11
 #| fig-height: 5.2
 fig_mapa_region
@@ -249,6 +289,7 @@ Promedio nacional: `r nac_fol`%. Estimaciones ponderadas. Escala de color ajusta
 ```{r}
 #| label: fig-norma
 #| fig-cap: "Hogares con ingesta aparente inferior al requerimiento sin fortificación y con la norma vigente de harina de trigo, por micronutriente. República Dominicana, 2018"
+#| fig-cap-location: top
 #| fig-width: 9.8
 #| fig-height: 3.4
 fig_norma + labs(y = "Micronutriente")
@@ -263,9 +304,10 @@ Naranja: sin fortificación; azul: norma vigente; rótulo: reducción en puntos 
 ```{r}
 #| label: fig-acciones
 #| fig-cap: "Cambio en la proporción de hogares con ingesta aparente inferior al requerimiento atribuible a cada acción, respecto del escenario precedente. República Dominicana, 2018"
+#| fig-cap-location: top
 #| fig-width: 12
-#| fig-height: 4.4
-fig_acciones + labs(y = "Acción")
+#| fig-height: 4.9
+fig_acc
 ```
 
 ::: {.notapie}
@@ -277,6 +319,7 @@ Punto: diferencia pareada; barra: IC 95%. Se muestran los micronutrientes con un
 ```{r}
 #| label: fig-equidad
 #| fig-cap: "Razón entre la ingesta mediana de folato del quinto y del primer quintil, por escenario de fortificación. República Dominicana, 2018"
+#| fig-cap-location: top
 #| fig-width: 10
 #| fig-height: 3.6
 fig_equidad
@@ -286,31 +329,12 @@ fig_equidad
 Razón de `r razon_base` con la norma vigente y de `r razon_arroz` con el arroz. Estimación puntual de medianas ponderadas. Congruente con la hipótesis formulada antes del análisis. Fuente: elaboración propia con microdatos de la ENGIH 2018.
 :::
 
-## ¿Permite una encuesta de gasto evaluar el diseño de un programa de fortificación?
+## Sí: una encuesta que el país ya tiene puede orientar la fortificación
 
-::: {style="font-size:1.05em;"}
-**Sí, con cuatro condiciones:**
-
-1. La conversión de unidades a gramos se verifica.
-2. La correspondencia con la tabla de composición se reporta con su cobertura.
-3. La contribución se lee como potencial hasta disponer del cumplimiento medido.
-4. El resultado se lee como ingesta aparente del hogar, no como deficiencia.
-:::
-
-## Implicaciones para la República Dominicana
-
-::: {style="font-size:0.95em;"}
-| Implicación | Evidencia |
-|---|---|
-| **La mayor ganancia no requiere una ley nueva:** hacer cumplir la norma del azúcar | Vitamina A: `r cambio_azucar` |
-| **El arroz es el vehículo de la equidad**; su aporte depende del cumplimiento | Razón de folato Q5/Q1: `r razon_base` con la norma vigente; `r razon_arroz` con el arroz; `r razon_oms` con el nivel de la OMS en harina |
-| **La norma de la harina funciona** para folato y hierro, no para el resto | Reducción del riesgo: `r red_fol` puntos en folato y `r red_fe` en hierro |
-
-: Implicaciones de los resultados y su evidencia. República Dominicana, 2018 {#tbl-implicaciones}
-:::
-
-::: {.notapie}
-Escenarios simulados con cumplimiento pleno de la norma. Fuente: elaboración propia con microdatos de la ENGIH 2018.
+::: {style="font-size:1.1em;"}
+- El mayor riesgo es el de vitamina A, y la norma que lo reduciría existe desde 2004.
+- El arroz es el único vehículo que acorta la distancia entre quintiles.
+- Pasar de la contribución potencial a la real requiere un dato: el cumplimiento.
 :::
 
 ## Lo que esta evidencia no puede responder sola
@@ -342,6 +366,33 @@ porción comestible y correspondencia con la tabla de composición.
 :::
 
 # Anexo {background-color="#2c5364"}
+
+## Implicaciones para la República Dominicana
+
+::: {style="font-size:0.95em;"}
+| Implicación | Evidencia |
+|---|---|
+| **La mayor ganancia no requiere una ley nueva:** hacer cumplir la norma del azúcar | Vitamina A: `r cambio_azucar` |
+| **El arroz es el vehículo de la equidad**; su aporte depende del cumplimiento | Razón de folato Q5/Q1: `r razon_base` con la norma vigente; `r razon_arroz` con el arroz; `r razon_oms` con el nivel de la OMS en harina |
+| **La norma de la harina funciona** para folato y hierro, no para el resto | Reducción del riesgo: `r red_fol` puntos en folato y `r red_fe` en hierro |
+
+: Implicaciones de los resultados y su evidencia. República Dominicana, 2018 {#tbl-implicaciones}
+:::
+
+::: {.notapie}
+Escenarios simulados con cumplimiento pleno de la norma. Fuente: elaboración propia con microdatos de la ENGIH 2018.
+:::
+
+## Condiciones de validez de la respuesta a la pregunta 1
+
+::: {style="font-size:1.05em;"}
+**Sí, con cuatro condiciones:**
+
+1. La conversión de unidades a gramos se verifica.
+2. La correspondencia con la tabla de composición se reporta con su cobertura.
+3. La contribución se lee como potencial hasta disponer del cumplimiento medido.
+4. El resultado se lee como ingesta aparente del hogar, no como deficiencia.
+:::
 
 ## Otros hallazgos
 
