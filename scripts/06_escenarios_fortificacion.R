@@ -101,10 +101,10 @@ consumo_vehiculo <- consumo |>
   inner_join(hogar, by = "id_hogar_unico") |>
   as_survey_design(ids = upm, strata = estrato, weights = factor_expansion, nest = TRUE) |>
   group_by(grupo) |>
-  summarise(pct_hogares = 100 * survey_mean(g > 0, vartype = NULL),
+  summarise(pct_hogares = 100 * survey_mean(g > 0, vartype = "ci"),
             media_todos = survey_mean(g, vartype = NULL),
             mediana_consumidores = survey_median(if_else(g > 0, g, NA_real_),
-                                                 vartype = NULL, na.rm = TRUE))
+                                                 vartype = "ci", na.rm = TRUE))
 message("Consumo de vehiculos (g por EMA y dia, ponderado):")
 print(as.data.frame(consumo_vehiculo), digits = 3)
 

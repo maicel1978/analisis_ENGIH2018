@@ -37,7 +37,53 @@ n_estratos <- dplyr::n_distinct(ema_d$estrato)
 n_upm      <- dplyr::n_distinct(paste(ema_d$estrato, ema_d$upm))
 
 FOL <- "folato_mcg_dfe"
-folato_pct <- fmt(riesgo_nac(E_BASE, FOL))
+METODOS <- c("Punto de corte", "Probabilidad, biodisponibilidad 10%")
+
+# Cobertura de los vehículos, con IC 95% (requiere 06 con intervalos)
+if (!all(c("pct_hogares_low", "pct_hogares_upp") %in% names(veh))) {
+  stop("escenarios_consumo_vehiculos.csv sin intervalos: correr 06_escenarios_fortificacion.R.", call. = FALSE)
+}
+cob_min <- fmt(min(veh$pct_hogares), 0)
+fig_veh_ic <- veh |>
+  mutate(grupo = reorder(grupo, pct_hogares)) |>
+  ggplot(aes(pct_hogares, grupo)) +
+  geom_segment(aes(x = 0, xend = pct_hogares, yend = grupo), colour = GRIS, linewidth = 1.6) +
+  geom_errorbarh(aes(xmin = pct_hogares_low, xmax = pct_hogares_upp), height = 0.25,
+                 colour = "#44555f", linewidth = 0.6) +
+  geom_point(colour = AZUL, size = 4.4) +
+  geom_text(aes(label = paste0(fmt(pct_hogares), "% (", fmt(pct_hogares_low), "–",
+                               fmt(pct_hogares_upp), ")  ·  ",
+                               fmt(mediana_consumidores, 0), " g")),
+            hjust = -0.12, size = 3.9, colour = "#44555f") +
+  scale_x_continuous(limits = c(0, 150), breaks = seq(0, 100, 25),
+                     labels = function(x) paste0(x, "%")) +
+  labs(x = "Hogares que lo adquieren (%)", y = "Vehículo") +
+  tema()
+
+# Riesgo por micronutriente con la norma vigente, con IC 95% en el rótulo
+base_nut <- rie |>
+  filter(dominio == "Nacional", hogares == "Todos", escenario == E_BASE,
+         nutriente %in% names(ETIQ_NUT), metodo %in% METODOS) |>
+  mutate(nut = reorder(ETIQ_NUT[nutriente], pct_inadecuado))
+top <- base_nut |> arrange(desc(pct_inadecuado)) |> slice(1)
+top_nut <- as.character(top$nut); top_nut <- paste0(tolower(substr(top_nut, 1, 1)), substring(top_nut, 2)); top_pct <- fmt(top$pct_inadecuado)
+fig_riesgo_ic <- ggplot(base_nut, aes(pct_inadecuado, nut)) +
+  geom_errorbarh(aes(xmin = pct_inadecuado_low, xmax = pct_inadecuado_upp),
+                 height = 0.25, colour = "#44555f", linewidth = 0.6) +
+  geom_point(colour = AZUL, size = 4.2) +
+  geom_text(aes(label = paste0(fmt(pct_inadecuado), "% (", fmt(pct_inadecuado_low),
+                               "–", fmt(pct_inadecuado_upp), ")")),
+            hjust = -0.25, size = 3.9, colour = "#44555f") +
+  scale_x_continuous(limits = c(0, 115), breaks = seq(0, 100, 25),
+                     labels = function(x) paste0(x, "%")) +
+  labs(x = "Hogares bajo el requerimiento (%)", y = "Micronutriente") +
+  tema()
+
+# Semiamplitud máxima de los IC de la figura de la norma vigente
+semi_norma <- rie |>
+  filter(dominio == "Nacional", hogares == "Todos", escenario %in% c(E_SIN, E_BASE),
+         nutriente %in% names(ETIQ_NUT), metodo %in% METODOS) |>
+  summarise(m = max(semiamplitud_ic)) |> pull(m) |> fmt()
 
 # Riesgo de folato por región (dominio de estimación de la encuesta)
 reg <- rie |>
@@ -128,35 +174,35 @@ fig_cadena
 :::
 ::::
 
-## `r n_mayoria` de los `r n_vehiculos` vehículos llegan a la mitad de los hogares o más
+## La cobertura no es la limitación: cada vehículo llega al `r cob_min`% de los hogares o más
 
 ```{r}
 #| label: fig-vehiculos
 #| fig-cap: "Hogares que adquieren cada vehículo de fortificación y consumo mediano entre quienes lo adquieren, en gramos por equivalente de mujer adulta y día. República Dominicana, 2018"
 #| fig-width: 10.5
 #| fig-height: 3.2
-fig_vehiculos + labs(y = "Vehículo")
+fig_veh_ic
 ```
 
 ::: {.notapie}
-Estimaciones ponderadas. Fuente: elaboración propia con microdatos de la ENGIH 2018.
+Punto: estimación ponderada; barra y paréntesis: IC 95%; gramos: mediana entre quienes lo adquieren. Fuente: elaboración propia con microdatos de la ENGIH 2018.
 :::
 
-## Con la norma vigente, `r folato_pct`% de los hogares no cubre el requerimiento de folato
+## Con la norma vigente, el mayor riesgo está en `r top_nut`: `r top_pct`% de los hogares
 
 ```{r}
 #| label: fig-riesgo
 #| fig-cap: "Hogares con ingesta aparente inferior al requerimiento, por micronutriente, con la norma vigente de harina de trigo. República Dominicana, 2018"
 #| fig-width: 9.6
 #| fig-height: 3.4
-fig_riesgo + labs(y = "Micronutriente")
+fig_riesgo_ic
 ```
 
 ::: {.notapie}
-Punto: estimación ponderada; barra: IC 95%. Punto de corte del EAR (IOM); hierro por el método probabilístico con 10% de biodisponibilidad. Fuente: elaboración propia con microdatos de la ENGIH 2018.
+Punto: estimación ponderada; barra y paréntesis: IC 95%. Punto de corte del EAR (IOM); hierro por el método probabilístico con 10% de biodisponibilidad. Fuente: elaboración propia con microdatos de la ENGIH 2018.
 :::
 
-## El riesgo de folato varía entre `r reg_min`% y `r reg_max`% según la región
+## El riesgo de folato está presente en todas las regiones: de `r reg_min`% a `r reg_max`%
 
 ```{r}
 #| label: fig-mapa-region
@@ -170,7 +216,7 @@ fig_mapa_region
 Estimaciones ponderadas. Regiones con precisión insuficiente (*: menos de 50 hogares o semiamplitud del IC 95% mayor de 10 puntos): `r reg_baja`. Límites: IDERD y ONE. Fuente: elaboración propia con microdatos de la ENGIH 2018.
 :::
 
-## La norma vigente reduce el riesgo de folato y de hierro, no el de los demás micronutrientes
+## La harina fortificada reduce el riesgo de folato y hierro, no el de los demás micronutrientes
 
 ```{r}
 #| label: fig-norma
@@ -181,10 +227,10 @@ fig_norma + labs(y = "Micronutriente")
 ```
 
 ::: {.notapie}
-Naranja: sin fortificación; azul: norma vigente; rótulo: reducción en puntos porcentuales. Supone cumplimiento pleno de la norma. Fuente: elaboración propia con microdatos de la ENGIH 2018.
+Naranja: sin fortificación; azul: norma vigente; rótulo: reducción en puntos porcentuales. Semiamplitud máxima de los IC 95%: `r semi_norma` puntos. Supone cumplimiento pleno de la norma. Fuente: elaboración propia con microdatos de la ENGIH 2018.
 :::
 
-## Hacer cumplir la norma del azúcar es la acción de mayor efecto
+## La mayor ganancia no requiere una ley nueva: hacer cumplir la norma del azúcar
 
 ```{r}
 #| label: fig-acciones
@@ -198,7 +244,7 @@ fig_acciones + labs(y = "Acción")
 Punto: diferencia pareada; barra: IC 95%. Se muestran los micronutrientes con un cambio de al menos 0,5 puntos. Supone cumplimiento pleno de la norma. Fuente: elaboración propia con microdatos de la ENGIH 2018.
 :::
 
-## La diferencia entre quintiles se reduce con el arroz, no con más harina
+## Más harina eleva la ingesta; solo el arroz acorta la distancia entre quintiles
 
 ```{r}
 #| label: fig-equidad
