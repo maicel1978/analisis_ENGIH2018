@@ -61,17 +61,23 @@ verif <- leer_limpio(here::here("data", "auditoria", "verificacion_punto_venta_2
 n_etiq <- sum(verif$tipo == "etiqueta"); n_pes <- sum(verif$tipo == "pesaje")
 ```
 
-::: {style="font-size:0.95em;"}
+::::: {.columns}
+:::: {.column width="60%" style="font-size:0.9em;"}
 Los factores de conversión de las unidades más frecuentes y las etiquetas de
 los vehículos se verificaron en un establecimiento de venta:
-`r n_pes` alimentos pesados y `r n_etiq` etiquetas registradas, con fotografía.
+`r n_pes` alimentos pesados, cinco unidades cada uno, y `r n_etiq` etiquetas
+registradas con fotografía.
 
 - El azúcar en venta **no declara vitamina A**, aunque la norma la exige desde 2004.
 - El arroz fortificado en venta declara los niveles de la propuesta de reglamento.
 
-Es una verificación de un establecimiento y un día: detecta errores gruesos de
-conversión y el estado del etiquetado, no estima cumplimiento.
-:::
+Un establecimiento y un día: detecta errores gruesos de conversión y el estado
+del etiquetado; no estima cumplimiento.
+::::
+:::: {.column width="40%"}
+![](../media/fotos_investigacion_mercado/platano_verde02.jpg){height="560px"}
+::::
+:::::
 
 ::: notes
 Decir explícitamente el alcance: un establecimiento, un día, balanza en libras.
@@ -171,14 +177,50 @@ fig_acciones
 **NOTA:** Diferencia frente al escenario anterior, con intervalo de confianza al 95% de la diferencia pareada. Escenarios aditivos.
 :::
 
-## Alcance y límites
+## Validez: sesgos, dirección y control {.smaller}
 
-::: {style="font-size:0.95em;"}
-- Ingesta **aparente** por equivalente, a nivel de hogar: no mide ingesta individual ni deficiencia.
-- Supone **cumplimiento pleno** de cada norma en todo el vehículo.
-- Toda estimación de ingesta es un **límite inferior**: los alimentos sin composición aportan cero.
-- Hierro con 10% de biodisponibilidad; con 18%, `r hierro_18`% de los hogares bajo el requerimiento.
-- La provincia no es dominio de estimación de la encuesta.
+| Fuente de error | Efecto sobre el riesgo estimado | Control |
+|---|---|---|
+| Unidades de medida no estándar | Indeterminado | Factores por alimento, verificados en campo |
+| Doble registro entre despensa y adquisiciones | Lo subestima | Regla de agotamiento; variante sin ella como sensibilidad |
+| Registros extremos de digitación | Lo subestima | Detección por alimento; exclusión trazable |
+| Alimentos sin composición | Lo sobrestima | Cobertura reportada por nutriente: límite inferior de la ingesta |
+| Consumo fuera del hogar | Lo sobrestima | Declarado; no corregible con la encuesta |
+| Adquirido no equivale a consumido | Lo subestima | Declarado |
+| Ingesta aparente frente a habitual | Depende de la posición del EAR respecto de la mediana | Declarado; supuesto del punto de corte |
+| Cumplimiento pleno de la norma | Lo subestima en los escenarios | Declarado; requiere el dato de cumplimiento |
+
+::: {style="font-size:1.05em; margin-top:0.5em;"}
+Los errores comunes a todos los escenarios se compensan en parte en la
+diferencia pareada: **la comparación entre escenarios es más robusta que el
+nivel absoluto.**
+:::
+
+::: notes
+Esta es la lámina de la epidemiología: cada error tiene dirección y control.
+Leer solo dos filas en voz alta (despensa y cumplimiento) y la conclusión.
+:::
+
+## Hipótesis contrastadas
+
+::: {style="font-size:0.93em;"}
+El riesgo de ingesta inadecuada varía entre provincias. Antes de interpretarlo,
+se contrastaron explicaciones alternativas:
+
+| Hipótesis | Resultado |
+|---|---|
+| Tamaño del hogar | Descartada: correlación prácticamente nula con el riesgo |
+| Reparto entre secciones, regla de agotamiento, días observados | Descartadas: ninguna reproduce el patrón |
+| Producción propia | Descartada: correlaciona con la energía entre provincias, no entre hogares (**falacia ecológica**) |
+| Energía registrada | Sostenida: el patrón sigue a la energía declarada, no a la composición de la dieta |
+
+Consecuencia: para comparar territorios se usa la **densidad de nutrientes**
+por 1000 kcal, en la que un factor multiplicativo de la energía se cancela.
+:::
+
+::: notes
+La falacia ecológica con datos reales es el punto que más conecta con una
+audiencia de salud pública. Decirlo en una frase, sin cifras.
 :::
 
 ## Relación con el monitoreo de la fortificación
