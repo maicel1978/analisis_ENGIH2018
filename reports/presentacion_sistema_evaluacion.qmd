@@ -136,6 +136,15 @@ equidad <- esc |>
   mutate(et = gsub("\n", " ", corto(escenario)))
 razon_base  <- fmt(equidad$razon_q5_q1[equidad$escenario == E_BASE], 2)
 razon_arroz <- fmt(equidad$razon_q5_q1[equidad$escenario == E_ARROZ], 2)
+razon_oms   <- fmt(equidad$razon_q5_q1[equidad$escenario == E_OMS], 2)
+
+# Implicaciones: reducción atribuible a la norma vigente de harina (puntos)
+red_harina <- function(n) fmt(riesgo_nac(E_SIN, n) - riesgo_nac(E_BASE, n))
+red_fol <- red_harina(FOL); red_fe <- red_harina("hierro_mg")
+
+# Otros hallazgos
+ul_arroz <- fmt(equidad$pct_folico_sobre_ul[equidad$escenario == E_ARROZ])
+hierro_10 <- fmt(riesgo_nac(E_BASE, "hierro_mg"))
 
 fig_equidad <- ggplot(equidad, aes(x = reorder(et, razon_q5_q1), y = razon_q5_q1)) +
   geom_hline(yintercept = 1, linetype = "dashed", colour = GRIS) +
@@ -288,6 +297,22 @@ Razón de `r razon_base` con la norma vigente y de `r razon_arroz` con el arroz.
 4. El resultado se lee como ingesta aparente del hogar, no como deficiencia.
 :::
 
+## Implicaciones para la República Dominicana
+
+::: {style="font-size:0.95em;"}
+| Implicación | Evidencia |
+|---|---|
+| **La mayor ganancia no requiere una ley nueva:** hacer cumplir la norma del azúcar | Vitamina A: `r cambio_azucar` |
+| **El arroz es el vehículo de la equidad**; su aporte depende del cumplimiento | Razón de folato Q5/Q1: `r razon_base` con la norma vigente; `r razon_arroz` con el arroz; `r razon_oms` con el nivel de la OMS en harina |
+| **La norma de la harina funciona** para folato y hierro, no para el resto | Reducción del riesgo: `r red_fol` puntos en folato y `r red_fe` en hierro |
+
+: Implicaciones de los resultados y su evidencia. República Dominicana, 2018 {#tbl-implicaciones}
+:::
+
+::: {.notapie}
+Escenarios simulados con cumplimiento pleno de la norma. Fuente: elaboración propia con microdatos de la ENGIH 2018.
+:::
+
 ## Lo que esta evidencia no puede responder sola
 
 ::: {style="font-size:1.05em;"}
@@ -317,6 +342,19 @@ porción comestible y correspondencia con la tabla de composición.
 :::
 
 # Anexo {background-color="#2c5364"}
+
+## Otros hallazgos
+
+::: {style="font-size:0.95em;"}
+| Hallazgo | Evidencia |
+|---|---|
+| El arroz con ácido fólico eleva la proporción de hogares sobre el nivel máximo tolerable | `r ul_arroz`% de los hogares; cota máxima, calculada sobre el ácido fólico añadido |
+| El azúcar en venta no declara vitamina A | Etiqueta registrada en la verificación en punto de venta |
+| El riesgo de hierro depende de la biodisponibilidad supuesta | `r hierro_10`% con 10%; `r hierro_18`% con 18% |
+| La media de ingesta está inflada por una cola de energía implausible | Se reporta la mediana |
+
+: Hallazgos secundarios y comprobaciones de sensibilidad. República Dominicana, 2018 {#tbl-otros}
+:::
 
 ## Los sesgos tienen dirección conocida {.smaller}
 
@@ -348,20 +386,6 @@ La comparación entre escenarios es más robusta que el nivel absoluto.
 | Energía registrada | Sostenida |
 
 : Explicaciones alternativas del patrón territorial del riesgo de ingesta inadecuada contrastadas con los datos. República Dominicana, 2018 {#tbl-hipotesis}
-:::
-
-## Origen del aporte de cada micronutriente
-
-```{r}
-#| label: fig-grupos
-#| fig-cap: "Aporte de cada grupo de alimentos al total de cada micronutriente, en por ciento. República Dominicana, 2018"
-#| fig-width: 10.5
-#| fig-height: 4.1
-fig_grupos + labs(x = "Micronutriente", y = "Grupo de alimentos")
-```
-
-::: {.notapie}
-Se rotulan los valores de 5% o más; cada columna suma 100%. Fuente: elaboración propia con microdatos de la ENGIH 2018.
 :::
 
 ## Referencias {.smaller}
