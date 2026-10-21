@@ -99,8 +99,8 @@ se derivan tres cosas que el país no tenía:
 ## Los alimentos que se pueden fortificar ya llegan a casi todos {background-color="#eef2f4"}
 
 ::: {style="font-size:1.15em; margin-top:1.2em;"}
-Comprar harina, arroz, azúcar o sal es algo que hacen prácticamente
-todos los hogares del país. Un cambio en esos alimentos llega a casi
+Comprar harina de trigo o sus derivados, arroz o azúcar es algo que hace la
+gran mayoría de los hogares del país. Un cambio en esos alimentos llega a casi
 toda la población sin necesidad de repartir nada ni de abrir ningún
 programa nuevo.
 :::
@@ -109,10 +109,11 @@ programa nuevo.
 
 ::: {style="font-size:1em;"}
 De los `r n_vehiculos` alimentos evaluados como vehículo posible,
-`r n_mayoria` son adquiridos por al menos la mitad de los hogares del país.
+`r n_mayoria` son adquiridos por al menos la mitad de los hogares del país;
+la harina de maíz, por `r fmt(veh$pct_hogares[veh$grupo == MAIZ], 0)`%.
 
-**La cobertura no es la restricción.** Una norma de fortificación sobre estos
-alimentos alcanza a la mayor parte de la población sin necesidad de ampliar su
+**La cobertura no es la restricción.** Una norma de fortificación sobre el
+trigo, el arroz o el azúcar alcanza a la mayor parte de la población sin necesidad de ampliar su
 distribución. La variable sobre la que se puede actuar es el contenido de
 micronutrientes, no el alcance.
 :::
@@ -121,12 +122,12 @@ micronutrientes, no el alcance.
 #| label: fig-vehiculos
 #| fig-cap: "Hogares que adquieren cada vehículo y consumo mediano entre quienes lo adquieren, por Equivalente de Mujer Adulta y día. República Dominicana, 2018"
 #| fig-width: 10.5
-#| fig-height: 2.9
+#| fig-height: 3.4
 fig_vehiculos
 ```
 
 ::: {.notapie}
-**NOTA:** Cobertura y consumo mediano entre quienes lo adquieren, por Equivalente de Mujer Adulta y día. Estimaciones ponderadas con el diseño muestral complejo de la encuesta.
+**NOTA:** Cobertura y consumo mediano entre quienes lo adquieren, por Equivalente de Mujer Adulta y día. Estimaciones ponderadas con el diseño muestral complejo de la encuesta. Harina de maíz: cobertura y consumo, sin escenario de fortificación.
 :::
 
 ## A muchos hogares no les llega suficiente {background-color="#eef2f4"}

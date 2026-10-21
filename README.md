@@ -43,7 +43,7 @@ Se compilan en `output/`, que no se versiona.
 for (s in c("01_import", "02_eda", "03_transform", "04_equivalente_adulto",
             "05_ingesta_micronutrientes", "06_escenarios_fortificacion",
             "07_riesgo_inadecuacion", "08_grupos_alimentos", "09_mapas",
-            "diagnostico_densidad_critica")) {
+            "diagnostico_densidad_critica", "anexo_harina_maiz")) {
   source(here::here("scripts", paste0(s, ".R")))
 }
 for (d in c("INFORME_final", "MANUAL_tecnico", "presentacion_recomendaciones")) {
@@ -51,7 +51,9 @@ for (d in c("INFORME_final", "MANUAL_tecnico", "presentacion_recomendaciones")) 
 }
 ```
 
-`diagnostico_densidad_critica.R` produce dos tablas que el informe requiere. Los
+`diagnostico_densidad_critica.R` produce dos tablas que el informe requiere, y
+`anexo_harina_maiz.R` la cobertura y el consumo de harina de maíz que muestran
+las presentaciones (sin escenario de fortificación). Los
 demás diagnósticos (`diagnostico_*.R`) no alimentan los documentos: cada uno
 contrasta una hipótesis o una decisión que el informe o el manual describen, y
 se ejecutan cuando se quiere revisar esa evidencia.

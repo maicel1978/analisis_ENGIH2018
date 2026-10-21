@@ -30,6 +30,13 @@ leer_clean <- function(archivo, script) {
 rie  <- leer_clean("riesgo_inadecuacion.csv",        "07_riesgo_inadecuacion.R")
 esc  <- leer_clean("escenarios_resumen.csv",         "06_escenarios_fortificacion.R")
 veh  <- leer_clean("escenarios_consumo_vehiculos.csv","06_escenarios_fortificacion.R")
+# Harina de maíz: solo cobertura y consumo (sin escenario de fortificación)
+MAIZ <- "Harina de maíz"
+veh  <- bind_rows(veh,
+  leer_clean("anexo_harina_maiz.csv", "anexo_harina_maiz.R") |>
+    filter(dominio == "Nacional") |>
+    transmute(grupo = MAIZ, pct_hogares, pct_hogares_low, pct_hogares_upp,
+              mediana_consumidores, mediana_consumidores_low, mediana_consumidores_upp))
 gnut <- leer_clean("grupos_micronutrientes.csv",     "08_grupos_alimentos.R")
 refs <- leer_limpio(file.path(RUTA_RAW, "valores_referencia.csv"))
 entregables <- leer_limpio(file.path(RUTA_RAW, "entregables_estado.csv")) |>

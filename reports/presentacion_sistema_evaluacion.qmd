@@ -44,7 +44,8 @@ METODOS <- c("Punto de corte", "Probabilidad, biodisponibilidad 10%")
 if (!all(c("pct_hogares_low", "pct_hogares_upp") %in% names(veh))) {
   stop("escenarios_consumo_vehiculos.csv sin intervalos: correr 06_escenarios_fortificacion.R.", call. = FALSE)
 }
-cob_min <- fmt(min(veh$pct_hogares), 0)
+cob_min3 <- fmt(min(veh$pct_hogares[veh$grupo != MAIZ]), 0)
+maiz_pct <- fmt(veh$pct_hogares[veh$grupo == MAIZ], 0)
 fig_veh_ic <- veh |>
   mutate(grupo = reorder(grupo, pct_hogares)) |>
   ggplot(aes(pct_hogares, grupo)) +
@@ -239,19 +240,19 @@ fig_cadena
 :::
 ::::
 
-## La cobertura no es la limitación: cada vehículo llega al `r cob_min`% de los hogares o más
+## Trigo, arroz y azúcar llegan al `r cob_min3`% de los hogares o más; la harina de maíz, al `r maiz_pct`%
 
 ```{r}
 #| label: fig-vehiculos
 #| fig-cap: "Hogares que adquieren cada vehículo de fortificación y consumo mediano entre quienes lo adquieren, en gramos por equivalente de mujer adulta y día. República Dominicana, 2018"
 #| fig-cap-location: top
 #| fig-width: 10.5
-#| fig-height: 3.2
+#| fig-height: 3.7
 fig_veh_ic
 ```
 
 ::: {.notapie}
-Punto: estimación ponderada; barra y paréntesis: IC 95%; gramos: mediana entre quienes lo adquieren. Fuente: elaboración propia con microdatos de la ENGIH 2018.
+Punto: estimación ponderada; barra y paréntesis: IC 95%; gramos: mediana entre quienes lo adquieren. Harina de maíz: cobertura y consumo, sin escenario de fortificación. Fuente: elaboración propia con microdatos de la ENGIH 2018.
 :::
 
 ## Con la norma vigente, el mayor riesgo está en `r top_nut`: `r top_pct`% de los hogares
