@@ -158,7 +158,7 @@ fig_riesgo
 ```
 
 ::: {.notapie}
-**NOTA:** Punto: proporción estimada. Barra: intervalo de confianza al 95%. Requerimientos del Institute of Medicine; hierro con 10% de biodisponibilidad. No es prevalencia de deficiencia.
+**NOTA:** Punto: proporción estimada. Barra: intervalo de confianza al 95%. Requerimientos del Institute of Medicine. Hierro: método probabilístico con 10% de biodisponibilidad; demás micronutrientes: punto de corte. No es prevalencia de deficiencia.
 :::
 
 ## Lo que ya se hace ayuda, pero no alcanza {background-color="#eef2f4"}
@@ -187,7 +187,7 @@ fig_norma
 ```
 
 ::: {.notapie}
-**NOTA:** Naranja: sin fortificación. Azul: con la norma vigente. Supone cumplimiento pleno de la norma en todo el vehículo.
+**NOTA:** Naranja: sin fortificación. Azul: con la norma vigente. Supone cumplimiento pleno de la norma en todo el vehículo. Hierro: método probabilístico; demás micronutrientes: punto de corte.
 :::
 
 ## Cada alimento trae unas vitaminas y no otras {background-color="#eef2f4"}
@@ -257,7 +257,7 @@ fig_acciones
 ```
 
 ::: {.notapie}
-**NOTA:** Punto: diferencia estimada frente a la situación inmediatamente anterior. Barra: intervalo de confianza al 95% de la diferencia pareada. Solo se muestran los micronutrientes que la acción desplaza.
+**NOTA:** Punto: diferencia estimada frente a la situación inmediatamente anterior. Barra: intervalo de confianza al 95% de la diferencia pareada. Solo se muestran los micronutrientes que la acción desplaza. Hierro: método probabilístico; demás micronutrientes: punto de corte.
 :::
 
 ## Acciones según la exigencia institucional

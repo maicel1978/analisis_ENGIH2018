@@ -493,7 +493,7 @@ externa de las cantidades.
 
 ```{r}
 #| label: fig-riesgo
-#| fig-cap: "Hogares con ingesta aparente por debajo del requerimiento, por nutriente. Escenario de línea base. El segmento indica el intervalo de confianza al 95%."
+#| fig-cap: "Hogares con ingesta aparente por debajo del requerimiento, por nutriente. Escenario de línea base. El segmento indica el intervalo de confianza al 95%. Hierro: método probabilístico con 10% de biodisponibilidad; demás nutrientes: punto de corte del Requerimiento Promedio Estimado."
 #| fig-width: 7
 #| fig-height: 3.6
 nac_base |>
@@ -512,7 +512,7 @@ nac_base |>
 
 ```{r}
 #| label: tbl-riesgo
-#| tbl-cap: "Hogares con ingesta aparente por debajo del requerimiento, según nutriente. Línea base. República Dominicana, 2018"
+#| tbl-cap: "Hogares con ingesta aparente por debajo del requerimiento, según nutriente. Línea base. República Dominicana, 2018 Hierro: método probabilístico con 10% de biodisponibilidad; demás nutrientes: punto de corte del Requerimiento Promedio Estimado."
 principal |>
   filter(dominio == "Nacional", escenario == ESCENARIO_BASE) |>
   arrange(desc(pct_inadecuado)) |>
@@ -677,7 +677,7 @@ poco la cobertura.
 
 ```{r}
 #| label: tbl-dominios
-#| tbl-cap: "Hogares con ingesta aparente por debajo del requerimiento, según quintil, zona y región. Línea base. República Dominicana, 2018"
+#| tbl-cap: "Hogares con ingesta aparente por debajo del requerimiento, según quintil, zona y región. Línea base. República Dominicana, 2018 Hierro: método probabilístico con 10% de biodisponibilidad; demás nutrientes: punto de corte del Requerimiento Promedio Estimado."
 principal |>
   filter(dominio %in% c("Quintil", "Zona", "Region"), escenario == ESCENARIO_BASE,
          nutriente %in% c("Folato", "Hierro", "Zinc", "Vitamina B12", "Vitamina A")) |>
@@ -764,7 +764,7 @@ invariante a ese nivel (sección de métodos).
 
 ```{r}
 #| label: fig-escenarios
-#| fig-cap: "Hogares bajo el requerimiento, por escenario de fortificación y nutriente. Los escenarios están ordenados de menor a mayor alcance; el punto de partida es la dieta sin fortificar. Escenarios: 0, sin fortificación; 1a, norma nacional en harina y pan; 1b, norma nacional en harina y todos los derivados; 1c, norma nacional y azúcar; 2a y 2b, niveles de la OMS para consumos de harina menores de 75 g y de 75 a 149 g; 3, norma nacional y arroz según la propuesta nacional."
+#| fig-cap: "Hogares bajo el requerimiento, por escenario de fortificación y nutriente. Los escenarios están ordenados de menor a mayor alcance; el punto de partida es la dieta sin fortificar. Escenarios: 0, sin fortificación; 1a, norma nacional en harina y pan; 1b, norma nacional en harina y todos los derivados; 1c, norma nacional y azúcar; 2a y 2b, niveles de la OMS para consumos de harina menores de 75 g y de 75 a 149 g; 3, norma nacional y arroz según la propuesta nacional. Hierro: método probabilístico con 10% de biodisponibilidad; demás nutrientes: punto de corte del Requerimiento Promedio Estimado."
 #| fig-width: 7.5
 #| fig-height: 4.4
 principal |>

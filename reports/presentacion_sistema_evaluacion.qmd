@@ -296,7 +296,7 @@ fig_norma + labs(y = "Micronutriente")
 ```
 
 ::: {.notapie}
-Naranja: sin fortificación; azul: norma vigente; rótulo: reducción en puntos porcentuales. Semiamplitud máxima de los IC 95%: `r semi_norma` puntos. Supone cumplimiento pleno de la norma. Fuente: elaboración propia con microdatos de la ENGIH 2018.
+Naranja: sin fortificación; azul: norma vigente; rótulo: reducción en puntos porcentuales. Hierro: método probabilístico; demás micronutrientes: punto de corte. Semiamplitud máxima de los IC 95%: `r semi_norma` puntos. Supone cumplimiento pleno de la norma. Fuente: elaboración propia con microdatos de la ENGIH 2018.
 :::
 
 ## La mayor ganancia no requiere una ley nueva: hacer cumplir la norma del azúcar
@@ -311,7 +311,7 @@ fig_acc
 ```
 
 ::: {.notapie}
-Punto: diferencia pareada; barra: IC 95%. Se muestran los micronutrientes con un cambio de al menos 0,5 puntos. Supone cumplimiento pleno de la norma. Fuente: elaboración propia con microdatos de la ENGIH 2018.
+Punto: diferencia pareada; barra: IC 95%. Hierro: método probabilístico; demás micronutrientes: punto de corte. Se muestran los micronutrientes con un cambio de al menos 0,5 puntos. Supone cumplimiento pleno de la norma. Fuente: elaboración propia con microdatos de la ENGIH 2018.
 :::
 
 ## Más harina eleva la ingesta; solo el arroz acorta la distancia entre quintiles
