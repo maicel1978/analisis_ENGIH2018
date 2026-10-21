@@ -62,7 +62,8 @@ n_etiq <- sum(verif$tipo == "etiqueta"); n_pes <- sum(verif$tipo == "pesaje")
 ```
 
 ::::: {.columns}
-:::: {.column width="60%" style="font-size:0.9em;"}
+:::: {.column width="60%"}
+::: {style="font-size:0.9em;"}
 Los factores de conversión de las unidades más frecuentes y las etiquetas de
 los vehículos se verificaron en un establecimiento de venta:
 `r n_pes` alimentos pesados, cinco unidades cada uno, y `r n_etiq` etiquetas
@@ -73,6 +74,7 @@ registradas con fotografía.
 
 Un establecimiento y un día: detecta errores gruesos de conversión y el estado
 del etiquetado; no estima cumplimiento.
+:::
 ::::
 :::: {.column width="40%"}
 ![](../media/fotos_investigacion_mercado/platano_verde02.jpg){height="560px"}
