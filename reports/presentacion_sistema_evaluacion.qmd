@@ -1,6 +1,6 @@
 ---
-title: "Análisis de encuestas de gasto de los hogares para la evaluación de la fortificación"
-subtitle: "Aplicación a la ENGIH 2018 de la República Dominicana · método, resultados y continuidad"
+title: "Cobertura, consumo y contribución de alimentos fortificables a la ingesta de micronutrientes"
+subtitle: "Análisis de la Encuesta Nacional de Gastos e Ingresos de los Hogares 2018, República Dominicana"
 author: "Maicel E. Monzón, PhD — Consultor internacional"
 date: last-modified
 date-format: "D [de] MMMM [de] YYYY"
@@ -24,137 +24,138 @@ execute:
 ```{r}
 #| label: setup
 source(here::here("reports", "_figuras_recomendaciones.R"))
-```
+library(sf)
 
-## Objetivo y diseño del estudio
-
-```{r}
-#| label: diseno
 ema_d <- leer_limpio(file.path(RUTA_CLEAN, "data_ema_hogar.csv"))
 n_estratos <- dplyr::n_distinct(ema_d$estrato)
 n_upm      <- dplyr::n_distinct(paste(ema_d$estrato, ema_d$upm))
+
+FOL <- "folato_mcg_dfe"
+folato_pct <- fmt(riesgo_nac(E_BASE, FOL))
+
+# Riesgo de folato por región (dominio de estimación de la encuesta)
+reg <- rie |>
+  filter(dominio == "Region", hogares == "Todos", escenario == E_BASE,
+         nutriente == FOL, metodo == metodo_de(FOL)) |>
+  mutate(nivel = as.character(nivel))
+reg_prov <- ema_d |> distinct(id_provincia, grupo_region) |>
+  mutate(grupo_region = as.character(grupo_region))
+if (anyDuplicated(reg_prov$id_provincia) > 0 || nrow(reg_prov) != 32) {
+  stop("La correspondencia provincia-región no es única o está incompleta.", call. = FALSE)
+}
+mapa_reg <- st_read(file.path(RUTA_RAW, "provincias_rd.geojson"), quiet = TRUE) |>
+  inner_join(reg_prov, by = "id_provincia") |>
+  group_by(grupo_region) |> summarise(.groups = "drop") |>
+  left_join(reg, by = c("grupo_region" = "nivel"))
+if (any(is.na(mapa_reg$pct_inadecuado))) {
+  stop("Regiones sin estimación de riesgo.", call. = FALSE)
+}
+reg_min <- fmt(min(reg$pct_inadecuado)); reg_max <- fmt(max(reg$pct_inadecuado))
+
+fig_mapa_region <- ggplot(mapa_reg) +
+  geom_sf(aes(fill = pct_inadecuado), colour = "white", linewidth = 0.6) +
+  geom_sf_text(aes(label = paste0(grupo_region, "\n", fmt(pct_inadecuado), "%",
+                                  if_else(precision_baja, "*", ""))),
+               size = 4.2, colour = "#1a3a4a", lineheight = 0.95,
+               fun.geometry = sf::st_point_on_surface) +
+  scale_fill_gradient(low = "#eef2f4", high = AZUL_C, limits = c(0, 100), guide = "none") +
+  theme_void()
+
+# Pregunta 5: razón entre la ingesta mediana de folato del quinto y del primer quintil
+equidad <- esc |>
+  filter(nutriente == FOL) |>
+  mutate(et = gsub("\n", " ", corto(escenario)))
+razon_base  <- fmt(equidad$razon_q5_q1[equidad$escenario == E_BASE], 2)
+razon_arroz <- fmt(equidad$razon_q5_q1[equidad$escenario == E_ARROZ], 2)
+
+fig_equidad <- ggplot(equidad, aes(x = reorder(et, razon_q5_q1), y = razon_q5_q1)) +
+  geom_hline(yintercept = 1, linetype = "dashed", colour = GRIS) +
+  geom_segment(aes(xend = reorder(et, razon_q5_q1), y = 1, yend = razon_q5_q1),
+               colour = GRIS, linewidth = 1) +
+  geom_point(aes(colour = escenario == E_ARROZ), size = 4.2) +
+  geom_text(aes(label = fmt(razon_q5_q1, 2)), hjust = -0.6, size = 4.2,
+            colour = "#44555f") +
+  scale_colour_manual(values = c(`FALSE` = AZUL, `TRUE` = ACENTO), guide = "none") +
+  scale_y_continuous(expand = expansion(mult = c(0.02, 0.15))) +
+  coord_flip() +
+  labs(x = NULL, y = "Razón de la ingesta mediana de folato, quintil 5 / quintil 1") +
+  tema()
 ```
 
-::: {style="font-size:0.95em;"}
-**Objetivo.** Estimar, con la ENGIH 2018, la cobertura y el consumo de los
-vehículos de fortificación, su contribución a la ingesta aparente de
-micronutrientes y el efecto de escenarios de fortificación sobre la proporción
-de hogares con ingesta inferior al requerimiento.
+## Preguntas
 
+::: {style="font-size:1.05em;"}
+1. ¿Permite la ENGIH 2018 estimar el consumo y la ingesta aparente de micronutrientes con calidad suficiente?
+2. ¿Qué proporción de hogares adquiere cada vehículo de fortificación, y en qué cantidad?
+3. ¿Qué proporción de hogares tiene una ingesta aparente inferior al requerimiento?
+4. ¿Qué efecto tendrían escenarios alternativos de fortificación sobre esa proporción?
+5. ¿Reduce un vehículo de consumo homogéneo la diferencia entre quintiles? *(hipótesis formulada antes del análisis)*
+:::
+
+# Métodos {background-color="#2c5364"}
+
+## Diseño del estudio
+
+::: {style="font-size:0.95em;"}
 | | |
 |---|---|
 | Tipo de estudio | Descriptivo transversal; análisis secundario de una encuesta poblacional |
-| Muestra | `r n_hogares` hogares; muestra probabilística estratificada y por conglomerados (`r n_estratos` estratos, `r n_upm` unidades primarias) |
-| Estimador principal | Proporción de hogares con ingesta aparente por EMA inferior al requerimiento |
-| Efecto de los escenarios | Diferencia pareada respecto del escenario precedente: simulación *ex ante* |
-| Inferencia | Ponderación, linealización de Taylor, intervalos *t* con los grados de libertad del diseño |
+| Muestra | `r n_hogares` hogares; probabilística, estratificada y por conglomerados (`r n_estratos` estratos, `r n_upm` unidades primarias) |
+| Estimador | Proporción de hogares con ingesta aparente por equivalente de mujer adulta inferior al requerimiento |
+| Escenarios | Simulación *ex ante*; diferencia pareada con el escenario precedente |
+| Inferencia | Ponderación; linealización de Taylor; intervalos *t* con los grados de libertad del diseño |
 :::
 
-::: notes
-Presentarse en una frase: epidemiólogo; la encuesta se abordó como un problema
-de estimación con datos secundarios. Subrayar que el efecto de los escenarios
-es simulado, no observado.
-:::
+## Procesamiento y control de calidad
 
-## Verificación en punto de venta
-
-```{r}
-#| label: campo
-verif <- leer_limpio(here::here("data", "auditoria", "verificacion_punto_venta_2026-10-04.csv"))
-n_etiq <- sum(verif$tipo == "etiqueta"); n_pes <- sum(verif$tipo == "pesaje")
-```
-
-::::: {.columns}
-:::: {.column width="60%"}
-::: {style="font-size:0.9em;"}
-Los factores de conversión de las unidades más frecuentes y las etiquetas de
-los vehículos se verificaron en un establecimiento de venta:
-`r n_pes` alimentos pesados, cinco unidades cada uno, y `r n_etiq` etiquetas
-registradas con fotografía.
-
-- El azúcar en venta **no declara vitamina A**, aunque la norma la exige desde 2004.
-- El arroz fortificado en venta declara los niveles de la propuesta de reglamento.
-
-Un establecimiento y un día: detecta errores gruesos de conversión y el estado
-del etiquetado; no estima cumplimiento.
-:::
-::::
-:::: {.column width="40%"}
-![](../media/fotos_investigacion_mercado/platano_verde02.jpg){height="560px"}
-::::
-:::::
-
-::: notes
-Decir explícitamente el alcance: un establecimiento, un día, balanza en libras.
-Sirve para detectar errores gruesos de conversión y el estado de las etiquetas.
-:::
-
-## Del registro de adquisiciones a la ingesta
-
+:::: {.columns}
+::: {.column width="64%"}
 ```{r}
 #| label: fig-cadena
-#| fig-width: 11.4
-#| fig-height: 1.6
+#| fig-width: 8.4
+#| fig-height: 1.9
 fig_cadena
 ```
-
-
-::: {style="font-size:0.92em;"}
-| Etapa | Procedimiento |
-|---|---|
-| Cantidad a gramos | Factores de conversión por unidad y alimento, verificados en punto de venta; porción comestible |
-| Normalización | Equivalente de Mujer Adulta (2291 kcal); regla de agotamiento entre despensa y adquisiciones |
-| Composición | Correspondencia con tablas INCAP y FNDDS, con la cobertura reportada por nutriente |
-| Escenarios | Adición de la norma de cada vehículo sobre la composición sin fortificar |
-| Riesgo | Punto de corte sobre el EAR del IOM; hierro por probabilidad (10% de biodisponibilidad; 18% como sensibilidad) |
 :::
-
-::: {.notapie}
-**Marco:** Tang et al. (2022), *Annals of the New York Academy of Sciences*, 1508(1), 105–122.
+::: {.column width="36%"}
+![](../media/fotos_investigacion_mercado/platano_verde02.jpg){height="500px"}
 :::
+::::
 
-::: notes
-Detenerse en la conversión a gramos y en la regla de agotamiento: son las dos
-decisiones que más pesan y las que más difieren entre encuestas.
-:::
+# Resultados {background-color="#2c5364"}
 
-## Cobertura de los vehículos
-
-::: {style="font-size:1em;"}
-De los `r n_vehiculos` alimentos evaluados como vehículo, `r n_mayoria` son
-adquiridos por al menos la mitad de los hogares.
-:::
+## `r n_mayoria` de los `r n_vehiculos` vehículos llegan a la mitad de los hogares o más
 
 ```{r}
 #| label: fig-vehiculos
 #| fig-width: 10.5
-#| fig-height: 2.9
+#| fig-height: 3.2
 fig_vehiculos
 ```
 
-::: {.notapie}
-**NOTA:** Cobertura y consumo mediano entre quienes adquieren el vehículo, por Equivalente de Mujer Adulta y día. Estimaciones ponderadas.
-:::
-
-## Riesgo de ingesta inadecuada con la norma vigente
-
-::: {style="font-size:1em;"}
-Hogares cuya canasta adquirida aporta menos del requerimiento:
-**`r folato_hoy`** en folato y **`r hierro_hoy`** en hierro.
-:::
+## Con la norma vigente, `r folato_pct`% de los hogares no cubre el requerimiento de folato
 
 ```{r}
 #| label: fig-riesgo
 #| fig-width: 9.6
-#| fig-height: 3.1
+#| fig-height: 3.4
 fig_riesgo
 ```
 
 ::: {.notapie}
-**NOTA:** Punto: proporción estimada. Barra: intervalo de confianza al 95%. Ingesta aparente, no prevalencia de deficiencia.
+Punto: estimación; barra: IC 95%. Hierro por el método probabilístico, 10% de biodisponibilidad.
 :::
 
-## Contribución de la norma vigente
+## El riesgo de folato varía entre `r reg_min`% y `r reg_max`% según la región
+
+```{r}
+#| label: fig-mapa-region
+#| fig-width: 11
+#| fig-height: 5.4
+fig_mapa_region
+```
+
+## La norma vigente reduce el riesgo de folato y de hierro, no el de los demás micronutrientes
 
 ```{r}
 #| label: fig-norma
@@ -163,140 +164,98 @@ fig_riesgo
 fig_norma
 ```
 
-::: {.notapie}
-**NOTA:** Naranja: sin fortificación. Azul: norma vigente de harina de trigo y pan. Supone cumplimiento pleno de la norma.
-:::
-
-## Origen del aporte de cada micronutriente
-
-```{r}
-#| label: fig-grupos
-#| fig-width: 10.5
-#| fig-height: 4.1
-fig_grupos
-```
-
-::: {.notapie}
-**NOTA:** Porcentaje del total de cada micronutriente aportado por cada grupo de alimentos.
-:::
-
-## Escenarios de fortificación
+## Hacer cumplir la norma del azúcar es la acción de mayor efecto
 
 ```{r}
 #| label: fig-acciones
 #| fig-width: 12
-#| fig-height: 4.9
+#| fig-height: 4.6
 fig_acciones
 ```
 
 ::: {.notapie}
-**NOTA:** Diferencia frente al escenario anterior, con intervalo de confianza al 95% de la diferencia pareada. Escenarios aditivos.
+Diferencia pareada con el escenario precedente; barra: IC 95%. Supone cumplimiento pleno.
 :::
 
-## Validez: sesgos, dirección y control {.smaller}
+## La diferencia entre quintiles se reduce con el arroz, no con más harina
+
+```{r}
+#| label: fig-equidad
+#| fig-width: 10
+#| fig-height: 3.8
+fig_equidad
+```
+
+::: {.notapie}
+Razón de `r razon_base` con la norma vigente y de `r razon_arroz` con el arroz. Estimación puntual de medianas ponderadas. Congruente con la hipótesis formulada antes del análisis.
+:::
+
+## El patrón territorial sigue a la energía registrada, no a la dieta
+
+::: {style="font-size:0.95em;"}
+| Explicación alternativa | Resultado |
+|---|---|
+| Tamaño del hogar | Descartada |
+| Reparto entre secciones, regla de agotamiento, días observados | Descartadas |
+| Producción propia | Descartada: correlaciona entre provincias, no entre hogares (**falacia ecológica**) |
+| Energía registrada | Sostenida |
+:::
+
+# Discusión {background-color="#2c5364"}
+
+## Los sesgos tienen dirección conocida {.smaller}
 
 | Fuente de error | Efecto sobre el riesgo estimado | Control |
 |---|---|---|
 | Unidades de medida no estándar | Indeterminado | Factores por alimento, verificados en campo |
-| Doble registro entre despensa y adquisiciones | Lo subestima | Regla de agotamiento; variante sin ella como sensibilidad |
-| Registros extremos de digitación | Lo subestima | Detección por alimento; exclusión trazable |
-| Alimentos sin composición | Lo sobrestima | Cobertura reportada por nutriente: límite inferior de la ingesta |
-| Consumo fuera del hogar | Lo sobrestima | Declarado; no corregible con la encuesta |
+| Doble registro entre despensa y adquisiciones | Lo subestima | Regla de agotamiento; sensibilidad sin ella |
+| Registros extremos | Lo subestima | Detección por alimento; exclusión trazable |
+| Alimentos sin composición | Lo sobrestima | Cobertura reportada por nutriente |
+| Consumo fuera del hogar | Lo sobrestima | Declarado |
 | Adquirido no equivale a consumido | Lo subestima | Declarado |
-| Ingesta aparente frente a habitual | Depende de la posición del EAR respecto de la mediana | Declarado; supuesto del punto de corte |
-| Cumplimiento pleno de la norma | Lo subestima en los escenarios | Declarado; requiere el dato de cumplimiento |
+| Ingesta aparente frente a habitual | Depende de la posición del EAR | Declarado |
+| Cumplimiento pleno de la norma | Lo subestima en los escenarios | Requiere el dato de cumplimiento |
 
-::: {style="font-size:1.05em; margin-top:0.5em;"}
-Los errores comunes a todos los escenarios se compensan en parte en la
-diferencia pareada: **la comparación entre escenarios es más robusta que el
-nivel absoluto.**
+::: {style="font-size:1.1em; margin-top:0.4em;"}
+La comparación entre escenarios es más robusta que el nivel absoluto.
 :::
 
-::: notes
-Esta es la lámina de la epidemiología: cada error tiene dirección y control.
-Leer solo dos filas en voz alta (despensa y cumplimiento) y la conclusión.
-:::
+## El cumplimiento medido convierte la contribución potencial en esperada
 
-## Hipótesis contrastadas
-
-::: {style="font-size:0.93em;"}
-El riesgo de ingesta inadecuada varía entre provincias. Antes de interpretarlo,
-se contrastaron explicaciones alternativas:
-
-| Hipótesis | Resultado |
-|---|---|
-| Tamaño del hogar | Descartada: correlación prácticamente nula con el riesgo |
-| Reparto entre secciones, regla de agotamiento, días observados | Descartadas: ninguna reproduce el patrón |
-| Producción propia | Descartada: correlaciona con la energía entre provincias, no entre hogares (**falacia ecológica**) |
-| Energía registrada | Sostenida: el patrón sigue a la energía declarada, no a la composición de la dieta |
-
-Consecuencia: para comparar territorios se usa la **densidad de nutrientes**
-por 1000 kcal, en la que un factor multiplicativo de la energía se cancela.
-:::
-
-::: notes
-La falacia ecológica con datos reales es el punto que más conecta con una
-audiencia de salud pública. Decirlo en una frase, sin cifras.
-:::
-
-## Relación con el monitoreo de la fortificación
-
-::: {style="font-size:0.95em;"}
+::: {style="font-size:1em;"}
 | Monitoreo de la calidad | Análisis de la encuesta de gasto |
 |---|---|
-| ¿El alimento contiene el nivel de la norma? | ¿El nivel de la norma cubre la brecha de la población? |
-| Muestras en producción y en venta | Adquisiciones declaradas por los hogares |
-| Proporción de cumplimiento | Contribución potencial y riesgo de ingesta inadecuada |
+| ¿El alimento contiene el nivel de la norma? | ¿El nivel de la norma cubre la brecha? |
+| Muestras en producción y en venta | Adquisiciones de los hogares |
+| Proporción de cumplimiento | Contribución y riesgo de ingesta inadecuada |
 :::
 
-::: {style="font-size:0.9em; margin-top:0.6em;"}
-Todas las contribuciones de este análisis suponen cumplimiento pleno de la
-norma. La proporción de cumplimiento que mide el monitoreo es el parámetro que
-convierte la contribución potencial en contribución esperada.
-:::
+# Conclusiones {background-color="#2c5364"}
 
-::: notes
-Si preguntan por el arroz: en 2018 no se fortificaba; el escenario modela la
-propuesta de reglamento. Confirmar antes qué norma de arroz se usa en el
-monitoreo actual.
-:::
-
-## ¿Puede una encuesta de gasto sostener la evaluación de un programa de fortificación?
+## ¿Permite una encuesta de gasto evaluar el diseño de un programa de fortificación?
 
 ::: {style="font-size:1.05em;"}
 **Sí, con cuatro condiciones:**
 
-1. La conversión de unidades a gramos se verifica, no se supone.
-2. La correspondencia con la tabla de composición se reporta con su cobertura por nutriente.
-3. La contribución se interpreta como potencial mientras no se disponga del cumplimiento medido.
-4. El resultado se lee como ingesta aparente del hogar, no como ingesta individual ni como deficiencia.
+1. La conversión de unidades a gramos se verifica.
+2. La correspondencia con la tabla de composición se reporta con su cobertura.
+3. La contribución se lee como potencial hasta disponer del cumplimiento medido.
+4. El resultado se lee como ingesta aparente del hogar, no como deficiencia.
+:::
+
+## Disponible
+
+::: {style="font-size:1em;"}
+| | |
+|---|---|
+| Cadena de análisis, informe y manual técnico | `github.com/maicel1978/analisis_ENGIH2018` |
+| Módulos de capacitación | `fortificacion.netlify.app` |
+| Código de los módulos | `github.com/maicel1978/fortificacion` |
 :::
 
 ::: {style="font-size:0.9em; margin-top:0.8em;"}
-Bajo esas condiciones, la encuesta permite estimar cobertura, consumo, brecha de
-micronutrientes y efecto esperado de cada norma, con precisión conocida y a
-nivel nacional y regional.
-:::
-
-::: notes
-La pregunta no fue el punto de partida: es lo que el trabajo permite responder.
-Decirlo así.
-:::
-
-## Lo que queda disponible
-
-::: {style="font-size:0.95em;"}
-- **Cadena de análisis reproducible** en R: código, parámetros editables y cifras de control.
-  `github.com/maicel1978/analisis_ENGIH2018`
-- **Informe analítico y manual técnico** de metodología, supuestos y adaptación a otra encuesta.
-- **Módulos de capacitación** del 01 al 17 y del 24 al 30, con ejercicios y banco de preguntas.
-  `fortificacion.netlify.app` · `github.com/maicel1978/fortificacion`
-:::
-
-::: {style="font-size:0.88em; margin-top:0.6em;"}
-El código está escrito para la estructura de la ENGIH 2018. Otra encuesta exige
-rehacer la conversión a gramos, la porción comestible y la correspondencia con
-la tabla de composición; la arquitectura y los procedimientos se reutilizan.
+Adaptable a otra encuesta de gasto rehaciendo tres tablas: conversión a gramos,
+porción comestible y correspondencia con la tabla de composición.
 :::
 
 ## Referencias {.smaller}
@@ -319,3 +278,14 @@ Institute of Medicine. 2000. *Dietary Reference Intakes: applications in dietary
 assessment*. Washington, D.C.: National Academies Press.
 <https://doi.org/10.17226/9956>
 :::
+
+# Anexo {background-color="#2c5364"}
+
+## Origen del aporte de cada micronutriente
+
+```{r}
+#| label: fig-grupos
+#| fig-width: 10.5
+#| fig-height: 4.1
+fig_grupos
+```
