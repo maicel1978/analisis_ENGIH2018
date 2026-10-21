@@ -1,0 +1,234 @@
+---
+title: "Análisis de encuestas de gasto de los hogares para la evaluación de la fortificación"
+subtitle: "Aplicación a la ENGIH 2018 de la República Dominicana · método, resultados y continuidad"
+author: "Maicel E. Monzón, PhD — Consultor internacional"
+date: last-modified
+date-format: "D [de] MMMM [de] YYYY"
+lang: es
+format:
+  revealjs:
+    theme: [default, custom.scss]
+    slide-number: true
+    show-slide-number: all
+    embed-resources: true
+    transition: none
+    width: 1330
+    height: 780
+    fig-align: center
+execute:
+  warning: false
+  message: false
+  echo: false
+---
+
+```{r}
+#| label: setup
+source(here::here("reports", "_figuras_recomendaciones.R"))
+```
+
+## Pregunta
+
+::: {style="font-size:1.05em;"}
+¿Puede una encuesta de gasto de los hogares, levantada con fines económicos,
+sostener la evaluación del diseño de un programa de fortificación?
+
+Se evaluó con la ENGIH 2018: `r n_hogares` hogares con ingesta estimada, con el
+diseño muestral completo (estratos, unidades primarias de muestreo y factores
+de expansión).
+:::
+
+```{r}
+#| label: fig-cadena
+#| fig-width: 11.4
+#| fig-height: 1.75
+fig_cadena
+```
+
+::: {.notapie}
+**Marco:** Tang et al. (2022), *Annals of the New York Academy of Sciences*, 1508(1), 105–122.
+:::
+
+::: notes
+Presentar el problema: la encuesta no se diseñó para nutrición. El aporte es
+mostrar qué sostiene y qué no.
+:::
+
+## Método
+
+::: {style="font-size:0.92em;"}
+| Etapa | Procedimiento |
+|---|---|
+| Cantidad a gramos | Factores de conversión por unidad y alimento, verificados en punto de venta; porción comestible |
+| Normalización | Equivalente de Mujer Adulta (2291 kcal); regla de agotamiento entre despensa y adquisiciones |
+| Composición | Correspondencia con tablas INCAP y FNDDS, con la cobertura reportada por nutriente |
+| Escenarios | Adición de la norma de cada vehículo sobre la composición sin fortificar |
+| Riesgo | Punto de corte sobre el EAR del IOM; hierro por probabilidad (10% de biodisponibilidad; 18% como sensibilidad) |
+| Inferencia | Estimaciones ponderadas con el diseño muestral complejo e intervalos de confianza |
+:::
+
+::: notes
+Detenerse en la conversión a gramos y en la regla de agotamiento: son las dos
+decisiones que más pesan y las que más difieren entre encuestas.
+:::
+
+## Cobertura de los vehículos
+
+::: {style="font-size:1em;"}
+De los `r n_vehiculos` alimentos evaluados como vehículo, `r n_mayoria` son
+adquiridos por al menos la mitad de los hogares.
+:::
+
+```{r}
+#| label: fig-vehiculos
+#| fig-width: 10.5
+#| fig-height: 2.9
+fig_vehiculos
+```
+
+::: {.notapie}
+**NOTA:** Cobertura y consumo mediano entre quienes adquieren el vehículo, por Equivalente de Mujer Adulta y día. Estimaciones ponderadas.
+:::
+
+## Riesgo de ingesta inadecuada con la norma vigente
+
+::: {style="font-size:1em;"}
+Hogares cuya canasta adquirida aporta menos del requerimiento:
+**`r folato_hoy`** en folato y **`r hierro_hoy`** en hierro.
+:::
+
+```{r}
+#| label: fig-riesgo
+#| fig-width: 9.6
+#| fig-height: 3.1
+fig_riesgo
+```
+
+::: {.notapie}
+**NOTA:** Punto: proporción estimada. Barra: intervalo de confianza al 95%. Ingesta aparente, no prevalencia de deficiencia.
+:::
+
+## Contribución de la norma vigente
+
+```{r}
+#| label: fig-norma
+#| fig-width: 9.8
+#| fig-height: 3.6
+fig_norma
+```
+
+::: {.notapie}
+**NOTA:** Naranja: sin fortificación. Azul: norma vigente de harina de trigo y pan. Supone cumplimiento pleno de la norma.
+:::
+
+## Origen del aporte de cada micronutriente
+
+```{r}
+#| label: fig-grupos
+#| fig-width: 10.5
+#| fig-height: 4.1
+fig_grupos
+```
+
+::: {.notapie}
+**NOTA:** Porcentaje del total de cada micronutriente aportado por cada grupo de alimentos.
+:::
+
+## Escenarios de fortificación
+
+```{r}
+#| label: fig-acciones
+#| fig-width: 12
+#| fig-height: 4.9
+fig_acciones
+```
+
+::: {.notapie}
+**NOTA:** Diferencia frente al escenario anterior, con intervalo de confianza al 95% de la diferencia pareada. Escenarios aditivos.
+:::
+
+## Alcance y límites
+
+::: {style="font-size:0.95em;"}
+- Ingesta **aparente** por equivalente, a nivel de hogar: no mide ingesta individual ni deficiencia.
+- Supone **cumplimiento pleno** de cada norma en todo el vehículo.
+- Toda estimación de ingesta es un **límite inferior**: los alimentos sin composición aportan cero.
+- Hierro con 10% de biodisponibilidad; con 18%, `r hierro_18`% de los hogares bajo el requerimiento.
+- La provincia no es dominio de estimación de la encuesta.
+:::
+
+# Integración en el sistema de evaluación {background-color="#2c5364"}
+
+## Complemento del control externo de calidad
+
+::: {style="font-size:0.95em;"}
+| Control externo de calidad | Análisis de la encuesta de gasto |
+|---|---|
+| ¿El alimento contiene el nivel de la norma? | ¿El nivel de la norma cubre la brecha de la población? |
+| Muestras compuestas en producción y venta | Consumo aparente de los hogares |
+| Cumplimiento medido | Contribución esperada y riesgo de ingesta inadecuada |
+:::
+
+::: {style="font-size:0.9em; margin-top:0.6em;"}
+El supuesto de cumplimiento pleno es el punto de unión: la proporción de
+cumplimiento medida en el control de calidad sustituye al supuesto en los
+escenarios, y la contribución estimada pasa a ser la contribución observable.
+:::
+
+::: notes
+Este es el mensaje técnico central para el sistema de evaluación: las dos
+líneas de trabajo se conectan por un parámetro del archivo de escenarios.
+:::
+
+## Lo que queda disponible
+
+::: {style="font-size:0.95em;"}
+- **Cadena de análisis reproducible** en R: código, parámetros editables y cifras de control.
+  `github.com/maicel1978/analisis_ENGIH2018`
+- **Informe analítico y manual técnico** de metodología, supuestos y adaptación a otra encuesta.
+- **Módulos de capacitación** del 01 al 17 y del 24 al 30, con ejercicios y banco de preguntas.
+  `fortificacion.netlify.app` · `github.com/maicel1978/fortificacion`
+:::
+
+::: {style="font-size:0.88em; margin-top:0.6em;"}
+El código está escrito para la estructura de la ENGIH 2018. Otra encuesta exige
+rehacer la conversión a gramos, la porción comestible y la correspondencia con
+la tabla de composición; la arquitectura y los procedimientos se reutilizan.
+:::
+
+## Continuidad propuesta
+
+::: {style="font-size:0.95em;"}
+| Línea | Contenido |
+|---|---|
+| Capacidad nacional | Formación de un equipo con los módulos y la cadena de análisis; demostración con datos reales |
+| Cumplimiento medido | Incorporación de los resultados del control externo de calidad a los escenarios |
+| Actualización | Aplicación a la siguiente ronda de la encuesta de gasto y comparación con 2018 |
+| Región | Adaptación a encuestas de otros países de América Latina y el Caribe |
+| Publicación | Artículo con la aplicación a la República Dominicana |
+:::
+
+::: notes
+Proponer, no pedir. Cerrar con la pregunta de qué línea es prioritaria para el
+sistema de evaluación de 2027.
+:::
+
+## Referencias {.smaller}
+
+::: {style="font-size:0.8em;"}
+Tang, K., Adams, K. P., Ferguson, E. L., Woldt, M., Kalimbira, A. A., Likoswe,
+B. *et al.* 2022. Modeling food fortification contributions to micronutrient
+requirements in Malawi using Household Consumption and Expenditure Surveys.
+*Annals of the New York Academy of Sciences*, 1508(1), 105–122.
+<https://doi.org/10.1111/nyas.14697>
+
+Weisell, R. y Dop, M. C. 2012. The adult male equivalent concept and its
+application to Household Consumption and Expenditures Surveys (HCES). *Food and
+Nutrition Bulletin*, 33(3 Suppl.), S157–S162.
+<https://doi.org/10.1177/15648265120333S203>
+
+FAO/WHO/UNU. 2004. *Human energy requirements*. Roma: FAO.
+
+Institute of Medicine. 2000. *Dietary Reference Intakes: applications in dietary
+assessment*. Washington, D.C.: National Academies Press.
+<https://doi.org/10.17226/9956>
+:::
