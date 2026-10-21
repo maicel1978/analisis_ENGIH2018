@@ -26,31 +26,34 @@ execute:
 source(here::here("reports", "_figuras_recomendaciones.R"))
 ```
 
-## Pregunta
-
-::: {style="font-size:1.05em;"}
-¿Puede una encuesta de gasto de los hogares, levantada con fines económicos,
-sostener la evaluación del diseño de un programa de fortificación?
-
-Se evaluó con la ENGIH 2018: `r n_hogares` hogares con ingesta estimada, con el
-diseño muestral completo (estratos, unidades primarias de muestreo y factores
-de expansión).
-:::
+## Objetivo y diseño del estudio
 
 ```{r}
-#| label: fig-cadena
-#| fig-width: 11.4
-#| fig-height: 1.75
-fig_cadena
+#| label: diseno
+ema_d <- leer_limpio(file.path(RUTA_CLEAN, "data_ema_hogar.csv"))
+n_estratos <- dplyr::n_distinct(ema_d$estrato)
+n_upm      <- dplyr::n_distinct(paste(ema_d$estrato, ema_d$upm))
 ```
 
-::: {.notapie}
-**Marco:** Tang et al. (2022), *Annals of the New York Academy of Sciences*, 1508(1), 105–122.
+::: {style="font-size:0.95em;"}
+**Objetivo.** Estimar, con la ENGIH 2018, la cobertura y el consumo de los
+vehículos de fortificación, su contribución a la ingesta aparente de
+micronutrientes y el efecto de escenarios de fortificación sobre la proporción
+de hogares con ingesta inferior al requerimiento.
+
+| | |
+|---|---|
+| Tipo de estudio | Descriptivo transversal; análisis secundario de una encuesta poblacional |
+| Muestra | `r n_hogares` hogares; muestra probabilística estratificada y por conglomerados (`r n_estratos` estratos, `r n_upm` unidades primarias) |
+| Estimador principal | Proporción de hogares con ingesta aparente por EMA inferior al requerimiento |
+| Efecto de los escenarios | Diferencia pareada respecto del escenario precedente: simulación *ex ante* |
+| Inferencia | Ponderación, linealización de Taylor, intervalos *t* con los grados de libertad del diseño |
 :::
 
 ::: notes
-Presentar el problema: la encuesta no se diseñó para nutrición. El aporte es
-mostrar qué sostiene y qué no.
+Presentarse en una frase: epidemiólogo; la encuesta se abordó como un problema
+de estimación con datos secundarios. Subrayar que el efecto de los escenarios
+es simulado, no observado.
 :::
 
 ## Verificación en punto de venta
@@ -86,7 +89,15 @@ Decir explícitamente el alcance: un establecimiento, un día, balanza en libras
 Sirve para detectar errores gruesos de conversión y el estado de las etiquetas.
 :::
 
-## Método
+## Del registro de adquisiciones a la ingesta
+
+```{r}
+#| label: fig-cadena
+#| fig-width: 11.4
+#| fig-height: 1.6
+fig_cadena
+```
+
 
 ::: {style="font-size:0.92em;"}
 | Etapa | Procedimiento |
@@ -96,7 +107,10 @@ Sirve para detectar errores gruesos de conversión y el estado de las etiquetas.
 | Composición | Correspondencia con tablas INCAP y FNDDS, con la cobertura reportada por nutriente |
 | Escenarios | Adición de la norma de cada vehículo sobre la composición sin fortificar |
 | Riesgo | Punto de corte sobre el EAR del IOM; hierro por probabilidad (10% de biodisponibilidad; 18% como sensibilidad) |
-| Inferencia | Estimaciones ponderadas con el diseño muestral complejo e intervalos de confianza |
+:::
+
+::: {.notapie}
+**Marco:** Tang et al. (2022), *Annals of the New York Academy of Sciences*, 1508(1), 105–122.
 :::
 
 ::: notes
@@ -245,6 +259,28 @@ convierte la contribución potencial en contribución esperada.
 Si preguntan por el arroz: en 2018 no se fortificaba; el escenario modela la
 propuesta de reglamento. Confirmar antes qué norma de arroz se usa en el
 monitoreo actual.
+:::
+
+## ¿Puede una encuesta de gasto sostener la evaluación de un programa de fortificación?
+
+::: {style="font-size:1.05em;"}
+**Sí, con cuatro condiciones:**
+
+1. La conversión de unidades a gramos se verifica, no se supone.
+2. La correspondencia con la tabla de composición se reporta con su cobertura por nutriente.
+3. La contribución se interpreta como potencial mientras no se disponga del cumplimiento medido.
+4. El resultado se lee como ingesta aparente del hogar, no como ingesta individual ni como deficiencia.
+:::
+
+::: {style="font-size:0.9em; margin-top:0.8em;"}
+Bajo esas condiciones, la encuesta permite estimar cobertura, consumo, brecha de
+micronutrientes y efecto esperado de cada norma, con precisión conocida y a
+nivel nacional y regional.
+:::
+
+::: notes
+La pregunta no fue el punto de partida: es lo que el trabajo permite responder.
+Decirlo así.
 :::
 
 ## Lo que queda disponible
