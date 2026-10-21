@@ -7,7 +7,9 @@ date-format: "D [de] MMMM [de] YYYY"
 lang: es
 format:
   revealjs:
-    theme: [default, custom.scss]
+    theme: [default, custom.scss, tecnica.scss]
+    fig-cap-location: top
+    tbl-cap-location: top
     slide-number: true
     show-slide-number: all
     embed-resources: true
@@ -15,6 +17,10 @@ format:
     width: 1330
     height: 780
     fig-align: center
+crossref:
+  fig-title: "Figura"
+  tbl-title: "Tabla"
+  title-delim: "."
 execute:
   warning: false
   message: false
@@ -60,6 +66,7 @@ fig_mapa_region <- ggplot(mapa_reg) +
                fun.geometry = sf::st_point_on_surface) +
   scale_fill_gradient(low = "#eef2f4", high = AZUL_C, limits = c(0, 100), guide = "none") +
   theme_void()
+reg_baja <- sum(reg$precision_baja)
 
 # Pregunta 5: razón entre la ingesta mediana de folato del quinto y del primer quintil
 equidad <- esc |>
@@ -78,7 +85,7 @@ fig_equidad <- ggplot(equidad, aes(x = reorder(et, razon_q5_q1), y = razon_q5_q1
   scale_colour_manual(values = c(`FALSE` = AZUL, `TRUE` = ACENTO), guide = "none") +
   scale_y_continuous(expand = expansion(mult = c(0.02, 0.15))) +
   coord_flip() +
-  labs(x = NULL, y = "Razón de la ingesta mediana de folato, quintil 5 / quintil 1") +
+  labs(x = "Escenario", y = "Razón de la ingesta mediana de folato, quintil 5 / quintil 1") +
   tema()
 ```
 
@@ -100,6 +107,8 @@ fig_equidad <- ggplot(equidad, aes(x = reorder(et, razon_q5_q1), y = razon_q5_q1
 | Tipo de estudio | Descriptivo transversal; análisis secundario de una encuesta poblacional |
 | Muestra | `r n_hogares` hogares; probabilística, estratificada y por conglomerados (`r n_estratos` estratos, `r n_upm` unidades primarias) |
 | Estimador | Proporción de hogares con ingesta aparente por equivalente de mujer adulta inferior al requerimiento |
+
+: Características del estudio {#tbl-diseno}
 :::
 
 ## Procesamiento y control de calidad
@@ -108,13 +117,14 @@ fig_equidad <- ggplot(equidad, aes(x = reorder(et, razon_q5_q1), y = razon_q5_q1
 ::: {.column width="64%"}
 ```{r}
 #| label: fig-cadena
+#| fig-cap: "Cadena de procesamiento: de la cantidad declarada a la ingesta aparente por equivalente de mujer adulta"
 #| fig-width: 8.4
 #| fig-height: 1.9
 fig_cadena
 ```
 :::
 ::: {.column width="36%"}
-![](../media/fotos_investigacion_mercado/platano_verde02.jpg){height="500px"}
+![Verificación de factores de conversión en punto de venta. República Dominicana, 4 de octubre de 2026](../media/fotos_investigacion_mercado/platano_verde02.jpg){#fig-campo height="460px"}
 :::
 ::::
 
@@ -122,66 +132,84 @@ fig_cadena
 
 ```{r}
 #| label: fig-vehiculos
+#| fig-cap: "Hogares que adquieren cada vehículo de fortificación y consumo mediano entre quienes lo adquieren, en gramos por equivalente de mujer adulta y día. República Dominicana, 2018"
 #| fig-width: 10.5
 #| fig-height: 3.2
-fig_vehiculos
+fig_vehiculos + labs(y = "Vehículo")
 ```
+
+::: {.notapie}
+Estimaciones ponderadas. Fuente: elaboración propia con microdatos de la ENGIH 2018.
+:::
 
 ## Con la norma vigente, `r folato_pct`% de los hogares no cubre el requerimiento de folato
 
 ```{r}
 #| label: fig-riesgo
+#| fig-cap: "Hogares con ingesta aparente inferior al requerimiento, por micronutriente, con la norma vigente de harina de trigo. República Dominicana, 2018"
 #| fig-width: 9.6
 #| fig-height: 3.4
-fig_riesgo
+fig_riesgo + labs(y = "Micronutriente")
 ```
 
 ::: {.notapie}
-Punto: estimación; barra: IC 95%. Hierro por el método probabilístico, 10% de biodisponibilidad.
+Punto: estimación ponderada; barra: IC 95%. Punto de corte del EAR (IOM); hierro por el método probabilístico con 10% de biodisponibilidad. Fuente: elaboración propia con microdatos de la ENGIH 2018.
 :::
 
 ## El riesgo de folato varía entre `r reg_min`% y `r reg_max`% según la región
 
 ```{r}
 #| label: fig-mapa-region
+#| fig-cap: "Hogares con ingesta aparente de folato inferior al requerimiento, por región, con la norma vigente de harina de trigo. República Dominicana, 2018"
 #| fig-width: 11
-#| fig-height: 5.4
+#| fig-height: 5.2
 fig_mapa_region
 ```
+
+::: {.notapie}
+Estimaciones ponderadas. Regiones con precisión insuficiente (*: menos de 50 hogares o semiamplitud del IC 95% mayor de 10 puntos): `r reg_baja`. Límites: IDERD y ONE. Fuente: elaboración propia con microdatos de la ENGIH 2018.
+:::
 
 ## La norma vigente reduce el riesgo de folato y de hierro, no el de los demás micronutrientes
 
 ```{r}
 #| label: fig-norma
+#| fig-cap: "Hogares con ingesta aparente inferior al requerimiento sin fortificación y con la norma vigente de harina de trigo, por micronutriente. República Dominicana, 2018"
 #| fig-width: 9.8
-#| fig-height: 3.6
-fig_norma
+#| fig-height: 3.4
+fig_norma + labs(y = "Micronutriente")
 ```
+
+::: {.notapie}
+Naranja: sin fortificación; azul: norma vigente; rótulo: reducción en puntos porcentuales. Supone cumplimiento pleno de la norma. Fuente: elaboración propia con microdatos de la ENGIH 2018.
+:::
 
 ## Hacer cumplir la norma del azúcar es la acción de mayor efecto
 
 ```{r}
 #| label: fig-acciones
+#| fig-cap: "Cambio en la proporción de hogares con ingesta aparente inferior al requerimiento atribuible a cada acción, respecto del escenario precedente. República Dominicana, 2018"
 #| fig-width: 12
-#| fig-height: 4.6
-fig_acciones
+#| fig-height: 4.4
+fig_acciones + labs(y = "Acción")
 ```
 
 ::: {.notapie}
-Diferencia pareada con el escenario precedente; barra: IC 95%. Supone cumplimiento pleno.
+Punto: diferencia pareada; barra: IC 95%. Se muestran los micronutrientes con un cambio de al menos 0,5 puntos. Supone cumplimiento pleno de la norma. Fuente: elaboración propia con microdatos de la ENGIH 2018.
 :::
 
 ## La diferencia entre quintiles se reduce con el arroz, no con más harina
 
 ```{r}
 #| label: fig-equidad
+#| fig-cap: "Razón entre la ingesta mediana de folato del quinto y del primer quintil, por escenario de fortificación. República Dominicana, 2018"
 #| fig-width: 10
-#| fig-height: 3.8
+#| fig-height: 3.6
 fig_equidad
 ```
 
 ::: {.notapie}
-Razón de `r razon_base` con la norma vigente y de `r razon_arroz` con el arroz. Estimación puntual de medianas ponderadas. Congruente con la hipótesis formulada antes del análisis.
+Razón de `r razon_base` con la norma vigente y de `r razon_arroz` con el arroz. Estimación puntual de medianas ponderadas. Congruente con la hipótesis formulada antes del análisis. Fuente: elaboración propia con microdatos de la ENGIH 2018.
 :::
 
 ## ¿Permite una encuesta de gasto evaluar el diseño de un programa de fortificación?
@@ -225,6 +253,8 @@ porción comestible y correspondencia con la tabla de composición.
 | Ingesta aparente frente a habitual | Depende de la posición del EAR | Declarado |
 | Cumplimiento pleno de la norma | Lo subestima en los escenarios | Requiere el dato de cumplimiento |
 
+: Fuentes de error, dirección de su efecto sobre la proporción estimada de hogares bajo el requerimiento y control aplicado {#tbl-sesgos}
+
 ::: {style="font-size:1.1em; margin-top:0.4em;"}
 La comparación entre escenarios es más robusta que el nivel absoluto.
 :::
@@ -238,16 +268,23 @@ La comparación entre escenarios es más robusta que el nivel absoluto.
 | Reparto entre secciones, regla de agotamiento, días observados | Descartadas |
 | Producción propia | Descartada: correlaciona entre provincias, no entre hogares (**falacia ecológica**) |
 | Energía registrada | Sostenida |
+
+: Explicaciones alternativas del patrón territorial del riesgo de ingesta inadecuada contrastadas con los datos. República Dominicana, 2018 {#tbl-hipotesis}
 :::
 
 ## Origen del aporte de cada micronutriente
 
 ```{r}
 #| label: fig-grupos
+#| fig-cap: "Aporte de cada grupo de alimentos al total de cada micronutriente, en por ciento. República Dominicana, 2018"
 #| fig-width: 10.5
 #| fig-height: 4.1
-fig_grupos
+fig_grupos + labs(x = "Micronutriente", y = "Grupo de alimentos")
 ```
+
+::: {.notapie}
+Se rotulan los valores de 5% o más; cada columna suma 100%. Fuente: elaboración propia con microdatos de la ENGIH 2018.
+:::
 
 ## Referencias {.smaller}
 
