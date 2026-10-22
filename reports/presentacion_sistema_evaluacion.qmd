@@ -408,17 +408,17 @@ Punto: estimación ponderada; barra: IC 95%. Hierro: método probabilístico con
 
 ## Estimadores {.smaller}
 
-::: {style="font-size:1.05em;"}
-| Paso | Estimador |
-|---|---|
-| Consumo diario del alimento *k* en el hogar *h* | $g_{hk} = Q_{hk}\,FC_k\,PC_k \,/\, PM_h$ |
-| Equivalente de Mujer Adulta del hogar | $EMA_h = \sum_{i \in h} RE_i \,/\, 2291\ \text{kcal}$ |
-| Ingesta aparente del nutriente *n* | $I_{hn} = \dfrac{1}{EMA_h}\sum_k g_{hk}\, c_{kn}/100$ |
-| Escenario *s* (aditivo) | $I_{hn}^{s} = I_{hn}^{0} + \dfrac{1}{EMA_h}\sum_{v} g_{hv}\, L_{vn}^{s}/1000$ |
-| Punto de corte | $\hat p_n = \sum_h w_h\, \mathbf{1}(I_{hn} < EAR_n) \,/\, \sum_h w_h$ |
-| Hierro, probabilístico | $\hat p = \sum_h w_h\, \Pr(R > I_h) \,/\, \sum_h w_h$ |
-| Efecto de un escenario | $\hat\Delta = \hat p^{\,s} - \hat p^{\,s-1}$, sobre los mismos hogares |
-| Varianza | Linealización de Taylor; IC con *t*, gl = UPM − estratos |
+::: {style="font-size:0.98em;"}
+| Paso | Estimador | En palabras |
+|---|---|---|
+| Consumo diario del alimento *k* en el hogar *h* | $g_{hk} = Q_{hk}\,FC_k\,PC_k \,/\, PM_h$ | Cantidad declarada, llevada a gramos comestibles y dividida entre los días del período |
+| Equivalente de Mujer Adulta del hogar | $EMA_h = \sum_{i \in h} RE_i \,/\, 2291\ \text{kcal}$ | Suma de los requerimientos energéticos de los miembros, expresada en mujeres adultas |
+| Ingesta aparente del nutriente *n* | $I_{hn} = \dfrac{1}{EMA_h}\sum_k g_{hk}\, c_{kn}/100$ | Gramos de cada alimento por su contenido del nutriente, sumados y divididos entre el EMA |
+| Escenario *s* (aditivo) | $I_{hn}^{s} = I_{hn}^{0} + \dfrac{1}{EMA_h}\sum_{v} g_{hv}\, L_{vn}^{s}/1000$ | Ingesta sin fortificar más lo que añade la norma en cada vehículo |
+| Punto de corte | $\hat p_n = \sum_h w_h\, \mathbf{1}(I_{hn} < EAR_n) \,/\, \sum_h w_h$ | Proporción ponderada de hogares por debajo del requerimiento promedio |
+| Hierro, probabilístico | $\hat p = \sum_h w_h\, \Pr(R > I_h) \,/\, \sum_h w_h$ | Promedio ponderado de la probabilidad de que el requerimiento supere la ingesta |
+| Efecto de un escenario | $\hat\Delta = \hat p^{\,s} - \hat p^{\,s-1}$ | Cambio en la proporción respecto del escenario anterior, en los mismos hogares |
+| Varianza | Linealización de Taylor | IC con *t*; gl = UPM − estratos |
 :::
 
 ::: {.notapie}
