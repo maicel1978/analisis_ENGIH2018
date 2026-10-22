@@ -174,6 +174,29 @@ fig_acc <- ggplot(acc, aes(dif_pp, nut)) +
   theme(strip.text.y = element_text(angle = 0, hjust = 0, face = "bold", colour = "#1a3a4a"),
         panel.spacing = unit(0.5, "lines"))
 
+# Anexo: tres escenarios para hierro, folato y zinc
+TRES <- c(E_SIN, E_BASE, E_OMS)
+ET_TRES <- c("Sin fortificación", "Norma nacional\n(harina y pan)", "Nivel OMS\n(harina y derivados)")
+NUT3 <- c(hierro_mg = "Hierro", folato_mcg_dfe = "Folato", zinc_mg = "Zinc")
+tres <- rie |>
+  filter(dominio == "Nacional", hogares == "Todos", escenario %in% TRES,
+         nutriente %in% names(NUT3), metodo %in% METODOS) |>
+  mutate(esc = factor(ET_TRES[match(escenario, TRES)], levels = ET_TRES),
+         nut = factor(NUT3[nutriente], levels = NUT3))
+if (nrow(tres) != 9) stop("Faltan combinaciones de escenario y nutriente en la figura de tres escenarios.", call. = FALSE)
+fig_tres <- ggplot(tres, aes(esc, pct_inadecuado)) +
+  geom_errorbar(aes(ymin = pct_inadecuado_low, ymax = pct_inadecuado_upp),
+                width = 0.15, colour = "#44555f", linewidth = 0.6) +
+  geom_point(aes(colour = esc), size = 4) +
+  geom_text(aes(label = paste0(fmt(pct_inadecuado), "%")), vjust = -1.2, size = 3.9,
+            colour = "#1a3a4a") +
+  facet_wrap(~ nut, nrow = 1) +
+  scale_colour_manual(values = c(ACENTO, AZUL, AZUL_C), guide = "none") +
+  scale_y_continuous(limits = c(0, 100), labels = function(x) paste0(x, "%")) +
+  labs(x = "Escenario", y = "Hogares bajo el requerimiento (%)") +
+  tema(13) +
+  theme(strip.text = element_text(face = "bold", colour = "#1a3a4a", size = 14))
+
 # Implicaciones: reducción atribuible a la norma vigente de harina (puntos)
 red_harina <- function(n) fmt(riesgo_nac(E_SIN, n) - riesgo_nac(E_BASE, n))
 red_fol <- red_harina(FOL); red_fe <- red_harina("hierro_mg")
@@ -367,6 +390,40 @@ porción comestible y correspondencia con la tabla de composición.
 :::
 
 # Anexo {background-color="#2c5364"}
+
+## Hierro, folato y zinc en tres escenarios de fortificación
+
+```{r}
+#| label: fig-tres
+#| fig-cap: "Hogares con ingesta aparente inferior al requerimiento de hierro, folato y zinc sin fortificación, con la norma nacional y con el nivel recomendado por la OMS. República Dominicana, 2018"
+#| fig-cap-location: top
+#| fig-width: 11.5
+#| fig-height: 4.4
+fig_tres
+```
+
+::: {.notapie}
+Punto: estimación ponderada; barra: IC 95%. Hierro: método probabilístico con 10% de biodisponibilidad; folato y zinc: punto de corte del EAR. La norma nacional no incluye zinc. Nivel OMS para consumos de harina de 75 a 149 g por día. Supone cumplimiento pleno. Fuente: elaboración propia con microdatos de la ENGIH 2018.
+:::
+
+## Estimadores {.smaller}
+
+::: {style="font-size:1.05em;"}
+| Paso | Estimador |
+|---|---|
+| Consumo diario del alimento *k* en el hogar *h* | $g_{hk} = Q_{hk}\,FC_k\,PC_k \,/\, PM_h$ |
+| Equivalente de Mujer Adulta del hogar | $EMA_h = \sum_{i \in h} RE_i \,/\, 2291\ \text{kcal}$ |
+| Ingesta aparente del nutriente *n* | $I_{hn} = \dfrac{1}{EMA_h}\sum_k g_{hk}\, c_{kn}/100$ |
+| Escenario *s* (aditivo) | $I_{hn}^{s} = I_{hn}^{0} + \dfrac{1}{EMA_h}\sum_{v} g_{hv}\, L_{vn}^{s}/1000$ |
+| Punto de corte | $\hat p_n = \sum_h w_h\, \mathbf{1}(I_{hn} < EAR_n) \,/\, \sum_h w_h$ |
+| Hierro, probabilístico | $\hat p = \sum_h w_h\, \Pr(R > I_h) \,/\, \sum_h w_h$ |
+| Efecto de un escenario | $\hat\Delta = \hat p^{\,s} - \hat p^{\,s-1}$, sobre los mismos hogares |
+| Varianza | Linealización de Taylor; IC con *t*, gl = UPM − estratos |
+:::
+
+::: {.notapie}
+$Q$: cantidad declarada; $FC$: factor de conversión a gramos; $PC$: porción comestible; $PM$: días del período de medición; $RE_i$: requerimiento energético del miembro *i*; $c_{kn}$: contenido por 100 g; $L_{vn}^{s}$: nivel de adición del vehículo *v* en el escenario *s* (mg/kg); $w_h$: factor de expansión; $R$: requerimiento de hierro, distribución asimétrica (IOM, 2001) con 10% de biodisponibilidad. El ácido fólico añadido se expresa en equivalentes dietéticos (×1,7).
+:::
 
 ## Implicaciones para la República Dominicana
 
