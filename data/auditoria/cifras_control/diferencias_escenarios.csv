@@ -1,0 +1,337 @@
+escenario_desde;escenario_hasta;nutriente;metodo;n;dif_pp;dif_pp_low;dif_pp_upp;significativa
+0. Sin fortificación;1a. Norma nacional: harina y pan;folato_mcg_dfe;Punto de corte;8778;-12.867924028643237;-13.776886623713008;-11.958961433573467;TRUE
+0. Sin fortificación;1b. Norma nacional: harina y todos los derivados;folato_mcg_dfe;Punto de corte;8778;-24.791643555376787;-25.994880625983512;-23.58840648477006;TRUE
+0. Sin fortificación;1c. Norma nacional y azúcar;folato_mcg_dfe;Punto de corte;8778;-24.791643555376787;-25.994880625983512;-23.58840648477006;TRUE
+0. Sin fortificación;2a. OMS: harina y derivados, consumo menor de 75 g;folato_mcg_dfe;Punto de corte;8778;-48.164183127294635;-49.58313386018137;-46.74523239440791;TRUE
+0. Sin fortificación;2b. OMS: harina y derivados, consumo de 75 a 149 g;folato_mcg_dfe;Punto de corte;8778;-33.788176701590054;-35.111255873273414;-32.465097529906686;TRUE
+0. Sin fortificación;3. Norma nacional y arroz (propuesta nacional);folato_mcg_dfe;Punto de corte;8778;-60.44982980860517;-61.8463756757557;-59.05328394145464;TRUE
+1a. Norma nacional: harina y pan;0. Sin fortificación;folato_mcg_dfe;Punto de corte;8778;12.867924028643237;11.958961433573467;13.776886623713008;TRUE
+1a. Norma nacional: harina y pan;1b. Norma nacional: harina y todos los derivados;folato_mcg_dfe;Punto de corte;8778;-11.923719526733551;-12.845858045461695;-11.001581008005406;TRUE
+1a. Norma nacional: harina y pan;1c. Norma nacional y azúcar;folato_mcg_dfe;Punto de corte;8778;-11.923719526733551;-12.845858045461695;-11.001581008005406;TRUE
+1a. Norma nacional: harina y pan;2a. OMS: harina y derivados, consumo menor de 75 g;folato_mcg_dfe;Punto de corte;8778;-35.2962590986514;-36.572753480693706;-34.019764716609096;TRUE
+1a. Norma nacional: harina y pan;2b. OMS: harina y derivados, consumo de 75 a 149 g;folato_mcg_dfe;Punto de corte;8778;-20.920252672946813;-22.04844053758668;-19.792064808306947;TRUE
+1a. Norma nacional: harina y pan;3. Norma nacional y arroz (propuesta nacional);folato_mcg_dfe;Punto de corte;8778;-47.58190577996194;-49.00276908017108;-46.16104247975281;TRUE
+1b. Norma nacional: harina y todos los derivados;0. Sin fortificación;folato_mcg_dfe;Punto de corte;8778;24.791643555376787;23.58840648477006;25.994880625983512;TRUE
+1b. Norma nacional: harina y todos los derivados;1a. Norma nacional: harina y pan;folato_mcg_dfe;Punto de corte;8778;11.923719526733551;11.001581008005406;12.845858045461695;TRUE
+1b. Norma nacional: harina y todos los derivados;1c. Norma nacional y azúcar;folato_mcg_dfe;Punto de corte;8778;0;0;0;FALSE
+1b. Norma nacional: harina y todos los derivados;2a. OMS: harina y derivados, consumo menor de 75 g;folato_mcg_dfe;Punto de corte;8778;-23.372539571917848;-24.470848813064528;-22.274230330771168;TRUE
+1b. Norma nacional: harina y todos los derivados;2b. OMS: harina y derivados, consumo de 75 a 149 g;folato_mcg_dfe;Punto de corte;8778;-8.996533146213261;-9.704945731936238;-8.288120560490283;TRUE
+1b. Norma nacional: harina y todos los derivados;3. Norma nacional y arroz (propuesta nacional);folato_mcg_dfe;Punto de corte;8778;-35.65818625322839;-37.00885261152132;-34.30751989493546;TRUE
+1c. Norma nacional y azúcar;0. Sin fortificación;folato_mcg_dfe;Punto de corte;8778;24.791643555376787;23.58840648477006;25.994880625983512;TRUE
+1c. Norma nacional y azúcar;1a. Norma nacional: harina y pan;folato_mcg_dfe;Punto de corte;8778;11.923719526733551;11.001581008005406;12.845858045461695;TRUE
+1c. Norma nacional y azúcar;1b. Norma nacional: harina y todos los derivados;folato_mcg_dfe;Punto de corte;8778;0;0;0;FALSE
+1c. Norma nacional y azúcar;2a. OMS: harina y derivados, consumo menor de 75 g;folato_mcg_dfe;Punto de corte;8778;-23.372539571917848;-24.470848813064528;-22.274230330771168;TRUE
+1c. Norma nacional y azúcar;2b. OMS: harina y derivados, consumo de 75 a 149 g;folato_mcg_dfe;Punto de corte;8778;-8.996533146213261;-9.704945731936238;-8.288120560490283;TRUE
+1c. Norma nacional y azúcar;3. Norma nacional y arroz (propuesta nacional);folato_mcg_dfe;Punto de corte;8778;-35.65818625322839;-37.00885261152132;-34.30751989493546;TRUE
+2a. OMS: harina y derivados, consumo menor de 75 g;0. Sin fortificación;folato_mcg_dfe;Punto de corte;8778;48.164183127294635;46.74523239440791;49.58313386018137;TRUE
+2a. OMS: harina y derivados, consumo menor de 75 g;1a. Norma nacional: harina y pan;folato_mcg_dfe;Punto de corte;8778;35.2962590986514;34.019764716609096;36.572753480693706;TRUE
+2a. OMS: harina y derivados, consumo menor de 75 g;1b. Norma nacional: harina y todos los derivados;folato_mcg_dfe;Punto de corte;8778;23.372539571917848;22.274230330771168;24.470848813064528;TRUE
+2a. OMS: harina y derivados, consumo menor de 75 g;1c. Norma nacional y azúcar;folato_mcg_dfe;Punto de corte;8778;23.372539571917848;22.274230330771168;24.470848813064528;TRUE
+2a. OMS: harina y derivados, consumo menor de 75 g;2b. OMS: harina y derivados, consumo de 75 a 149 g;folato_mcg_dfe;Punto de corte;8778;14.376006425704588;13.475048341066941;15.276964510342234;TRUE
+2a. OMS: harina y derivados, consumo menor de 75 g;3. Norma nacional y arroz (propuesta nacional);folato_mcg_dfe;Punto de corte;8778;-12.285646681310542;-13.45903781224953;-11.112255550371556;TRUE
+2b. OMS: harina y derivados, consumo de 75 a 149 g;0. Sin fortificación;folato_mcg_dfe;Punto de corte;8778;33.788176701590054;32.465097529906686;35.111255873273414;TRUE
+2b. OMS: harina y derivados, consumo de 75 a 149 g;1a. Norma nacional: harina y pan;folato_mcg_dfe;Punto de corte;8778;20.920252672946813;19.792064808306947;22.04844053758668;TRUE
+2b. OMS: harina y derivados, consumo de 75 a 149 g;1b. Norma nacional: harina y todos los derivados;folato_mcg_dfe;Punto de corte;8778;8.996533146213261;8.288120560490283;9.704945731936238;TRUE
+2b. OMS: harina y derivados, consumo de 75 a 149 g;1c. Norma nacional y azúcar;folato_mcg_dfe;Punto de corte;8778;8.996533146213261;8.288120560490283;9.704945731936238;TRUE
+2b. OMS: harina y derivados, consumo de 75 a 149 g;2a. OMS: harina y derivados, consumo menor de 75 g;folato_mcg_dfe;Punto de corte;8778;-14.376006425704588;-15.276964510342234;-13.475048341066941;TRUE
+2b. OMS: harina y derivados, consumo de 75 a 149 g;3. Norma nacional y arroz (propuesta nacional);folato_mcg_dfe;Punto de corte;8778;-26.661653107015127;-27.981105472418438;-25.342200741611816;TRUE
+3. Norma nacional y arroz (propuesta nacional);0. Sin fortificación;folato_mcg_dfe;Punto de corte;8778;60.44982980860517;59.05328394145464;61.8463756757557;TRUE
+3. Norma nacional y arroz (propuesta nacional);1a. Norma nacional: harina y pan;folato_mcg_dfe;Punto de corte;8778;47.58190577996194;46.16104247975281;49.00276908017108;TRUE
+3. Norma nacional y arroz (propuesta nacional);1b. Norma nacional: harina y todos los derivados;folato_mcg_dfe;Punto de corte;8778;35.65818625322839;34.30751989493546;37.00885261152132;TRUE
+3. Norma nacional y arroz (propuesta nacional);1c. Norma nacional y azúcar;folato_mcg_dfe;Punto de corte;8778;35.65818625322839;34.30751989493546;37.00885261152132;TRUE
+3. Norma nacional y arroz (propuesta nacional);2a. OMS: harina y derivados, consumo menor de 75 g;folato_mcg_dfe;Punto de corte;8778;12.285646681310542;11.112255550371556;13.45903781224953;TRUE
+3. Norma nacional y arroz (propuesta nacional);2b. OMS: harina y derivados, consumo de 75 a 149 g;folato_mcg_dfe;Punto de corte;8778;26.661653107015127;25.342200741611816;27.981105472418438;TRUE
+0. Sin fortificación;1a. Norma nacional: harina y pan;hierro_mg;Probabilidad, biodisponibilidad 10%;8778;-4.968958356732565;-5.222697903165704;-4.715218810299426;TRUE
+0. Sin fortificación;1b. Norma nacional: harina y todos los derivados;hierro_mg;Probabilidad, biodisponibilidad 10%;8778;-9.742472262105148;-10.123139282973606;-9.361805241236691;TRUE
+0. Sin fortificación;1c. Norma nacional y azúcar;hierro_mg;Probabilidad, biodisponibilidad 10%;8778;-9.742472262105148;-10.123139282973606;-9.361805241236691;TRUE
+0. Sin fortificación;2a. OMS: harina y derivados, consumo menor de 75 g;hierro_mg;Probabilidad, biodisponibilidad 10%;8778;-10.651876407930082;-11.060769210981812;-10.24298360487835;TRUE
+0. Sin fortificación;2b. OMS: harina y derivados, consumo de 75 a 149 g;hierro_mg;Probabilidad, biodisponibilidad 10%;8778;-10.651876407930082;-11.060769210981812;-10.24298360487835;TRUE
+0. Sin fortificación;3. Norma nacional y arroz (propuesta nacional);hierro_mg;Probabilidad, biodisponibilidad 10%;8778;-28.55817676492046;-29.221827001103517;-27.89452652873741;TRUE
+1a. Norma nacional: harina y pan;0. Sin fortificación;hierro_mg;Probabilidad, biodisponibilidad 10%;8778;4.968958356732565;4.715218810299426;5.222697903165704;TRUE
+1a. Norma nacional: harina y pan;1b. Norma nacional: harina y todos los derivados;hierro_mg;Probabilidad, biodisponibilidad 10%;8778;-4.7735139053725835;-5.004903191759723;-4.542124618985443;TRUE
+1a. Norma nacional: harina y pan;1c. Norma nacional y azúcar;hierro_mg;Probabilidad, biodisponibilidad 10%;8778;-4.7735139053725835;-5.004903191759723;-4.542124618985443;TRUE
+1a. Norma nacional: harina y pan;2a. OMS: harina y derivados, consumo menor de 75 g;hierro_mg;Probabilidad, biodisponibilidad 10%;8778;-5.682918051197516;-5.93829457376643;-5.427541528628603;TRUE
+1a. Norma nacional: harina y pan;2b. OMS: harina y derivados, consumo de 75 a 149 g;hierro_mg;Probabilidad, biodisponibilidad 10%;8778;-5.682918051197516;-5.93829457376643;-5.427541528628603;TRUE
+1a. Norma nacional: harina y pan;3. Norma nacional y arroz (propuesta nacional);hierro_mg;Probabilidad, biodisponibilidad 10%;8778;-23.589218408187897;-24.16066374578828;-23.01777307058751;TRUE
+1b. Norma nacional: harina y todos los derivados;0. Sin fortificación;hierro_mg;Probabilidad, biodisponibilidad 10%;8778;9.742472262105148;9.361805241236691;10.123139282973606;TRUE
+1b. Norma nacional: harina y todos los derivados;1a. Norma nacional: harina y pan;hierro_mg;Probabilidad, biodisponibilidad 10%;8778;4.7735139053725835;4.542124618985443;5.004903191759723;TRUE
+1b. Norma nacional: harina y todos los derivados;1c. Norma nacional y azúcar;hierro_mg;Probabilidad, biodisponibilidad 10%;8778;0;0;0;FALSE
+1b. Norma nacional: harina y todos los derivados;2a. OMS: harina y derivados, consumo menor de 75 g;hierro_mg;Probabilidad, biodisponibilidad 10%;8778;-0.9094041458249328;-0.9422758132643323;-0.8765324783855333;TRUE
+1b. Norma nacional: harina y todos los derivados;2b. OMS: harina y derivados, consumo de 75 a 149 g;hierro_mg;Probabilidad, biodisponibilidad 10%;8778;-0.9094041458249328;-0.9422758132643323;-0.8765324783855333;TRUE
+1b. Norma nacional: harina y todos los derivados;3. Norma nacional y arroz (propuesta nacional);hierro_mg;Probabilidad, biodisponibilidad 10%;8778;-18.815704502815315;-19.2979994560153;-18.333409549615325;TRUE
+1c. Norma nacional y azúcar;0. Sin fortificación;hierro_mg;Probabilidad, biodisponibilidad 10%;8778;9.742472262105148;9.361805241236691;10.123139282973606;TRUE
+1c. Norma nacional y azúcar;1a. Norma nacional: harina y pan;hierro_mg;Probabilidad, biodisponibilidad 10%;8778;4.7735139053725835;4.542124618985443;5.004903191759723;TRUE
+1c. Norma nacional y azúcar;1b. Norma nacional: harina y todos los derivados;hierro_mg;Probabilidad, biodisponibilidad 10%;8778;0;0;0;FALSE
+1c. Norma nacional y azúcar;2a. OMS: harina y derivados, consumo menor de 75 g;hierro_mg;Probabilidad, biodisponibilidad 10%;8778;-0.9094041458249328;-0.9422758132643323;-0.8765324783855333;TRUE
+1c. Norma nacional y azúcar;2b. OMS: harina y derivados, consumo de 75 a 149 g;hierro_mg;Probabilidad, biodisponibilidad 10%;8778;-0.9094041458249328;-0.9422758132643323;-0.8765324783855333;TRUE
+1c. Norma nacional y azúcar;3. Norma nacional y arroz (propuesta nacional);hierro_mg;Probabilidad, biodisponibilidad 10%;8778;-18.815704502815315;-19.2979994560153;-18.333409549615325;TRUE
+2a. OMS: harina y derivados, consumo menor de 75 g;0. Sin fortificación;hierro_mg;Probabilidad, biodisponibilidad 10%;8778;10.651876407930082;10.24298360487835;11.060769210981812;TRUE
+2a. OMS: harina y derivados, consumo menor de 75 g;1a. Norma nacional: harina y pan;hierro_mg;Probabilidad, biodisponibilidad 10%;8778;5.682918051197516;5.427541528628603;5.93829457376643;TRUE
+2a. OMS: harina y derivados, consumo menor de 75 g;1b. Norma nacional: harina y todos los derivados;hierro_mg;Probabilidad, biodisponibilidad 10%;8778;0.9094041458249328;0.8765324783855333;0.9422758132643323;TRUE
+2a. OMS: harina y derivados, consumo menor de 75 g;1c. Norma nacional y azúcar;hierro_mg;Probabilidad, biodisponibilidad 10%;8778;0.9094041458249328;0.8765324783855333;0.9422758132643323;TRUE
+2a. OMS: harina y derivados, consumo menor de 75 g;2b. OMS: harina y derivados, consumo de 75 a 149 g;hierro_mg;Probabilidad, biodisponibilidad 10%;8778;0;0;0;FALSE
+2a. OMS: harina y derivados, consumo menor de 75 g;3. Norma nacional y arroz (propuesta nacional);hierro_mg;Probabilidad, biodisponibilidad 10%;8778;-17.906300356990382;-18.38057239793202;-17.432028316048743;TRUE
+2b. OMS: harina y derivados, consumo de 75 a 149 g;0. Sin fortificación;hierro_mg;Probabilidad, biodisponibilidad 10%;8778;10.651876407930082;10.24298360487835;11.060769210981812;TRUE
+2b. OMS: harina y derivados, consumo de 75 a 149 g;1a. Norma nacional: harina y pan;hierro_mg;Probabilidad, biodisponibilidad 10%;8778;5.682918051197516;5.427541528628603;5.93829457376643;TRUE
+2b. OMS: harina y derivados, consumo de 75 a 149 g;1b. Norma nacional: harina y todos los derivados;hierro_mg;Probabilidad, biodisponibilidad 10%;8778;0.9094041458249328;0.8765324783855333;0.9422758132643323;TRUE
+2b. OMS: harina y derivados, consumo de 75 a 149 g;1c. Norma nacional y azúcar;hierro_mg;Probabilidad, biodisponibilidad 10%;8778;0.9094041458249328;0.8765324783855333;0.9422758132643323;TRUE
+2b. OMS: harina y derivados, consumo de 75 a 149 g;2a. OMS: harina y derivados, consumo menor de 75 g;hierro_mg;Probabilidad, biodisponibilidad 10%;8778;0;0;0;FALSE
+2b. OMS: harina y derivados, consumo de 75 a 149 g;3. Norma nacional y arroz (propuesta nacional);hierro_mg;Probabilidad, biodisponibilidad 10%;8778;-17.906300356990382;-18.38057239793202;-17.432028316048743;TRUE
+3. Norma nacional y arroz (propuesta nacional);0. Sin fortificación;hierro_mg;Probabilidad, biodisponibilidad 10%;8778;28.55817676492046;27.89452652873741;29.221827001103517;TRUE
+3. Norma nacional y arroz (propuesta nacional);1a. Norma nacional: harina y pan;hierro_mg;Probabilidad, biodisponibilidad 10%;8778;23.589218408187897;23.01777307058751;24.16066374578828;TRUE
+3. Norma nacional y arroz (propuesta nacional);1b. Norma nacional: harina y todos los derivados;hierro_mg;Probabilidad, biodisponibilidad 10%;8778;18.815704502815315;18.333409549615325;19.2979994560153;TRUE
+3. Norma nacional y arroz (propuesta nacional);1c. Norma nacional y azúcar;hierro_mg;Probabilidad, biodisponibilidad 10%;8778;18.815704502815315;18.333409549615325;19.2979994560153;TRUE
+3. Norma nacional y arroz (propuesta nacional);2a. OMS: harina y derivados, consumo menor de 75 g;hierro_mg;Probabilidad, biodisponibilidad 10%;8778;17.906300356990382;17.432028316048743;18.38057239793202;TRUE
+3. Norma nacional y arroz (propuesta nacional);2b. OMS: harina y derivados, consumo de 75 a 149 g;hierro_mg;Probabilidad, biodisponibilidad 10%;8778;17.906300356990382;17.432028316048743;18.38057239793202;TRUE
+0. Sin fortificación;1a. Norma nacional: harina y pan;hierro_mg;Probabilidad, biodisponibilidad 18%;8778;-7.160261454166794;-7.476082247122433;-6.844440661211156;TRUE
+0. Sin fortificación;1b. Norma nacional: harina y todos los derivados;hierro_mg;Probabilidad, biodisponibilidad 18%;8778;-12.42392248684773;-12.86479109754386;-11.9830538761516;TRUE
+0. Sin fortificación;1c. Norma nacional y azúcar;hierro_mg;Probabilidad, biodisponibilidad 18%;8778;-12.42392248684773;-12.86479109754386;-11.9830538761516;TRUE
+0. Sin fortificación;2a. OMS: harina y derivados, consumo menor de 75 g;hierro_mg;Probabilidad, biodisponibilidad 18%;8778;-13.319930072549239;-13.787264469179158;-12.852595675919318;TRUE
+0. Sin fortificación;2b. OMS: harina y derivados, consumo de 75 a 149 g;hierro_mg;Probabilidad, biodisponibilidad 18%;8778;-13.319930072549239;-13.787264469179158;-12.852595675919318;TRUE
+0. Sin fortificación;3. Norma nacional y arroz (propuesta nacional);hierro_mg;Probabilidad, biodisponibilidad 18%;8778;-26.381521685493325;-27.10469188893086;-25.658351482055792;TRUE
+1a. Norma nacional: harina y pan;0. Sin fortificación;hierro_mg;Probabilidad, biodisponibilidad 18%;8778;7.160261454166794;6.844440661211156;7.476082247122433;TRUE
+1a. Norma nacional: harina y pan;1b. Norma nacional: harina y todos los derivados;hierro_mg;Probabilidad, biodisponibilidad 18%;8778;-5.263661032680936;-5.506046826687106;-5.021275238674766;TRUE
+1a. Norma nacional: harina y pan;1c. Norma nacional y azúcar;hierro_mg;Probabilidad, biodisponibilidad 18%;8778;-5.263661032680936;-5.506046826687106;-5.021275238674766;TRUE
+1a. Norma nacional: harina y pan;2a. OMS: harina y derivados, consumo menor de 75 g;hierro_mg;Probabilidad, biodisponibilidad 18%;8778;-6.159668618382444;-6.423015955821473;-5.896321280943415;TRUE
+1a. Norma nacional: harina y pan;2b. OMS: harina y derivados, consumo de 75 a 149 g;hierro_mg;Probabilidad, biodisponibilidad 18%;8778;-6.159668618382444;-6.423015955821473;-5.896321280943415;TRUE
+1a. Norma nacional: harina y pan;3. Norma nacional y arroz (propuesta nacional);hierro_mg;Probabilidad, biodisponibilidad 18%;8778;-19.22126023132653;-19.828082691908588;-18.61443777074447;TRUE
+1b. Norma nacional: harina y todos los derivados;0. Sin fortificación;hierro_mg;Probabilidad, biodisponibilidad 18%;8778;12.42392248684773;11.9830538761516;12.86479109754386;TRUE
+1b. Norma nacional: harina y todos los derivados;1a. Norma nacional: harina y pan;hierro_mg;Probabilidad, biodisponibilidad 18%;8778;5.263661032680936;5.021275238674766;5.506046826687106;TRUE
+1b. Norma nacional: harina y todos los derivados;1c. Norma nacional y azúcar;hierro_mg;Probabilidad, biodisponibilidad 18%;8778;0;0;0;FALSE
+1b. Norma nacional: harina y todos los derivados;2a. OMS: harina y derivados, consumo menor de 75 g;hierro_mg;Probabilidad, biodisponibilidad 18%;8778;-0.8960075857015082;-0.9290912497254494;-0.8629239216775669;TRUE
+1b. Norma nacional: harina y todos los derivados;2b. OMS: harina y derivados, consumo de 75 a 149 g;hierro_mg;Probabilidad, biodisponibilidad 18%;8778;-0.8960075857015082;-0.9290912497254494;-0.8629239216775669;TRUE
+1b. Norma nacional: harina y todos los derivados;3. Norma nacional y arroz (propuesta nacional);hierro_mg;Probabilidad, biodisponibilidad 18%;8778;-13.957599198645593;-14.469034171972734;-13.446164225318451;TRUE
+1c. Norma nacional y azúcar;0. Sin fortificación;hierro_mg;Probabilidad, biodisponibilidad 18%;8778;12.42392248684773;11.9830538761516;12.86479109754386;TRUE
+1c. Norma nacional y azúcar;1a. Norma nacional: harina y pan;hierro_mg;Probabilidad, biodisponibilidad 18%;8778;5.263661032680936;5.021275238674766;5.506046826687106;TRUE
+1c. Norma nacional y azúcar;1b. Norma nacional: harina y todos los derivados;hierro_mg;Probabilidad, biodisponibilidad 18%;8778;0;0;0;FALSE
+1c. Norma nacional y azúcar;2a. OMS: harina y derivados, consumo menor de 75 g;hierro_mg;Probabilidad, biodisponibilidad 18%;8778;-0.8960075857015082;-0.9290912497254494;-0.8629239216775669;TRUE
+1c. Norma nacional y azúcar;2b. OMS: harina y derivados, consumo de 75 a 149 g;hierro_mg;Probabilidad, biodisponibilidad 18%;8778;-0.8960075857015082;-0.9290912497254494;-0.8629239216775669;TRUE
+1c. Norma nacional y azúcar;3. Norma nacional y arroz (propuesta nacional);hierro_mg;Probabilidad, biodisponibilidad 18%;8778;-13.957599198645593;-14.469034171972734;-13.446164225318451;TRUE
+2a. OMS: harina y derivados, consumo menor de 75 g;0. Sin fortificación;hierro_mg;Probabilidad, biodisponibilidad 18%;8778;13.319930072549239;12.852595675919318;13.787264469179158;TRUE
+2a. OMS: harina y derivados, consumo menor de 75 g;1a. Norma nacional: harina y pan;hierro_mg;Probabilidad, biodisponibilidad 18%;8778;6.159668618382444;5.896321280943415;6.423015955821473;TRUE
+2a. OMS: harina y derivados, consumo menor de 75 g;1b. Norma nacional: harina y todos los derivados;hierro_mg;Probabilidad, biodisponibilidad 18%;8778;0.8960075857015082;0.8629239216775669;0.9290912497254494;TRUE
+2a. OMS: harina y derivados, consumo menor de 75 g;1c. Norma nacional y azúcar;hierro_mg;Probabilidad, biodisponibilidad 18%;8778;0.8960075857015082;0.8629239216775669;0.9290912497254494;TRUE
+2a. OMS: harina y derivados, consumo menor de 75 g;2b. OMS: harina y derivados, consumo de 75 a 149 g;hierro_mg;Probabilidad, biodisponibilidad 18%;8778;0;0;0;FALSE
+2a. OMS: harina y derivados, consumo menor de 75 g;3. Norma nacional y arroz (propuesta nacional);hierro_mg;Probabilidad, biodisponibilidad 18%;8778;-13.061591612944085;-13.563670320383803;-12.559512905504366;TRUE
+2b. OMS: harina y derivados, consumo de 75 a 149 g;0. Sin fortificación;hierro_mg;Probabilidad, biodisponibilidad 18%;8778;13.319930072549239;12.852595675919318;13.787264469179158;TRUE
+2b. OMS: harina y derivados, consumo de 75 a 149 g;1a. Norma nacional: harina y pan;hierro_mg;Probabilidad, biodisponibilidad 18%;8778;6.159668618382444;5.896321280943415;6.423015955821473;TRUE
+2b. OMS: harina y derivados, consumo de 75 a 149 g;1b. Norma nacional: harina y todos los derivados;hierro_mg;Probabilidad, biodisponibilidad 18%;8778;0.8960075857015082;0.8629239216775669;0.9290912497254494;TRUE
+2b. OMS: harina y derivados, consumo de 75 a 149 g;1c. Norma nacional y azúcar;hierro_mg;Probabilidad, biodisponibilidad 18%;8778;0.8960075857015082;0.8629239216775669;0.9290912497254494;TRUE
+2b. OMS: harina y derivados, consumo de 75 a 149 g;2a. OMS: harina y derivados, consumo menor de 75 g;hierro_mg;Probabilidad, biodisponibilidad 18%;8778;0;0;0;FALSE
+2b. OMS: harina y derivados, consumo de 75 a 149 g;3. Norma nacional y arroz (propuesta nacional);hierro_mg;Probabilidad, biodisponibilidad 18%;8778;-13.061591612944085;-13.563670320383803;-12.559512905504366;TRUE
+3. Norma nacional y arroz (propuesta nacional);0. Sin fortificación;hierro_mg;Probabilidad, biodisponibilidad 18%;8778;26.381521685493325;25.658351482055792;27.10469188893086;TRUE
+3. Norma nacional y arroz (propuesta nacional);1a. Norma nacional: harina y pan;hierro_mg;Probabilidad, biodisponibilidad 18%;8778;19.22126023132653;18.61443777074447;19.828082691908588;TRUE
+3. Norma nacional y arroz (propuesta nacional);1b. Norma nacional: harina y todos los derivados;hierro_mg;Probabilidad, biodisponibilidad 18%;8778;13.957599198645593;13.446164225318451;14.469034171972734;TRUE
+3. Norma nacional y arroz (propuesta nacional);1c. Norma nacional y azúcar;hierro_mg;Probabilidad, biodisponibilidad 18%;8778;13.957599198645593;13.446164225318451;14.469034171972734;TRUE
+3. Norma nacional y arroz (propuesta nacional);2a. OMS: harina y derivados, consumo menor de 75 g;hierro_mg;Probabilidad, biodisponibilidad 18%;8778;13.061591612944085;12.559512905504366;13.563670320383803;TRUE
+3. Norma nacional y arroz (propuesta nacional);2b. OMS: harina y derivados, consumo de 75 a 149 g;hierro_mg;Probabilidad, biodisponibilidad 18%;8778;13.061591612944085;12.559512905504366;13.563670320383803;TRUE
+0. Sin fortificación;1a. Norma nacional: harina y pan;vitamina_a_mcg_rae;Punto de corte;8778;0;0;0;FALSE
+0. Sin fortificación;1b. Norma nacional: harina y todos los derivados;vitamina_a_mcg_rae;Punto de corte;8778;0;0;0;FALSE
+0. Sin fortificación;1c. Norma nacional y azúcar;vitamina_a_mcg_rae;Punto de corte;8778;-39.64149805997787;-41.01032137324069;-38.27267474671505;TRUE
+0. Sin fortificación;2a. OMS: harina y derivados, consumo menor de 75 g;vitamina_a_mcg_rae;Punto de corte;8778;-30.179757571736708;-31.397423873158864;-28.962091270314556;TRUE
+0. Sin fortificación;2b. OMS: harina y derivados, consumo de 75 a 149 g;vitamina_a_mcg_rae;Punto de corte;8778;-14.998386503250224;-15.944355551822422;-14.052417454678027;TRUE
+0. Sin fortificación;3. Norma nacional y arroz (propuesta nacional);vitamina_a_mcg_rae;Punto de corte;8778;0;0;0;FALSE
+1a. Norma nacional: harina y pan;0. Sin fortificación;vitamina_a_mcg_rae;Punto de corte;8778;0;0;0;FALSE
+1a. Norma nacional: harina y pan;1b. Norma nacional: harina y todos los derivados;vitamina_a_mcg_rae;Punto de corte;8778;0;0;0;FALSE
+1a. Norma nacional: harina y pan;1c. Norma nacional y azúcar;vitamina_a_mcg_rae;Punto de corte;8778;-39.64149805997787;-41.01032137324069;-38.27267474671505;TRUE
+1a. Norma nacional: harina y pan;2a. OMS: harina y derivados, consumo menor de 75 g;vitamina_a_mcg_rae;Punto de corte;8778;-30.179757571736708;-31.397423873158864;-28.962091270314556;TRUE
+1a. Norma nacional: harina y pan;2b. OMS: harina y derivados, consumo de 75 a 149 g;vitamina_a_mcg_rae;Punto de corte;8778;-14.998386503250224;-15.944355551822422;-14.052417454678027;TRUE
+1a. Norma nacional: harina y pan;3. Norma nacional y arroz (propuesta nacional);vitamina_a_mcg_rae;Punto de corte;8778;0;0;0;FALSE
+1b. Norma nacional: harina y todos los derivados;0. Sin fortificación;vitamina_a_mcg_rae;Punto de corte;8778;0;0;0;FALSE
+1b. Norma nacional: harina y todos los derivados;1a. Norma nacional: harina y pan;vitamina_a_mcg_rae;Punto de corte;8778;0;0;0;FALSE
+1b. Norma nacional: harina y todos los derivados;1c. Norma nacional y azúcar;vitamina_a_mcg_rae;Punto de corte;8778;-39.64149805997787;-41.01032137324069;-38.27267474671505;TRUE
+1b. Norma nacional: harina y todos los derivados;2a. OMS: harina y derivados, consumo menor de 75 g;vitamina_a_mcg_rae;Punto de corte;8778;-30.179757571736708;-31.397423873158864;-28.962091270314556;TRUE
+1b. Norma nacional: harina y todos los derivados;2b. OMS: harina y derivados, consumo de 75 a 149 g;vitamina_a_mcg_rae;Punto de corte;8778;-14.998386503250224;-15.944355551822422;-14.052417454678027;TRUE
+1b. Norma nacional: harina y todos los derivados;3. Norma nacional y arroz (propuesta nacional);vitamina_a_mcg_rae;Punto de corte;8778;0;0;0;FALSE
+1c. Norma nacional y azúcar;0. Sin fortificación;vitamina_a_mcg_rae;Punto de corte;8778;39.64149805997787;38.27267474671505;41.01032137324069;TRUE
+1c. Norma nacional y azúcar;1a. Norma nacional: harina y pan;vitamina_a_mcg_rae;Punto de corte;8778;39.64149805997787;38.27267474671505;41.01032137324069;TRUE
+1c. Norma nacional y azúcar;1b. Norma nacional: harina y todos los derivados;vitamina_a_mcg_rae;Punto de corte;8778;39.64149805997787;38.27267474671505;41.01032137324069;TRUE
+1c. Norma nacional y azúcar;2a. OMS: harina y derivados, consumo menor de 75 g;vitamina_a_mcg_rae;Punto de corte;8778;9.461740488241162;8.073841950645866;10.849639025836458;TRUE
+1c. Norma nacional y azúcar;2b. OMS: harina y derivados, consumo de 75 a 149 g;vitamina_a_mcg_rae;Punto de corte;8778;24.643111556727646;23.276982717603477;26.009240395851812;TRUE
+1c. Norma nacional y azúcar;3. Norma nacional y arroz (propuesta nacional);vitamina_a_mcg_rae;Punto de corte;8778;39.64149805997787;38.27267474671505;41.01032137324069;TRUE
+2a. OMS: harina y derivados, consumo menor de 75 g;0. Sin fortificación;vitamina_a_mcg_rae;Punto de corte;8778;30.179757571736708;28.962091270314556;31.397423873158864;TRUE
+2a. OMS: harina y derivados, consumo menor de 75 g;1a. Norma nacional: harina y pan;vitamina_a_mcg_rae;Punto de corte;8778;30.179757571736708;28.962091270314556;31.397423873158864;TRUE
+2a. OMS: harina y derivados, consumo menor de 75 g;1b. Norma nacional: harina y todos los derivados;vitamina_a_mcg_rae;Punto de corte;8778;30.179757571736708;28.962091270314556;31.397423873158864;TRUE
+2a. OMS: harina y derivados, consumo menor de 75 g;1c. Norma nacional y azúcar;vitamina_a_mcg_rae;Punto de corte;8778;-9.461740488241162;-10.849639025836458;-8.073841950645866;TRUE
+2a. OMS: harina y derivados, consumo menor de 75 g;2b. OMS: harina y derivados, consumo de 75 a 149 g;vitamina_a_mcg_rae;Punto de corte;8778;15.181371068486484;14.32415740765344;16.03858472931953;TRUE
+2a. OMS: harina y derivados, consumo menor de 75 g;3. Norma nacional y arroz (propuesta nacional);vitamina_a_mcg_rae;Punto de corte;8778;30.179757571736708;28.962091270314556;31.397423873158864;TRUE
+2b. OMS: harina y derivados, consumo de 75 a 149 g;0. Sin fortificación;vitamina_a_mcg_rae;Punto de corte;8778;14.998386503250224;14.052417454678027;15.944355551822422;TRUE
+2b. OMS: harina y derivados, consumo de 75 a 149 g;1a. Norma nacional: harina y pan;vitamina_a_mcg_rae;Punto de corte;8778;14.998386503250224;14.052417454678027;15.944355551822422;TRUE
+2b. OMS: harina y derivados, consumo de 75 a 149 g;1b. Norma nacional: harina y todos los derivados;vitamina_a_mcg_rae;Punto de corte;8778;14.998386503250224;14.052417454678027;15.944355551822422;TRUE
+2b. OMS: harina y derivados, consumo de 75 a 149 g;1c. Norma nacional y azúcar;vitamina_a_mcg_rae;Punto de corte;8778;-24.643111556727646;-26.009240395851812;-23.276982717603477;TRUE
+2b. OMS: harina y derivados, consumo de 75 a 149 g;2a. OMS: harina y derivados, consumo menor de 75 g;vitamina_a_mcg_rae;Punto de corte;8778;-15.181371068486484;-16.03858472931953;-14.32415740765344;TRUE
+2b. OMS: harina y derivados, consumo de 75 a 149 g;3. Norma nacional y arroz (propuesta nacional);vitamina_a_mcg_rae;Punto de corte;8778;14.998386503250224;14.052417454678027;15.944355551822422;TRUE
+3. Norma nacional y arroz (propuesta nacional);0. Sin fortificación;vitamina_a_mcg_rae;Punto de corte;8778;0;0;0;FALSE
+3. Norma nacional y arroz (propuesta nacional);1a. Norma nacional: harina y pan;vitamina_a_mcg_rae;Punto de corte;8778;0;0;0;FALSE
+3. Norma nacional y arroz (propuesta nacional);1b. Norma nacional: harina y todos los derivados;vitamina_a_mcg_rae;Punto de corte;8778;0;0;0;FALSE
+3. Norma nacional y arroz (propuesta nacional);1c. Norma nacional y azúcar;vitamina_a_mcg_rae;Punto de corte;8778;-39.64149805997787;-41.01032137324069;-38.27267474671505;TRUE
+3. Norma nacional y arroz (propuesta nacional);2a. OMS: harina y derivados, consumo menor de 75 g;vitamina_a_mcg_rae;Punto de corte;8778;-30.179757571736708;-31.397423873158864;-28.962091270314556;TRUE
+3. Norma nacional y arroz (propuesta nacional);2b. OMS: harina y derivados, consumo de 75 a 149 g;vitamina_a_mcg_rae;Punto de corte;8778;-14.998386503250224;-15.944355551822422;-14.052417454678027;TRUE
+0. Sin fortificación;1a. Norma nacional: harina y pan;vitamina_b12_mcg;Punto de corte;8778;0;0;0;FALSE
+0. Sin fortificación;1b. Norma nacional: harina y todos los derivados;vitamina_b12_mcg;Punto de corte;8778;0;0;0;FALSE
+0. Sin fortificación;1c. Norma nacional y azúcar;vitamina_b12_mcg;Punto de corte;8778;0;0;0;FALSE
+0. Sin fortificación;2a. OMS: harina y derivados, consumo menor de 75 g;vitamina_b12_mcg;Punto de corte;8778;-26.049146316090223;-27.306276017722574;-24.792016614457868;TRUE
+0. Sin fortificación;2b. OMS: harina y derivados, consumo de 75 a 149 g;vitamina_b12_mcg;Punto de corte;8778;-15.837969158212248;-16.828306429198275;-14.847631887226221;TRUE
+0. Sin fortificación;3. Norma nacional y arroz (propuesta nacional);vitamina_b12_mcg;Punto de corte;8778;-28.055685188441494;-29.320851508036448;-26.790518868846537;TRUE
+1a. Norma nacional: harina y pan;0. Sin fortificación;vitamina_b12_mcg;Punto de corte;8778;0;0;0;FALSE
+1a. Norma nacional: harina y pan;1b. Norma nacional: harina y todos los derivados;vitamina_b12_mcg;Punto de corte;8778;0;0;0;FALSE
+1a. Norma nacional: harina y pan;1c. Norma nacional y azúcar;vitamina_b12_mcg;Punto de corte;8778;0;0;0;FALSE
+1a. Norma nacional: harina y pan;2a. OMS: harina y derivados, consumo menor de 75 g;vitamina_b12_mcg;Punto de corte;8778;-26.049146316090223;-27.306276017722574;-24.792016614457868;TRUE
+1a. Norma nacional: harina y pan;2b. OMS: harina y derivados, consumo de 75 a 149 g;vitamina_b12_mcg;Punto de corte;8778;-15.837969158212248;-16.828306429198275;-14.847631887226221;TRUE
+1a. Norma nacional: harina y pan;3. Norma nacional y arroz (propuesta nacional);vitamina_b12_mcg;Punto de corte;8778;-28.055685188441494;-29.320851508036448;-26.790518868846537;TRUE
+1b. Norma nacional: harina y todos los derivados;0. Sin fortificación;vitamina_b12_mcg;Punto de corte;8778;0;0;0;FALSE
+1b. Norma nacional: harina y todos los derivados;1a. Norma nacional: harina y pan;vitamina_b12_mcg;Punto de corte;8778;0;0;0;FALSE
+1b. Norma nacional: harina y todos los derivados;1c. Norma nacional y azúcar;vitamina_b12_mcg;Punto de corte;8778;0;0;0;FALSE
+1b. Norma nacional: harina y todos los derivados;2a. OMS: harina y derivados, consumo menor de 75 g;vitamina_b12_mcg;Punto de corte;8778;-26.049146316090223;-27.306276017722574;-24.792016614457868;TRUE
+1b. Norma nacional: harina y todos los derivados;2b. OMS: harina y derivados, consumo de 75 a 149 g;vitamina_b12_mcg;Punto de corte;8778;-15.837969158212248;-16.828306429198275;-14.847631887226221;TRUE
+1b. Norma nacional: harina y todos los derivados;3. Norma nacional y arroz (propuesta nacional);vitamina_b12_mcg;Punto de corte;8778;-28.055685188441494;-29.320851508036448;-26.790518868846537;TRUE
+1c. Norma nacional y azúcar;0. Sin fortificación;vitamina_b12_mcg;Punto de corte;8778;0;0;0;FALSE
+1c. Norma nacional y azúcar;1a. Norma nacional: harina y pan;vitamina_b12_mcg;Punto de corte;8778;0;0;0;FALSE
+1c. Norma nacional y azúcar;1b. Norma nacional: harina y todos los derivados;vitamina_b12_mcg;Punto de corte;8778;0;0;0;FALSE
+1c. Norma nacional y azúcar;2a. OMS: harina y derivados, consumo menor de 75 g;vitamina_b12_mcg;Punto de corte;8778;-26.049146316090223;-27.306276017722574;-24.792016614457868;TRUE
+1c. Norma nacional y azúcar;2b. OMS: harina y derivados, consumo de 75 a 149 g;vitamina_b12_mcg;Punto de corte;8778;-15.837969158212248;-16.828306429198275;-14.847631887226221;TRUE
+1c. Norma nacional y azúcar;3. Norma nacional y arroz (propuesta nacional);vitamina_b12_mcg;Punto de corte;8778;-28.055685188441494;-29.320851508036448;-26.790518868846537;TRUE
+2a. OMS: harina y derivados, consumo menor de 75 g;0. Sin fortificación;vitamina_b12_mcg;Punto de corte;8778;26.049146316090223;24.792016614457868;27.306276017722574;TRUE
+2a. OMS: harina y derivados, consumo menor de 75 g;1a. Norma nacional: harina y pan;vitamina_b12_mcg;Punto de corte;8778;26.049146316090223;24.792016614457868;27.306276017722574;TRUE
+2a. OMS: harina y derivados, consumo menor de 75 g;1b. Norma nacional: harina y todos los derivados;vitamina_b12_mcg;Punto de corte;8778;26.049146316090223;24.792016614457868;27.306276017722574;TRUE
+2a. OMS: harina y derivados, consumo menor de 75 g;1c. Norma nacional y azúcar;vitamina_b12_mcg;Punto de corte;8778;26.049146316090223;24.792016614457868;27.306276017722574;TRUE
+2a. OMS: harina y derivados, consumo menor de 75 g;2b. OMS: harina y derivados, consumo de 75 a 149 g;vitamina_b12_mcg;Punto de corte;8778;10.211177157877975;9.42840512441999;10.99394919133596;TRUE
+2a. OMS: harina y derivados, consumo menor de 75 g;3. Norma nacional y arroz (propuesta nacional);vitamina_b12_mcg;Punto de corte;8778;-2.0065388723512676;-3.170539157832079;-0.842538586870456;TRUE
+2b. OMS: harina y derivados, consumo de 75 a 149 g;0. Sin fortificación;vitamina_b12_mcg;Punto de corte;8778;15.837969158212248;14.847631887226221;16.828306429198275;TRUE
+2b. OMS: harina y derivados, consumo de 75 a 149 g;1a. Norma nacional: harina y pan;vitamina_b12_mcg;Punto de corte;8778;15.837969158212248;14.847631887226221;16.828306429198275;TRUE
+2b. OMS: harina y derivados, consumo de 75 a 149 g;1b. Norma nacional: harina y todos los derivados;vitamina_b12_mcg;Punto de corte;8778;15.837969158212248;14.847631887226221;16.828306429198275;TRUE
+2b. OMS: harina y derivados, consumo de 75 a 149 g;1c. Norma nacional y azúcar;vitamina_b12_mcg;Punto de corte;8778;15.837969158212248;14.847631887226221;16.828306429198275;TRUE
+2b. OMS: harina y derivados, consumo de 75 a 149 g;2a. OMS: harina y derivados, consumo menor de 75 g;vitamina_b12_mcg;Punto de corte;8778;-10.211177157877975;-10.99394919133596;-9.42840512441999;TRUE
+2b. OMS: harina y derivados, consumo de 75 a 149 g;3. Norma nacional y arroz (propuesta nacional);vitamina_b12_mcg;Punto de corte;8778;-12.217716030229242;-13.427934352233265;-11.007497708225221;TRUE
+3. Norma nacional y arroz (propuesta nacional);0. Sin fortificación;vitamina_b12_mcg;Punto de corte;8778;28.055685188441494;26.790518868846537;29.320851508036448;TRUE
+3. Norma nacional y arroz (propuesta nacional);1a. Norma nacional: harina y pan;vitamina_b12_mcg;Punto de corte;8778;28.055685188441494;26.790518868846537;29.320851508036448;TRUE
+3. Norma nacional y arroz (propuesta nacional);1b. Norma nacional: harina y todos los derivados;vitamina_b12_mcg;Punto de corte;8778;28.055685188441494;26.790518868846537;29.320851508036448;TRUE
+3. Norma nacional y arroz (propuesta nacional);1c. Norma nacional y azúcar;vitamina_b12_mcg;Punto de corte;8778;28.055685188441494;26.790518868846537;29.320851508036448;TRUE
+3. Norma nacional y arroz (propuesta nacional);2a. OMS: harina y derivados, consumo menor de 75 g;vitamina_b12_mcg;Punto de corte;8778;2.0065388723512676;0.842538586870456;3.170539157832079;TRUE
+3. Norma nacional y arroz (propuesta nacional);2b. OMS: harina y derivados, consumo de 75 a 149 g;vitamina_b12_mcg;Punto de corte;8778;12.217716030229242;11.007497708225221;13.427934352233265;TRUE
+0. Sin fortificación;1a. Norma nacional: harina y pan;vitamina_d_mcg;Punto de corte;8778;0;0;0;FALSE
+0. Sin fortificación;1b. Norma nacional: harina y todos los derivados;vitamina_d_mcg;Punto de corte;8778;0;0;0;FALSE
+0. Sin fortificación;1c. Norma nacional y azúcar;vitamina_d_mcg;Punto de corte;8778;0;0;0;FALSE
+0. Sin fortificación;2a. OMS: harina y derivados, consumo menor de 75 g;vitamina_d_mcg;Punto de corte;8778;0;0;0;FALSE
+0. Sin fortificación;2b. OMS: harina y derivados, consumo de 75 a 149 g;vitamina_d_mcg;Punto de corte;8778;0;0;0;FALSE
+0. Sin fortificación;3. Norma nacional y arroz (propuesta nacional);vitamina_d_mcg;Punto de corte;8778;0;0;0;FALSE
+1a. Norma nacional: harina y pan;0. Sin fortificación;vitamina_d_mcg;Punto de corte;8778;0;0;0;FALSE
+1a. Norma nacional: harina y pan;1b. Norma nacional: harina y todos los derivados;vitamina_d_mcg;Punto de corte;8778;0;0;0;FALSE
+1a. Norma nacional: harina y pan;1c. Norma nacional y azúcar;vitamina_d_mcg;Punto de corte;8778;0;0;0;FALSE
+1a. Norma nacional: harina y pan;2a. OMS: harina y derivados, consumo menor de 75 g;vitamina_d_mcg;Punto de corte;8778;0;0;0;FALSE
+1a. Norma nacional: harina y pan;2b. OMS: harina y derivados, consumo de 75 a 149 g;vitamina_d_mcg;Punto de corte;8778;0;0;0;FALSE
+1a. Norma nacional: harina y pan;3. Norma nacional y arroz (propuesta nacional);vitamina_d_mcg;Punto de corte;8778;0;0;0;FALSE
+1b. Norma nacional: harina y todos los derivados;0. Sin fortificación;vitamina_d_mcg;Punto de corte;8778;0;0;0;FALSE
+1b. Norma nacional: harina y todos los derivados;1a. Norma nacional: harina y pan;vitamina_d_mcg;Punto de corte;8778;0;0;0;FALSE
+1b. Norma nacional: harina y todos los derivados;1c. Norma nacional y azúcar;vitamina_d_mcg;Punto de corte;8778;0;0;0;FALSE
+1b. Norma nacional: harina y todos los derivados;2a. OMS: harina y derivados, consumo menor de 75 g;vitamina_d_mcg;Punto de corte;8778;0;0;0;FALSE
+1b. Norma nacional: harina y todos los derivados;2b. OMS: harina y derivados, consumo de 75 a 149 g;vitamina_d_mcg;Punto de corte;8778;0;0;0;FALSE
+1b. Norma nacional: harina y todos los derivados;3. Norma nacional y arroz (propuesta nacional);vitamina_d_mcg;Punto de corte;8778;0;0;0;FALSE
+1c. Norma nacional y azúcar;0. Sin fortificación;vitamina_d_mcg;Punto de corte;8778;0;0;0;FALSE
+1c. Norma nacional y azúcar;1a. Norma nacional: harina y pan;vitamina_d_mcg;Punto de corte;8778;0;0;0;FALSE
+1c. Norma nacional y azúcar;1b. Norma nacional: harina y todos los derivados;vitamina_d_mcg;Punto de corte;8778;0;0;0;FALSE
+1c. Norma nacional y azúcar;2a. OMS: harina y derivados, consumo menor de 75 g;vitamina_d_mcg;Punto de corte;8778;0;0;0;FALSE
+1c. Norma nacional y azúcar;2b. OMS: harina y derivados, consumo de 75 a 149 g;vitamina_d_mcg;Punto de corte;8778;0;0;0;FALSE
+1c. Norma nacional y azúcar;3. Norma nacional y arroz (propuesta nacional);vitamina_d_mcg;Punto de corte;8778;0;0;0;FALSE
+2a. OMS: harina y derivados, consumo menor de 75 g;0. Sin fortificación;vitamina_d_mcg;Punto de corte;8778;0;0;0;FALSE
+2a. OMS: harina y derivados, consumo menor de 75 g;1a. Norma nacional: harina y pan;vitamina_d_mcg;Punto de corte;8778;0;0;0;FALSE
+2a. OMS: harina y derivados, consumo menor de 75 g;1b. Norma nacional: harina y todos los derivados;vitamina_d_mcg;Punto de corte;8778;0;0;0;FALSE
+2a. OMS: harina y derivados, consumo menor de 75 g;1c. Norma nacional y azúcar;vitamina_d_mcg;Punto de corte;8778;0;0;0;FALSE
+2a. OMS: harina y derivados, consumo menor de 75 g;2b. OMS: harina y derivados, consumo de 75 a 149 g;vitamina_d_mcg;Punto de corte;8778;0;0;0;FALSE
+2a. OMS: harina y derivados, consumo menor de 75 g;3. Norma nacional y arroz (propuesta nacional);vitamina_d_mcg;Punto de corte;8778;0;0;0;FALSE
+2b. OMS: harina y derivados, consumo de 75 a 149 g;0. Sin fortificación;vitamina_d_mcg;Punto de corte;8778;0;0;0;FALSE
+2b. OMS: harina y derivados, consumo de 75 a 149 g;1a. Norma nacional: harina y pan;vitamina_d_mcg;Punto de corte;8778;0;0;0;FALSE
+2b. OMS: harina y derivados, consumo de 75 a 149 g;1b. Norma nacional: harina y todos los derivados;vitamina_d_mcg;Punto de corte;8778;0;0;0;FALSE
+2b. OMS: harina y derivados, consumo de 75 a 149 g;1c. Norma nacional y azúcar;vitamina_d_mcg;Punto de corte;8778;0;0;0;FALSE
+2b. OMS: harina y derivados, consumo de 75 a 149 g;2a. OMS: harina y derivados, consumo menor de 75 g;vitamina_d_mcg;Punto de corte;8778;0;0;0;FALSE
+2b. OMS: harina y derivados, consumo de 75 a 149 g;3. Norma nacional y arroz (propuesta nacional);vitamina_d_mcg;Punto de corte;8778;0;0;0;FALSE
+3. Norma nacional y arroz (propuesta nacional);0. Sin fortificación;vitamina_d_mcg;Punto de corte;8778;0;0;0;FALSE
+3. Norma nacional y arroz (propuesta nacional);1a. Norma nacional: harina y pan;vitamina_d_mcg;Punto de corte;8778;0;0;0;FALSE
+3. Norma nacional y arroz (propuesta nacional);1b. Norma nacional: harina y todos los derivados;vitamina_d_mcg;Punto de corte;8778;0;0;0;FALSE
+3. Norma nacional y arroz (propuesta nacional);1c. Norma nacional y azúcar;vitamina_d_mcg;Punto de corte;8778;0;0;0;FALSE
+3. Norma nacional y arroz (propuesta nacional);2a. OMS: harina y derivados, consumo menor de 75 g;vitamina_d_mcg;Punto de corte;8778;0;0;0;FALSE
+3. Norma nacional y arroz (propuesta nacional);2b. OMS: harina y derivados, consumo de 75 a 149 g;vitamina_d_mcg;Punto de corte;8778;0;0;0;FALSE
+0. Sin fortificación;1a. Norma nacional: harina y pan;vitamina_e_mg;Punto de corte;8778;0;0;0;FALSE
+0. Sin fortificación;1b. Norma nacional: harina y todos los derivados;vitamina_e_mg;Punto de corte;8778;0;0;0;FALSE
+0. Sin fortificación;1c. Norma nacional y azúcar;vitamina_e_mg;Punto de corte;8778;0;0;0;FALSE
+0. Sin fortificación;2a. OMS: harina y derivados, consumo menor de 75 g;vitamina_e_mg;Punto de corte;8778;0;0;0;FALSE
+0. Sin fortificación;2b. OMS: harina y derivados, consumo de 75 a 149 g;vitamina_e_mg;Punto de corte;8778;0;0;0;FALSE
+0. Sin fortificación;3. Norma nacional y arroz (propuesta nacional);vitamina_e_mg;Punto de corte;8778;0;0;0;FALSE
+1a. Norma nacional: harina y pan;0. Sin fortificación;vitamina_e_mg;Punto de corte;8778;0;0;0;FALSE
+1a. Norma nacional: harina y pan;1b. Norma nacional: harina y todos los derivados;vitamina_e_mg;Punto de corte;8778;0;0;0;FALSE
+1a. Norma nacional: harina y pan;1c. Norma nacional y azúcar;vitamina_e_mg;Punto de corte;8778;0;0;0;FALSE
+1a. Norma nacional: harina y pan;2a. OMS: harina y derivados, consumo menor de 75 g;vitamina_e_mg;Punto de corte;8778;0;0;0;FALSE
+1a. Norma nacional: harina y pan;2b. OMS: harina y derivados, consumo de 75 a 149 g;vitamina_e_mg;Punto de corte;8778;0;0;0;FALSE
+1a. Norma nacional: harina y pan;3. Norma nacional y arroz (propuesta nacional);vitamina_e_mg;Punto de corte;8778;0;0;0;FALSE
+1b. Norma nacional: harina y todos los derivados;0. Sin fortificación;vitamina_e_mg;Punto de corte;8778;0;0;0;FALSE
+1b. Norma nacional: harina y todos los derivados;1a. Norma nacional: harina y pan;vitamina_e_mg;Punto de corte;8778;0;0;0;FALSE
+1b. Norma nacional: harina y todos los derivados;1c. Norma nacional y azúcar;vitamina_e_mg;Punto de corte;8778;0;0;0;FALSE
+1b. Norma nacional: harina y todos los derivados;2a. OMS: harina y derivados, consumo menor de 75 g;vitamina_e_mg;Punto de corte;8778;0;0;0;FALSE
+1b. Norma nacional: harina y todos los derivados;2b. OMS: harina y derivados, consumo de 75 a 149 g;vitamina_e_mg;Punto de corte;8778;0;0;0;FALSE
+1b. Norma nacional: harina y todos los derivados;3. Norma nacional y arroz (propuesta nacional);vitamina_e_mg;Punto de corte;8778;0;0;0;FALSE
+1c. Norma nacional y azúcar;0. Sin fortificación;vitamina_e_mg;Punto de corte;8778;0;0;0;FALSE
+1c. Norma nacional y azúcar;1a. Norma nacional: harina y pan;vitamina_e_mg;Punto de corte;8778;0;0;0;FALSE
+1c. Norma nacional y azúcar;1b. Norma nacional: harina y todos los derivados;vitamina_e_mg;Punto de corte;8778;0;0;0;FALSE
+1c. Norma nacional y azúcar;2a. OMS: harina y derivados, consumo menor de 75 g;vitamina_e_mg;Punto de corte;8778;0;0;0;FALSE
+1c. Norma nacional y azúcar;2b. OMS: harina y derivados, consumo de 75 a 149 g;vitamina_e_mg;Punto de corte;8778;0;0;0;FALSE
+1c. Norma nacional y azúcar;3. Norma nacional y arroz (propuesta nacional);vitamina_e_mg;Punto de corte;8778;0;0;0;FALSE
+2a. OMS: harina y derivados, consumo menor de 75 g;0. Sin fortificación;vitamina_e_mg;Punto de corte;8778;0;0;0;FALSE
+2a. OMS: harina y derivados, consumo menor de 75 g;1a. Norma nacional: harina y pan;vitamina_e_mg;Punto de corte;8778;0;0;0;FALSE
+2a. OMS: harina y derivados, consumo menor de 75 g;1b. Norma nacional: harina y todos los derivados;vitamina_e_mg;Punto de corte;8778;0;0;0;FALSE
+2a. OMS: harina y derivados, consumo menor de 75 g;1c. Norma nacional y azúcar;vitamina_e_mg;Punto de corte;8778;0;0;0;FALSE
+2a. OMS: harina y derivados, consumo menor de 75 g;2b. OMS: harina y derivados, consumo de 75 a 149 g;vitamina_e_mg;Punto de corte;8778;0;0;0;FALSE
+2a. OMS: harina y derivados, consumo menor de 75 g;3. Norma nacional y arroz (propuesta nacional);vitamina_e_mg;Punto de corte;8778;0;0;0;FALSE
+2b. OMS: harina y derivados, consumo de 75 a 149 g;0. Sin fortificación;vitamina_e_mg;Punto de corte;8778;0;0;0;FALSE
+2b. OMS: harina y derivados, consumo de 75 a 149 g;1a. Norma nacional: harina y pan;vitamina_e_mg;Punto de corte;8778;0;0;0;FALSE
+2b. OMS: harina y derivados, consumo de 75 a 149 g;1b. Norma nacional: harina y todos los derivados;vitamina_e_mg;Punto de corte;8778;0;0;0;FALSE
+2b. OMS: harina y derivados, consumo de 75 a 149 g;1c. Norma nacional y azúcar;vitamina_e_mg;Punto de corte;8778;0;0;0;FALSE
+2b. OMS: harina y derivados, consumo de 75 a 149 g;2a. OMS: harina y derivados, consumo menor de 75 g;vitamina_e_mg;Punto de corte;8778;0;0;0;FALSE
+2b. OMS: harina y derivados, consumo de 75 a 149 g;3. Norma nacional y arroz (propuesta nacional);vitamina_e_mg;Punto de corte;8778;0;0;0;FALSE
+3. Norma nacional y arroz (propuesta nacional);0. Sin fortificación;vitamina_e_mg;Punto de corte;8778;0;0;0;FALSE
+3. Norma nacional y arroz (propuesta nacional);1a. Norma nacional: harina y pan;vitamina_e_mg;Punto de corte;8778;0;0;0;FALSE
+3. Norma nacional y arroz (propuesta nacional);1b. Norma nacional: harina y todos los derivados;vitamina_e_mg;Punto de corte;8778;0;0;0;FALSE
+3. Norma nacional y arroz (propuesta nacional);1c. Norma nacional y azúcar;vitamina_e_mg;Punto de corte;8778;0;0;0;FALSE
+3. Norma nacional y arroz (propuesta nacional);2a. OMS: harina y derivados, consumo menor de 75 g;vitamina_e_mg;Punto de corte;8778;0;0;0;FALSE
+3. Norma nacional y arroz (propuesta nacional);2b. OMS: harina y derivados, consumo de 75 a 149 g;vitamina_e_mg;Punto de corte;8778;0;0;0;FALSE
+0. Sin fortificación;1a. Norma nacional: harina y pan;zinc_mg;Punto de corte;8778;0;0;0;FALSE
+0. Sin fortificación;1b. Norma nacional: harina y todos los derivados;zinc_mg;Punto de corte;8778;0;0;0;FALSE
+0. Sin fortificación;1c. Norma nacional y azúcar;zinc_mg;Punto de corte;8778;0;0;0;FALSE
+0. Sin fortificación;2a. OMS: harina y derivados, consumo menor de 75 g;zinc_mg;Punto de corte;8778;-22.39582836173871;-23.615751663565383;-21.175905059912044;TRUE
+0. Sin fortificación;2b. OMS: harina y derivados, consumo de 75 a 149 g;zinc_mg;Punto de corte;8778;-15.638506189250654;-16.619969725703303;-14.657042652798005;TRUE
+0. Sin fortificación;3. Norma nacional y arroz (propuesta nacional);zinc_mg;Punto de corte;8778;-22.320499518770156;-23.48700031379991;-21.153998723740404;TRUE
+1a. Norma nacional: harina y pan;0. Sin fortificación;zinc_mg;Punto de corte;8778;0;0;0;FALSE
+1a. Norma nacional: harina y pan;1b. Norma nacional: harina y todos los derivados;zinc_mg;Punto de corte;8778;0;0;0;FALSE
+1a. Norma nacional: harina y pan;1c. Norma nacional y azúcar;zinc_mg;Punto de corte;8778;0;0;0;FALSE
+1a. Norma nacional: harina y pan;2a. OMS: harina y derivados, consumo menor de 75 g;zinc_mg;Punto de corte;8778;-22.39582836173871;-23.615751663565383;-21.175905059912044;TRUE
+1a. Norma nacional: harina y pan;2b. OMS: harina y derivados, consumo de 75 a 149 g;zinc_mg;Punto de corte;8778;-15.638506189250654;-16.619969725703303;-14.657042652798005;TRUE
+1a. Norma nacional: harina y pan;3. Norma nacional y arroz (propuesta nacional);zinc_mg;Punto de corte;8778;-22.320499518770156;-23.48700031379991;-21.153998723740404;TRUE
+1b. Norma nacional: harina y todos los derivados;0. Sin fortificación;zinc_mg;Punto de corte;8778;0;0;0;FALSE
+1b. Norma nacional: harina y todos los derivados;1a. Norma nacional: harina y pan;zinc_mg;Punto de corte;8778;0;0;0;FALSE
+1b. Norma nacional: harina y todos los derivados;1c. Norma nacional y azúcar;zinc_mg;Punto de corte;8778;0;0;0;FALSE
+1b. Norma nacional: harina y todos los derivados;2a. OMS: harina y derivados, consumo menor de 75 g;zinc_mg;Punto de corte;8778;-22.39582836173871;-23.615751663565383;-21.175905059912044;TRUE
+1b. Norma nacional: harina y todos los derivados;2b. OMS: harina y derivados, consumo de 75 a 149 g;zinc_mg;Punto de corte;8778;-15.638506189250654;-16.619969725703303;-14.657042652798005;TRUE
+1b. Norma nacional: harina y todos los derivados;3. Norma nacional y arroz (propuesta nacional);zinc_mg;Punto de corte;8778;-22.320499518770156;-23.48700031379991;-21.153998723740404;TRUE
+1c. Norma nacional y azúcar;0. Sin fortificación;zinc_mg;Punto de corte;8778;0;0;0;FALSE
+1c. Norma nacional y azúcar;1a. Norma nacional: harina y pan;zinc_mg;Punto de corte;8778;0;0;0;FALSE
+1c. Norma nacional y azúcar;1b. Norma nacional: harina y todos los derivados;zinc_mg;Punto de corte;8778;0;0;0;FALSE
+1c. Norma nacional y azúcar;2a. OMS: harina y derivados, consumo menor de 75 g;zinc_mg;Punto de corte;8778;-22.39582836173871;-23.615751663565383;-21.175905059912044;TRUE
+1c. Norma nacional y azúcar;2b. OMS: harina y derivados, consumo de 75 a 149 g;zinc_mg;Punto de corte;8778;-15.638506189250654;-16.619969725703303;-14.657042652798005;TRUE
+1c. Norma nacional y azúcar;3. Norma nacional y arroz (propuesta nacional);zinc_mg;Punto de corte;8778;-22.320499518770156;-23.48700031379991;-21.153998723740404;TRUE
+2a. OMS: harina y derivados, consumo menor de 75 g;0. Sin fortificación;zinc_mg;Punto de corte;8778;22.39582836173871;21.175905059912044;23.615751663565383;TRUE
+2a. OMS: harina y derivados, consumo menor de 75 g;1a. Norma nacional: harina y pan;zinc_mg;Punto de corte;8778;22.39582836173871;21.175905059912044;23.615751663565383;TRUE
+2a. OMS: harina y derivados, consumo menor de 75 g;1b. Norma nacional: harina y todos los derivados;zinc_mg;Punto de corte;8778;22.39582836173871;21.175905059912044;23.615751663565383;TRUE
+2a. OMS: harina y derivados, consumo menor de 75 g;1c. Norma nacional y azúcar;zinc_mg;Punto de corte;8778;22.39582836173871;21.175905059912044;23.615751663565383;TRUE
+2a. OMS: harina y derivados, consumo menor de 75 g;2b. OMS: harina y derivados, consumo de 75 a 149 g;zinc_mg;Punto de corte;8778;6.757322172488058;6.070056907462165;7.44458743751395;TRUE
+2a. OMS: harina y derivados, consumo menor de 75 g;3. Norma nacional y arroz (propuesta nacional);zinc_mg;Punto de corte;8778;0.0753288429685533;-0.9166151332389658;1.0672728191760725;FALSE
+2b. OMS: harina y derivados, consumo de 75 a 149 g;0. Sin fortificación;zinc_mg;Punto de corte;8778;15.638506189250654;14.657042652798005;16.619969725703303;TRUE
+2b. OMS: harina y derivados, consumo de 75 a 149 g;1a. Norma nacional: harina y pan;zinc_mg;Punto de corte;8778;15.638506189250654;14.657042652798005;16.619969725703303;TRUE
+2b. OMS: harina y derivados, consumo de 75 a 149 g;1b. Norma nacional: harina y todos los derivados;zinc_mg;Punto de corte;8778;15.638506189250654;14.657042652798005;16.619969725703303;TRUE
+2b. OMS: harina y derivados, consumo de 75 a 149 g;1c. Norma nacional y azúcar;zinc_mg;Punto de corte;8778;15.638506189250654;14.657042652798005;16.619969725703303;TRUE
+2b. OMS: harina y derivados, consumo de 75 a 149 g;2a. OMS: harina y derivados, consumo menor de 75 g;zinc_mg;Punto de corte;8778;-6.757322172488058;-7.44458743751395;-6.070056907462165;TRUE
+2b. OMS: harina y derivados, consumo de 75 a 149 g;3. Norma nacional y arroz (propuesta nacional);zinc_mg;Punto de corte;8778;-6.681993329519504;-7.666973446812965;-5.697013212226045;TRUE
+3. Norma nacional y arroz (propuesta nacional);0. Sin fortificación;zinc_mg;Punto de corte;8778;22.320499518770156;21.153998723740404;23.48700031379991;TRUE
+3. Norma nacional y arroz (propuesta nacional);1a. Norma nacional: harina y pan;zinc_mg;Punto de corte;8778;22.320499518770156;21.153998723740404;23.48700031379991;TRUE
+3. Norma nacional y arroz (propuesta nacional);1b. Norma nacional: harina y todos los derivados;zinc_mg;Punto de corte;8778;22.320499518770156;21.153998723740404;23.48700031379991;TRUE
+3. Norma nacional y arroz (propuesta nacional);1c. Norma nacional y azúcar;zinc_mg;Punto de corte;8778;22.320499518770156;21.153998723740404;23.48700031379991;TRUE
+3. Norma nacional y arroz (propuesta nacional);2a. OMS: harina y derivados, consumo menor de 75 g;zinc_mg;Punto de corte;8778;-0.0753288429685533;-1.0672728191760725;0.9166151332389658;FALSE
+3. Norma nacional y arroz (propuesta nacional);2b. OMS: harina y derivados, consumo de 75 a 149 g;zinc_mg;Punto de corte;8778;6.681993329519504;5.697013212226045;7.666973446812965;TRUE
