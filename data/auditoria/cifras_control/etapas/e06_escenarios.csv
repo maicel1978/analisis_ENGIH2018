@@ -1,0 +1,36 @@
+"escenario";"nutriente";"hogares";"base";"anadido";"ingesta"
+"0. Sin fortificación";"folato_mcg_dfe";8778;2474576.42028994;0;2474576.42028994
+"1a. Norma nacional: harina y pan";"folato_mcg_dfe";8778;2474576.42028994;672607.049513855;3147183.4698038
+"1b. Norma nacional: harina y todos los derivados";"folato_mcg_dfe";8778;2474576.42028994;1300014.79492948;3774591.21521943
+"1c. Norma nacional y azúcar";"folato_mcg_dfe";8778;2474576.42028994;1300014.79492948;3774591.21521943
+"2a. OMS: harina y derivados, consumo menor de 75 g";"folato_mcg_dfe";8778;2474576.42028994;3611152.20813745;6085728.6284274
+"2b. OMS: harina y derivados, consumo de 75 a 149 g";"folato_mcg_dfe";8778;2474576.42028994;1877799.14823148;4352375.56852142
+"3. Norma nacional y arroz (propuesta nacional)";"folato_mcg_dfe";8778;2474576.42028994;7529923.27533914;10004499.6956291
+"0. Sin fortificación";"hierro_mg";8778;98680.8879980392;0;98680.8879980392
+"1a. Norma nacional: harina y pan";"hierro_mg";8778;98680.8879980392;12089.3423932229;110770.230391262
+"1b. Norma nacional: harina y todos los derivados";"hierro_mg";8778;98680.8879980392;23366.2789938306;122047.16699187
+"1c. Norma nacional y azúcar";"hierro_mg";8778;98680.8879980392;23366.2789938306;122047.16699187
+"2a. OMS: harina y derivados, consumo menor de 75 g";"hierro_mg";8778;98680.8879980392;25490.4861750879;124171.374173127
+"2b. OMS: harina y derivados, consumo de 75 a 149 g";"hierro_mg";8778;98680.8879980392;25490.4861750879;124171.374173127
+"3. Norma nacional y arroz (propuesta nacional)";"hierro_mg";8778;98680.8879980392;72228.3062911613;170909.1942892
+"0. Sin fortificación";"vitamina_a_mcg_rae";8778;3763094.43696472;0;3763094.43696472
+"1a. Norma nacional: harina y pan";"vitamina_a_mcg_rae";8778;3763094.43696472;0;3763094.43696472
+"1b. Norma nacional: harina y todos los derivados";"vitamina_a_mcg_rae";8778;3763094.43696472;0;3763094.43696472
+"1c. Norma nacional y azúcar";"vitamina_a_mcg_rae";8778;3763094.43696472;4853160.99746223;8616255.43442695
+"2a. OMS: harina y derivados, consumo menor de 75 g";"vitamina_a_mcg_rae";8778;3763094.43696472;2506564.47388364;6269658.91084836
+"2b. OMS: harina y derivados, consumo de 75 a 149 g";"vitamina_a_mcg_rae";8778;3763094.43696472;1274524.3087544;5037618.74571912
+"3. Norma nacional y arroz (propuesta nacional)";"vitamina_a_mcg_rae";8778;3763094.43696472;0;3763094.43696472
+"0. Sin fortificación";"vitamina_b12_mcg";8778;30378.4135872977;0;30378.4135872977
+"1a. Norma nacional: harina y pan";"vitamina_b12_mcg";8778;30378.4135872977;0;30378.4135872977
+"1b. Norma nacional: harina y todos los derivados";"vitamina_b12_mcg";8778;30378.4135872977;0;30378.4135872977
+"1c. Norma nacional y azúcar";"vitamina_b12_mcg";8778;30378.4135872977;0;30378.4135872977
+"2a. OMS: harina y derivados, consumo menor de 75 g";"vitamina_b12_mcg";8778;30378.4135872977;16993.6574500586;47372.0710373564
+"2b. OMS: harina y derivados, consumo de 75 a 149 g";"vitamina_b12_mcg";8778;30378.4135872977;8496.8287250293;38875.242312327
+"3. Norma nacional y arroz (propuesta nacional)";"vitamina_b12_mcg";8778;30378.4135872977;20359.1780405544;50737.5916278522
+"0. Sin fortificación";"zinc_mg";8778;82067.6545130671;0;82067.6545130671
+"1a. Norma nacional: harina y pan";"zinc_mg";8778;82067.6545130671;0;82067.6545130671
+"1b. Norma nacional: harina y todos los derivados";"zinc_mg";8778;82067.6545130671;0;82067.6545130671
+"1c. Norma nacional y azúcar";"zinc_mg";8778;82067.6545130671;0;82067.6545130671
+"2a. OMS: harina y derivados, consumo menor de 75 g";"zinc_mg";8778;82067.6545130671;40359.9364438892;122427.590956956
+"2b. OMS: harina y derivados, consumo de 75 a 149 g";"zinc_mg";8778;82067.6545130671;23366.2789938306;105433.933506898
+"3. Norma nacional y arroz (propuesta nacional)";"zinc_mg";8778;82067.6545130671;50897.9451013861;132965.599614453
